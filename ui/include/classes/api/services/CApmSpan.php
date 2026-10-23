@@ -135,6 +135,14 @@ class CApmSpan extends CApmGeneral {
 			->where('t.Timestamp>=toDateTime64({time_from:Int32},9)', ['time_from' => ['Int32', $options['time_from']]])
 			->where('t.Timestamp<toDateTime64({time_till:Int32},9)', ['time_till' => ['Int32', $options['time_till']]]);
 
+		if (!$options['countOutput']) {
+			$fallback_sortfields = array_diff(['TraceId', 'SpanId'], $options['sortfield']);
+
+			foreach ($fallback_sortfields as $sortfield) {
+				$query->order('t.'.$sortfield);
+			}
+		}
+
 		if ($options['traceids'] !== null) {
 			$query->where('t.TraceId IN {traceids:Array(String)}', ['traceids' => ['String', $options['traceids']]]);
 		}

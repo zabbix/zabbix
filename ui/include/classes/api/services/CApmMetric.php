@@ -214,6 +214,10 @@ class CApmMetric extends CApmGeneral {
 			? array_intersect_key(self::CLICKHOUSE_METRICS_TABLES, array_flip($options['types']))
 			: self::CLICKHOUSE_METRICS_TABLES;
 
+		$fallback_sortfields = $options['countOutput']
+			? []
+			: array_diff(['TimeUnix', 'MetricName', 'ServiceName'], $options['sortfield']);
+
 		$sub_query_options = $options['countOutput']
 			? array_diff_key($options, array_flip(['output', 'sortfield', 'sortorder', 'limit', 'offset']))
 			: array_diff_key($options, array_flip(['output', 'limit', 'offset']));
@@ -230,6 +234,10 @@ class CApmMetric extends CApmGeneral {
 				->where($table_alias.'.TimeUnix<toDateTime64({time_till:Int32},9)', [
 					'time_till' => ['Int32', $options['time_till']]
 				]);
+
+			foreach ($fallback_sortfields as $sortfield) {
+				$sub_query->order($table_alias.'.'.$sortfield);
+			}
 
 			if ($options['limit'] !== null) {
 				$sub_query->limit($options['limit'] + ($options['offset'] ?? 0));
@@ -266,7 +274,9 @@ class CApmMetric extends CApmGeneral {
 			}
 
 			if (!$options['countOutput']) {
-				$select_fields = array_keys(array_flip($options['output']) + array_flip($options['sortfield']));
+				$select_fields = array_keys(array_flip($options['output']) + array_flip($options['sortfield']) +
+					array_flip($fallback_sortfields)
+				);
 
 				foreach (array_intersect(array_keys(self::CLICKHOUSE_FIELDS), $select_fields) as $field) {
 					if ($field === 'Type') {
@@ -324,6 +334,10 @@ class CApmMetric extends CApmGeneral {
 				};
 
 				$query->order('u.'.$field, $sort_order);
+			}
+
+			foreach ($fallback_sortfields as $sortfield) {
+				$query->order('u.'.$sortfield);
 			}
 
 			$query
