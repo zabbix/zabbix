@@ -415,17 +415,17 @@
 					const compact_view = this.#datatable.getOption('compact_view');
 
 					const flex_wrapper = document.createElement('div');
-					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+
+					if (compact_view.checked) {
+						flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+					}
 
 					for (const [index, host] of hosts.entries()) {
-						const flex_item = document.createElement('div');
-						flex_item.classList.add(ZBX_STYLE_FLEX_ITEM,
-							compact_view.checked ? ZBX_STYLE_OVERFLOW_ELLIPSIS : ZBX_STYLE_WORDBREAK);
-
 						const {hostid, name, maintenance_type, maintenance_status} = host;
 
 						const host_link = document.createElement('a');
-						host_link.classList.add(ZBX_STYLE_LINK_ACTION);
+						host_link.classList.add(ZBX_STYLE_LINK_ACTION,
+							compact_view.checked ? ZBX_STYLE_OVERFLOW_ELLIPSIS : ZBX_STYLE_WORDBREAK);
 						host_link.setAttribute('data-menu-popup', JSON.stringify({
 							type: 'host',
 							data: {
@@ -438,7 +438,7 @@
 						host_link.setAttribute('href', 'javascript:void(0)');
 						host_link.textContent = name;
 
-						flex_item.appendChild(host_link);
+						flex_wrapper.appendChild(host_link);
 
 						if (maintenance_status == HOST_MAINTENANCE_STATUS_ON) {
 							let maintenance_name, maintenance_description;
@@ -471,7 +471,7 @@
 							maintenance_icon.setAttribute('data-hintbox-static', '1');
 							maintenance_icon.setAttribute('aria-expanded', 'false');
 
-							flex_item.appendChild(maintenance_icon);
+							flex_wrapper.appendChild(maintenance_icon);
 						}
 
 						if (index + 1 < hosts.length) {
@@ -479,10 +479,8 @@
 							separator.classList.add(ZBX_STYLE_SEPARATOR);
 							separator.textContent = ',';
 
-							flex_item.appendChild(separator);
+							flex_wrapper.appendChild(separator);
 						}
-
-						flex_wrapper.appendChild(flex_item);
 					}
 
 					cell.appendChild(flex_wrapper);
