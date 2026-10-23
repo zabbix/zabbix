@@ -143,12 +143,12 @@ class testUserGroup extends CAPITest {
 					'name' => 'user group selectApmFilters check',
 					'apm_filters' => [
 						[
-							'attribute_key' => 'attr_key2',
+							'key' => 'attr_key2',
 							'value' => 'attr_value',
 							'signal_type' => SIGNAL_TYPE_METRICS
 						],
 						[
-							'attribute_key' => 'attr_key1',
+							'key' => 'attr_key1',
 							'signal_type' => SIGNAL_TYPE_METRICS
 						]
 					]
@@ -254,12 +254,12 @@ class testUserGroup extends CAPITest {
 						'name' => 'User group with APM filter',
 						'apm_filters' => [
 							[
-								'attribute_key' => 'attr_key',
+								'key' => 'attr_key',
 								'value' => 'attr_value',
 								'signal_type' => SIGNAL_TYPE_ALL
 							],
 							[
-								'attribute_key' => 'attr_key',
+								'key' => 'attr_key',
 								'value' => '',
 								'signal_type' => SIGNAL_TYPE_METRICS
 							]
@@ -274,7 +274,7 @@ class testUserGroup extends CAPITest {
 						'name' => 'User group with APM filter without value',
 						'apm_filters' => [
 							[
-								'attribute_key' => 'aatr_key',
+								'key' => 'aatr_key',
 								'signal_type' => SIGNAL_TYPE_LOGS
 							]
 						]
@@ -756,13 +756,13 @@ class testUserGroup extends CAPITest {
 					'name' => 'Check APM filter, empty resource attribute key',
 					'apm_filters' => [
 							[
-								'attribute_key' => '',
+								'key' => '',
 								'value' => 'attr_value',
 								'signal_type' => SIGNAL_TYPE_ALL
 							]
 						]
 				],
-				'expected_error' => 'Invalid parameter "/1/apm_filters/1/attribute_key": cannot be empty.'
+				'expected_error' => 'Invalid parameter "/1/apm_filters/1/key": cannot be empty.'
 			],
 			[
 				'group' => [
@@ -774,14 +774,14 @@ class testUserGroup extends CAPITest {
 							]
 						]
 				],
-				'expected_error' => 'Invalid parameter "/1/apm_filters/1": the parameter "attribute_key" is missing.'
+				'expected_error' => 'Invalid parameter "/1/apm_filters/1": the parameter "key" is missing.'
 			],
 			[
 				'group' => [
 					'name' => 'Check APM filter signal type, not valid number',
 					'apm_filters' => [
 							[
-								'attribute_key' => 'attr_key',
+								'key' => 'attr_key',
 								'value' => 'attr_value',
 								'signal_type' => 'abc'
 							]
@@ -794,7 +794,7 @@ class testUserGroup extends CAPITest {
 					'name' => 'Check APM filter, incorrect signal type value',
 					'apm_filters' => [
 							[
-								'attribute_key' => 'attr_key',
+								'key' => 'attr_key',
 								'value' => 'attr_value',
 								'signal_type' => 5
 							]
@@ -1285,12 +1285,12 @@ class testUserGroup extends CAPITest {
 						'apm_filters' => [
 							[
 								'signal_type' => SIGNAL_TYPE_METRICS,
-								'attribute_key' => 'attr_key1',
+								'key' => 'attr_key1',
 								'value' => ''
 							],
 							[
 								'signal_type' => SIGNAL_TYPE_METRICS,
-								'attribute_key' => 'attr_key2',
+								'key' => 'attr_key2',
 								'value' => 'attr_value'
 							]
 						]
