@@ -182,6 +182,8 @@ class TabIndicatorFactory {
 	 */
 	static createTabIndicator(name) {
 		switch (name) {
+			case 'ApmFilter':
+				return new ApmFilterTabIndicatorItem;
 			case 'ChildServices':
 				return new ChildServicesTabIndicatorItem;
 			case 'Dependency':
@@ -284,8 +286,6 @@ class TabIndicatorFactory {
 				return new TemplateMacrosTabIndicatorItem;
 			case 'Time':
 				return new TimeTabIndicatorItem;
-			case 'ApmFilter':
-				return new ApmFilterTabIndicatorItem;
 			case 'Valuemaps':
 				return new ValuemapsTabIndicatorItem;
 			case 'TemplateValuemaps':
