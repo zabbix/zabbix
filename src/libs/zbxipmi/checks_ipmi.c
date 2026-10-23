@@ -2417,6 +2417,8 @@ int	zbx_set_ipmi_control_value(zbx_uint64_t hostid, const char *addr, unsigned s
 
 	h = zbx_init_ipmi_host(addr, port, authtype, privilege, username, password);
 
+	h->lastaccess = time(NULL);
+
 	if (ZBX_IPMI_DOMAIN_STATE_UP != h->domain_state)
 	{
 		if (NULL != h->err)
