@@ -127,7 +127,7 @@ class CControllerApmTraceListSplitView extends CController {
 			$span_events = array_map(function (array $event) use ($start_timestamp) {
 				$event_time = $event['timestamp'] - $start_timestamp;
 				$event_duration = $event_time
-					? convertSecondsToTimeUnits($event_time, ['combine_last_subsecond_parts' => true])
+					? convertSecondsToTimeUnits($event_time * SEC_PER_NANOSEC, ['combine_last_subsecond_parts' => true])
 					: '0'._x('ns', 'nanosecond short');
 
 				return [
@@ -188,16 +188,12 @@ class CControllerApmTraceListSplitView extends CController {
 			$clock = floor($time_unix / 1000000000);
 		}
 
-		$ns = $this->formatNs($time_unix);
+		$ns = str_pad((string) ($time_unix % 1000000000), 9, '0', STR_PAD_LEFT);
 
 		return $clock >= $today
 			? strtr(zbx_date2str(strtr(TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock), ['!' => $ns])
 			: strtr(zbx_date2str(strtr(DATE_TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock),
 				['!' => $ns]
 			);
-	}
-
-	private function formatNs($ns): int {
-		return str_pad((string) ($ns % 1000000000), 9, '0', STR_PAD_LEFT);
 	}
 }
