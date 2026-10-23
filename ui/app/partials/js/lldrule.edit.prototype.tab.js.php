@@ -209,14 +209,14 @@ var LldRuleEditPrototypeTab = class {
 
 		for (const name of ['delay', 'lookback_limit', 'granularity']) {
 			this.#form_element.querySelector(`[name="${name}"]`)
-			.addEventListener('input', () => this.#updateTelemetryIndicators());
+				.addEventListener('input', () => this.#updateTelemetryIndicators());
 		}
 
 		this.#form_element.querySelector('.js-add-aggregated-column')
-		.addEventListener('click', (e) => this.#openAggregatedColumnModal(e.target));
+			.addEventListener('click', (e) => this.#openAggregatedColumnModal(e.target));
 
 		this.#form_element.querySelector('.js-add-condition')
-		.addEventListener('click', (e) => this.#openConditionModal(e.target));
+			.addEventListener('click', (e) => this.#openConditionModal(e.target));
 
 		this.#form_element.querySelector('#columns-table').addEventListener('change', (e) => {
 			if (e.target.classList.contains('js-column')) {
@@ -634,7 +634,8 @@ var LldRuleEditPrototypeTab = class {
 
 		const parameters = {
 			signal_type: signal_type,
-			metric_point_type: metric_point_type
+			metric_point_type: metric_point_type,
+			parent_discoveryid: this.#lldrule.discoveryData.itemdiscoveryid
 		};
 
 		if (row !== null) {
