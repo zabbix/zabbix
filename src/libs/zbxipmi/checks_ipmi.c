@@ -1102,9 +1102,6 @@ static void	zbx_read_ipmi_sensor(zbx_ipmi_host_t *h, const zbx_ipmi_sensor_t *s)
 			if (0 != (ret = ipmi_sensor_id_get_reading(s->sensor_id, zbx_got_thresh_reading_cb,
 					ZBX_IPMI_HOST_CB_DATA(h))))
 			{
-				/* do not use pointer to sensor here - the sensor may have */
-				/* disappeared during ipmi_sensor_id_get_reading(), as     */
-				/* domain might be closed due to communication failure     */
 				h->err = zbx_dsprintf(h->err, "Cannot read sensor \"%s\"."
 						" ipmi_sensor_id_get_reading() returned error: 0x%x", id_str,
 						(unsigned int)ret);
@@ -1143,9 +1140,6 @@ static void	zbx_read_ipmi_sensor(zbx_ipmi_host_t *h, const zbx_ipmi_sensor_t *s)
 			if (0 != (ret = ipmi_sensor_id_get_states(s->sensor_id, zbx_got_discrete_states_cb,
 					ZBX_IPMI_HOST_CB_DATA(h))))
 			{
-				/* do not use pointer to sensor here - the sensor may     */
-				/* have disappeared during ipmi_sensor_id_get_states(),   */
-				/* as domain might be closed due to communication failure */
 				h->err = zbx_dsprintf(h->err, "Cannot read sensor \"%s\"."
 						" ipmi_sensor_id_get_states() returned error: 0x%x", id_str,
 						(unsigned int)ret);
