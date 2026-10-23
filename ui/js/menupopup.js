@@ -1587,7 +1587,11 @@ function getMenuPopupURLItems(tree, trigger_elm) {
 					}
 
 					if (data.params.error !== null) {
-						item.dataAttributes = {error: data.params.error};
+						if (item.dataAttributes === undefined) {
+							item.dataAttributes = {};
+						}
+
+						item.dataAttributes.error = data.params.error;
 					}
 				}
 			}
