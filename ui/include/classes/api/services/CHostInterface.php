@@ -885,38 +885,6 @@ class CHostInterface extends CApiService {
 		$this->checkMainInterfaces($interfaces);
 	}
 
-	/**
-	 * Prepares data to validate main interface for every interface type. Executes main interface validation.
-	 *
-	 * @param array $interfaces                     Array of interfaces to validate.
-	 * @param int   $interfaces[]['hostid']         Updated interface's hostid.
-	 * @param int   $interfaces[]['interfaceid']    Updated interface's interfaceid.
-	 *
-	 * @throws APIException
-	 */
-	private function checkMainInterfacesOnUpdate(array $interfaces) {
-		$hostids = array_keys(array_flip(zbx_objectValues($interfaces, 'hostid')));
-
-		$dbInterfaces = API::HostInterface()->get([
-			'hostids' => $hostids,
-			'output' => ['hostid', 'main', 'type'],
-			'preservekeys' => true,
-			'nopermissions' => true
-		]);
-
-		// update interfaces from DB with data that will be updated.
-		foreach ($interfaces as $interface) {
-			if (isset($dbInterfaces[$interface['interfaceid']])) {
-				$dbInterfaces[$interface['interfaceid']] = array_merge(
-					$dbInterfaces[$interface['interfaceid']],
-					$interface
-				);
-			}
-		}
-
-		$this->checkMainInterfaces($dbInterfaces);
-	}
-
 	private function checkMainInterfacesOnDelete(array $interfaceIds) {
 		$this->checkIfInterfaceHasItems($interfaceIds);
 
