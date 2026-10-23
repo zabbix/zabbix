@@ -220,6 +220,8 @@ window.item_edit_form = new class {
 			}
 
 			this.#selectNextColumn(e.target);
+		}).on('afterremove.dynamicRows', () => {
+			this.#toggleSelectedColumns();
 		});
 
 		this.form_element.querySelectorAll('#delay-flex-table .form_row')?.forEach(row => {
@@ -285,7 +287,8 @@ window.item_edit_form = new class {
 
 		const selected_columns = [...columns].slice(0, -1).map(column => column.value);
 		const last_column = columns[columns.length - 1];
-		const next_option = last_column.getOptions().find(option => !selected_columns.includes(String(option.value)));
+		const next_option = last_column.getOptions()
+			.find(option => !option.disabled && !selected_columns.includes(String(option.value)));
 
 		if (next_option !== undefined) {
 			last_column.value = next_option.value;
@@ -295,13 +298,17 @@ window.item_edit_form = new class {
 
 	#toggleSelectedColumns() {
 		const columns = this.form_element.querySelectorAll('#columns-table .js-column');
-		const selected_columns = [...columns].map(column => column.value);
+		const selected_columns = [...columns]
+			.filter(column => !this.telemetry_columns_config.complex.includes(column.value))
+			.map(column => column.value);
+		const available_columns = this.#getTelemetryColumns();
 
 		for (const column of columns) {
 			const disabled_columns = selected_columns.filter(value => value !== column.value);
 
 			for (const option of column.getOptions()) {
-				option.disabled = disabled_columns.includes(String(option.value));
+				option.disabled = !available_columns.includes(String(option.value))
+					|| disabled_columns.includes(String(option.value));
 			}
 		}
 	}
@@ -667,6 +674,8 @@ window.item_edit_form = new class {
 			this.#populateColumnSelect(select);
 			this.#toggleAttributeKey(select);
 		}
+
+		this.#toggleSelectedColumns();
 	}
 
 	#telemetrySignalChangeHandler() {
