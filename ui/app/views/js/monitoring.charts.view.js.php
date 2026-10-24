@@ -122,11 +122,16 @@
 
 		initCharts() {
 			this._$tmpl_row = $('<tr>').append(
-				$('<div>', {class: 'flickerfreescreen'}).append(
-					$('<div>', {class: '<?= ZBX_STYLE_CENTER ?>', style: 'min-height: 300px;'}).append(
-						$('<img>')
+				$('<td>').append([
+					$('<div>', {class: '<?= ZBX_STYLE_CHART_TITLE ?>'}),
+					$('<div>', {class: '<?= ZBX_STYLE_CHART_IMAGE ?>'}).append(
+						$('<div>', {class: 'flickerfreescreen'}).append(
+							$('<div>', {class: '<?= ZBX_STYLE_CENTER ?>', style: 'min-height: 300px;'}).append(
+								$('<img>')
+							)
+						)
 					)
-				)
+				])
 			);
 
 			this._app = new ChartList( $('#charts'), this._data.timeline, this._data.config, this._container);
@@ -218,6 +223,17 @@
 	function Chart(chart, timeline, $tmpl, wrapper) {
 		this.$el = $tmpl.clone();
 		this.$img = this.$el.find('img');
+
+		// Same text as the header drawn into the image, which .<?= ZBX_STYLE_CHART_IMAGE ?> clips away.
+		this.$title = chart.url !== null
+			? $('<a>', {class: '<?= ZBX_STYLE_LINK_ALT ?>'})
+			: $('<span>');
+
+		this.title_url = chart.url !== null ? new URL(chart.url, location.href) : null;
+
+		this.$title.text(chart.name);
+		this.$el.find('.<?= ZBX_STYLE_CHART_TITLE ?>').append(this.$title);
+		this.$img.attr('alt', chart.name);
 
 		this.chartid = chart.chartid;
 
@@ -311,6 +327,12 @@
 		this.curl.setArgument('profileIdx', 'web.charts.filter');
 		this.curl.setArgument('resolve_macros', 1);
 		this.curl.setArgument('_', (+new Date).toString(34));
+
+		if (this.title_url !== null) {
+			this.title_url.searchParams.set('from', this.timeline.from);
+			this.title_url.searchParams.set('to', this.timeline.to);
+			this.$title.attr('href', this.title_url.href);
+		}
 
 		const unsetLoading = this.setLoading(delay_loading);
 
