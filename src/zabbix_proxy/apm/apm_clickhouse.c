@@ -291,9 +291,6 @@ int	apm_clickhouse_commit(zbx_apm_clickhouse_t *conn, const zbx_apm_clickhouse_c
 	ret |= apm_clickhouse_commit_rowset(conn, cfg, "otel_logs", &ds->logs);
 	ret |= apm_clickhouse_commit_rowset(conn, cfg, "otel_traces", &ds->traces);
 
-	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
-		apm_dataset_dump(ds);
-
 	return ret;
 }
 

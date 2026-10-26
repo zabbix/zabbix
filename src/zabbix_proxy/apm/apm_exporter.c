@@ -455,6 +455,9 @@ int	apm_exporter_commit(zbx_apm_exporter_t *exporter, zbx_apm_dataset_t *ds)
 {
 	int	ret = APM_COMMIT_OK;
 
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
+		apm_dataset_dump(ds);
+
 	switch (exporter->cfg->type)
 	{
 		case APM_EXPORTER_UNKNOWN:

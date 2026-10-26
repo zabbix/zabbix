@@ -1210,7 +1210,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			1000},
 		{"WebDriverURL",		&config_webdriver_url,			ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
-		{"StartAPMCollectors",		&config_forks[ZBX_PROCESS_TYPE_APM_MANAGER],	ZBX_CFG_TYPE_INT,
+		{"StartAPMCollector",		&config_forks[ZBX_PROCESS_TYPE_APM_MANAGER],	ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	0,			1},
 		{"TelemetryProvider",			&config_telemetry_providers,	ZBX_CFG_TYPE_MULTISTRING,
 				ZBX_CONF_PARM_OPT,	0,			0},

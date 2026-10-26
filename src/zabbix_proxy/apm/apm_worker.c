@@ -154,7 +154,7 @@ void	*apm_worker_entry(void *args)
 			zbx_mw_queue_unlock(worker->base.queue);
 			zbx_mw_worker_report_busy(&worker->base);
 
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() process task type:%u", __func__, task->type);
+			zabbix_log(LOG_LEVEL_DEBUG, "process task type:%u", task->type);
 
 			switch (task->type)
 			{
