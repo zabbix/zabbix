@@ -1274,7 +1274,7 @@ class CUserGroup extends CApiService {
 		unset($usrgrp);
 	}
 
-	private static function updateApmFilters(array &$user_groups, ?array $db_usrgrps = null): void {
+	private static function updateApmFilters(array &$user_groups, ?array $db_user_groups = null): void {
 		$ins_apm_filters = [];
 		$del_apm_filterids = [];
 
@@ -1284,8 +1284,8 @@ class CUserGroup extends CApiService {
 			}
 
 			$db_apm_filterids_by_apm_value = [];
-			$db_apm_filters = $db_usrgrps !== null
-				? $db_usrgrps[$user_group['usrgrpid']]['apm_filters']
+			$db_apm_filters = $db_user_groups !== null
+				? $db_user_groups[$user_group['usrgrpid']]['apm_filters']
 				: [];
 
 			foreach ($db_apm_filters as $db_apm_filter) {
@@ -1773,7 +1773,7 @@ class CUserGroup extends CApiService {
 	}
 
 	private function addRelatedApms(array $options, array &$user_groups): void {
-		if (!array_key_exists('selectApmFilters', $options) || $options['selectApmFilters'] === null) {
+		if ($options['selectApmFilters'] === null) {
 			return;
 		}
 
@@ -1781,11 +1781,6 @@ class CUserGroup extends CApiService {
 			$user_group['apm_filters'] = [];
 		}
 		unset($user_group);
-
-		if ($options['selectApmFilters'] != API_OUTPUT_EXTEND
-				&& array_key_exists('key', $options['selectApmFilters'])) {
-			CArrayHelper::renameKeys($options['selectApmFilters'], ['key' => 'attribute_key']);
-		}
 
 		$resource = DBselect(
 			'SELECT a.signal_type,a.attribute_key,a.value,a.usrgrpid'.
@@ -1804,7 +1799,11 @@ class CUserGroup extends CApiService {
 			$user_groups[$usrgrpid]['apm_filters'][] = array_merge(array_flip($default_apm_fields), $row);
 		}
 
-		if ($options['selectApmFilters'] === API_OUTPUT_EXTEND) {
+		if ($options['selectApmFilters'] != API_OUTPUT_EXTEND
+				&& array_key_exists('key', $options['selectApmFilters'])) {
+			CArrayHelper::renameKeys($options['selectApmFilters'], ['key' => 'attribute_key']);
+		}
+		elseif ($options['selectApmFilters'] === API_OUTPUT_EXTEND) {
 			$options['selectApmFilters'] = self::APM_OUTPUT_FIELDS;
 		}
 
