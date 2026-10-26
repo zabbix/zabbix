@@ -263,20 +263,28 @@ static zbx_ipmi_host_t	*zbx_allocate_ipmi_host(const char *ip, int port, int aut
 
 	zbx_ipmi_host_t	*h = (zbx_ipmi_host_t *)zbx_malloc(NULL, sizeof(zbx_ipmi_host_t));
 
-	memset(h, 0, sizeof(zbx_ipmi_host_t));
-
 	h->ip = strdup(ip);
 	h->port = port;
 	h->authtype = authtype;
 	h->privilege = privilege;
+	h->ret = SUCCEED;
 	h->username = strdup(username);
 	h->password = strdup(password);
+	h->sensors = NULL;
+	h->controls = NULL;
+	h->sensor_count = 0;
+	h->control_count = 0;
+	h->con = NULL;
+	h->domain_state = ZBX_IPMI_DOMAIN_STATE_CLOSED;
+	h->done = 0;
+	h->lastaccess = 0;
 	h->domain_nr = domain_nr;
 
 	/* 0 is reserved to keep NULL cb_data invalid */
 	if (0 == ++domain_nr)
 		domain_nr = 1;
 
+	h->err = NULL;
 	h->next = hosts;
 	hosts = h;
 

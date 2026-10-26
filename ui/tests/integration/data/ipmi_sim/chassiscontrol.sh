@@ -66,9 +66,6 @@ do_set() {
 						;;
 				esac
 				;;
-			identify)
-				shift
-				;;
 			*)
 				echo "Invalid parameter: $param"
 				exit 1
@@ -83,9 +80,6 @@ case $op in
 		;;
 	set)
 		do_set "$@"
-		;;
-	check)
-		exit 1
 		;;
 	*)
 		echo "Unknown operation: $op"
