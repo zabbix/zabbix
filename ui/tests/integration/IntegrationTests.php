@@ -53,6 +53,7 @@ require_once dirname(__FILE__).'/testUserMacrosInItemNames.php';
 require_once dirname(__FILE__).'/testConnectorExport.php';
 require_once dirname(__FILE__).'/testScriptManualInput.php';
 require_once dirname(__FILE__).'/testAgentJsonProtocol.php';
+require_once dirname(__FILE__).'/testTrapperAuthentication.php';
 require_once dirname(__FILE__).'/testSnmpTrapsInHa.php';
 require_once dirname(__FILE__).'/testPermissions.php';
 require_once dirname(__FILE__).'/testFunctionChangeCount.php';
@@ -71,6 +72,7 @@ require_once dirname(__FILE__).'/testLLDHistorySyncAtScale.php';
 require_once dirname(__FILE__).'/testTelnetChecks.php';
 require_once dirname(__FILE__).'/testHousekeepingConfSync.php';
 require_once dirname(__FILE__).'/testScheduledReports.php';
+require_once dirname(__FILE__).'/testReportTest.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -120,6 +122,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testConnectorExport');
 		$suite->addTestSuite('testScriptManualInput');
 		$suite->addTestSuite('testAgentJsonProtocol');
+		$suite->addTestSuite('testTrapperAuthentication');
 		$suite->addTestSuite('testSnmpTrapsInHa');
 		$suite->addTestSuite('testPermissions');
 		$suite->addTestSuite('testFunctionChangeCount');
@@ -133,6 +136,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testNestedLLD');
 		$suite->addTestSuite('testCalculatedExpression');
 		$suite->addTestSuite('testDiagInfo');
+		$suite->addTestSuite('testReportTest');
 		$suite->addTestSuite('testLLDHistorySyncAtScale');
 		/* $suite->addTestSuite('testLLDHistorySyncAtScaleSingleSyncer'); */
 		$suite->addTestSuite('testTelnetChecks');
