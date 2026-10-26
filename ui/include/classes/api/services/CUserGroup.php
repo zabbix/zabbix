@@ -300,11 +300,7 @@ class CUserGroup extends CApiService {
 				'tag' =>					['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('tag_filter', 'tag'), 'default' => DB::getDefault('tag_filter', 'tag')],
 				'value' =>					['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('tag_filter', 'value'), 'default' => DB::getDefault('tag_filter', 'value')]
 			]],
-			'apm_filters' =>			['type' => API_OBJECTS, 'uniq' => [['key', 'value', 'signal_type']], 'fields' => [
-				'key' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('usrgrp_apm_filter', 'attribute_key')],
-				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('usrgrp_apm_filter', 'value'), 'default' => DB::getDefault('usrgrp_apm_filter', 'value')],
-				'signal_type' =>		['type' => API_INT32, 'in' => implode(',', [SIGNAL_TYPE_ALL, SIGNAL_TYPE_TRACES, SIGNAL_TYPE_METRICS, SIGNAL_TYPE_LOGS]), 'default' => DB::getDefault('usrgrp_apm_filter', 'signal_type')]
-			]],
+			'apm_filters' => 			self::getApmFiltersValidationRules(),
 			'users' =>					['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['userid']], 'fields' => [
 				'userid' =>					['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
@@ -388,15 +384,6 @@ class CUserGroup extends CApiService {
 		$names = [];
 		$usrgrps = $this->extendObjectsByKey($usrgrps, $db_usrgrps, 'usrgrpid', ['gui_access', 'mfa_status']);
 
-		foreach ($usrgrps as $user_group) {
-			if (array_key_exists('apm_filters', $user_group)) {
-				foreach ($user_group['apm_filters'] as &$resource_attribute) {
-					$resource_attribute = CArrayHelper::renameKeys($resource_attribute, ['attribute_key' => 'key']);
-				}
-				unset($resource_attribute);
-			}
-		}
-
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'usrgrpid' =>				['type' => API_ID],
 			'name' =>					['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('usrgrp', 'name')],
@@ -425,11 +412,7 @@ class CUserGroup extends CApiService {
 				'tag' =>					['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('tag_filter', 'tag'), 'default' => DB::getDefault('tag_filter', 'tag')],
 				'value' =>					['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('tag_filter', 'value'), 'default' => DB::getDefault('tag_filter', 'value')]
 			]],
-			'apm_filters' =>			['type' => API_OBJECTS, 'uniq' => [['key', 'value', 'signal_type']], 'fields' => [
-				'key' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('usrgrp_apm_filter', 'attribute_key')],
-				'value' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('usrgrp_apm_filter', 'value'), 'default' => DB::getDefault('usrgrp_apm_filter', 'value')],
-				'signal_type' =>		['type' => API_INT32, 'in' => implode(',', [SIGNAL_TYPE_ALL, SIGNAL_TYPE_TRACES, SIGNAL_TYPE_METRICS, SIGNAL_TYPE_LOGS]), 'default' => DB::getDefault('usrgrp_apm_filter', 'signal_type')]
-			]],
+			'apm_filters' => 			self::getApmFiltersValidationRules(),
 			'users' =>					['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['userid']], 'fields' => [
 				'userid' =>					['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
@@ -476,6 +459,14 @@ class CUserGroup extends CApiService {
 		$this->checkProxyGroups($usrgrps);
 		self::checkUserDirectories($usrgrps);
 		self::checkMfaIds($usrgrps, $db_usrgrps);
+	}
+
+	private static function getApmFiltersValidationRules(): array {
+		return ['type' => API_OBJECTS, 'uniq' => [['key', 'value', 'signal_type']], 'fields' => [
+			'key' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('usrgrp_apm_filter', 'attribute_key')],
+			'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('usrgrp_apm_filter', 'value'), 'default' => DB::getDefault('usrgrp_apm_filter', 'value')],
+			'signal_type' =>	['type' => API_INT32, 'in' => implode(',', [SIGNAL_TYPE_ALL, SIGNAL_TYPE_TRACES, SIGNAL_TYPE_METRICS, SIGNAL_TYPE_LOGS]), 'default' => DB::getDefault('usrgrp_apm_filter', 'signal_type')]
+		]];
 	}
 
 	/**
@@ -1697,7 +1688,7 @@ class CUserGroup extends CApiService {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
-		$this->addRelatedApms($options, $result);
+		$this->addRelatedApmFilters($options, $result);
 		$this->addRelatedUsers($options, $result);
 		$this->addRelatedProxies($options, $result);
 		$this->addRelatedProxyGroups($options, $result);
@@ -1764,7 +1755,7 @@ class CUserGroup extends CApiService {
 		$result = $relation_map->mapMany($result, $db_users, 'users');
 	}
 
-	private function addRelatedApms(array $options, array &$user_groups): void {
+	private function addRelatedApmFilters(array $options, array &$user_groups): void {
 		if ($options['selectApmFilters'] === null) {
 			return;
 		}
@@ -2036,26 +2027,26 @@ class CUserGroup extends CApiService {
 
 		foreach ($user_groups as $user_group) {
 			if (array_key_exists('apm_filters', $user_group)) {
-				$usrgrpids['apm_filters'][] = $user_group['usrgrpid'];
+				$usrgrpids[] = $user_group['usrgrpid'];
 				$db_user_groups[$user_group['usrgrpid']]['apm_filters'] = [];
 			}
 		}
 
-		if (array_key_exists('apm_filters', $usrgrpids)) {
-			$options = [
-				'output' => ['usrgrp_apm_filterid', 'usrgrpid', 'attribute_key', 'value', 'signal_type'],
-				'filter' => ['usrgrpid' => $usrgrpids['apm_filters']]
-			];
-			$db_apms = DBselect(DB::makeSql('usrgrp_apm_filter', $options));
+		if (!$usrgrpids) {
+			return;
+		}
 
-			while ($row = DBfetch($db_apms)) {
-				if (array_key_exists('attribute_key', $row)) {
-					$row = CArrayHelper::renameKeys($row, ['attribute_key' => 'key']);
-				}
+		$options = [
+			'output' => ['usrgrp_apm_filterid', 'usrgrpid', 'attribute_key', 'value', 'signal_type'],
+			'filter' => ['usrgrpid' => $usrgrpids]
+		];
+		$db_apms = DBselect(DB::makeSql('usrgrp_apm_filter', $options));
 
-				$db_user_groups[$row['usrgrpid']]['apm_filters'][$row['usrgrp_apm_filterid']] =
-					array_diff_key($row, array_flip(['usrgrpid']));
-			}
+		while ($row = DBfetch($db_apms)) {
+			$row = CArrayHelper::renameKeys($row, ['attribute_key' => 'key']);
+
+			$db_user_groups[$row['usrgrpid']]['apm_filters'][$row['usrgrp_apm_filterid']] =
+				array_diff_key($row, array_flip(['usrgrpid']));
 		}
 	}
 
