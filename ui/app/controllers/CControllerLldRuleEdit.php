@@ -282,20 +282,11 @@ class CControllerLldRuleEdit extends CController
 	}
 
 	private function getLldRuleData(array $host): array {
-		if ($this->lldrule) {
+		if ($this->getInput('clone', 0)) {
+			$item = $this->getClone($host);
+		}
+		elseif ($this->lldrule) {
 			$item = CLldRuleHelper::convertApiInputForForm($this->lldrule);
-
-			if ($this->getInput('clone', 0)) {
-				$item = CLldRuleHelper::normalizeFormData($this->getInputAll() + $item);
-				$item['itemid'] = null;
-				$item['templateid'] = null;
-				$item['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
-				$item['parent_items'] = [];
-				$item['discovered'] = false;
-				$item['discovered_lld'] = false;
-				$item['templated'] = false;
-				$item['inventory_link'] = 0;
-			}
 		}
 		else {
 			$item = CLldRuleHelper::getDefaults();
@@ -359,5 +350,38 @@ class CControllerLldRuleEdit extends CController
 		CArrayHelper::sort($item['overrides'], ['step']);
 
 		return [$item, $inherited_timeouts];
+	}
+
+	/**
+	 * Get LLD rule form input for clone action.
+	 *
+	 * @param array $host  LLD rule host data.
+	 *
+	 * @return array LLD rule clone form data.
+	 */
+	private function getClone(array $host): array {
+		$item = [
+			'itemid' => null,
+			'templateid' => null,
+			'hostid' => $host['hostid'],
+			'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
+			'parent_items' => [],
+			'discovered' => false,
+			'discovered_lld' => false,
+			'templated' => false,
+			'inventory_link' => 0
+		] + CLldRuleHelper::normalizeFormData($this->getInputAll() + CLldRuleHelper::getDefaults());
+
+		if ($item['master_itemid']) {
+			$master_item = API::Item()->get([
+				'output' => ['itemid', 'name'],
+				'itemids' => $item['master_itemid'],
+				'webitems' => true
+			]);
+
+			$item['master_item'] = $master_item ? reset($master_item) : [];
+		}
+
+		return $item;
 	}
 }
