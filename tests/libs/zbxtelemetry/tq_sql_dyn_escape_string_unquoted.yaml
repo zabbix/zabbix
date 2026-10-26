@@ -47,6 +47,38 @@ out:
   value: "\\'\\\"\\`\\\\"
 
 ---
+test case: "%"
+in:
+  str: "%"
+
+out:
+  value: "%"
+
+---
+test case: "_"
+in:
+  str: "_"
+
+out:
+  value: "_"
+
+---
+test case: "\\%"
+in:
+  str: "\\%"
+
+out:
+  value: "\\\\%"
+
+---
+test case: "\\_"
+in:
+  str: "\\_"
+
+out:
+  value: "\\\\_"
+
+---
 test case: single quote
 in:
   str: "'"
