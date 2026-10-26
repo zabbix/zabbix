@@ -434,6 +434,41 @@ static char	*tq_sql_dyn_get_condition_exists(const char *atom, const char *key, 
 	return str;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: if the numeric literal contains leading or trailing decimal       *
+ *          point, inserts '0' before or after it respectively                *
+ *                                                                            *
+ * Parameters: value - [IN] a valid numeric literal string                    *
+ *                          (see zbx_tq_validate_numeric_condition_value)     *
+ *                                                                            *
+ ******************************************************************************/
+static char	*tq_sql_dyn_normalize_numeric_condition_value(const char *value)
+{
+	const char	*p_decimal_point;
+	char		*value_norm = zbx_strdup(NULL, value);
+
+	if (NULL == (p_decimal_point = strchr(value, '.')))
+		return value_norm;
+
+	if (p_decimal_point == value || 0 == isdigit((unsigned char)*(p_decimal_point - 1)))
+	{
+		size_t	l = p_decimal_point - value;
+		size_t	r = l;
+
+		zbx_replace_string(&value_norm, l, &r, "0.");
+	}
+	else if ('\0' == *(p_decimal_point + 1) || 0 == isdigit((unsigned char)*(p_decimal_point + 1)))
+	{
+		size_t	l = p_decimal_point - value;
+		size_t	r = l;
+
+		zbx_replace_string(&value_norm, l, &r, ".0");
+	}
+
+	return value_norm;
+}
+
 static char	*tq_sql_dyn_get_atom_condition(const char *atom, zbx_tq_column_type_t type, const char *key,
 		const char *value, zbx_tq_operator_t operator, const tq_sql_ctx_t *ctx)
 {
@@ -465,8 +500,9 @@ static char	*tq_sql_dyn_get_atom_condition(const char *atom, zbx_tq_column_type_
 
 		if (SUCCEED == zbx_tq_column_type_requires_numeric_comparison(type))
 		{
-			/* value is already validated to be numeric */
-			str = zbx_dsprintf(NULL, "(%s%s%s)", operand, operator_str, value);
+			char	*value_norm = tq_sql_dyn_normalize_numeric_condition_value(value);
+			str = zbx_dsprintf(NULL, "(%s%s%s)", operand, operator_str, value_norm);
+			zbx_free(value_norm);
 		}
 		else
 		{
