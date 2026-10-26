@@ -191,7 +191,7 @@ class testDiscoveryRulePrototype extends CAPITest {
 
 		yield 'Telemetry query "query" is required' => [
 			$discoveryrule + [
-				'key_' => 'telemetry_query_create_invalid_12[{#M}]',
+				'key_' => 'telemetry_query_create_invalid_12[{#M}]'
 			],
 			'Invalid parameter "/1": the parameter "query" is missing.'
 		];
