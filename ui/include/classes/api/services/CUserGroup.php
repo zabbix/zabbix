@@ -1760,42 +1760,35 @@ class CUserGroup extends CApiService {
 			return;
 		}
 
-		$internal_fields = ['signal_type', 'attribute_key'];
-
 		foreach ($user_groups as &$user_group) {
 			$user_group['apm_filters'] = [];
 		}
 		unset($user_group);
 
-		$output = array_unique(array_merge($options['selectApmFilters'], $internal_fields));
+		$output_fields = $options['selectApmFilters'];
+		$output_fields[] = 'attribute_key';
+
+		if (array_key_exists('key', array_flip($output_fields))) {
+			unset($output_fields[array_search('key', $options['selectApmFilters'])]);
+		}
 
 		$sql_options = [
-			'output' => array_merge(['usrgrpid'], array_diff($output, ['key'])),
-			'filter' => ['usrgrpid' => array_keys($user_groups)]
+			'output' => array_merge(['usrgrpid'], $output_fields),
+			'filter' => ['usrgrpid' => array_keys($user_groups)],
+			'sortfield' => ['signal_type', 'attribute_key', 'value']
 		];
 		$resource = DBselect(DB::makeSql('usrgrp_apm_filter', $sql_options));
 
 		while ($row = DBfetch($resource)) {
 			$row['key'] = $row['attribute_key'];
+			unset($row['attribute_key']);
 
-			$user_groups[$row['usrgrpid']]['apm_filters'][] = array_diff_key(
-				array_merge(array_flip($options['selectApmFilters']), $row),
-				array_flip(['usrgrpid', 'usrgrp_apm_filterid'])
-			);
+			$user_groupid = $row['usrgrpid'];
+			$row = array_merge(array_flip(
+				$options['selectApmFilters']), array_intersect_key($row, array_flip($options['selectApmFilters'])
+			));
+			$user_groups[$user_groupid]['apm_filters'][] = $row;
 		}
-
-		$fields_to_unset = array_flip(array_diff(array_merge($internal_fields, ['key']), $options['selectApmFilters']));
-
-		foreach ($user_groups as &$user_group) {
-			CArrayHelper::sort($user_group['apm_filters'], ['signal_type', 'key']);
-			$user_group['apm_filters'] = array_values($user_group['apm_filters']);
-
-			foreach ($user_group['apm_filters'] as &$apm_filter) {
-				$apm_filter = array_diff_key($apm_filter, $fields_to_unset);
-			}
-			unset($apm_filter);
-		}
-		unset($user_group);
 	}
 
 	private function addRelatedProxies(array $options, array &$result): void {
