@@ -2216,10 +2216,10 @@ class testLowLevelDiscovery extends CWebTest {
 			$this->fillComplexFields($data['Filters']['filters'], $form, 'Filters', 'z-textarea-flexible');
 
 			if (array_key_exists('calculation', $data['Filters'])) {
-				$form->fill(['id:evaltype' => $data['Filters']['calculation']]);
+				$form->fill(['id:filters_evaltype' => $data['Filters']['calculation']]);
 
 				if (array_key_exists('formula', $data['Filters'])) {
-					$form->fill(['id:formula' => $data['Filters']['formula']]);
+					$form->fill(['id:filters_formula' => $data['Filters']['formula']]);
 				}
 			}
 		}
