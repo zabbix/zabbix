@@ -114,6 +114,7 @@ class CUserMacro extends CApiService {
 				$sqlParts['from'][] = 'permission p';
 				$sqlParts['where'][] = 'hm.hostid=hh.hostid';
 				$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
+				$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 				if ($options['editable']) {
 					$sqlParts['where'][] = 'p.permission='.PERM_READ_WRITE;
