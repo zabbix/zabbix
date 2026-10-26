@@ -49,7 +49,7 @@
 #define ZBX_TQ_CONDITION_ATTRIBUTE_KEY_LEN	255
 #define ZBX_TQ_CONDITION_VALUE_LEN		255
 
-#define ZBX_TQ_MAX_RESULT_ROWS	10000	/* maximum amount of rows selected by a single query */
+#define ZBX_TQ_MAX_RESULT_ROWS	1000000	/* maximum amount of rows selected by a single query */
 
 /* apm db */
 
