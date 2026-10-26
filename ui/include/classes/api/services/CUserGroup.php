@@ -396,11 +396,13 @@ class CUserGroup extends CApiService {
 		$names = [];
 		$usrgrps = $this->extendObjectsByKey($usrgrps, $db_usrgrps, 'usrgrpid', ['gui_access', 'mfa_status']);
 
-		foreach ($usrgrps as $apm_filter) {
-			foreach ($apm_filter['apm_filters'] as &$resource_attribute) {
-				$resource_attribute = CArrayHelper::renameKeys($resource_attribute, ['attribute_key' => 'key']);
+		foreach ($usrgrps as $user_group) {
+			if (array_key_exists('apm_filters', $user_group)) {
+				foreach ($user_group['apm_filters'] as &$resource_attribute) {
+					$resource_attribute = CArrayHelper::renameKeys($resource_attribute, ['attribute_key' => 'key']);
+				}
+				unset($resource_attribute);
 			}
-			unset($resource_attribute);
 		}
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
@@ -2054,7 +2056,7 @@ class CUserGroup extends CApiService {
 			}
 		}
 
-		if ($usrgrpids['apm_filters']) {
+		if (array_key_exists('apm_filters', $usrgrpids)) {
 			$options = [
 				'output' => ['usrgrp_apm_filterid', 'usrgrpid', 'attribute_key', 'value', 'signal_type'],
 				'filter' => ['usrgrpid' => $usrgrpids['apm_filters']]
