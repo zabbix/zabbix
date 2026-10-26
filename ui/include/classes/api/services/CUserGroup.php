@@ -248,15 +248,7 @@ class CUserGroup extends CApiService {
 
 		$this->validateCreate($usrgrps);
 
-		$ins_usrgrps = [];
-
-		foreach ($usrgrps as $usrgrp) {
-			unset($usrgrp['hostgroup_rights'], $usrgrp['templategroup_rights'], $usrgrp['tag_filters'],
-				$usrgrp['apm_filters'], $usrgrp['users']
-			);
-			$ins_usrgrps[] = $usrgrp;
-		}
-		$usrgrpids = DB::insert('usrgrp', $ins_usrgrps);
+		$usrgrpids = DB::insert('usrgrp', $usrgrps);
 
 		foreach ($usrgrps as $index => &$usrgrp) {
 			$usrgrp['usrgrpid'] = $usrgrpids[$index];
@@ -1777,48 +1769,42 @@ class CUserGroup extends CApiService {
 			return;
 		}
 
+		$internal_fields = ['signal_type', 'attribute_key'];
+
 		foreach ($user_groups as &$user_group) {
 			$user_group['apm_filters'] = [];
 		}
 		unset($user_group);
 
-		$resource = DBselect(
-			'SELECT a.signal_type,a.attribute_key,a.value,a.usrgrpid'.
-			' FROM usrgrp_apm_filter a'.
-			' JOIN usrgrp u ON a.usrgrpid=u.usrgrpid'.
-			' WHERE '.dbConditionId('a.usrgrpid', array_keys($user_groups))
-		);
+		$output = array_unique(array_merge($options['selectApmFilters'], $internal_fields));
 
-		$default_apm_fields = ['signal_type', 'key', 'value'];
+		$sql_options = [
+			'output' => array_merge(['usrgrpid'], array_diff($output, ['key'])),
+			'filter' => ['usrgrpid' => array_keys($user_groups)]
+		];
+		$resource = DBselect(DB::makeSql('usrgrp_apm_filter', $sql_options));
 
 		while ($row = DBfetch($resource)) {
-			$usrgrpid = $row['usrgrpid'];
-			unset($row['usrgrp_apm_filterid'], $row['usrgrpid']);
+			$row['key'] = $row['attribute_key'];
 
-			$row = CArrayHelper::renameKeys($row, ['attribute_key' => 'key']);
-			$user_groups[$usrgrpid]['apm_filters'][] = array_merge(array_flip($default_apm_fields), $row);
+			$user_groups[$row['usrgrpid']]['apm_filters'][] = array_diff_key(
+				array_merge(array_flip($options['selectApmFilters']), $row),
+				array_flip(['usrgrpid', 'usrgrp_apm_filterid'])
+			);
 		}
 
-		if ($options['selectApmFilters'] != API_OUTPUT_EXTEND
-				&& array_key_exists('key', $options['selectApmFilters'])) {
-			CArrayHelper::renameKeys($options['selectApmFilters'], ['key' => 'attribute_key']);
-		}
-		elseif ($options['selectApmFilters'] === API_OUTPUT_EXTEND) {
-			$options['selectApmFilters'] = self::APM_OUTPUT_FIELDS;
-		}
+		$fields_to_unset = array_flip(array_diff(array_merge($internal_fields, ['key']), $options['selectApmFilters']));
 
-		foreach ($user_groups as &$apm_filter) {
-			CArrayHelper::sort($apm_filter['apm_filters'], ['signal_type', 'key']);
-			$apm_filter['apm_filters'] = array_values($apm_filter['apm_filters']);
+		foreach ($user_groups as &$user_group) {
+			CArrayHelper::sort($user_group['apm_filters'], ['signal_type', 'key']);
+			$user_group['apm_filters'] = array_values($user_group['apm_filters']);
 
-			foreach ($apm_filter['apm_filters'] as &$resource_attribute) {
-				$resource_attribute = array_intersect_key(
-					$resource_attribute, array_flip($options['selectApmFilters'])
-				);
+			foreach ($user_group['apm_filters'] as &$apm_filter) {
+				$apm_filter = array_diff_key($apm_filter, $fields_to_unset);
 			}
-			unset($resource_attribute);
+			unset($apm_filter);
 		}
-		unset($apm_filter);
+		unset($user_group);
 	}
 
 	private function addRelatedProxies(array $options, array &$result): void {
