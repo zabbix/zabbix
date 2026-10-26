@@ -215,7 +215,9 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 				'flags' => in_array($this->test_type, [
 					self::ZBX_TEST_TYPE_ITEM_PROTOTYPE,
 					self::ZBX_TEST_TYPE_LLD_PROTOTYPE
-				]),
+				])
+					? ZBX_FLAG_DISCOVERY_PROTOTYPE
+					: ZBX_FLAG_DISCOVERY_NORMAL,
 				'query' => CItemGeneralHelper::composeTelemetryQuery($this->getInputAll())
 			];
 
