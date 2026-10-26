@@ -224,15 +224,15 @@ class testLowLevelDiscovery extends CWebTest {
 					$this->assertEquals(['Label', 'Macro', '', 'Regular expression', ''],
 							$filter_table->getHeadersText()
 					);
-					$this->assertFalse($filters_container->query('id:evaltype')->exists());
+					$this->assertFalse($filters_container->query('id:filters_evaltype')->exists());
 					$filters_container->query('button:Add')->waitUntilClickable()->one()->click();
-					$evaluation_type = $form->getField('id:evaltype');
-					$form->checkValue(['id:evaltype' => 'And/Or']);
+					$evaluation_type = $form->getField('id:filters_evaltype');
+					$form->checkValue(['id:filters_evaltype' => 'And/Or']);
 					$evaluation_type->fill('Custom expression');
 
 					$filter_fields = [
-						'id:evaltype' => ['value' => 'Custom expression', 'options' => ['And/Or', 'And', 'Or', 'Custom expression']],
-						'id:formula' => ['value' => '', 'placeholder' => 'A or (B and C) ...', 'maxlength' => 255],
+						'id:filters_evaltype' => ['value' => 'Custom expression', 'options' => ['And/Or', 'And', 'Or', 'Custom expression']],
+						'id:filters_formula' => ['value' => '', 'placeholder' => 'A or (B and C) ...', 'maxlength' => 255],
 						'id:filters_conditions_0_macro' => ['value' => '', 'placeholder' => '{#MACRO}', 'maxlength' => 64],
 						'id:filters_conditions_0_value' => ['value' => '', 'placeholder' => 'regular expression', 'maxlength' => 255],
 						'name:filters_conditions[0][operator]' => [
@@ -1944,7 +1944,7 @@ class testLowLevelDiscovery extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'id:formula' => 'This field cannot be empty.'
+						'id:filters_formula' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -2008,7 +2008,7 @@ class testLowLevelDiscovery extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'id:formula' => 'Incorrect syntax near "Wrong formula".'
+						'id:filters_formula' => 'Incorrect syntax near "Wrong formula".'
 					]
 				]
 			],
@@ -2030,7 +2030,7 @@ class testLowLevelDiscovery extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'id:formula' => 'Incorrect syntax near "Not B".'
+						'id:filters_formula' => 'Incorrect syntax near "Not B".'
 					]
 				]
 			],
@@ -2052,7 +2052,7 @@ class testLowLevelDiscovery extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'id:formula' => 'Incorrect syntax near " A and not B".'
+						'id:filters_formula' => 'Incorrect syntax near " A and not B".'
 					]
 				]
 			],
@@ -2074,7 +2074,7 @@ class testLowLevelDiscovery extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'id:formula' => 'Incorrect syntax near " not B".'
+						'id:filters_formula' => 'Incorrect syntax near " not B".'
 					]
 				]
 			],
