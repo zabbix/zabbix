@@ -376,8 +376,8 @@ var LldRuleEditLldRuleTab = class {
 	#toggleSelectedColumns() {
 		const columns = this.#form_element.querySelectorAll('#columns-table .js-column');
 		const selected_columns = [...columns]
-		.filter(column => !this.#telemetry_columns_config.complex.includes(column.value))
-		.map(column => column.value);
+			.filter(column => !this.#telemetry_columns_config.complex.includes(column.value))
+			.map(column => column.value);
 		const available_columns = this.#getTelemetryColumns();
 
 		for (const column of columns) {
@@ -423,7 +423,7 @@ var LldRuleEditLldRuleTab = class {
 
 		if (!is_custom_expression) {
 			this.field.expression.innerHTML = getConditionFormula(this.#getTelemetryConditions(),
-				+ this.field.evaltype.value
+				+this.field.evaltype.value
 			);
 		}
 
@@ -576,7 +576,7 @@ var LldRuleEditLldRuleTab = class {
 			let row_index = 0;
 
 			while (this.#form_element.querySelector(`#aggregated-columns-table [data-row_index="${row_index}"]`)
-			!== null) {
+					!== null) {
 				row_index++;
 			}
 
@@ -598,8 +598,8 @@ var LldRuleEditLldRuleTab = class {
 		const rows = this.#form_element.querySelectorAll('#aggregated-columns-table tbody [data-row_index]');
 
 		return [...rows]
-		.filter((row) => row !== exclude_row)
-		.map((row) => row.querySelector(`[name="aggregated_columns[${row.dataset.row_index}][alias]"]`).value);
+			.filter((row) => row !== exclude_row)
+			.map((row) => row.querySelector(`[name="aggregated_columns[${row.dataset.row_index}][alias]"]`).value);
 	}
 
 	#addAggregatedColumnRow(data) {
@@ -687,8 +687,7 @@ var LldRuleEditLldRuleTab = class {
 		const existing = tbody.querySelector(`[data-row_index="${data.row_index}"]`);
 
 		const used_formulaids = new Set(
-			[...tbody.querySelectorAll('input[name$="[formulaid]"]')]
-			.map(input => input.value)
+			[...tbody.querySelectorAll('input[name$="[formulaid]"]')].map(input => input.value)
 		);
 
 		let formulaid_index = 0;

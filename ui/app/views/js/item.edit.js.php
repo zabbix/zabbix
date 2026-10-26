@@ -908,7 +908,7 @@ window.item_edit_form = new class {
 
 		if (!is_custom_expression) {
 			this.field.expression.innerHTML = getConditionFormula(this.#getTelemetryConditions(),
-				+ this.field.evaltype.value
+				+this.field.evaltype.value
 			);
 		}
 
