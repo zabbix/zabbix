@@ -364,13 +364,17 @@ var LldRuleEditLldRuleTab = class {
 
 		const selected_columns = [...columns].slice(0, -1).map(column => column.value);
 		const last_column = columns[columns.length - 1];
-		const next_option = last_column.getOptions()
-			.find(option => !option.disabled && !selected_columns.includes(String(option.value)));
+		let next_option = last_column.getOptions().find(option => !selected_columns.includes(String(option.value)));
 
-		if (next_option !== undefined) {
-			last_column.value = next_option.value;
-			last_column.dispatchEvent(new Event('change', {bubbles: true}));
+		if (next_option === undefined) {
+			const first_complex_value = this.#telemetry_columns_config.complex
+				.filter(value => last_column.getOptions().some(option => option.value === value))
+				.sort()[0];
+			next_option = last_column.getOptions().find(option => option.value === first_complex_value);
 		}
+
+		last_column.value = next_option.value;
+		last_column.dispatchEvent(new Event('change', {bubbles: true}));
 	}
 
 	#toggleSelectedColumns() {
