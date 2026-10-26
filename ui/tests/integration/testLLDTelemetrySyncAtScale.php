@@ -332,16 +332,33 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 		$this->assertArrayHasKey(0, $response['result']['itemids']);
 		$lld_ruleid = $response['result']['itemids'][0];
 
-		// Each dependent item keeps only rows of its own device and extracts the aggregated status. JSONPath as
-		// the first step lets all dependent items share one parsed and indexed master value, rows of other
-		// devices do not match and are discarded.
 		$response = $this->call('itemprototype.create', [
 			'hostid' => self::$templateid,
 			'ruleid' => $lld_ruleid,
 			'name' => 'APM device status ['.self::LLD_MACRO.']',
 			'key_' => self::ITEM_PROTO_KEY.'['.self::LLD_MACRO.']',
 			'type' => ITEM_TYPE_DEPENDENT,
-			'master_itemid' => self::$template_tq_itemid,
+			'master_itemid' => self::$template_tq_itemid
+		] + static::deviceItemPrototype());
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['itemids']);
+
+		$response = $this->call('triggerprototype.create', [
+			'description' => 'APM device '.self::LLD_MACRO.' status problem',
+			'expression' => static::deviceTriggerExpression(),
+			'priority' => TRIGGER_SEVERITY_AVERAGE
+		]);
+		$this->assertArrayHasKey('triggerids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['triggerids']);
+	}
+
+	/**
+	 * Value type and preprocessing of the per-device dependent item prototype. Each dependent item keeps only rows
+	 * of its own device and extracts the aggregated status. JSONPath as the first step lets all dependent items share
+	 * one parsed and indexed master value, rows of other devices do not match and are discarded.
+	 */
+	protected static function deviceItemPrototype(): array {
+		return [
 			'value_type' => ITEM_VALUE_TYPE_FLOAT,
 			'preprocessing' => [
 				[
@@ -351,17 +368,14 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 					'error_handler_params' => ''
 				]
 			]
-		]);
-		$this->assertArrayHasKey('itemids', $response['result']);
-		$this->assertArrayHasKey(0, $response['result']['itemids']);
+		];
+	}
 
-		$response = $this->call('triggerprototype.create', [
-			'description' => 'APM device '.self::LLD_MACRO.' status problem',
-			'expression' => 'last(/'.self::TEMPLATE_NAME.'/'.self::ITEM_PROTO_KEY.'['.self::LLD_MACRO.'])=1',
-			'priority' => TRIGGER_SEVERITY_AVERAGE
-		]);
-		$this->assertArrayHasKey('triggerids', $response['result']);
-		$this->assertArrayHasKey(0, $response['result']['triggerids']);
+	/**
+	 * Expression of the per-device trigger prototype, problem when the device reports status=1.
+	 */
+	protected static function deviceTriggerExpression(): string {
+		return 'last(/'.self::TEMPLATE_NAME.'/'.self::ITEM_PROTO_KEY.'['.self::LLD_MACRO.'])=1';
 	}
 
 	/**

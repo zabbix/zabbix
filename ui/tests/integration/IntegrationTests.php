@@ -79,6 +79,7 @@ require_once dirname(__FILE__).'/testDiagInfo.php';
 require_once dirname(__FILE__).'/testLLDHistorySyncAtScale.php';
 require_once dirname(__FILE__).'/testLLDProxyHistorySyncAtScale.php';
 require_once dirname(__FILE__).'/testLLDTelemetrySyncAtScale.php';
+require_once dirname(__FILE__).'/testLLDTelemetrySyncAtScaleJsonPathTrigger.php';
 /* require_once dirname(__FILE__).'/testLLDTelemetrySyncAtScaleClickHouseCollector.php'; */
 
 /* require_once dirname(__FILE__).'/testLLDHistorySyncAtScaleSingleSyncer.php'; can be enabled to test with single history syncer */
@@ -171,6 +172,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testLLDHistorySyncAtScale');
 		$suite->addTestSuite('testLLDProxyHistorySyncAtScale');
 		$suite->addTestSuite('testLLDTelemetrySyncAtScale');
+		$suite->addTestSuite('testLLDTelemetrySyncAtScaleJsonPathTrigger');
 		$suite->addTestSuite('testTelemetryQueryItemsWithProxyInput');
 		/* $suite->addTestSuite('testLLDTelemetrySyncAtScaleClickHouseCollector'); */
 
