@@ -2269,19 +2269,22 @@ jQuery(function($) {
 
 				link.on('click', (e) => alert(e.target.dataset.error));
 			}
-			else if (options.url !== undefined) {
-				link.attr('href', options.url);
+			else {
+				if (options.url !== undefined) {
+					link.attr('href', options.url);
 
-				if ('target' in options) {
-					link.attr('target', options.target);
+					if ('target' in options) {
+						link.attr('target', options.target);
+					}
+
+					if ('rel' in options) {
+						link.attr('rel', options.rel);
+					}
 				}
 
-				if ('rel' in options) {
-					link.attr('rel', options.rel);
+				if (options.clickCallback !== undefined) {
+					link.on('click', options.clickCallback);
 				}
-			}
-			else if (options.clickCallback !== undefined) {
-				link.on('click', options.clickCallback);
 			}
 		}
 
