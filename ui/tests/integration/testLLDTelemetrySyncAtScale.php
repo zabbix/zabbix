@@ -31,8 +31,9 @@ require_once __DIR__.'/../../include/classes/api/item_types/CItemTypeTelemetryQu
  * is the {$SITE} user macro, which every host sets to its own name.
  *
  * Each query result row is a separate value, so every row is processed by all dependent items of its host:
- * PROBLEM_DEVICE_COUNT * LLD_DISCOVERY_COUNT JSONPath lookups per host and round (indexed, master value parsed
- * once).
+ * LLD_DISCOVERY_COUNT * LLD_DISCOVERY_COUNT JSONPath lookups per host and round when every device reports, as in
+ * the trigger rounds, where problem devices report status=1 among status=0 of all other devices (indexed, master
+ * value parsed once).
  *
  * Requires: proxy built with APM support, ClickHouse with otel_* tables, grpcurl in PATH.
  *
@@ -70,7 +71,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 
 	const HOST_COUNT = 4;
 	/* every device is a row of the discovery query, which must not exceed ZBX_TQ_MAX_RESULT_ROWS (10000) */
-	const LLD_DISCOVERY_COUNT = 8192;
+	const LLD_DISCOVERY_COUNT = 32768;
 	const PROBLEM_DEVICE_COUNT = 8192;
 	const OTLP_BATCH_SIZE = 1000;
 	const LLD_ITERATIONS = 60;
@@ -110,7 +111,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	private static $disabled_hostids = [];
 	/* baselines taken before status=0 of all devices is sent */
 	private static $vps_last;
-	private static $stored_zero_last;
+	private static $stored_last;
 
 	/**
 	 * Component configuration provider.
@@ -433,7 +434,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 		$this->syncCollectorConfiguration();
 
 		// Resend periodically, data sent before the proxy has APM configuration may be dropped.
-		$baseline = $this->getStoredStatusCount(0);
+		$baseline = $this->getStoredStatusCounts()[0];
 		$deadline = time() + 30;
 		$next_send = time();
 		$count = $baseline;
@@ -441,7 +442,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 		while ($count === $baseline && time() < $deadline) {
 			if (time() >= $next_send) {
 				$error = null;
-				if (!$this->sendDeviceStatus([self::PREFLIGHT_SITE => [self::PREFLIGHT_DEVICE]], 0, $error)) {
+				if (!$this->sendDeviceStatus([self::PREFLIGHT_SITE => [self::PREFLIGHT_DEVICE => 0]], $error)) {
 					$send_error = $error;
 				}
 				$next_send = time() + self::PREFLIGHT_RESEND_SECONDS;
@@ -449,7 +450,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 
 			sleep(self::WAIT_ITERATION_DELAY);
 
-			$count = $this->getStoredStatusCount(0);
+			$count = $this->getStoredStatusCounts()[0];
 		}
 
 		$this->assertGreaterThan($baseline, $count,
@@ -465,11 +466,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	 * @depends testLLDTelemetrySyncAtScale_IngestPreflight
 	 */
 	public function testLLDTelemetrySyncAtScale_LLDDiscovery() {
-		$devices = [];
-		foreach (self::hostNames() as $host) {
-			$devices[$host] = self::deviceNames();
-		}
-		$this->sendStatusAndWaitStored($devices, 0);
+		$this->sendStatusAndWaitStored(self::allDeviceStatuses([], 0));
 
 		$this->createSiteHosts();
 		// Data is already stored when the first poll of the LLD rule runs, so devices are discovered by it.
@@ -507,15 +504,10 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	 */
 	public function testLLDTelemetrySyncAtScale_StatusZeroSend() {
 		self::$vps_last = $this->getVpsWritten();
-		self::$stored_zero_last = $this->getStoredStatusCount(0);
-
-		$devices = [];
-		foreach (self::hostNames() as $host) {
-			$devices[$host] = self::deviceNames();
-		}
+		self::$stored_last = $this->getStoredStatusCounts();
 
 		$error = null;
-		$this->assertTrue($this->sendDeviceStatus($devices, 0, $error),
+		$this->assertTrue($this->sendDeviceStatus(self::allDeviceStatuses([], 0), $error),
 				'Failed to send status=0 data points: '.$error);
 	}
 
@@ -534,16 +526,18 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	 * @depends testLLDTelemetrySyncAtScale_StatusZeroSend
 	 */
 	public function testLLDTelemetrySyncAtScale_StatusZeroVerify() {
-		$this->assertStoredStatusIncreasedBy(0, self::$stored_zero_last, self::LLD_DISCOVERY_COUNT * self::HOST_COUNT);
+		$this->assertStoredStatusIncreasedBy(self::$stored_last, [self::LLD_DISCOVERY_COUNT * self::HOST_COUNT, 0]);
 	}
 
 	/**
-	 * Send status=1 for the problem devices of all sites and wait until it is stored in ClickHouse.
+	 * Every device of every site reports, status=1 for the problem devices and status=0 for the rest, as devices
+	 * that report periodically would, and wait until it is stored in ClickHouse. Every poll of the query item then
+	 * holds rows of healthy and problem devices of the site.
 	 *
 	 * @depends testLLDTelemetrySyncAtScale_LLDDiscovery
 	 */
 	public function testLLDTelemetrySyncAtScale_TriggerFiringSend() {
-		$this->sendStatusAndWaitStored(self::problemDevices(), 1);
+		$this->sendStatusAndWaitStored(self::allDeviceStatuses(self::problemDevices(), 1));
 	}
 
 	/**
@@ -560,12 +554,12 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	}
 
 	/**
-	 * Send status=0 for the same devices and wait until it is stored in ClickHouse.
+	 * Every device of every site reports status=0 and wait until it is stored in ClickHouse.
 	 *
 	 * @depends testLLDTelemetrySyncAtScale_TriggerFiringVerify
 	 */
 	public function testLLDTelemetrySyncAtScale_TriggerRecoverySend() {
-		$this->sendStatusAndWaitStored(self::problemDevices(), 0);
+		$this->sendStatusAndWaitStored(self::allDeviceStatuses([], 0));
 	}
 
 	/**
@@ -602,7 +596,8 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	 * @depends testLLDTelemetrySyncAtScale_SmallGranularityUpdate
 	 */
 	public function testLLDTelemetrySyncAtScale_SmallGranularityTriggerFiringSend() {
-		$this->sendStatusAndWaitStored(self::problemDevices(self::SMALL_GRANULARITY_PROBLEM_DEVICE_COUNT), 1,
+		$this->sendStatusAndWaitStored(
+				self::deviceStatuses(self::problemDevices(self::SMALL_GRANULARITY_PROBLEM_DEVICE_COUNT), 1),
 				self::SMALL_GRANULARITY_SEND_COUNT);
 	}
 
@@ -625,7 +620,8 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	 * @depends testLLDTelemetrySyncAtScale_SmallGranularityTriggerFiringVerify
 	 */
 	public function testLLDTelemetrySyncAtScale_SmallGranularityTriggerRecoverySend() {
-		$this->sendStatusAndWaitStored(self::problemDevices(self::SMALL_GRANULARITY_PROBLEM_DEVICE_COUNT), 0,
+		$this->sendStatusAndWaitStored(
+				self::deviceStatuses(self::problemDevices(self::SMALL_GRANULARITY_PROBLEM_DEVICE_COUNT), 0),
 				self::SMALL_GRANULARITY_SEND_COUNT);
 	}
 
@@ -689,13 +685,56 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	}
 
 	/**
-	 * Send the status $send_count times, a second apart, so with granularity of a second every send of a device is
-	 * a bucket of its own.
+	 * Status of the given devices only.
 	 *
 	 * @param array $devices  site => device names
+	 *
+	 * @return array  site => [device name => status]
 	 */
-	private function sendStatusAndWaitStored(array $devices, int $status, int $send_count = 1): void {
-		$baseline = $this->getStoredStatusCount($status);
+	private static function deviceStatuses(array $devices, int $status): array {
+		$statuses = [];
+		foreach ($devices as $site => $names) {
+			$statuses[$site] = array_fill_keys($names, $status);
+		}
+
+		return $statuses;
+	}
+
+	/**
+	 * Status of every device of every site, $status for the given devices and 0 for the rest.
+	 *
+	 * @param array $devices  site => device names
+	 *
+	 * @return array  site => [device name => status]
+	 */
+	private static function allDeviceStatuses(array $devices, int $status): array {
+		$statuses = [];
+		foreach (self::hostNames() as $host) {
+			$statuses[$host] = array_fill_keys(self::deviceNames(), 0);
+
+			if (array_key_exists($host, $devices)) {
+				$statuses[$host] = array_fill_keys($devices[$host], $status) + $statuses[$host];
+			}
+		}
+
+		return $statuses;
+	}
+
+	/**
+	 * Send the statuses $send_count times, a second apart, so with granularity of a second every send of a device
+	 * is a bucket of its own.
+	 *
+	 * @param array $statuses  site => [device name => status]
+	 */
+	private function sendStatusAndWaitStored(array $statuses, int $send_count = 1): void {
+		$baseline = $this->getStoredStatusCounts();
+
+		$increase = [0, 0];
+		foreach ($statuses as $device_statuses) {
+			foreach ($device_statuses as $status) {
+				$increase[$status] += $send_count;
+			}
+		}
 
 		for ($i = 1; $i <= $send_count; $i++) {
 			if ($i > 1) {
@@ -703,12 +742,11 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 			}
 
 			$error = null;
-			$this->assertTrue($this->sendDeviceStatus($devices, $status, $error),
-					'Failed to send status='.$status.' data points (send '.$i.' of '.$send_count.'): '.$error);
+			$this->assertTrue($this->sendDeviceStatus($statuses, $error),
+					'Failed to send status data points (send '.$i.' of '.$send_count.'): '.$error);
 		}
 
-		$this->assertStoredStatusIncreasedBy($status, $baseline,
-				array_sum(array_map('count', $devices)) * $send_count);
+		$this->assertStoredStatusIncreasedBy($baseline, $increase);
 	}
 
 	private function waitForOpenProblemCount(int $expected): void {
@@ -751,13 +789,13 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	 * Send one device.status gauge data point per device, one OTLP resource per device, batched. A batch may hold
 	 * devices of several sites, as when sent by a collector.
 	 *
-	 * @param array $devices  site => device names
+	 * @param array $statuses  site => [device name => status]
 	 */
-	private function sendDeviceStatus(array $devices, int $status, ?string &$error = null): bool {
+	private function sendDeviceStatus(array $statuses, ?string &$error = null): bool {
 		$site_devices = [];
-		foreach ($devices as $site => $names) {
-			foreach ($names as $device) {
-				$site_devices[] = [$site, $device];
+		foreach ($statuses as $site => $device_statuses) {
+			foreach ($device_statuses as $device => $status) {
+				$site_devices[] = [$site, (string) $device, $status];
 			}
 		}
 
@@ -767,7 +805,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 			$time_ns = (string) (int) (microtime(true) * 1e9);
 
 			$resource_metrics = [];
-			foreach ($batch as [$site, $device]) {
+			foreach ($batch as [$site, $device, $status]) {
 				$resource_metrics[] = [
 					'resource' => [
 						'attributes' => [
@@ -917,29 +955,36 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 		return [$count - $ones, $ones];
 	}
 
-	private function getStoredStatusCount(int $status): int {
+	/**
+	 * @return array  [0 => status=0 count, 1 => status=1 count]
+	 */
+	private function getStoredStatusCounts(): array {
 		$result = $this->callTestItemUntilCallback(self::storedStatusItem(),
 			fn($result) => self::parseStoredStatusCounts($result) !== null,
 			['single' => false, 'state' => 0], self::CLICKHOUSE_WAIT_SECONDS * 1000
 		);
 
-		return self::parseStoredStatusCounts($result)[$status];
+		return self::parseStoredStatusCounts($result);
 	}
 
-	private function assertStoredStatusIncreasedBy(int $status, int $baseline, int $increase): void {
-		$expected = $baseline + $increase;
+	/**
+	 * @param array $baseline  [0 => status=0 count, 1 => status=1 count]
+	 * @param array $increase  [0 => status=0 count, 1 => status=1 count]
+	 */
+	private function assertStoredStatusIncreasedBy(array $baseline, array $increase): void {
+		$expected = [$baseline[0] + $increase[0], $baseline[1] + $increase[1]];
 
 		$result = $this->callTestItemUntilCallback(self::storedStatusItem(),
-			function ($result) use ($status, $expected) {
+			function ($result) use ($expected) {
 				$counts = self::parseStoredStatusCounts($result);
 
-				return $counts !== null && $counts[$status] >= $expected;
+				return $counts !== null && $counts[0] >= $expected[0] && $counts[1] >= $expected[1];
 			},
 			['single' => false, 'state' => 0], self::CLICKHOUSE_WAIT_SECONDS * 1000
 		);
 
-		$this->assertEquals($expected, self::parseStoredStatusCounts($result)[$status],
-				'Unexpected number of status='.$status.' data points stored in ClickHouse: '.
+		$this->assertEquals($expected, self::parseStoredStatusCounts($result),
+				'Unexpected number of status=0 and status=1 data points stored in ClickHouse: '.
 				$result['item']['result']);
 	}
 
