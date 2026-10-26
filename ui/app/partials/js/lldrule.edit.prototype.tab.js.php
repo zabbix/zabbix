@@ -737,6 +737,8 @@ var LldRuleEditPrototypeTab = class {
 		this.#lldrule.conditions.forEach((condition, row_index) => {
 			this.#addConditionRow({...condition, row_index});
 		});
+
+		this.#toggleSelectedColumns();
 	}
 
 	#updateSortOrder(table, name_field) {

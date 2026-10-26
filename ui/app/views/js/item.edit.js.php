@@ -872,6 +872,8 @@ window.item_edit_form = new class {
 		this.form_data.conditions.forEach((condition, row_index) => {
 			this.#addConditionRow({...condition, row_index});
 		});
+
+		this.#toggleSelectedColumns();
 	}
 
 	#updateTelemetryVisibility() {
