@@ -58,4 +58,5 @@ declare -A BASELINE_TIMES=(
   [testUserMacrosWithContext]=10
   [testScheduledReports]=10
   [testGraphLinking]=8
+  [testReportTest]=5
 )
