@@ -644,7 +644,7 @@ var LldRuleEditPrototypeTab = class {
 		const parameters = {
 			signal_type: signal_type,
 			metric_point_type: metric_point_type,
-			parent_discoveryid: this.#lldrule.discoveryData.itemdiscoveryid
+			parent_discoveryid: this.#form_element.querySelector('[name="parent_discoveryid"]').value
 		};
 
 		if (row !== null) {
