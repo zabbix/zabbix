@@ -692,7 +692,7 @@ function renderApmAttrRow($index, array $attribute, array $options = []): array 
 	$fields_row = (new CRow([
 		(new CCol(
 			(new CTextAreaFlexible($options['field_name'].'['.$index.'][key]', $attribute['key']))
-				->setErrorContainer($options['has_inline_validation'] ? 'attr_name_'.$index.'_error_container' : null)
+				->setErrorContainer($options['has_inline_validation'] ? 'attribute_'.$index.'_error_container' : null)
 				->setErrorLabel($options['has_inline_validation'] ? _('Name') : null)
 				->setAttribute('placeholder', _('name'))
 				->setAdaptiveWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -700,7 +700,7 @@ function renderApmAttrRow($index, array $attribute, array $options = []): array 
 		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol(
 			(new CTextAreaFlexible($options['field_name'].'['.$index.'][value]', $attribute['value']))
-				->setErrorContainer($options['has_inline_validation'] ? 'attr_value_'.$index.'_error_container' : null)
+				->setErrorContainer($options['has_inline_validation'] ? 'attribute_'.$index.'_error_container' : null)
 				->setErrorLabel($options['has_inline_validation'] ? _('Value') : null)
 				->setAttribute('placeholder', _('value'))
 				->setAdaptiveWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -708,7 +708,7 @@ function renderApmAttrRow($index, array $attribute, array $options = []): array 
 		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol(
 			(new CSelect($options['field_name'].'['.$index.'][signal_type]'))
-				->setErrorContainer($options['has_inline_validation'] ? 'attr_type_'.$index.'_error_container' : null)
+				->setErrorContainer($options['has_inline_validation'] ? 'attribute_'.$index.'_error_container' : null)
 				->setErrorLabel($options['has_inline_validation'] ? _('Type') : null)
 				->setValue($attribute['signal_type'])
 				->addOptions(CSelect::createOptionsFromArray($options['signal_types']))
@@ -728,7 +728,7 @@ function renderApmAttrRow($index, array $attribute, array $options = []): array 
 		? (new CRow(
 			(new CCol())
 				->addClass(ZBX_STYLE_ERROR_CONTAINER)
-				->setId('attr_'.$index.'_error_container')
+				->setId('attribute_'.$index.'_error_container')
 				->setColSpan(4)
 		))
 		: null;
