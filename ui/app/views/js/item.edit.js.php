@@ -823,8 +823,7 @@ window.item_edit_form = new class {
 		const existing = tbody.querySelector(`[data-row_index="${data.row_index}"]`);
 
 		const used_formulaids = new Set(
-			[...tbody.querySelectorAll('input[name$="[formulaid]"]')]
-			.map(input => input.value)
+			[...tbody.querySelectorAll('input[name$="[formulaid]"]')].map(input => input.value)
 		);
 
 		let formulaid_index = 0;
