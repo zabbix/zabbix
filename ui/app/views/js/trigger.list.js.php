@@ -130,7 +130,7 @@
 					}
 				}
 
-				location.href = location.href;
+				location.reload();
 			});
 		}
 
@@ -150,7 +150,7 @@
 					postMessageDetails('success', e.detail.success.messages);
 				}
 
-				location.href = location.href;
+				location.reload();
 			});
 		}
 
@@ -245,7 +245,7 @@
 						uncheckTableRows('trigger');
 					}
 
-					location.href = location.href;
+					location.reload();
 				})
 				.catch(() => {
 					clearMessages();
