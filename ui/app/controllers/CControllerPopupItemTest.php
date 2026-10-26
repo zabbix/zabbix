@@ -259,6 +259,10 @@ abstract class CControllerPopupItemTest extends CController {
 		'granularity' => [
 			'support_user_macros' => true,
 			'support_lld_macros' => true
+		],
+		'query' => [
+			'support_user_macros' => true,
+			'support_lld_macros' => true
 		]
 	];
 
@@ -856,7 +860,7 @@ abstract class CControllerPopupItemTest extends CController {
 			}
 		}
 
-		if (array_key_exists('key', $inputs) && strstr($inputs['key'], '{') !== false) {
+		if (array_key_exists('key', $inputs) && str_contains($inputs['key'], '{')) {
 			$usermacros = CMacrosResolverHelper::extractItemTestMacros([
 				'steps' => [],
 				'delay' => '',
@@ -1101,7 +1105,7 @@ abstract class CControllerPopupItemTest extends CController {
 				}
 
 				foreach ($inputs[$field] as &$entry) {
-					if (strpos($entry['name'], '{') !== false) {
+					if (str_contains($entry['name'], '{')) {
 						$matched_macros = CMacrosResolverGeneral::getMacroPositions($entry['name'], $types);
 
 						foreach (array_reverse($matched_macros, true) as $pos => $macro) {
@@ -1113,7 +1117,7 @@ abstract class CControllerPopupItemTest extends CController {
 						}
 					}
 
-					if (strpos($entry['value'], '{') !== false) {
+					if (str_contains($entry['value'], '{')) {
 						$matched_macros = CMacrosResolverGeneral::getMacroPositions($entry['value'], $types);
 
 						foreach (array_reverse($matched_macros, true) as $pos => $macro) {
@@ -1127,7 +1131,31 @@ abstract class CControllerPopupItemTest extends CController {
 				}
 				unset($entry);
 			}
-			elseif (strstr($inputs[$field], '{') !== false) {
+			elseif ($field === 'query') {
+				$query = json_decode($inputs[$field], true);
+
+				if (!array_key_exists('conditions', $query['filter'])) {
+					continue;
+				}
+
+				foreach ($query['filter']['conditions'] as &$condition) {
+					foreach (['attribute_key', 'value'] as $name) {
+						$matched_macros = CMacrosResolverGeneral::getMacroPositions($condition[$name], $types);
+
+						foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+							$macro_value = array_key_exists($macro, $macros_posted)
+								? $macros_posted[$macro]
+								: '';
+
+							$condition[$name] = substr_replace($condition[$name], $macro_value, $pos, strlen($macro));
+						}
+					}
+				}
+				unset($condition);
+
+				$inputs[$field] = json_encode($query, JSON_UNESCAPED_UNICODE);
+			}
+			elseif (str_contains($inputs[$field], '{')) {
 				if ($field === 'key') {
 					$inputs[$field] = CMacrosResolverGeneral::resolveItemKeyMacros($inputs[$field], $macros_posted, $types);
 				}
@@ -1159,7 +1187,7 @@ abstract class CControllerPopupItemTest extends CController {
 		// Resolve interface details (SNMP) macros separately.
 		if (array_key_exists('interface', $inputs) && array_key_exists('details', $inputs['interface'])) {
 			foreach ($inputs['interface']['details'] as &$field) {
-				if (strstr($field, '{') !== false) {
+				if (str_contains($field, '{')) {
 					$matched_macros = CMacrosResolverGeneral::getMacroPositions($field, ['usermacros' => true]);
 
 					foreach (array_reverse($matched_macros, true) as $pos => $macro) {
