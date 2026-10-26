@@ -285,8 +285,7 @@ $apm_tab = (new CFormGrid())
 		))->addClass('js-apm-attributes'),
 	)
 	->addItem([
-		(new CLabel([_('Resource attributes')], 'additional_resource_attributes'))
-			->addClass('js-apm-attributes'),
+		(new CLabel([_('Resource attributes')], 'additional_resource_attributes'))->addClass('js-apm-attributes'),
 		(new CFormField(
 			(new CDiv(new CPartial('apm.attributes', [
 				'attributes' => $data['form']['additional_resource_attributes'],
@@ -301,8 +300,8 @@ $apm_tab = (new CFormGrid())
 				],
 				'default_signal_type' => SIGNAL_TYPE_TRACES
 			])))
+				->addStyle('width: 100%;')
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->addClass('form-field-apm-attributes')
 		))->addClass('js-apm-attributes')
 	]);
 

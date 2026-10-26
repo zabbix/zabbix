@@ -382,8 +382,7 @@ $tag_filter_form_grid = (new CFormGrid())
 	]);
 
 $apm_filter = (new CFormGrid())->addItem([
-		(new CLabel([_('Resource attributes')], 'apm_filters'))
-			->addClass('js-apm-attributes'),
+		(new CLabel([_('Resource attributes')], 'apm_filters'))->addClass('js-apm-attributes'),
 		(new CFormField(
 			(new CDiv(new CPartial('apm.attributes', [
 				'attributes' => $data['apm_filters'],
@@ -399,8 +398,8 @@ $apm_filter = (new CFormGrid())->addItem([
 				],
 				'default_signal_type' => SIGNAL_TYPE_ALL
 			])))
+				->addStyle('min-width: 540px;')
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->addClass('form-field-apm-attributes')
 		))->addClass('js-apm-attributes')
 	]);
 
