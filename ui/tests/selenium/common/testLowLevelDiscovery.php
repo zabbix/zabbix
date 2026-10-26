@@ -2340,10 +2340,10 @@ class testLowLevelDiscovery extends CWebTest {
 				$this->checkComplexFields($data['Filters']['filters'], $form, 'Filters', 'z-textarea-flexible');
 
 				if (array_key_exists('calculation', $data['Filters'])) {
-					$form->checkValue(['id:evaltype' => $data['Filters']['calculation']]);
+					$form->checkValue(['id:filters_evaltype' => $data['Filters']['calculation']]);
 
 					if (array_key_exists('formula', $data['Filters'])) {
-						$form->checkValue(['id:formula' => $data['Filters']['formula']]);
+						$form->checkValue(['id:filters_formula' => $data['Filters']['formula']]);
 					}
 				}
 			}
