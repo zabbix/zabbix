@@ -1761,24 +1761,31 @@ jQuery(function($) {
 			link.addClass('disabled');
 		}
 		else {
-			if (options.url !== undefined) {
-				link.attr('href', options.url);
-
-				if ('target' in options) {
-					link.attr('target', options.target);
+			if (options.error !== undefined) {
+				if (options.dataAttributes === undefined) {
+					options.dataAttributes = {};
 				}
 
-				if ('rel' in options) {
-					link.attr('rel', options.rel);
-				}
-			}
+				options.dataAttributes.error = options.error;
 
-			if (options.clickCallback !== undefined) {
-				link.on('click', options.clickCallback);
-			}
-
-			if (options.url === null && 'dataAttributes' in options && 'error' in options.dataAttributes) {
 				link.on('click', (e) => alert(e.target.dataset.error));
+			}
+			else {
+				if (options.url !== undefined) {
+					link.attr('href', options.url);
+
+					if ('target' in options) {
+						link.attr('target', options.target);
+					}
+
+					if ('rel' in options) {
+						link.attr('rel', options.rel);
+					}
+				}
+
+				if (options.clickCallback !== undefined) {
+					link.on('click', options.clickCallback);
+				}
 			}
 		}
 
