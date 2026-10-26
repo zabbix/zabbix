@@ -261,7 +261,9 @@ window.host_wizard_edit = new class {
 
 			if (this.#pending_form_update) {
 				this.#pending_form_update = false;
-				this.#updateForm(this.#last_input_changed ?? this.#inputNameToInputPath(this.#last_input_changed));
+				this.#updateForm(
+					this.#last_input_changed ? this.#inputNameToInputPath(this.#last_input_changed) : null
+				);
 				this.#last_input_changed = null;
 			}
 		});

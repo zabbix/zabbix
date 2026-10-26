@@ -100,8 +100,7 @@ class Maps {
 						'selementid' => 2,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_MAP,
 						'iconid_off' => 3,
-						'label' => 'Map element (Local network)',
-						'label_location' => MAP_LABEL_LOC_RIGHT,
+						'label' => '',
 						'x' => 551,
 						'y' => 112,
 						'use_iconmap' => 0,
@@ -132,15 +131,14 @@ class Maps {
 						'elements' => [['groupid' => 4]], // Zabbix servers.
 						'zindex' => 3
 					],
-					// Host (Disk array symbol).
+					// Host (House symbol).
 					[
 						'selementid' => 5,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
-						'iconid_off' => 19,
+						'iconid_off' => 34,
 						'label' => 'Host element (Zabbix Server)',
-						'label_location' => MAP_LABEL_LOC_RIGHT,
-						'x' => 543,
-						'y' => 369,
+						'x' => 546,
+						'y' => 343,
 						'use_iconmap' => 0,
 						'elements' => [['hostid' => $result['hostids']['Host for map with links']]],
 						'zindex' => 4
@@ -178,10 +176,10 @@ class Maps {
 					// Pink ellipse.
 					[
 						'type' => SYSMAP_SHAPE_TYPE_ELLIPSE,
-						'x' => 468,
-						'y' => 324,
-						'width' => 313,
-						'height' => 201,
+						'x' => 478,
+						'y' => 93,
+						'width' => 296,
+						'height' => 166,
 						'text' => '',
 						'border_width' => 2,
 						'background_color' => 'FFCCCC',
@@ -244,9 +242,8 @@ class Maps {
 						'elements' => [['hostid' => $result['hostids']['Host for map for form testing']]],
 						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
 						'iconid_off' => 186,
-						'label_location' => MAP_LABEL_LOC_TOP,
-						'x' => 143,
-						'y' => 68,
+						'x' => 60,
+						'y' => 69,
 						'use_iconmap' => 0,
 						'zindex' => 0
 					],
@@ -255,8 +252,8 @@ class Maps {
 						'selementid' => 7,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_IMAGE,
 						'iconid_off' => 6,
-						'x' => 111,
-						'y' => 314,
+						'x' => 300,
+						'y' => 15,
 						'zindex' => 1
 					],
 					// Trigger.
@@ -265,8 +262,8 @@ class Maps {
 						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
 						'iconid_off' => 146,
 						'elements' => [['triggerid' => $map_form_triggerid]],
-						'x' => 350,
-						'y' => 200,
+						'x' => 240,
+						'y' => 227,
 						'zindex' => 2
 					]
 				],

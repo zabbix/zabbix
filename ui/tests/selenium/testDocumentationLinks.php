@@ -2723,7 +2723,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'element' => [
-						'xpath://div[contains(@class, "sysmap_iconid_19")]',
+						'xpath://div[contains(@class, "sysmap_iconid_34")]',
 						'xpath://div[contains(@class, "sysmap_iconid_7")]'
 					],
 					'doc_link' => '/en/manual/config/visualization/maps/map#selecting-elements'
@@ -2733,7 +2733,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'element' => [
-						'xpath://div[contains(@style, "top: 324px")]',
+						'xpath://div[contains(@style, "top: 93px")]',
 						'xpath://div[contains(@style, "top: 63px")]'
 					],
 					'doc_link' => '/en/manual/config/visualization/maps/map#adding-shapes'

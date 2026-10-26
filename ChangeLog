@@ -1,21 +1,37 @@
-Changes for 7.4.16rc1
+Changes for 7.4.17rc1
 
 New features:
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.4.16
+
+7.4.16rc1 was released as 7.4.16 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 7.4.16rc1
+
+New features:
+A.......S. [ZBXNEXT-10786] updated maximum supported TimescaleDB version to 2.30 (mprihodko)
+
+Bug fixes:
+........S. [ZBX-27897] fixed time function triggers not working after disabling and enabling item (wiper)
+..F....... [ZBX-26854] fixed handling of null as previous value in preprocessing during item test (vskalbins)
+..F....... [ZBX-23109] fixed automatic setting of SNMP maximum repetition count and community on SNMP version change for host interface (gberzina)
 .........T [ZBX-24844] added missing filters in EtherLike-MIB discovery (kflorowski)
 ........S. [ZBX-27673] fixed browser item timeout (sboidenko)
-.......PS. [ZBX-27888] resumed VMware data collection after a pause of more than 1 hour (MVekslers)
+.......PS. [ZBX-27888] resumed VMware data collection after pause of more than 1 hour (MVekslers)
 .........T [ZBX-28164] fixed naming in README.md for MikroTik family templates (egordymov)
-..F....... [ZBX-27778] fixed keyboard navigation to the 'Edit filter properties' button (aluchko)
+..F....... [ZBX-27778] fixed keyboard navigation to "Edit filter properties" button (aluchko)
 A......... [ZBX-27967] fixed remote script execution for hosts monitored by proxy group when EnabledGlobalScripts is disabled (scernisenko)
 ..F....... [ZBX-24729] fixed unreadable long unit names in SVG graph widget (aluchko)
 A......... [ZBX-27803] implemented collecting history.get results by sub-periods when limit parameter is given to avoid full table scans (jfreibergs)
-..F....... [ZBX-27909] fixed text area max length in host inventory (uolekss)
+..F....... [ZBX-27909] fixed text area maximum length in host inventory (uolekss)
 ...G...... [ZBX-27943] fixed web.page.* checks failing when server requests TLS renegotiation on Zabbix agent 2 (esneiders)
-...G...... [ZBX-26359] fixed smart plugin handling of smartctl exit statuses and fixed discovery returning data if one drive failed (opucka)
-..F....... [ZBX-27957] fixed color selection in Pie chart and SVG Graph datasets when aggregation is used (dfofanovs)
-..F....... [ZBX-27779] fixed update and save buttons misplacement after switching filter tabs in Safari (gklavins)
+...G...... [ZBX-26359] fixed Smart plugin handling of smartctl exit statuses and fixed discovery not returning data if one drive failed (opucka)
+..F....... [ZBX-27957] fixed color selection in Pie chart and SVG graph datasets when aggregation is used (dfofanovs)
+..F....... [ZBX-27779] fixed misplacement of "Update" and "Save" buttons after switching filter tabs in Safari (gklavins)
 ..F....... [ZBX-27492] fixed unsupported state change error caused by missing host in geomap widget (gklavins)
 ........S. [ZBX-26836] fixed crashes in alert, connector, IPMI, LLD and report managers during Zabbix server shutdown (ademidovs)
 .........T [ZBX-28146] fixed naming in Veeam Backup & Replication by HTTP template (egordymov)
@@ -112,6 +128,11 @@ A.......S. [ZBXNEXT-10669] updated maximum supported TimescaleDB version to 2.28
 .........T [ZBXNEXT-10558] updated Veeam Backup and Replication & Veeam Backup Enterprise Manager by HTTP templates (egordymov)
 
 Bug fixes:
+.....J.PS. [ZBX-28197] improved validation of SNMP trap payload in zabbix_trap_receiver.pl (MVekslers)
+.......PS. [ZBX-28196] added heartbeat connection type and frequency validation (sboidenko)
+..F....... [ZBX-28195] implemented validation of parameters for jsrpc.php (Ivo)
+........S. [ZBX-28194] fixed memory allocation size for binary items on MySQL/MariaDB (sboidenko)
+.......PS. [ZBX-28193] fixed JavaScript preprocessing memory initialization (MVekslers)
 .......PS. [ZBX-27975] fixed potential VMware collector crash caused by network connectivity issues to vCenter (MVekslers)
 .........T [ZBX-21745] fixed duplicate discovery key and JavaScript preprocessing in RabbitMQ templates (abrosimovs)
 ..F....... [ZBX-26583] fixed incorrectly displayed templates after clearing search field in host wizard (aluchko, gklavins)
@@ -144,6 +165,7 @@ A.......S. [ZBXNEXT-10618] updated maximum supported TimescaleDB version to 2.27
 A......PS. [ZBXNEXT-10592] updated maximum supported MySQL version to 9.7 (mprihodko)
 
 Bug fixes:
+A.F....... [ZBX-28198] fixed redirection to invalid URL (dpankins)
 A......... [ZBX-28076] improved login handling (vbodrihins)
 A......... [ZBX-28074] fixed potential disclosure of some write-only fields through API filter and search parameters (dpankins)
 .......PS. [ZBX-28073] improved behavior of script HttpRequest call (MVekslers)
@@ -1630,23 +1652,40 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
 
 --------------------------------------------------------------------------------
-Changes for 7.0.32rc1
+Changes for 7.0.33rc1
 
 New features:
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.0.32
+
+7.0.32rc1 was released as 7.0.32 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 7.0.32rc1
+
+New features:
+A.......S. [ZBXNEXT-10786] updated maximum supported TimescaleDB version to 2.30 (mprihodko)
+
+Bug fixes:
+........S. [ZBX-27897] fixed time function triggers not working after disabling and enabling item (wiper)
+..F....... [ZBX-26854] fixed handling of null as previous value in preprocessing during item test (vskalbins)
+..F....... [ZBX-23109] fixed automatic setting of SNMP maximum repetition count and community on SNMP version change for host interface (gberzina)
+...G...... [ZBX-27925] added AI_NUMERICHOST flag to suppress potentially lengthy network host address lookups (jburlakovs)
 .........T [ZBX-24844] added missing filters in EtherLike-MIB discovery (kflorowski)
 ........S. [ZBX-27673] fixed browser item timeout (sboidenko)
-.......PS. [ZBX-27888] resumed VMware data collection after a pause of more than 1 hour (MVekslers)
-..F....... [ZBX-27778] fixed keyboard navigation to the 'Edit filter properties' button (aluchko)
+.......PS. [ZBX-27888] resumed VMware data collection after pause of more than 1 hour (MVekslers)
+..F....... [ZBX-27778] fixed keyboard navigation to "Edit filter properties" button (aluchko)
 A......... [ZBX-27967] fixed remote script execution for hosts monitored by proxy group when EnabledGlobalScripts is disabled (scernisenko)
 A......... [ZBX-27803] implemented collecting history.get results by sub-periods when limit parameter is given to avoid full table scans (jfreibergs)
-..F....... [ZBX-27909] fixed text area max length in host inventory (uolekss)
+..F....... [ZBX-27909] fixed text area maximum length in host inventory (uolekss)
 ..F....... [ZBX-24729] fixed unreadable long unit names in SVG graph widget (aluchko)
 ...G...... [ZBX-27943] fixed web.page.* checks failing when server requests TLS renegotiation on Zabbix agent 2 (esneiders)
-...G...... [ZBX-26359] fixed smart plugin handling of smartctl exit statuses and fixed discovery not returning data if one drive failed (opucka)
-..F....... [ZBX-27957] fixed color selection in Pie chart and SVG Graph datasets when aggregation is used (dfofanovs)
-..F....... [ZBX-27779] fixed update and save buttons misplacement after switching filter tabs in Safari (gklavins)
+...G...... [ZBX-26359] fixed Smart plugin handling of smartctl exit statuses and fixed discovery not returning data if one drive failed (opucka)
+..F....... [ZBX-27957] fixed color selection in Pie chart and SVG graph datasets when aggregation is used (dfofanovs)
+..F....... [ZBX-27779] fixed misplacement of "Update" and "Save" buttons after switching filter tabs in Safari (gklavins)
 ..F....... [ZBX-27492] fixed unsupported state change error caused by missing host in geomap widget (gklavins)
 ........S. [ZBX-26836] fixed crashes in alert, connector, IPMI, LLD and report managers during Zabbix server shutdown (ademidovs)
 
@@ -1730,6 +1769,11 @@ New features:
 A.......S. [ZBXNEXT-10669] updated maximum supported TimescaleDB version to 2.28 (mprihodko)
 
 Bug fixes:
+.....J.PS. [ZBX-28197] improved validation of SNMP trap payload in zabbix_trap_receiver.pl (MVekslers)
+.......PS. [ZBX-28196] added heartbeat connection type and frequency validation (sboidenko)
+..F....... [ZBX-28195] implemented validation of parameters for jsrpc.php (Ivo)
+........S. [ZBX-28194] fixed memory allocation size for binary items on MySQL/MariaDB (sboidenko)
+.......PS. [ZBX-28193] fixed JavaScript preprocessing memory initialization (MVekslers)
 .......PS. [ZBX-27975] fixed potential VMware collector crash caused by network connectivity issues to vCenter (MVekslers)
 .........T [ZBX-21745] fixed duplicate discovery key and JavaScript preprocessing in RabbitMQ templates (abrosimovs)
 ..F....... [ZBX-26953] fixed redirect functionality for discovery rules, host prototypes, graphs, graph prototypes, web scenarios, and maps (msnihach)
@@ -5879,12 +5923,22 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
 
 --------------------------------------------------------------------------------
+Changes for 6.0.50rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.49
+
+6.0.49rc1 was released as 6.0.49 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.49rc1
 
 New features:
-A.......S. [ZBXNEXT-10720] updated maximum supported TimescaleDB version to 2.29 (mprihodko)
-
-Bug fixes:
+A.......S. [ZBXNEXT-10786] updated maximum supported TimescaleDB version to 2.30 (mprihodko)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.48
@@ -5898,6 +5952,9 @@ New features:
 A.......S. [ZBXNEXT-10669] updated maximum supported TimescaleDB version to 2.28 (mprihodko)
 
 Bug fixes:
+.....J.PS. [ZBX-28197] improved validation of SNMP trap payload in zabbix_trap_receiver.pl (MVekslers)
+..F....... [ZBX-28195] implemented validation of parameters for jsrpc.php (Ivo)
+.......PS. [ZBX-28193] fixed JavaScript preprocessing memory initialization (MVekslers)
 ...G...... [ZBX-27024] resolved system.run failing and race conditions (opucka)
 
 --------------------------------------------------------------------------------
