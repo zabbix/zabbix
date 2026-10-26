@@ -203,7 +203,7 @@
 
 				uncheckTableRows('host_discovery_' + view.checkbox_hash, [], false);
 
-				location.href = location.href;
+				location.reload();
 			}
 		}
 	};
