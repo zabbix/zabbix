@@ -41,7 +41,7 @@ static int	tq_clickhouse_parse_row(const zbx_tq_query_t *query, struct zbx_json_
 		goto out;
 	}
 
-	zbx_json_adduint64(j, "clock", clock); /* TODO: rename to something else */
+	zbx_json_adduint64(j, "clock", clock);
 
 	for (int i = 0; i < query->columns.values_num; i++)
 	{
