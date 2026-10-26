@@ -37,7 +37,7 @@ void CALLBACK	ZBXEndThread(ULONG_PTR dwParam)
 	_endthreadex(SUCCEED);
 }
 #else
-#include "zbxtime.h"
+#include "zbxmutexs.h"
 /******************************************************************************
  *                                                                            *
  * Purpose: Flush stdout and stderr before forking.                           *
@@ -190,6 +190,70 @@ int	zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 	return status;
 }
 
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+#define ZBX_THREADS_POLLS_PER_SEC	10
+
+typedef struct
+{
+	int	threads_num;	/* number of running processes at last poll */
+	int	value;		/* value returned by progress callback at last poll */
+	int	idle_polls;	/* number of polls without progress */
+}
+zbx_threads_progress_t;
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: kills processes immediately and waits until they have exited      *
+ *                                                                            *
+ * Parameters: threads     - [IN/OUT] handles to processes, reset when        *
+ *                                    process has exited                      *
+ *             threads_num - [IN] number of handles                           *
+ *                                                                            *
+ * Comments: Log mutex is held until killed processes have exited, so that    *
+ *           process cannot be killed while one of its threads holds it,      *
+ *           otherwise other processes would block on it forever. SIGKILL is  *
+ *           used, because processes waiting for log mutex block SIGHUP.      *
+ *                                                                            *
+ ******************************************************************************/
+static void	threads_kill_fatal(ZBX_THREAD_HANDLE *threads, int threads_num)
+{
+	sigset_t	mask, orig_mask;
+	zbx_mutex_t	log_mutex = zbx_mutex_addr_get(ZBX_MUTEX_LOG);
+
+	/* signal handlers can write to log, block them while log mutex is locked */
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGUSR1);
+	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGINT);
+	sigaddset(&mask, SIGQUIT);
+	sigaddset(&mask, SIGHUP);
+	zbx_sigmask(SIG_BLOCK, &mask, &orig_mask);
+
+	zbx_mutex_lock(log_mutex);
+
+	for (int i = 0; i < threads_num; i++)
+	{
+		if (ZBX_THREAD_HANDLE_NULL != threads[i])
+			kill(threads[i], SIGKILL);
+	}
+
+	for (int i = 0; i < threads_num; i++)
+	{
+		if (ZBX_THREAD_HANDLE_NULL == threads[i])
+			continue;
+
+		while (-1 == waitpid(threads[i], NULL, 0) && EINTR == errno)
+			;
+
+		threads[i] = ZBX_THREAD_HANDLE_NULL;
+	}
+
+	zbx_mutex_unlock(log_mutex);
+	zbx_sigmask(SIG_SETMASK, &orig_mask, NULL);
+}
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Purpose: sends termination signal to threads                               *
@@ -206,6 +270,13 @@ int	zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 static void	threads_kill(ZBX_THREAD_HANDLE *threads, int threads_num, const int *threads_flags, int priority,
 		int ret)
 {
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+	if (SUCCEED != ret)
+	{
+		threads_kill_fatal(threads, threads_num);
+		return;
+	}
+#endif
 	for (int i = 0; i < threads_num; i++)
 	{
 		if (ZBX_THREAD_HANDLE_NULL == threads[i])
@@ -275,24 +346,95 @@ static void	log_exit_status(pid_t pid, int status)
 	}
 }
 
-static int	threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num,
-		int priority, int ret, int timeout)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks if shutdown is making progress                             *
+ *                                                                            *
+ * Parameters: threads     - [IN] handles to processes                        *
+ *             threads_num - [IN] number of handles                           *
+ *             progress_cb - [IN] optional callback returning value that      *
+ *                                changes while processes make progress       *
+ *             progress    - [IN/OUT] progress state of previous poll         *
+ *                                                                            *
+ * Return value: number of polls without progress                             *
+ *                                                                            *
+ * Comments: Exit of any process is progress.                                 *
+ *                                                                            *
+ ******************************************************************************/
+static int	threads_poll_progress(const ZBX_THREAD_HANDLE *threads, int threads_num,
+		zbx_threads_progress_f progress_cb, zbx_threads_progress_t *progress)
+{
+	int	running_num = 0, value = (NULL != progress_cb ? progress_cb() : 0);
+
+	for (int i = 0; i < threads_num; i++)
+	{
+		if (ZBX_THREAD_HANDLE_NULL != threads[i])
+			running_num++;
+	}
+
+	if (running_num != progress->threads_num || value != progress->value)
+	{
+		progress->threads_num = running_num;
+		progress->value = value;
+		progress->idle_polls = 0;
+	}
+	else
+		progress->idle_polls++;
+
+	return progress->idle_polls;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: waits for threads with specified priority to exit                 *
+ *                                                                            *
+ * Parameters: threads       - [IN/OUT] handles to processes, reset when      *
+ *                                      process has exited                    *
+ *             threads_flags - [IN] thread priority flags                     *
+ *             threads_num   - [IN] number of handles                         *
+ *             priority      - [IN] priority of threads to wait for           *
+ *             ret           - [IN] SUCCEED if threads were asked to exit     *
+ *                                  politely, FAIL otherwise                  *
+ *             timeout       - [IN] seconds without progress before giving    *
+ *                                  up, 0 - wait without timeout              *
+ *             progress_cb   - [IN] optional callback returning value that    *
+ *                                  changes while threads make progress       *
+ *             progress      - [IN/OUT] progress state, shared by waits of    *
+ *                                      all priorities                        *
+ *                                                                            *
+ * Return value: ret           - threads exited                               *
+ *               TIMEOUT_ERROR - no progress was made for timeout seconds     *
+ *                                                                            *
+ * Comments: Time is counted in polling intervals, so that system clock       *
+ *           changes do not affect it.                                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	threads_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num, int priority,
+		int ret, int timeout, zbx_threads_progress_f progress_cb, zbx_threads_progress_t *progress)
 {
 	pid_t	pid;
-	double	time_start = zbx_time();
-
-	threads_kill(threads, threads_num, threads_flags, priority, ret);
 
 	for (int i = 0; 0 != zbx_thread_count(threads, threads_num, threads_flags, priority); i++)
 	{
 		int	status;
 
-		struct timespec	poll_delay = {0, 1e8};
+		struct timespec	poll_delay = {0, 1000000000 / ZBX_THREADS_POLLS_PER_SEC};
 
 		if (i != 0)
 		{
-			if (zbx_time() - time_start > timeout && 0 != timeout)
+			if (0 != timeout && timeout * ZBX_THREADS_POLLS_PER_SEC <= threads_poll_progress(threads,
+					threads_num, progress_cb, progress))
 			{
+				for (int j = 0; j < threads_num; j++)
+				{
+					if (ZBX_THREAD_HANDLE_NULL == threads[j] || priority != threads_flags[j])
+						continue;
+
+					zabbix_log(LOG_LEVEL_WARNING, "process with PID %d has not exited, no shutdown"
+							" progress in %d seconds after shutdown request, killing it",
+							(int)threads[j], timeout);
+				}
+
 				zbx_error("timed out while waiting for child processes");
 				return TIMEOUT_ERROR;
 			}
@@ -321,6 +463,15 @@ static int	threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_
 
 	return ret;
 }
+
+static int	threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num,
+		int priority, int ret, int timeout, zbx_threads_progress_f progress_cb,
+		zbx_threads_progress_t *progress)
+{
+	threads_kill(threads, threads_num, threads_flags, priority, ret);
+
+	return threads_wait(threads, threads_flags, threads_num, priority, ret, timeout, progress_cb, progress);
+}
 #endif
 
 /******************************************************************************
@@ -330,15 +481,25 @@ static int	threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_
  * Parameters: threads       - [IN] handles to threads or processes           *
  *             threads_flags - [IN] thread priority flags                     *
  *             threads_num   - [IN] number of handles                         *
- *             timeout       - [IN] terminate thread politely or ask threads  *
- *                                  to exit immediately on timeout            *
+ *             timeout       - [IN] seconds without shutdown progress after   *
+ *                                  which threads are terminated immediately, *
+ *                                  0 - wait without timeout                  *
+ *             progress_cb   - [IN] optional callback returning value that    *
+ *                                  changes while threads are making progress *
+ *                                                                            *
+ * Return value: SUCCEED - all threads exited                                 *
+ *               FAIL    - threads made no progress for timeout seconds and   *
+ *                         were killed                                        *
  *                                                                            *
  ******************************************************************************/
-void	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num, int timeout)
+int	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num, int timeout,
+		zbx_threads_progress_f progress_cb)
 {
+	int	ret = SUCCEED;
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
-	sigset_t	set;
-	int		supervisor_ret;
+	sigset_t		set;
+	int			supervisor_ret;
+	zbx_threads_progress_t	progress = {.threads_num = -1};
 
 	/* ignore SIGCHLD signals in order for zbx_sleep() to work */
 	sigemptyset(&set);
@@ -350,32 +511,46 @@ void	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_fl
 
 	/* always try to exit gracefully */
 	if (TIMEOUT_ERROR == threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_COLLECTOR,
-			SUCCEED, timeout))
+			SUCCEED, timeout, progress_cb, &progress))
 	{
-		threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_COLLECTOR, FAIL, 0);
+		threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_COLLECTOR, FAIL, 0, NULL,
+				&progress);
+		ret = FAIL;
 	}
 
+	/* supervisor units wait for history syncers, so supervisor is killed only after them */
 	supervisor_ret = threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_SUPERVISOR,
-		SUCCEED, timeout);
+		SUCCEED, timeout, progress_cb, &progress);
 
 	if (TIMEOUT_ERROR == threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_SYNCER,
-			SUCCEED, timeout))
+			SUCCEED, timeout, progress_cb, &progress))
 	{
-		threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_SYNCER, FAIL, 0);
+		threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_SYNCER, FAIL, 0, NULL,
+				&progress);
+		ret = FAIL;
 	}
 
 	if (TIMEOUT_ERROR == threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_WORKER,
-			SUCCEED, timeout))
+			SUCCEED, timeout, progress_cb, &progress))
 	{
-		threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_WORKER, FAIL, 0);
+		threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_WORKER, FAIL, 0, NULL,
+				&progress);
+		ret = FAIL;
 	}
 
 	if (SUCCEED != supervisor_ret)
-		threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_SUPERVISOR, FAIL, 0);
+	{
+		threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_SUPERVISOR, FAIL, 0,
+				NULL, &progress);
+		ret = FAIL;
+	}
 
 	/* signal idle threads to exit */
-	threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_NONE, FAIL, 0);
+	threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_NONE, FAIL, 0, NULL, &progress);
 #else
+	ZBX_UNUSED(timeout);
+	ZBX_UNUSED(progress_cb);
+
 	/* wait for threads to finish first; although listener threads will never end */
 	WaitForMultipleObjectsEx(threads_num, threads, TRUE, 1000, FALSE);
 	threads_kill(threads, threads_num, threads_flags, ZBX_THREAD_PRIORITY_NONE, FAIL);
@@ -390,9 +565,51 @@ void	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_fl
 		threads[i] = ZBX_THREAD_HANDLE_NULL;
 	}
 #endif
+	return ret;
 }
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: executes function in child process and waits for it to exit,      *
+ *          kills it if no progress is made                                   *
+ *                                                                            *
+ * Parameters: func        - [IN] function to execute                         *
+ *             timeout     - [IN] seconds without progress before child       *
+ *                                process is killed                           *
+ *             progress_cb - [IN] optional callback returning value that      *
+ *                                changes while function makes progress       *
+ *                                                                            *
+ * Comments: Used on shutdown to write cached data to database without risk   *
+ *           of hanging on unavailable database. If child process cannot be   *
+ *           created, function is executed by calling process.                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_thread_exec_and_wait(void (*func)(void), int timeout, zbx_threads_progress_f progress_cb)
+{
+	ZBX_THREAD_HANDLE	pid;
+	int			flag = ZBX_THREAD_PRIORITY_COLLECTOR;
+	zbx_threads_progress_t	progress = {.threads_num = -1};
+
+	zbx_child_fork(&pid);
+
+	if (0 == pid)
+	{
+		func();
+		exit(EXIT_SUCCESS);
+	}
+
+	if (-1 == pid)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot create process: %s", zbx_strerror(errno));
+		func();
+		return;
+	}
+
+	if (TIMEOUT_ERROR == threads_wait(&pid, &flag, 1, flag, SUCCEED, timeout, progress_cb, &progress))
+		threads_kill_and_wait(&pid, &flag, 1, flag, FAIL, 0, NULL, &progress);
+}
+
 void	zbx_pthread_init_attr(pthread_attr_t *attr)
 {
 	if (0 != pthread_attr_init(attr))
