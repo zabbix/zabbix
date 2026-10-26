@@ -22,6 +22,8 @@
 #include "zbxstr.h"
 #include "zbx_scripts_constants.h"
 
+#define MVAR_MANUALINPUT	"{MANUALINPUT}"
+
 /******************************************************************************
  *                                                                            *
  * Purpose: formats full user name from name, surname and alias.              *
@@ -111,6 +113,7 @@ static int	macro_host_script_resolv(zbx_macro_resolv_data_t *p, va_list args, ch
 
 	const zbx_uint64_t	*userid = va_arg(args, const zbx_uint64_t *);
 	const zbx_dc_host_t	*dc_host = va_arg(args, const zbx_dc_host_t *);
+	const char		*manualinput = va_arg(args, const char *);
 
 	ZBX_UNUSED(data);
 	ZBX_UNUSED(error);
@@ -118,7 +121,11 @@ static int	macro_host_script_resolv(zbx_macro_resolv_data_t *p, va_list args, ch
 
 	if (0 == p->indexed)
 	{
-		if (SUCCEED == zbx_token_is_user_macro(p->macro, &p->token))
+		if (NULL != manualinput && 0 == strcmp(p->macro, MVAR_MANUALINPUT))
+		{
+			*replace_to = zbx_strdup(*replace_to, manualinput);
+		}
+		else if (SUCCEED == zbx_token_is_user_macro(p->macro, &p->token))
 		{
 			zbx_dc_get_user_macro(um_handle, p->macro, &dc_host->hostid, 1, replace_to);
 			p->pos = p->token.loc.r;
@@ -178,9 +185,17 @@ static int	macro_normal_script_resolv(zbx_macro_resolv_data_t *p, va_list args, 
 	const zbx_uint64_t		*userid = va_arg(args, const zbx_uint64_t *);
 	const zbx_dc_host_t		*dc_host = va_arg(args, const zbx_dc_host_t *);
 	const char			*tz = va_arg(args, const char *);
+	const char			*manualinput = va_arg(args, const char *);
+
+	if (0 == p->indexed && NULL != p->macro && NULL != manualinput && 0 == strcmp(p->macro, MVAR_MANUALINPUT))
+	{
+		*replace_to = zbx_strdup(*replace_to, manualinput);
+
+		return ret;
+	}
 
 	ret = zbx_macro_message_common_resolv(p, um_handle, NULL, event, r_event, userid, dc_host, NULL, NULL, NULL,
-			tz,  replace_to, data, error, maxerrlen);
+			tz, replace_to, data, error, maxerrlen);
 
 	if (SUCCEED == ret && NULL != p->macro)
 	{
@@ -217,9 +232,24 @@ static int	macro_normal_script_resolv(zbx_macro_resolv_data_t *p, va_list args, 
 	return ret;
 }
 
+static int	macro_webhook_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to, char **data,
+		char *error, size_t maxerrlen)
+{
+	const char	*manualinput = va_arg(args, const char *);
+
+	ZBX_UNUSED(data);
+	ZBX_UNUSED(error);
+	ZBX_UNUSED(maxerrlen);
+
+	if (0 == p->indexed && NULL != p->macro && NULL != manualinput && 0 == strcmp(p->macro, MVAR_MANUALINPUT))
+		*replace_to = zbx_strdup(*replace_to, manualinput);
+
+	return SUCCEED;
+}
+
 int	substitute_script_macros(char **data, char *error, int maxerrlen, int script_type,
-		zbx_dc_um_handle_t * um_handle, const zbx_db_event *event, const zbx_db_event *r_event,
-		zbx_uint64_t *userid, const zbx_dc_host_t *dc_host, const char *tz)
+		zbx_dc_um_handle_t *um_handle, const zbx_db_event *event, const zbx_db_event *r_event,
+		zbx_uint64_t *userid, const zbx_dc_host_t *dc_host, const char *tz, const char *manualinput)
 {
 	int	ret = SUCCEED;
 
@@ -229,15 +259,42 @@ int	substitute_script_macros(char **data, char *error, int maxerrlen, int script
 	{
 		case ZBX_SCRIPT_SCOPE_HOST:
 			ret = zbx_substitute_macros(data, error, maxerrlen, &macro_host_script_resolv, um_handle,
-					userid, dc_host);
+					userid, dc_host, manualinput);
 			break;
 		case ZBX_SCRIPT_SCOPE_EVENT:
 			ret = zbx_substitute_macros(data, error, maxerrlen, &macro_normal_script_resolv,
-					um_handle, event, r_event, userid, dc_host, tz);
+					um_handle, event, r_event, userid, dc_host, tz, manualinput);
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: replaces macros in JavaScript webhook scripts                     *
+ *                                                                            *
+ * Parameters: data        - [IN/OUT] pointer to data where the macro should  *
+ *                                    be resolved                             *
+ *             error       - [OUT] pre-allocated buffer for error message     *
+ *             maxerrlen   - [IN] size of pre-allocated error message buffer  *
+ *             manualinput - [IN] validated raw manual input, or NULL         *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully (even if macro is absent)  *
+ *                FAIL    - error occurred                                    *
+ *                                                                            *
+ ******************************************************************************/
+int	substitute_webhook_macros(char **data, char *error, size_t maxerrlen, const char *manualinput)
+{
+	int	ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	ret = zbx_substitute_macros(data, error, maxerrlen, &macro_webhook_resolv, manualinput);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

@@ -19,26 +19,25 @@
 #include "zbxdb.h"
 #include "zbxstr.h"
 
-/******************************************************************************
- *                                                                            *
- * Purpose: lock maintenances in database                                     *
- *                                                                            *
- * Parameters: maintenanceids - [IN/OUT] a vector of unique maintenance ids   *
- *                                 IN - the maintenances to lock              *
- *                                 OUT - the locked maintenance ids (sorted)  *
- *                                                                            *
- * Return value: SUCCEED - at least one maintenance was locked                *
- *               FAIL    - no maintenances were locked (all target            *
- *                         maintenances were removed by user and              *
- *                         configuration cache was not yet updated)           *
- *                                                                            *
- * Comments: This function locks maintenances in database to avoid foreign    *
- *           key errors when a maintenance is removed in the middle of        *
- *           processing.                                                      *
- *           The output vector might contain less values than input vector if *
- *           a maintenance was removed before lock attempt.                   *
- *                                                                            *
- ******************************************************************************/
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: lock maintenances in database                                        *
+ *                                                                               *
+ * Parameters: maintenanceids - [IN/OUT] sorted vector of unique maintenance ids *
+ *                                 IN - the maintenances to lock                 *
+ *                                 OUT - the locked maintenance ids              *
+ *                                                                               *
+ * Return value: SUCCEED - at least one maintenance was locked                   *
+ *               FAIL    - no maintenances were locked (all target               *
+ *                         maintenances were removed by user and                 *
+ *                         configuration cache was not yet updated)              *
+ *                                                                               *
+ * Comments: This function locks maintenances in database to avoid foreign key   *
+ *           errors when a maintenance is removed in the middle of processing.   *
+ *           The output vector might contain less values than input vector if    *
+ *           a maintenance was removed before lock attempt.                      *
+ *                                                                               *
+ ********************************************************************************/
 int	zbx_db_lock_maintenanceids(zbx_vector_uint64_t *maintenanceids)
 {
 	char		*sql = NULL;
@@ -47,8 +46,6 @@ int	zbx_db_lock_maintenanceids(zbx_vector_uint64_t *maintenanceids)
 	int		i;
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
-
-	zbx_vector_uint64_sort(maintenanceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select maintenanceid from maintenances where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "maintenanceid", maintenanceids->values,

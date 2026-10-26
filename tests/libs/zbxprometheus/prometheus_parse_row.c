@@ -17,7 +17,7 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "zbxexpr.h"
+#include "zbxstr.h"
 #include "zbxalgo.h"
 #include "prometheus_test.h"
 

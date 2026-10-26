@@ -16,54 +16,60 @@
 
 class CControllerResponseData extends CControllerResponse {
 
-	private $data;
+	private array $data;
+
 	private string $title = '';
-	private $file_name = null;
 
-	/**
-	 * @var bool $view_enabled  true - send view and layout; false - send layout only.
-	 */
-	private $view_enabled = true;
+	private string $file_name = '';
+	private string $file_mime_type = '';
 
-	public function __construct($data) {
+	private bool $view_enabled = true;
+
+	public function __construct(array $data) {
 		$this->data = $data;
 	}
 
-	public function getData() {
+	public function getData(): array {
 		return $this->data;
 	}
 
-	public function setTitle(string $title) {
+	public function setTitle(string $title): static {
 		$this->title = $title;
+
+		return $this;
 	}
 
 	public function getTitle(): string {
 		return $this->title;
 	}
 
-	public function setFileName($file_name) {
+	public function setFileName(string $file_name): static {
 		$this->file_name = $file_name;
+
+		return $this;
 	}
 
-	public function getFileName() {
+	public function getFileName(): string {
 		return $this->file_name;
 	}
 
-	/**
-	 * Prohibits sending view.
-	 */
-	public function disableView() {
+	public function setFileMimeType(string $mime_type): static {
+		$this->file_mime_type = $mime_type;
+
+		return $this;
+	}
+
+	public function getFileMimeType(): string {
+		return $this->file_mime_type;
+	}
+
+	public function disableView(): static {
 		$this->view_enabled = false;
 
 		return $this;
 	}
 
-	/**
-	 * Returns current value of view_enabled variable.
-	 *
-	 * @return bool
-	 */
-	public function isViewEnabled() {
+	public function isViewEnabled(): bool {
 		return $this->view_enabled;
 	}
 }

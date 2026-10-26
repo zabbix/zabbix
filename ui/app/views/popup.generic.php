@@ -378,12 +378,20 @@ switch ($data['popup_type']) {
 				array_pop($description);
 			}
 
+			if ($data['popup_type'] === 'trigger_prototypes') {
+				$indicator = triggerIndicator($trigger['status']);
+				$indicator_style = triggerIndicatorStyle($trigger['status']);
+			}
+			else {
+				$indicator = triggerIndicator($trigger['status'], $trigger['state']);
+				$indicator_style = triggerIndicatorStyle($trigger['status'], $trigger['state']);
+			}
+
 			$table->addRow([
 				$check_box,
 				$description,
 				CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
-				(new CSpan(triggerIndicator($trigger['status'], $trigger['state'])))
-					->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
+				(new CSpan($indicator))->addClass($indicator_style)
 			]);
 
 			$trigger = [

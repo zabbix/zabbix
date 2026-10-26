@@ -268,7 +268,16 @@ class WidgetProblems extends CTableInfo {
 			}
 
 			if ($problem['r_eventid'] != 0) {
-				if ($problem['correlationid'] != 0) {
+				if ($problem['cep_ruleid'] != 0) {
+					$info_icons[] = makeInformationIcon(
+						array_key_exists($problem['cep_ruleid'], $data['cep_rules'])
+							? _s('Resolved by complex event processing rule "%1$s".',
+							$data['cep_rules'][$problem['cep_ruleid']]['name']
+						)
+							: _('Resolved by complex event processing rule.')
+					);
+				}
+				elseif ($problem['correlationid'] != 0) {
 					$info_icons[] = makeInformationIcon(
 						array_key_exists($problem['correlationid'], $data['correlations'])
 							? _s('Resolved by event correlation rule "%1$s".',

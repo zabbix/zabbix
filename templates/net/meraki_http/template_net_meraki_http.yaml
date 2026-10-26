@@ -31,7 +31,7 @@ zabbix_export:
         Set filters with host wizard configuration fields if you want to override default filter parameters.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: Templates/Applications
         - name: 'Templates/Network devices'
@@ -44,12 +44,39 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var params = JSON.parse(value);
+            
+            var tls = new CTlsConfig(params.tls_verify);
             
             var r_match = '{$MERAKI.ORGANIZATION.NAME.MATCHES}';
             var r_not_match = '{$MERAKI.ORGANIZATION.NAME.NOT_MATCHES}';
             
-            var request = new HttpRequest();
+            var request = new HttpRequest(tls.options);
             
             request.addHeader('X-Cisco-Meraki-API-Key:' + params.token);
             request.addHeader('User-Agent: ZabbixServer/1.2 Zabbix');
@@ -145,6 +172,8 @@ zabbix_export:
             		params.url += '/';
             	}
             
+            	tls.checkURL(params.url);
+            
             	if (typeof params.httpproxy !== 'undefined' && params.httpproxy !== '') {
             		request.setProxy(params.httpproxy);
             	}
@@ -193,6 +222,8 @@ zabbix_export:
           parameters:
             - name: httpproxy
               value: '{$MERAKI.HTTP_PROXY}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Cisco Meraki dashboard"}'
             - name: token
               value: '{$MERAKI.TOKEN}'
             - name: url
@@ -354,6 +385,22 @@ zabbix_export:
         - tag: target
           value: cisco-meraki-dashboard
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Cisco Meraki dashboard", e.g. {$HTTP.TLS.VERIFY:"Cisco Meraki dashboard"}.'
+          config:
+            type: LIST
+            priority: '11'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$MERAKI.API.URL}'
           value: api.meraki.com/api/v1
           description: 'Cisco Meraki dashboard API URL, e.g., api.meraki.com/api/v1'
@@ -455,7 +502,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-6
+        version: 8.0-7
       groups:
         - name: Templates/Applications
         - name: 'Templates/Network devices'
@@ -504,9 +551,36 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var params = JSON.parse(value);
             
-            var request = new HttpRequest();
+            var tls = new CTlsConfig(params.tls_verify);
+            
+            var request = new HttpRequest(tls.options);
             
             request.addHeader('X-Cisco-Meraki-API-Key:' + params.token);
             request.addHeader('User-Agent: ZabbixServer/1.2 Zabbix');
@@ -624,6 +698,8 @@ zabbix_export:
             		params.url += '/';
             	}
             
+            	tls.checkURL(params.url);
+            
             	if (typeof params.httpproxy !== 'undefined' && params.httpproxy !== '') {
             		request.setProxy(params.httpproxy);
             	}
@@ -652,6 +728,8 @@ zabbix_export:
               value: '{$ORGANIZATION_ID}'
             - name: serial
               value: '{$SERIAL}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Cisco Meraki device"}'
             - name: token
               value: '{$MERAKI.TOKEN}'
             - name: url
@@ -891,9 +969,36 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var params = JSON.parse(value);
             
-            var request = new HttpRequest();
+            var tls = new CTlsConfig(params.tls_verify);
+            
+            var request = new HttpRequest(tls.options);
             
             request.addHeader('X-Cisco-Meraki-API-Key:' + params.token);
             request.addHeader('User-Agent: ZabbixServer/1.2 Zabbix');
@@ -1003,6 +1108,8 @@ zabbix_export:
             		params.url += '/';
             	}
             
+            	tls.checkURL(params.url);
+            
             	if (typeof params.httpproxy !== 'undefined' && params.httpproxy !== '') {
             		request.setProxy(params.httpproxy);
             	}
@@ -1038,6 +1145,8 @@ zabbix_export:
               value: '{$ORGANIZATION_ID}'
             - name: serial
               value: '{$SERIAL}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Cisco Meraki device"}'
             - name: token
               value: '{$MERAKI.TOKEN}'
             - name: url
@@ -1079,9 +1188,36 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var params = JSON.parse(value);
             
-            var request = new HttpRequest();
+            var tls = new CTlsConfig(params.tls_verify);
+            
+            var request = new HttpRequest(tls.options);
             
             request.addHeader('X-Cisco-Meraki-API-Key:' + params.token);
             request.addHeader('User-Agent: ZabbixServer/1.2 Zabbix');
@@ -1199,6 +1335,8 @@ zabbix_export:
             		params.url += '/';
             	}
             
+            	tls.checkURL(params.url);
+            
             	if (typeof params.httpproxy !== 'undefined' && params.httpproxy !== '') {
             		request.setProxy(params.httpproxy);
             	}
@@ -1226,6 +1364,8 @@ zabbix_export:
               value: '{$ORGANIZATION_ID}'
             - name: serial
               value: '{$SERIAL}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Cisco Meraki device"}'
             - name: token
               value: '{$MERAKI.TOKEN}'
             - name: url
@@ -1403,6 +1543,22 @@ zabbix_export:
         - tag: target
           value: cisco-meraki-dashboard
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Cisco Meraki device", e.g. {$HTTP.TLS.VERIFY:"Cisco Meraki device"}.'
+          config:
+            type: LIST
+            priority: '8'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$MERAKI.API.URL}'
           value: api.meraki.com/api/v1
           description: 'Cisco Meraki dashboard API URL, e.g., api.meraki.com/api/v1'
@@ -1505,7 +1661,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-4
+        version: 8.0-5
       groups:
         - name: Templates/Applications
         - name: 'Templates/Network devices'
@@ -1536,9 +1692,36 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var params = JSON.parse(value);
             
-            var request = new HttpRequest();
+            var tls = new CTlsConfig(params.tls_verify);
+            
+            var request = new HttpRequest(tls.options);
             
             request.addHeader('X-Cisco-Meraki-API-Key:' + params.token);
             request.addHeader('User-Agent: ZabbixServer/1.2 Zabbix');
@@ -1606,6 +1789,8 @@ zabbix_export:
             		params.url += '/';
             	}
             
+            	tls.checkURL(params.url);
+            
             	if (typeof params.httpproxy !== 'undefined' && params.httpproxy !== '') {
             		request.setProxy(params.httpproxy);
             	}
@@ -1627,6 +1812,8 @@ zabbix_export:
               value: '{$MERAKI.HTTP_PROXY}'
             - name: organizationId
               value: '{$ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Cisco Meraki organization"}'
             - name: token
               value: '{$MERAKI.TOKEN}'
             - name: url
@@ -1694,9 +1881,36 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var params = JSON.parse(value);
             
-            var request = new HttpRequest();
+            var tls = new CTlsConfig(params.tls_verify);
+            
+            var request = new HttpRequest(tls.options);
             
             request.addHeader('X-Cisco-Meraki-API-Key:' + params.token);
             request.addHeader('User-Agent: ZabbixServer/1.2 Zabbix');
@@ -1805,6 +2019,8 @@ zabbix_export:
             		params.url += '/';
             	}
             
+            	tls.checkURL(params.url);
+            
             	if (typeof params.httpproxy !== 'undefined' && params.httpproxy !== '') {
             		request.setProxy(params.httpproxy);
             	}
@@ -1832,6 +2048,8 @@ zabbix_export:
               value: '{$MERAKI.HTTP_PROXY}'
             - name: organizationId
               value: '{$ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Cisco Meraki organization"}'
             - name: token
               value: '{$MERAKI.TOKEN}'
             - name: url
@@ -1873,9 +2091,36 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var params = JSON.parse(value);
             
-            var request = new HttpRequest();
+            var tls = new CTlsConfig(params.tls_verify);
+            
+            var request = new HttpRequest(tls.options);
             
             request.addHeader('X-Cisco-Meraki-API-Key:' + params.token);
             request.addHeader('User-Agent: ZabbixServer/1.2 Zabbix');
@@ -1975,6 +2220,8 @@ zabbix_export:
             		params.url += '/';
             	}
             
+            	tls.checkURL(params.url);
+            
             	if (typeof params.httpproxy !== 'undefined' && params.httpproxy !== '') {
             		request.setProxy(params.httpproxy);
             	}
@@ -2004,6 +2251,8 @@ zabbix_export:
               value: '{$MERAKI.HTTP_PROXY}'
             - name: organizationId
               value: '{$ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Cisco Meraki organization"}'
             - name: token
               value: '{$MERAKI.TOKEN}'
             - name: url
@@ -2045,9 +2294,36 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var params = JSON.parse(value);
             
-            var request = new HttpRequest();
+            var tls = new CTlsConfig(params.tls_verify);
+            
+            var request = new HttpRequest(tls.options);
             
             request.addHeader('X-Cisco-Meraki-API-Key:' + params.token);
             request.addHeader('User-Agent: ZabbixServer/1.2 Zabbix');
@@ -2158,6 +2434,8 @@ zabbix_export:
             		params.url += '/';
             	}
             
+            	tls.checkURL(params.url);
+            
             	if (typeof params.httpproxy !== 'undefined' && params.httpproxy !== '') {
             		request.setProxy(params.httpproxy);
             	}
@@ -2200,6 +2478,8 @@ zabbix_export:
               value: '{$MERAKI.HTTP_PROXY}'
             - name: organizationId
               value: '{$ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Cisco Meraki organization"}'
             - name: token
               value: '{$MERAKI.TOKEN}'
             - name: url
@@ -2215,9 +2495,36 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var params = JSON.parse(value);
             
-            var request = new HttpRequest();
+            var tls = new CTlsConfig(params.tls_verify);
+            
+            var request = new HttpRequest(tls.options);
             
             request.addHeader('X-Cisco-Meraki-API-Key:' + params.token);
             request.addHeader('User-Agent: ZabbixServer/1.2 Zabbix');
@@ -2314,6 +2621,8 @@ zabbix_export:
             		params.url += '/';
             	}
             
+            	tls.checkURL(params.url);
+            
             	if (typeof params.httpproxy !==  'undefined' && params.httpproxy !== '') {
             		request.setProxy(params.httpproxy);
             	}
@@ -2366,6 +2675,8 @@ zabbix_export:
               value: '{$MERAKI.HTTP_PROXY}'
             - name: organizationId
               value: '{$ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Cisco Meraki organization"}'
             - name: token
               value: '{$MERAKI.TOKEN}'
             - name: url
@@ -2425,9 +2736,36 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var params = JSON.parse(value);
             
-            var request = new HttpRequest();
+            var tls = new CTlsConfig(params.tls_verify);
+            
+            var request = new HttpRequest(tls.options);
             
             request.addHeader('X-Cisco-Meraki-API-Key:' + params.token);
             request.addHeader('User-Agent: ZabbixServer/1.2 Zabbix');
@@ -2537,6 +2875,8 @@ zabbix_export:
             		params.url += '/';
             	}
             
+            	tls.checkURL(params.url);
+            
             	if (typeof params.httpproxy !== 'undefined' && params.httpproxy !== '') {
             		request.setProxy(params.httpproxy);
             	}
@@ -2600,6 +2940,8 @@ zabbix_export:
               value: '{$MERAKI.HTTP_PROXY}'
             - name: organizationId
               value: '{$ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Cisco Meraki organization"}'
             - name: token
               value: '{$MERAKI.TOKEN}'
             - name: url
@@ -4010,6 +4352,22 @@ zabbix_export:
         - tag: target
           value: cisco-meraki-dashboard
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Cisco Meraki organization", e.g. {$HTTP.TLS.VERIFY:"Cisco Meraki organization"}.'
+          config:
+            type: LIST
+            priority: '21'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$MERAKI.ADMIN.NAME.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable admins in organization.'
@@ -4134,7 +4492,7 @@ zabbix_export:
           description: 'This macro is used in uplinks discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '21'
+            priority: '22'
             section_name: Filters
             label: 'Uplink network name filter (include)'
             description: 'This macro is used in uplinks discovery. Can be overridden on the host or linked template level.'
@@ -4143,7 +4501,7 @@ zabbix_export:
           description: 'This macro is used in uplinks discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '22'
+            priority: '23'
             section_name: Filters
             label: 'Uplink network name filter (exclude)'
             description: 'This macro is used in uplinks discovery. Can be overridden on the host or linked template level.'
@@ -4152,7 +4510,7 @@ zabbix_export:
           description: 'This macro is used in uplinks discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '23'
+            priority: '24'
             section_name: Filters
             label: 'Uplink role filter (include)'
             description: 'This macro is used in uplinks discovery. Can be overridden on the host or linked template level.'
@@ -4161,7 +4519,7 @@ zabbix_export:
           description: 'This macro is used in uplinks discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '24'
+            priority: '25'
             section_name: Filters
             label: 'Uplink role filter (exclude)'
             description: 'This macro is used in uplinks discovery. Can be overridden on the host or linked template level.'
@@ -4170,7 +4528,7 @@ zabbix_export:
           description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '25'
+            priority: '26'
             section_name: Filters
             label: 'VPN network name filter (include)'
             description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'
@@ -4179,7 +4537,7 @@ zabbix_export:
           description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '26'
+            priority: '27'
             section_name: Filters
             label: 'VPN network name filter (exclude)'
             description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'
@@ -4188,7 +4546,7 @@ zabbix_export:
           description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '27'
+            priority: '28'
             section_name: Filters
             label: 'VPN peer network name filter (include)'
             description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'
@@ -4197,7 +4555,7 @@ zabbix_export:
           description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '28'
+            priority: '29'
             section_name: Filters
             label: 'VPN peer network name filter (exclude)'
             description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'
@@ -4206,7 +4564,7 @@ zabbix_export:
           description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '31'
+            priority: '32'
             section_name: Filters
             label: 'VPN receiver uplink filter (include)'
             description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'
@@ -4215,7 +4573,7 @@ zabbix_export:
           description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '32'
+            priority: '33'
             section_name: Filters
             label: 'VPN receiver uplink filter (exclude)'
             description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'
@@ -4224,7 +4582,7 @@ zabbix_export:
           description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '29'
+            priority: '30'
             section_name: Filters
             label: 'VPN sender uplink filter (include)'
             description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'
@@ -4233,7 +4591,7 @@ zabbix_export:
           description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '30'
+            priority: '31'
             section_name: Filters
             label: 'VPN sender uplink filter (exclude)'
             description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'

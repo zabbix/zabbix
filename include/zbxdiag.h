@@ -35,6 +35,7 @@ typedef enum
 	ZBX_DIAGINFO_LOCKS,
 	ZBX_DIAGINFO_CONNECTOR,
 	ZBX_DIAGINFO_PROXYBUFFER,
+	ZBX_DIAGINFO_CEP
 }
 zbx_diaginfo_section_t;
 
@@ -59,6 +60,7 @@ typedef int (*zbx_diag_add_section_info_func_t)(const char *section, const struc
 #define ZBX_DIAG_LOCKS		"locks"
 #define ZBX_DIAG_CONNECTOR	"connector"
 #define ZBX_DIAG_PROXYBUFFER	"proxybuffer"
+#define ZBX_DIAG_CEP		"cep"
 
 void	zbx_diag_map_free(zbx_diag_map_t *map);
 int	zbx_diag_parse_request(const struct zbx_json_parse *jp, const zbx_diag_map_t *field_map, zbx_uint64_t

@@ -84,7 +84,9 @@ class CItemHelper extends CItemGeneralHelper {
 
 		// The prefix will be added to a value mapping only for inherited items and item prototypes, or for items
 		// created from inherited item prototypes.
-		if ($item['valuemap'] && bccomp($item['valuemap']['hostid'], $item['hostid']) != 0) {
+		if ($item['valuemap']
+				&& !array_key_exists('inaccessible', $item['valuemap'])
+				&& bccomp($item['valuemap']['hostid'], $item['hostid']) != 0) {
 			$templates = API::Template()->get(['output' => ['name'], 'templateids' => $item['valuemap']['hostid']]);
 			$item['valuemap']['prefix'] = $templates[0]['name'].NAME_DELIMITER;
 		}
@@ -212,7 +214,7 @@ class CItemHelper extends CItemGeneralHelper {
 	 * @return array
 	 */
 	public static function getSourceItems(array $src_options): array {
-		return API::Item()->get([
+		$src_items = API::Item()->get([
 			'output' => ['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
 				'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status',
 
@@ -241,13 +243,18 @@ class CItemHelper extends CItemGeneralHelper {
 				'snmp_oid',
 
 				// SSH item type specific fields.
-				'publickey', 'privatekey'
+				'publickey', 'privatekey',
+
+				// Telemetry query
+				'time_shift', 'lookback_limit', 'granularity', 'query'
 			],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'selectTags' => ['tag', 'value'],
 			'selectHosts' => ['status'],
 			'preservekeys' => true
 		] + $src_options);
+
+		return self::prepareSourceItemsForCopy($src_items);
 	}
 
 	/**

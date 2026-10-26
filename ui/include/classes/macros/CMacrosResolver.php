@@ -30,6 +30,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		'hostInterfaceDetailsPrivPassphrase' => ['user'],
 		'hostInterfaceDetailsContextName' => ['user'],
 		'hostInterfaceDetailsCommunity' => ['user'],
+		'hostInterfaceDetailsMaxRepetitions' => ['user'],
+		'hostInterfaceDetailsRetries' => ['user'],
 		'hostInterfacePort' => ['user'],
 		'widgetURL' => ['host', 'hostId', 'interfaceWithPort', 'user'],
 		'widgetURLUser' => ['user']

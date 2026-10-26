@@ -99,6 +99,7 @@ Context macros can be defined in the *Macros* section of the host and will overr
 |Name|Description|Default|
 |----|-----------|-------|
 |{$GLPI.HTTP.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "GLPI", e.g. {$HTTP.TLS.VERIFY:"GLPI"}.</p>|`full`|
 |{$GLPI.API.URL}|<p>GLPI REST API v2 base URL, e.g., https://glpi.example.com/api.php/v2.3.</p>||
 |{$GLPI.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$GLPI.CLIENT.ID}|<p>OAuth2 client ID used for GLPI API authentication.</p>||

@@ -575,7 +575,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 	 */
 	public function testCauseAndSymptomEvents_FilterResults($data) {
 		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1&sort=clock&sortorder=ASC');
-		$displayed_symptom_xpath = 'xpath:.//div[@class="row"]//a[text()="Problem trap>10 [Symptom]"]';
+		$displayed_symptom_xpath = 'xpath:.//div[@class="datatable-row"]//a[text()="Problem trap>10 [Symptom]"]';
 
 		// Reset datatable layout to default before checking the its default state.
 		$table = $this->getDatatable();
@@ -592,7 +592,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 		$options_dialog->waitUntilNotVisible();
 
 		// Check that cells with timeline are present and that symptoms are not present as separate problems by default.
-		$this->assertTrue($table->query('class:cell-timeline')->one(false)->isValid(), 'Timeline should be present.');
+		$this->assertTrue($table->query('class:datatable-cell-timeline')->one(false)->isValid(), 'Timeline should be present.');
 		$this->assertFalse($table->query($displayed_symptom_xpath)->one(false)->isValid());
 
 		$this->page->open('zabbix.php?action=problem.view&hostids[]='.
@@ -610,7 +610,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 			$this->changeLayoutFromHeader($data['header_settings']);
 			$table->waitUntilReady()->invalidate();
 
-			$this->assertEquals($data['header_settings']['Time']['Show timeline'], $table->query('class:cell-timeline')
+			$this->assertEquals($data['header_settings']['Time']['Show timeline'], $table->query('class:datatable-cell-timeline')
 					->one(false)->isValid(), '"Show timeline" option did not work as expected.'
 			);
 		}

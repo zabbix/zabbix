@@ -115,7 +115,7 @@ foreach ($data['proxy_groups'] as $proxy_groupid => $proxy_group) {
 				->setArgument('proxyid', $proxy['proxyid'])
 				->getUrl();
 
-			$proxies[] = $data['user']['can_edit_proxies']
+			$proxies[] = CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
 				? new CLink($proxy['name'], $proxy_url)
 				: $proxy['name'];
 			$proxies[] = ', ';

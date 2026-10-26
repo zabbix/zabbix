@@ -285,9 +285,10 @@ func prepareDiskCache(options *agent.AgentOptions, addresses [][]string, hostnam
 		return err
 	}
 
+	defer rows.Close() //nolint:errcheck // best-effort close.
+
 	for rows.Next() {
 		if err = rows.Scan(&id, &address, &hostname); err != nil {
-			rows.Close()
 			return err
 		}
 		ids = append(ids, id)

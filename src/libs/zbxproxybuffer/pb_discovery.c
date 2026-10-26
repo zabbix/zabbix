@@ -13,6 +13,7 @@
 **/
 
 #include "pb_discovery.h"
+#include "proxybuffer.h"
 #include "zbxcachehistory.h"
 #include "zbxstr.h"
 #include "zbxdb.h"

@@ -19,6 +19,7 @@ The configurable parameters are intended to be changed according to the webhook 
 
 |Name|Value|Description|
 |----|-----|-----------|
+|tls_verify|\{$HTTP\.TLS\.VERIFY:"Zammad"\}|TLS certificate verification for HTTP requests: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this media type only, define the global macro with the context "Zammad", e.g. {$HTTP.TLS.VERIFY:"Zammad"}.|
 |zabbix_url|\{$ZABBIX\.URL\}|The URL of the Zabbix frontend.|
 |zammad_access_token|\<PUT YOUR ACCESS TOKEN\>|Zammad access token.|
 |zammad_customer|\<PUT YOUR CUSTOMER EMAIL\>|Zammad customer email.|

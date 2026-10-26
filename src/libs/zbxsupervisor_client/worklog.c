@@ -114,6 +114,8 @@ void	zbx_supervisor_update_activity(const char *fmt, ...)
 
 	zbx_vsnprintf_alloc(&buf->str, &buf->alloc, &offset, fmt, args);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "%s", buf->str);
+
 	pthread_mutex_unlock(&worklog.sync);
 	va_end(args);
 }

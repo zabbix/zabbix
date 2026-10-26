@@ -41,6 +41,8 @@ typedef struct
 	zbx_uint64_t	service_problemid;
 	zbx_uint64_t	serviceid;
 	int		severity;
+	int		suppress;
+	time_t		suppress_mtime;
 	zbx_timespec_t	ts;
 }
 zbx_service_problem_t;

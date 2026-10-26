@@ -678,7 +678,7 @@ static int	process_results(zbx_discoverer_manager_t *manager, const zbx_vector_u
 				discovery_update_hosts_cb(result-> druleid, result->now, events_cbs->add_event_cb);
 
 			if (NULL != events_cbs->process_events_cb)
-				events_cbs->process_events_cb(NULL, NULL, NULL);
+				events_cbs->process_events_cb();
 
 			if (NULL != events_cbs->clean_events_cb)
 				events_cbs->clean_events_cb();
@@ -1307,7 +1307,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 			get_process_type_string(worker->thread_type), worker->worker_id);
 	zbx_set_log_component(component, &worker->logger);
 
-	ZBX_INIT_THREAD_OR_RETURN(jmp_ret);
+	ZBX_INIT_THREAD_OR_RETURN(jmp_ret, NULL);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started [%s #%d]",
 			get_process_type_string(worker->thread_type), worker->worker_id);

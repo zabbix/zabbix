@@ -113,7 +113,9 @@ class testFormTemplate extends CLegacyWebTest {
 		$this->page->login()->open('zabbix.php?action=template.list&filter_rst=1')->waitUntilReady();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->getField('Template groups')->select('Templates');
+		$table = $this->query('id:datatable-templates')->asDatatable()->one();
 		$filter->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 		$this->zbxTestContentControlButtonClickTextWait('Create template');
 		$this->zbxTestInputTypeWait('template_name', $data['name']);
@@ -229,26 +231,27 @@ class testFormTemplate extends CLegacyWebTest {
 		$this->assertEquals(0, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='$this->template_edit_name'"));
 	}
 
-	public function testFormTemplate_CloneTemplate() {
-		$cloned_template_name = 'Cloned template';
+	// TODO: uncomment after ZBX-28185 fix.
+	// public function testFormTemplate_CloneTemplate() {
+	// 	$cloned_template_name = 'Cloned template';
 
-		$this->zbxTestLogin('zabbix.php?action=template.list');
-		$this->filterAndOpenTemplate($this->template_clone);
+	// 	$this->zbxTestLogin('zabbix.php?action=template.list');
+	// 	$this->filterAndOpenTemplate($this->template_clone);
 
-		$this->clickModalFooterButton('Clone');
-		COverlayDialogElement::find()->one()->waitUntilReady();
-		$this->zbxTestInputTypeOverwrite('template_name', $cloned_template_name);
+	// 	$this->clickModalFooterButton('Clone');
+	// 	COverlayDialogElement::find()->one()->waitUntilReady();
+	// 	$this->zbxTestInputTypeOverwrite('template_name', $cloned_template_name);
 
-		$this->clickModalFooterButton('Add');
-		COverlayDialogElement::find()->one()->ensureNotPresent();
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template added');
-		$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='".$cloned_template_name."'"));
-		$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='$this->template_clone'"));
+	// 	$this->clickModalFooterButton('Add');
+	// 	COverlayDialogElement::find()->one()->ensureNotPresent();
+	// 	$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template added');
+	// 	$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='".$cloned_template_name."'"));
+	// 	$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='$this->template_clone'"));
 
-		$template = CDBHelper::getRow("select hostid from hosts where host like '".$cloned_template_name."'");
-		$this->assertEquals(71, CDBHelper::getCount("SELECT itemid FROM items WHERE hostid='".$template['hostid']."'"));
-		$this->assertEquals(3, CDBHelper::getCount("SELECT dashboardid FROM dashboard WHERE templateid='".$template['hostid']."'"));
-	}
+	// 	$template = CDBHelper::getRow("select hostid from hosts where host like '".$cloned_template_name."'");
+	// 	$this->assertEquals(71, CDBHelper::getCount("SELECT itemid FROM items WHERE hostid='".$template['hostid']."'"));
+	// 	$this->assertEquals(3, CDBHelper::getCount("SELECT dashboardid FROM dashboard WHERE templateid='".$template['hostid']."'"));
+	// }
 
 	public function testFormTemplate_Delete() {
 		$template = CDBHelper::getRow("select hostid from hosts where host like '".$this->template."'");

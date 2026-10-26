@@ -51,6 +51,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/dashboard/dashboard";
 @import "components/datatable";
 @import "components/date-selector";
+@import "components/details-panel";
 @import "components/diff";
 @import "components/entity-count";
 @import "components/expandable-subfilter";
@@ -88,11 +89,15 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/tag";
 @import "components/time-quick";
 @import "components/toc";
+@import "components/trace-view";
 @import "components/z-bar-gauge";
 @import "components/z-color-picker";
+@import "components/z-navigation-tree";
 @import "components/z-select";
 @import "components/z-sparkline";
+@import "components/z-split-view";
 @import "components/z-textarea-flexible";
+@import "components/z-timeline-range-slider";
 
 @import "components/dashboard/widget-field-sparkline";
 
@@ -124,6 +129,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 
 @import "components/modal/host-wizard";
 @import "components/modal/user-device-init-view";
+@import "components/modal/cep-edit";
 
 .link-action {
 	@extend %link-action-style;
@@ -493,6 +499,16 @@ form {
 .wordbreak {
 	white-space: pre-wrap;
 	word-break: break-word;
+
+	&.wordbreak-clamp {
+		--line-clamp: none;
+
+		display: -webkit-box;
+		overflow-wrap: break-word;
+		overflow: hidden;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: var(--line-clamp);
+	}
 }
 
 .line-clamp {
@@ -520,7 +536,7 @@ form {
 }
 
 .list-check-radio {
-	li {
+	> li {
 		display: block;
 		line-height: 24px;
 	}
@@ -1755,7 +1771,7 @@ td.inactive-bg {
 		bottom: 0;
 		left: 0;
 		right: 0;
-		z-index: 5;
+		z-index: 20;
 	}
 
 	&::after {
@@ -1773,7 +1789,7 @@ td.inactive-bg {
 		left: 0;
 		right: 0;
 		animation: is-loading-kf .6s infinite linear;
-		z-index: 5; // More than z-index of .msg-*.
+		z-index: 20; // More than z-index of .msg-*.
 		content: '';
 	}
 
@@ -2270,7 +2286,7 @@ svg {
 
 	.preprocessing-list-item {
 		.step-parameters {
-			align-items: baseline;
+			align-items: end;
 			line-height: 22px;
 		}
 	}
@@ -2492,6 +2508,10 @@ svg {
 	.item-test-result {
 		display: inline-flex;
 	}
+}
+
+#proxy-form .form-field-apm-attributes {
+	width: 100%;
 }
 
 #token_form {
@@ -2956,10 +2976,22 @@ z-select {
 }
 
 // Users permissions tab.
+.rules-status-title {
+	margin-bottom: 3px;
+	color: $font-alt-color;
+}
+
 .rules-status-container {
 	.status-green,
-	.status-grey {
+	.status-grey,
+	.btn-plus-more {
 		margin: 3px 3px 3px 0;
+	}
+
+	.status-green,
+	.status-grey {
+		max-width: 100%;
+		@extend %overflow-ellipsis;
 	}
 }
 

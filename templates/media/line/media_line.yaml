@@ -22,6 +22,8 @@ zabbix_export:
           value: '{EVENT.VALUE}'
         - name: send_to
           value: '{ALERT.SENDTO}'
+        - name: tls_verify
+          value: '{$HTTP.TLS.VERIFY:"Line"}'
         - name: trigger_description
           value: '{TRIGGER.DESCRIPTION}'
         - name: trigger_id
@@ -30,132 +32,155 @@ zabbix_export:
           value: '{$ZABBIX.URL}'
       status: DISABLED
       script: |
+        const CTlsConfig = function (raw_value) {
+        	raw_value = String(raw_value).trim().toLowerCase();
+        
+        	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+        		raw_value = 'full';
+        	}
+        
+        	this.options = {
+        		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+        		SSLVerifyHost: (raw_value === 'full')
+        	};
+        
+        	this.enabled = (raw_value !== 'none');
+        
+        	this.checkURL = function (url) {
+        		if (this.enabled && !/^https:\/\//i.test(url)) {
+        			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+        			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+        		}
+        
+        		return url;
+        	};
+        }
+        
+        
         function sendMessage(to, messages, params) {
-            var response,
-                request = new HttpRequest();
+        	var response,
+        		request = new HttpRequest(tls.options);
         
-            if (typeof params.HTTPProxy === 'string' && params.HTTPProxy.trim() !== '') {
-                request.setProxy(params.HTTPProxy);
-            }
+        	if (typeof params.HTTPProxy === 'string' && params.HTTPProxy.trim() !== '') {
+        		request.setProxy(params.HTTPProxy);
+        	}
         
-            request.addHeader('Content-Type: application/json');
-            request.addHeader('Authorization: Bearer ' + params.bot_token);
+        	request.addHeader('Content-Type: application/json');
+        	request.addHeader('Authorization: Bearer ' + params.bot_token);
         
-            response = request.post('https://api.line.me/v2/bot/message/push', JSON.stringify({
-                "to": to,
-                "messages": messages
-            }));
+        	response = request.post('https://api.line.me/v2/bot/message/push', JSON.stringify({
+        		"to": to,
+        		"messages": messages
+        	}));
         
-            if (request.getStatus() !== 200) {
-                throw response;
-            }
+        	if (request.getStatus() !== 200) {
+        		throw response;
+        	}
         }
         
         function validateParams(params) {
-            if (typeof params.bot_token !== 'string' || params.bot_token.trim() === '') {
-                throw 'Field "bot_token" cannot be empty';
-            }
+        	if (typeof params.bot_token !== 'string' || params.bot_token.trim() === '') {
+        		throw 'Field "bot_token" cannot be empty';
+        	}
         
-            if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
-                throw 'Incorrect "event_source" parameter given: "' + params.event_source + '".\nMust be 0-3.';
-            }
+        	if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
+        		throw 'Incorrect "event_source" parameter given: "' + params.event_source + '".\nMust be 0-3.';
+        	}
         
-            if (params.event_source !== '0') {
-                params.event_nseverity = '0';
-                params.event_severity = 'Not classified';
-                params.event_update_status = '0';
-            }
+        	if (params.event_source !== '0') {
+        		params.event_nseverity = '0';
+        		params.event_severity = 'Not classified';
+        		params.event_update_status = '0';
+        	}
         
-            if (params.event_source === '1' || params.event_source === '2') {
-                params.event_value = '1';
-            }
+        	if (params.event_source === '1' || params.event_source === '2') {
+        		params.event_value = '1';
+        	}
         
-            if ([0, 1, 2, 3, 4, 5].indexOf(parseInt(params.event_nseverity)) === -1) {
-                throw 'Incorrect "event_nseverity" parameter given: ' + params.event_nseverity + '\nMust be 0-5.';
-            }
+        	if ([0, 1, 2, 3, 4, 5].indexOf(parseInt(params.event_nseverity)) === -1) {
+        		throw 'Incorrect "event_nseverity" parameter given: ' + params.event_nseverity + '\nMust be 0-5.';
+        	}
         
-            if (params.event_update_status !== '0' && params.event_update_status !== '1') {
-                throw 'Incorrect "event_update_status" parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';
-            }
+        	if (params.event_update_status !== '0' && params.event_update_status !== '1') {
+        		throw 'Incorrect "event_update_status" parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';
+        	}
         
-            if (params.event_value !== '0' && params.event_value !== '1') {
-                throw 'Incorrect "event_value" parameter given: ' + params.event_value + '\nMust be 0 or 1.';
-            }
+        	if (params.event_value !== '0' && params.event_value !== '1') {
+        		throw 'Incorrect "event_value" parameter given: ' + params.event_value + '\nMust be 0 or 1.';
+        	}
         
-            if (isNaN(params.trigger_id) && params.event_source === '0') {
-                throw 'field "trigger_id" is not a number';
-            }
+        	if (isNaN(params.trigger_id) && params.event_source === '0') {
+        		throw 'field "trigger_id" is not a number';
+        	}
         
-            if (typeof params.zabbix_url !== 'string' || params.zabbix_url.trim() === '') {
-                throw 'Field "zabbix_url" cannot be empty';
-            }
+        	if (typeof params.zabbix_url !== 'string' || params.zabbix_url.trim() === '') {
+        		throw 'Field "zabbix_url" cannot be empty';
+        	}
         
-            if (!/^(http|https):\/\/.+/.test(params.zabbix_url)) {
-                throw 'Field "zabbix_url" must contain a schema';
-            }
+        	if (!/^(http|https):\/\/.+/.test(params.zabbix_url)) {
+        		throw 'Field "zabbix_url" must contain a schema';
+        	}
         }
         
         function getZabbixProblemLink(params) {
-            return params.zabbix_url + (params.zabbix_url.endsWith('/') ? '' : '/') + 'tr_events.php?triggerid=' + params.trigger_id + '&eventid=' + params.event_id;    
+        	return params.zabbix_url + (params.zabbix_url.endsWith('/') ? '' : '/') + 'tr_events.php?triggerid=' + params.trigger_id + '&eventid=' + params.event_id;	
         }
         
         try {
-            var params = JSON.parse(value);
+        	var params = JSON.parse(value);
+        	var tls = new CTlsConfig(params.tls_verify);
         
-            validateParams(params);
+        	validateParams(params);
         
-            severity_emoji = [
-                "\u26AA",
-                "\uD83D\uDD35",
-                "\uD83D\uDFE4",
-                "\uD83D\uDFE1",
-                "\uD83D\uDFE0",
-                "\uD83D\uDD34",
-            ];
+        	severity_emoji = [
+        		"\u26AA",
+        		"\uD83D\uDD35",
+        		"\uD83D\uDFE4",
+        		"\uD83D\uDFE1",
+        		"\uD83D\uDFE0",
+        		"\uD83D\uDD34",
+        	];
         
-            // If its a trigger and a recovery operation and not an update operation.
-            if (params.event_source === '0' && params.event_value === '0' && params.event_update_status === '0') {
-                var line_message = [
-                    {
-                        "type": "text",
-                        "text": '\u2705 ' + params.alert_subject + '\n\n' + params.alert_message + '\n' + params.trigger_description + '\n\n' + getZabbixProblemLink(params)
-                    }
-                ];
-            }
-            // If its a trigger and its a problem.
-            else if (params.event_source === '0' && params.event_value === '1') {
-                var line_message = [
-                    {
-                        "type": "text",
-                        "text": severity_emoji[params.event_nseverity] + ' ' + params.alert_subject + '\n\n' + params.alert_message + '\n' + params.trigger_description + '\n\n' + getZabbixProblemLink(params)
-                    }
-                ];
-            }
-            // If its a trigger and its an update operation.
-            else if (params.event_source === '0' && params.event_update_status === '1') {
-                var line_message = [
-                    {
-                        "type": "text",
-                        "text": '\u2733 ' + severity_emoji[params.event_nseverity] + ' ' + params.alert_subject + '\n\n' + params.alert_message + '\n' + params.trigger_description + '\n\n' + getZabbixProblemLink(params)
-                    }
-                ];
-            }
-            else {
-                var line_message = [
-                    {
-                        "type": "text",
-                        "text": params.alert_subject + '\n\n' + params.alert_message + '\n'
-                    }
-                ];
-            }
+        	if (params.event_source === '0' && params.event_value === '0' && params.event_update_status === '0') {
+        		var line_message = [
+        			{
+        				"type": "text",
+        				"text": '\u2705 ' + params.alert_subject + '\n\n' + params.alert_message + '\n' + params.trigger_description + '\n\n' + getZabbixProblemLink(params)
+        			}
+        		];
+        	}
+        	else if (params.event_source === '0' && params.event_value === '1') {
+        		var line_message = [
+        			{
+        				"type": "text",
+        				"text": severity_emoji[params.event_nseverity] + ' ' + params.alert_subject + '\n\n' + params.alert_message + '\n' + params.trigger_description + '\n\n' + getZabbixProblemLink(params)
+        			}
+        		];
+        	}
+        	else if (params.event_source === '0' && params.event_update_status === '1') {
+        		var line_message = [
+        			{
+        				"type": "text",
+        				"text": '\u2733 ' + severity_emoji[params.event_nseverity] + ' ' + params.alert_subject + '\n\n' + params.alert_message + '\n' + params.trigger_description + '\n\n' + getZabbixProblemLink(params)
+        			}
+        		];
+        	}
+        	else {
+        		var line_message = [
+        			{
+        				"type": "text",
+        				"text": params.alert_subject + '\n\n' + params.alert_message + '\n'
+        			}
+        		];
+        	}
         
-            sendMessage(params.send_to, line_message, params);
+        	sendMessage(params.send_to, line_message, params);
         
-            return 'OK';
+        	return 'OK';
         }
         catch (err) {
-            Zabbix.log(4, '[ Line Webhook ] Line notification failed : ' + err);
-            throw 'Line notification failed : ' + err;
+        	Zabbix.log(4, '[ Line Webhook ] Line notification failed : ' + err);
+        	throw 'Line notification failed : ' + err;
         }
       description: |
         Please refer to setup guide here: https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/media/line
@@ -173,16 +198,17 @@ zabbix_export:
             Severity: {EVENT.SEVERITY}
             Operational data: {EVENT.OPDATA}
             Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
         - event_source: TRIGGERS
           operation_mode: RECOVERY
           subject: 'Resolved in {EVENT.DURATION}: {EVENT.NAME}'
           message: |
-            Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
             Problem name: {EVENT.NAME}
-            Problem duration: {EVENT.DURATION}
             Host: {HOST.NAME}
             Severity: {EVENT.SEVERITY}
             Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
         - event_source: TRIGGERS
           operation_mode: UPDATE
           subject: 'Updated problem in {EVENT.AGE}: {EVENT.NAME}'
@@ -213,3 +239,50 @@ zabbix_export:
             Host name: {HOST.HOST}
             Host IP: {HOST.IP}
             Agent port: {HOST.PORT}
+        - event_source: INTERNAL
+          operation_mode: PROBLEM
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Original problem ID: {EVENT.ID}
+        - event_source: INTERNAL
+          operation_mode: RECOVERY
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Original problem ID: {EVENT.ID}
+        - event_source: SERVICE
+          operation_mode: PROBLEM
+          subject: 'Service "{SERVICE.NAME}" problem: {EVENT.NAME}'
+          message: |
+            Service problem started at {EVENT.TIME} on {EVENT.DATE}
+            Service problem name: {EVENT.NAME}
+            Service: {SERVICE.NAME}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            Service description: {SERVICE.DESCRIPTION}
+            
+            {SERVICE.ROOTCAUSE}
+        - event_source: SERVICE
+          operation_mode: RECOVERY
+          subject: 'Service "{SERVICE.NAME}" resolved in {EVENT.DURATION}: {EVENT.NAME}'
+          message: |
+            Service "{SERVICE.NAME}" has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Problem duration: {EVENT.DURATION}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            Service description: {SERVICE.DESCRIPTION}
+        - event_source: SERVICE
+          operation_mode: UPDATE
+          subject: 'Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} in {EVENT.AGE}'
+          message: |
+            Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            Current problem age is {EVENT.AGE}.
+            Service description: {SERVICE.DESCRIPTION}
+            
+            {SERVICE.ROOTCAUSE}

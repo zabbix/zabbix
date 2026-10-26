@@ -1,5 +1,5 @@
 
-# MikroTik CSS326-24G-2SRM by SNMP
+# MikroTik CSS326-24G-2S+RM by SNMP
 
 ## Overview
 

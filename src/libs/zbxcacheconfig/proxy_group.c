@@ -494,11 +494,14 @@ int	dc_get_host_redirect(const char *host, const zbx_tls_conn_attr_t *attr, zbx_
 		now = (int)time(NULL);
 
 		/* check if proxy is not offline and the client redirect should be reset */
-		if (now - get_dc_config()->proxy_lastonline < get_dc_config()->proxy_failover_delay ||
-				now - hpi->lastreset < get_dc_config()->proxy_failover_delay)
+		if (now - get_dc_config()->proxy_lastonline < get_dc_config()->proxy_failover_delay * 1.5)
 		{
+			hpi->lastreset = 0;
 			return FAIL;
 		}
+
+		if (now - hpi->lastreset < SEC_PER_MIN * 5)
+			return FAIL;
 
 		hpi->lastreset = now;
 		redirect->reset = ZBX_REDIRECT_RESET;

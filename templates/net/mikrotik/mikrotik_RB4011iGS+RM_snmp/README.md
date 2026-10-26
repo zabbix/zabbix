@@ -1,5 +1,5 @@
 
-# MikroTik RB4011iGSRM by SNMP
+# MikroTik RB4011iGS+RM by SNMP
 
 ## Overview
 

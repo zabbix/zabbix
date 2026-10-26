@@ -316,6 +316,7 @@ class CImportDataAdapterTest extends TestCase {
 							'version' => '2',
 							'community' => '{$SNMP_COMMUNITY}',
 							'max_repetitions' => '10',
+							'retries' => '5',
 							'contextname' => '',
 							'securityname' => '',
 							'securitylevel' => '0',
@@ -2598,6 +2599,7 @@ class CImportDataAdapterTest extends TestCase {
 							'version' => '1',
 							'community' => 'public',
 							'max_repetitions' => '10',
+							'retries' => '5',
 							'contextname' => '',
 							'securityname' => '',
 							'securitylevel' => '0',
@@ -2620,6 +2622,7 @@ class CImportDataAdapterTest extends TestCase {
 							'version' => '1',
 							'community' => 'public',
 							'max_repetitions' => '10',
+							'retries' => '5',
 							'contextname' => '',
 							'securityname' => '',
 							'securitylevel' => '0',
@@ -2642,6 +2645,7 @@ class CImportDataAdapterTest extends TestCase {
 							'version' => '2',
 							'community' => 'public',
 							'max_repetitions' => '10',
+							'retries' => '5',
 							'contextname' => '',
 							'securityname' => '',
 							'securitylevel' => '0',
@@ -2664,6 +2668,7 @@ class CImportDataAdapterTest extends TestCase {
 							'version' => '2',
 							'community' => 'public',
 							'max_repetitions' => '10',
+							'retries' => '5',
 							'contextname' => '',
 							'securityname' => '',
 							'securitylevel' => '0',
@@ -2692,7 +2697,8 @@ class CImportDataAdapterTest extends TestCase {
 							'privprotocol' => '0',
 							'privpassphrase' => 'test',
 							'community' => '',
-							'max_repetitions' => '10'
+							'max_repetitions' => '10',
+							'retries' => '5'
 						],
 						'useip' => '1',
 						'ip' => '127.0.0.1',
@@ -2714,7 +2720,8 @@ class CImportDataAdapterTest extends TestCase {
 							'privprotocol' => '0',
 							'privpassphrase' => 'test',
 							'community' => '',
-							'max_repetitions' => '10'
+							'max_repetitions' => '10',
+							'retries' => '5'
 						],
 						'useip' => '1',
 						'ip' => '127.0.0.1',
@@ -2736,7 +2743,8 @@ class CImportDataAdapterTest extends TestCase {
 							'privprotocol' => '0',
 							'privpassphrase' => 'test',
 							'community' => '',
-							'max_repetitions' => '10'
+							'max_repetitions' => '10',
+							'retries' => '5'
 						],
 						'useip' => '1',
 						'ip' => '127.0.0.1',

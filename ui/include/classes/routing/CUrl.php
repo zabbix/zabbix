@@ -43,10 +43,10 @@ class CUrl {
 			}
 
 			// parse query
-			$pos = strpos($url, '?');
+			$pos = strpos($this->url, '?');
 			if ($pos !== false) {
-				$this->query = substr($url, $pos + 1);
-				$this->url = substr($url, 0, $pos);
+				$this->query = substr($this->url, $pos + 1);
+				$this->url = substr($this->url, 0, $pos);
 			}
 
 			$this->formatArguments();

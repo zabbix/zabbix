@@ -108,6 +108,27 @@ class CControllerProxyUpdate extends CController {
 				['db proxy.tls_subject', 'when' => ['tls_connect', 'in' => [HOST_ENCRYPTION_CERTIFICATE]]],
 				['db proxy.tls_subject', 'when' => ['tls_accept_certificate', true]]
 			],
+			'data_collection_status' => ['required', 'boolean',
+				'in' => [PROXY_APM_DATA_COLLECTION_DISABLED, PROXY_APM_DATA_COLLECTION_ENABLED]
+			],
+			'quota_mode' => ['required', 'integer',
+				'in' => [PROXY_APM_QUOTA_MODE_UNLIMITED, PROXY_APM_QUOTA_MODE_CUSTOM],
+				'when' => [['data_collection_status', 'in' => [PROXY_APM_DATA_COLLECTION_ENABLED]]]
+			],
+			'max_messages_per_second' => ['required', 'integer', 'not_empty', 'min' => 0, 'max' => ZBX_MAX_INT32,
+				'when' => [['quota_mode', 'in' => [PROXY_APM_QUOTA_MODE_CUSTOM]]]
+			],
+			'additional_resource_attributes' => ['objects', 'uniq' => ['key', 'signal_type'],
+				'fields' => [
+					'key' => ['required', 'string', 'not_empty'],
+					'value' => ['required', 'string'],
+					'signal_type' => ['required', 'integer',
+						'in' => [SIGNAL_TYPE_TRACES, SIGNAL_TYPE_METRICS, SIGNAL_TYPE_LOGS]
+					]
+				],
+				'when' => [['data_collection_status', 'in' => [PROXY_APM_DATA_COLLECTION_ENABLED]]],
+				'messages' => ['uniq' => _('Attribute name and type is not unique.')]
+			],
 			'custom_timeouts' => ['db proxy.custom_timeouts',
 				'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED, ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]
 			],
@@ -148,6 +169,10 @@ class CControllerProxyUpdate extends CController {
 				'when' => ['custom_timeouts', 'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]]
 			],
 			'timeout_browser' => ['db proxy.timeout_browser', 'required', 'not_empty',
+				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN, 'usermacros' => true]],
+				'when' => ['custom_timeouts', 'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]]
+			],
+			'timeout_telemetry_query' => ['db proxy.timeout_telemetry_query', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN, 'usermacros' => true]],
 				'when' => ['custom_timeouts', 'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]]
 			]
@@ -222,7 +247,7 @@ class CControllerProxyUpdate extends CController {
 		if ($proxy['custom_timeouts'] == ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED) {
 			$this->getInputs($proxy, ['timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent',
 				'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent',
-				'timeout_telnet_agent', 'timeout_script', 'timeout_browser'
+				'timeout_telnet_agent', 'timeout_script', 'timeout_browser', 'timeout_telemetry_query'
 			]);
 		}
 
@@ -242,6 +267,17 @@ class CControllerProxyUpdate extends CController {
 		}
 
 		$proxy['tls_accept'] = $tls_accept;
+
+		$proxy['apm'] = [];
+		$this->getInputs($proxy['apm'], ['data_collection_status']);
+
+		if ($proxy['apm']['data_collection_status'] === PROXY_APM_DATA_COLLECTION_ENABLED) {
+			$this->getInputs($proxy['apm'], ['max_messages_per_second', 'additional_resource_attributes']);
+
+			if ($this->getInput('quota_mode') === PROXY_APM_QUOTA_MODE_UNLIMITED) {
+				$proxy['apm']['max_messages_per_second'] = 0;
+			}
+		}
 
 		$result = API::Proxy()->update($proxy);
 

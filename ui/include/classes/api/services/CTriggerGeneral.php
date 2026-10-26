@@ -284,6 +284,8 @@ abstract class CTriggerGeneral extends CApiService {
 						while ($hist_function = prev($hist_functions));
 					}
 
+					$new_trigger['host_status'] = $host['status'];
+
 					if (array_key_exists($host['hostid'], $chd_triggers_all)
 							&& array_key_exists($tpl_trigger['triggerid'], $chd_triggers_all[$host['hostid']])) {
 						$chd_trigger = $chd_triggers_all[$host['hostid']][$tpl_trigger['triggerid']];
@@ -425,16 +427,17 @@ abstract class CTriggerGeneral extends CApiService {
 	private function getHostTriggersByTemplateId(array $tpl_triggerids, ?array $hostids = null) {
 		$output = 't.triggerid,t.expression,t.description,t.url_name,t.url,t.status,t.priority,t.comments,t.type,'.
 			't.recovery_mode,t.recovery_expression,t.correlation_mode,t.correlation_tag,t.manual_close,t.opdata,'.
-			't.templateid,t.event_name,i.hostid';
+			't.templateid,t.event_name,i.hostid,h.status AS host_status';
 		if ($this instanceof CTriggerPrototype) {
 			$output .= ',t.discover';
 		}
 
 		// Preparing list of triggers by templateid.
 		$sql = 'SELECT DISTINCT '.$output.
-			' FROM triggers t,functions f,items i'.
+			' FROM triggers t,functions f,items i,hosts h'.
 			' WHERE t.triggerid=f.triggerid'.
 				' AND f.itemid=i.itemid'.
+				' AND i.hostid=h.hostid'.
 				' AND '.dbConditionInt('t.templateid', $tpl_triggerids);
 		if ($hostids !== null) {
 			$sql .= ' AND '.dbConditionInt('i.hostid', $hostids);
@@ -488,7 +491,7 @@ abstract class CTriggerGeneral extends CApiService {
 
 		$output = 't.triggerid,t.expression,t.description,t.url_name,t.url,t.status,t.priority,t.comments,t.type,'.
 			't.recovery_mode,t.recovery_expression,t.correlation_mode,t.correlation_tag,t.manual_close,t.opdata,'.
-			't.event_name,i.hostid,h.host';
+			't.event_name,i.hostid,h.host,h.status AS host_status';
 		if ($this instanceof CTriggerPrototype) {
 			$output .= ',t.discover';
 		}
@@ -672,22 +675,28 @@ abstract class CTriggerGeneral extends CApiService {
 		return $descriptions;
 	}
 
-	/**
-	 * @param array $triggers
-	 * @param array $descriptions
-	 *
-	 * @throws APIException
-	 */
-	private static function validateUuid(array $triggers, array $descriptions): void {
-		$triggers_validate_indexes = [];
-
+	protected static function addHostStatus(array &$triggers, array $descriptions, ?array $db_triggers = null): void {
 		foreach ($descriptions as $_triggers) {
 			foreach ($_triggers as $_trigger) {
 				$triggers[$_trigger['index']]['host_status'] = $_trigger['host']['status'];
-				$triggers_validate_indexes[] = $_trigger['index'];
 			}
 		}
 
+		if ($db_triggers === null) {
+			return;
+		}
+
+		foreach ($triggers as &$trigger) {
+			if (array_key_exists('host_status', $trigger)) {
+				continue;
+			}
+
+			$trigger['host_status'] = $db_triggers[$trigger['triggerid']]['host_status'];
+		}
+		unset($trigger);
+	}
+
+	private static function validateUuid(array $triggers): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED | API_PRESERVE_KEYS, 'uniq' => [['uuid']], 'fields' => [
 			'host_status' =>	['type' => API_ANY],
 			'uuid' =>			['type' => API_MULTIPLE, 'rules' => [
@@ -695,8 +704,6 @@ abstract class CTriggerGeneral extends CApiService {
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('triggers', 'uuid'), 'unset' => true]
 			]]
 		]];
-
-		$triggers = array_intersect_key($triggers, array_flip($triggers_validate_indexes));
 
 		if (!CApiInputValidator::validate($api_input_rules, $triggers, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -770,7 +777,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param array  $descriptions
 	 * @param string $descriptions[<description>][]['expression']
 	 * @param string $descriptions[<description>][]['recovery_expression']
-	 * @param string $descriptions[<description>][]['hostid']
+	 * @param string $descriptions[<description>][]['host']['hostid']
 	 *
 	 * @throws APIException if at least one trigger exists
 	 */
@@ -780,10 +787,6 @@ abstract class CTriggerGeneral extends CApiService {
 			$expressions = [];
 
 			foreach ($triggers as $trigger) {
-				if (array_key_exists('name_updated', $trigger) && !$trigger['name_updated']) {
-					continue;
-			}
-
 				$hostids[$trigger['host']['hostid']] = true;
 				$expressions[$trigger['expression']][$trigger['recovery_expression']] = $trigger['host']['hostid'];
 			}
@@ -1153,7 +1156,9 @@ abstract class CTriggerGeneral extends CApiService {
 
 		$descriptions = $this->populateHostIds($descriptions);
 
-		self::validateUuid($triggers, $descriptions);
+		self::addHostStatus($triggers, $descriptions);
+
+		self::validateUuid($triggers);
 
 		self::addUuid($triggers, $descriptions);
 
@@ -1307,8 +1312,6 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 		}
 
-		$this->addAffectedObjects($triggers, $db_triggers);
-
 		$read_only_fields = ['uuid', 'description', 'expression', 'recovery_mode', 'recovery_expression',
 			'correlation_mode', 'correlation_tag', 'manual_close'
 		];
@@ -1356,16 +1359,13 @@ abstract class CTriggerGeneral extends CApiService {
 			self::checkTriggerRecoveryMode($trigger);
 			self::checkTriggerCorrelationMode($trigger);
 
-			$name_updated = $trigger['expression'] !== $db_trigger['expression']
-				|| $trigger['recovery_expression'] !== $db_trigger['recovery_expression']
-				|| $trigger['description'] !== $db_trigger['description'];
-
-			if ($name_updated || array_key_exists('uuid', $trigger)) {
+			if ($trigger['expression'] !== $db_trigger['expression']
+					|| $trigger['recovery_expression'] !== $db_trigger['recovery_expression']
+					|| $trigger['description'] !== $db_trigger['description']) {
 				$descriptions[$trigger['description']][] = [
 					'index' => $index,
 					'expression' => $trigger['expression'],
-					'recovery_expression' => $trigger['recovery_expression'],
-					'name_updated' => $name_updated
+					'recovery_expression' => $trigger['recovery_expression']
 				];
 			}
 		}
@@ -1374,25 +1374,22 @@ abstract class CTriggerGeneral extends CApiService {
 		if ($descriptions) {
 			$descriptions = $this->populateHostIds($descriptions);
 
-			self::validateUuid($triggers, $descriptions);
-
-			self::checkUuidDuplicates($triggers, $db_triggers);
 			$this->checkDuplicates($descriptions);
 		}
 
+		self::addAffectedObjects($triggers, $db_triggers);
+
+		self::addHostStatus($triggers, $descriptions, $db_triggers);
+
+		self::validateUuid($triggers);
+
+		self::checkUuidDuplicates($triggers, $db_triggers);
 		$this->checkDependencies($triggers, $db_triggers);
 		$this->checkDependenciesLinks($triggers, $db_triggers);
 	}
 
-	/**
-	 * @param array $triggers
-	 * @param array $db_triggers
-	 */
-	private function addAffectedObjects(array $triggers, array &$db_triggers): void {
-		if ($this instanceof CTrigger) {
-			self::addAffectedHosts($triggers, $db_triggers);
-		}
-
+	private static function addAffectedObjects(array $triggers, array &$db_triggers): void {
+		self::addAffectedHosts($triggers, $db_triggers);
 		self::addAffectedTags($triggers, $db_triggers);
 		self::addAffectedDependencies($triggers, $db_triggers);
 	}
@@ -1405,14 +1402,8 @@ abstract class CTriggerGeneral extends CApiService {
 		$triggerids = [];
 
 		foreach ($triggers as $trigger) {
-			$db_trigger = $db_triggers[$trigger['triggerid']];
-
-			if ((array_key_exists('expression', $trigger) && $trigger['expression'] !== $db_trigger['expression'])
-					|| (array_key_exists('recovery_expression', $trigger)
-						&& $trigger['recovery_expression'] !== $db_trigger['recovery_expression'])) {
-				$triggerids[] = $trigger['triggerid'];
-				$db_triggers[$trigger['triggerid']]['hosts'] = [];
-			}
+			$triggerids[] = $trigger['triggerid'];
+			$db_triggers[$trigger['triggerid']]['hosts'] = [];
 		}
 
 		if (!$triggerids) {
@@ -1420,13 +1411,15 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 
 		$result = DBselect(
-			'SELECT DISTINCT f.triggerid,i.hostid'.
-			' FROM functions f,items i'.
-			' WHERE f.itemid=i.itemid'.
-				' AND '.dbConditionId('f.triggerid', $triggerids)
+			'SELECT DISTINCT f.triggerid,i.hostid,h.status'.
+			' FROM functions f'.
+			' JOIN items i ON f.itemid=i.itemid'.
+			' JOIN hosts h ON i.hostid=h.hostid'.
+			' WHERE '.dbConditionId('f.triggerid', $triggerids)
 		);
 
 		while ($row = DBfetch($result)) {
+			$db_triggers[$row['triggerid']]['host_status'] = $row['status'];
 			$db_triggers[$row['triggerid']]['hosts'][$row['hostid']] = true;
 		}
 	}
@@ -1474,7 +1467,11 @@ abstract class CTriggerGeneral extends CApiService {
 		foreach ($triggers as $trigger) {
 			$db_trigger = $db_triggers[$trigger['triggerid']];
 
-			if (array_key_exists('dependencies', $trigger) || array_key_exists('hosts', $db_trigger)) {
+			$expression_changed = self::isTrigger()
+				&& ($trigger['expression'] !== $db_trigger['expression']
+					|| $trigger['recovery_expression'] !== $db_trigger['recovery_expression']);
+
+			if (array_key_exists('dependencies', $trigger) || $expression_changed) {
 				$triggerids[] = $trigger['triggerid'];
 				$db_triggers[$trigger['triggerid']]['dependencies'] = [];
 			}
@@ -1712,6 +1709,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$new_functions = [];
 		$triggers_functions = [];
 		$new_tags = [];
+		$ins_trigger_rtdata = [];
 		$this->implode_expressions($new_triggers, null, $triggers_functions, $inherited);
 
 		$triggerid = DB::reserveIds('triggers', count($new_triggers));
@@ -1728,6 +1726,9 @@ abstract class CTriggerGeneral extends CApiService {
 			if ($this instanceof CTriggerPrototype) {
 				$new_trigger['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 			}
+			elseif (in_array($new_trigger['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])) {
+				$ins_trigger_rtdata[] = ['triggerid' => $new_trigger['triggerid']];
+			}
 
 			if (array_key_exists('tags', $new_trigger)) {
 				foreach ($new_trigger['tags'] as $tag) {
@@ -1737,11 +1738,14 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 
 			$triggerid = bcadd($triggerid, 1, 0);
+
+			unset($new_trigger['host_status']);
 		}
 		unset($new_trigger);
 
 		DB::insert('triggers', $new_triggers, false);
 		DB::insertBatch('functions', $new_functions, false);
+		DB::insertBatch('trigger_rtdata', $ins_trigger_rtdata, false);
 
 		if ($new_tags) {
 			DB::insert('trigger_tag', $new_tags);
@@ -1803,6 +1807,8 @@ abstract class CTriggerGeneral extends CApiService {
 		$new_functions = [];
 		$del_functions_triggerids = [];
 		$triggers_functions = [];
+		$ins_trigger_rtdata = [];
+		$del_trigger_rtdata_triggerids = [];
 		$new_tags = [];
 		$del_triggertagids = [];
 		$upd_discovered_triggers = [];
@@ -1875,6 +1881,16 @@ abstract class CTriggerGeneral extends CApiService {
 				$upd_trigger['values']['manual_close'] = $trigger['manual_close'];
 			}
 
+			if (self::isTrigger() && $trigger['host_status'] != $db_trigger['host_status']) {
+				if ($trigger['host_status'] == HOST_STATUS_TEMPLATE) {
+					$del_trigger_rtdata_triggerids[] = $trigger['triggerid'];
+				}
+				elseif ($db_trigger['host_status'] == HOST_STATUS_TEMPLATE) {
+					$ins_trigger_rtdata[] = ['triggerid' => $trigger['triggerid']];
+				}
+			}
+			unset($save_triggers[$tnum]['host_status']);
+
 			if ($upd_trigger['values']) {
 				$upd_triggers[] = $upd_trigger;
 			}
@@ -1928,6 +1944,12 @@ abstract class CTriggerGeneral extends CApiService {
 		if ($new_functions) {
 			DB::insertBatch('functions', $new_functions, false);
 		}
+
+		if ($del_trigger_rtdata_triggerids) {
+			DB::delete('trigger_rtdata', ['triggerid' => $del_trigger_rtdata_triggerids]);
+		}
+		DB::insertBatch('trigger_rtdata', $ins_trigger_rtdata, false);
+
 		if ($del_triggertagids) {
 			DB::delete('trigger_tag', ['triggertagid' => $del_triggertagids]);
 		}

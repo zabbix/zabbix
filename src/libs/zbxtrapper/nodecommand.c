@@ -30,48 +30,9 @@
 #include "zbxcacheconfig.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
-#include "zbxexpr.h"
 #include "zbxjson.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
-
-/**********************************************************************************
- *                                                                                *
- * Purpose: replaces occurrence of macro in input string with value given in      *
- *          macrovalue, with memory management                                    *
- *                                                                                *
- * Parameters:  in               - [IN] input string to be processed              *
- *              macro            - [IN] macro to replace                          *
- *              macrovalue       - [IN] value to replace macro with               *
- *              out              - [IN/OUT] pointer to memory holding result      *
- *              out_alloc        - [IN/OUT] size of memory holding result         *
- *                                                                                *
- * Return value:  SUCCEED - remote command was executed successfully              *
- *                FAIL    - error occurred                                        *
- *                                                                                *
- **********************************************************************************/
-static void	substitute_macro(const char *in, const char *macro, const char *macrovalue, char **out,
-		size_t *out_alloc)
-{
-	zbx_token_t	token;
-	int		pos = 0;
-	size_t		out_offset = 0, macrovalue_len;
-
-	macrovalue_len = strlen(macrovalue);
-	zbx_strcpy_alloc(out, out_alloc, &out_offset, in);
-	out_offset++;
-
-	for (; SUCCEED == zbx_token_find(*out, pos, &token, ZBX_TOKEN_SIMPLE_MACRO); pos++)
-	{
-		pos = token.loc.r;
-
-		if (0 == strncmp(*out + token.loc.l, macro, token.loc.r - token.loc.l + 1))
-		{
-			pos += zbx_replace_mem_dyn(out, out_alloc, &out_offset, token.loc.l,
-					token.loc.r - token.loc.l + 1, macrovalue, macrovalue_len);
-		}
-	}
-}
 
 /******************************************************************************
  *                                                                            *
@@ -543,13 +504,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 			goto fail;
 	}
 
-	/* substitute macros in script body and webhook parameters */
-
 	if (ZBX_SCRIPT_MANUALINPUT_YES == script.manualinput)
 	{
-		char	*expanded_cmd = NULL;
-		size_t	expanded_cmd_size;
-
 		if (NULL == manualinput)
 		{
 			zbx_strlcpy(error, "Script takes user input, but none was provided.", sizeof(error));
@@ -562,40 +518,13 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 			zbx_strlcpy(error, "Provided script user input failed validation.", sizeof(error));
 			goto fail;
 		}
-
-		substitute_macro(script.command, "{MANUALINPUT}", manualinput, &expanded_cmd, &expanded_cmd_size);
-
-		script.command = zbx_strdup(script.command, expanded_cmd);
-
-		zbx_free(expanded_cmd);
-
-		/* in the case that this is a webhook script, perform the substitution for parameter values as well */
-		if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type && 0 < webhook_params.values_num)
-		{
-			for (int n = 0; n < webhook_params.values_num; n++)
-			{
-				char	*expanded_value = NULL;
-				size_t	expanded_value_size;
-
-				/* avoid unnecessary mem (re)allocation in case the macro isn't present */
-				if (NULL == strstr(webhook_params.values[n].second, "{MANUALINPUT}"))
-					continue;
-
-				substitute_macro(webhook_params.values[n].second, "{MANUALINPUT}", manualinput,
-						&expanded_value, &expanded_value_size);
-
-				webhook_params.values[n].second = zbx_strdup(webhook_params.values[n].second,
-						expanded_value);
-
-				zbx_free(expanded_value);
-			}
-		}
 	}
 	else if (NULL != manualinput) /* script does not take additional input yet we've received a value anyway */
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "script (name:%s) "
 				"does not accept additional manual input, but request contains it anyway",
 				script.name);
+		manualinput = NULL; /* ignore input the script does not accept */
 	}
 
 	if (0 != hostid)	/* script on host */
@@ -606,16 +535,20 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	um_handle_masked = zbx_dc_open_user_macros_masked();
 	um_handle_unmasked = zbx_dc_open_user_macros_secure();
 
+	/* substitute macros in script body and in webhook parameters */
 	if (ZBX_SCRIPT_TYPE_WEBHOOK != script.type)
 	{
+		/* um_handle_unmasked: {MANUALINPUT} is expanded together with the other macros */
 		if (SUCCEED != substitute_script_macros(&script.command, error, sizeof(error), macro_scope_type,
-				um_handle_unmasked, problem_event, recovery_event, &user->userid, &host, tz))
+				um_handle_unmasked, problem_event, recovery_event, &user->userid, &host, tz,
+				manualinput))
 		{
 			goto fail;
 		}
 
+		/* masked / original copy (audit log): expand {MANUALINPUT} as well, but keep user macros masked */
 		if (SUCCEED != substitute_script_macros(&script.command_orig, error, sizeof(error), macro_scope_type,
-				um_handle_masked, problem_event, recovery_event, &user->userid, &host, tz))
+				um_handle_masked, problem_event, recovery_event, &user->userid, &host, tz, manualinput))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			goto fail;
@@ -623,11 +556,16 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	}
 	else
 	{
+		/* webhook body: expand ONLY {MANUALINPUT}; all other macros are left as-is */
+		if (SUCCEED != substitute_webhook_macros(&script.command, error, sizeof(error), manualinput))
+			goto fail;
+
+		/* webhook parameters: full macro resolution, including {MANUALINPUT} */
 		for (int i = 0; i < webhook_params.values_num; i++)
 		{
 			if (SUCCEED != substitute_script_macros((char **)&webhook_params.values[i].second, error,
 					sizeof(error), macro_scope_type, um_handle_unmasked, problem_event,
-					recovery_event, &user->userid, &host, tz))
+					recovery_event, &user->userid, &host, tz, manualinput))
 			{
 				goto fail;
 			}
@@ -699,53 +637,6 @@ fail:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Checks if the user has specific or default access for             *
- *          administration actions.                                           *
- *                                                                            *
- * Return value:  SUCCEED - access is granted                                 *
- *                FAIL    - access is denied                                  *
- *                                                                            *
- ******************************************************************************/
-static int	check_user_administration_actions_permissions(const zbx_user_t *user, const char *role_rule_default,
-		const char *role_rule)
-{
-	int		ret = FAIL;
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() userid:" ZBX_FS_UI64 , __func__, user->userid);
-
-	result = zbx_db_select("select value_int,name from role_rule where roleid=" ZBX_FS_UI64
-			" and (name='%s' or name='%s')", user->roleid, role_rule,
-			role_rule_default);
-
-	while (NULL != (row = zbx_db_fetch(result)))
-	{
-		if (0 == strcmp(role_rule, row[1]))
-		{
-			if (ROLE_PERM_ALLOW == atoi(row[0]))
-				ret = SUCCEED;
-			else
-				ret = FAIL;
-			break;
-		}
-		else if (0 == strcmp(role_rule_default, row[1]))
-		{
-			if (ROLE_PERM_ALLOW == atoi(row[0]))
-				ret = SUCCEED;
-		}
-		else
-			THIS_SHOULD_NEVER_HAPPEN;
-	}
-	zbx_db_free_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: processes command received from frontend                          *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
@@ -774,14 +665,9 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 	if (FAIL == zbx_get_user_from_json(jp, &user, &result))
 		goto finish;
 
-	if (SUCCEED != zbx_db_check_user_perm2system(user.userid))
-	{
-		result = zbx_strdup(result, "Permission denied. User is a member of group with disabled access.");
-		goto finish;
-	}
 #define ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS		"actions.default_access"
 #define ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS	"actions.execute_scripts"
-	if (SUCCEED != check_user_administration_actions_permissions(&user,
+	if (SUCCEED != zbx_db_user_has_administration_actions_permissions(&user,
 			ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS,
 			ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS))
 	{

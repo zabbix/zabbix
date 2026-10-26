@@ -147,7 +147,7 @@ class testFormHostGroupSearchPage extends testFormGroups {
 					'expected' => TEST_BAD,
 					'name' => 'Group for Maintenance',
 					'error' => 'Cannot delete host group "Group for Maintenance" because maintenance'.
-						' "Maintenance for host group testing" must contain at least one host or host group.'
+						' "Maintenance for host group testing" must contain at least one host group, host or trigger.'
 				]
 			],
 			[

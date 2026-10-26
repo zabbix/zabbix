@@ -19,6 +19,7 @@ The configurable parameters are intended to be changed according to the webhook 
 
 |Name|Value|Description|
 |----|-----|-----------|
+|tls_verify|\{$HTTP\.TLS\.VERIFY:"Slack"\}|TLS certificate verification for HTTP requests: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this media type only, define the global macro with the context "Slack", e.g. {$HTTP.TLS.VERIFY:"Slack"}.|
 |zabbix_url|\{$ZABBIX\.URL\}|Current Zabbix URL.|
 |bot_token|\<PLACE YOUR TOKEN\>|Slack bot token.|
 |slack_mode|alarm|Slack mode. Could be "alarm" or "event" as a value.|

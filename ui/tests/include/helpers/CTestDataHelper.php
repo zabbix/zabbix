@@ -33,7 +33,8 @@ class CTestDataHelper {
 	 */
 	public static function createObjects(array $objects): void {
 		$objects += array_fill_keys(['template_groups', 'host_groups', 'templates', 'proxies', 'hosts', 'triggers',
-			'trigger_prototypes', 'roles', 'user_groups', 'users', 'scripts',  'drules', 'actions', 'media_type'
+			'trigger_prototypes', 'roles', 'user_groups', 'users', 'scripts', 'drules', 'actions', 'media_type',
+			'ceprules'
 		], []);
 
 		try {
@@ -51,6 +52,7 @@ class CTestDataHelper {
 			self::createDrules($objects['drules']);
 			self::createActions($objects['actions']);
 			self::createMediatypes($objects['media_type']);
+			self::createCepRules($objects['ceprules']);
 		}
 		catch (Exception $e) {
 			self::cleanUp();
@@ -125,6 +127,7 @@ class CTestDataHelper {
 			return;
 		}
 
+		$macro_templates = [];
 		$value_maps = [];
 		$items = [];
 		$lld_rules = [];
@@ -136,6 +139,10 @@ class CTestDataHelper {
 				],
 				'templates' => []
 			];
+
+			if (array_key_exists('macros', $template)) {
+				$macro_templates[] = ':template:'.$template['host'];
+			}
 
 			if (array_key_exists('value_maps', $template)) {
 				foreach ($template['value_maps'] as $value_map) {
@@ -171,6 +178,7 @@ class CTestDataHelper {
 			self::$objectids['template'][$template['host']] = array_shift($result['templateids']);
 		}
 
+		self::prepareMacroReferences($macro_templates);
 		self::createValueMaps($value_maps);
 		self::createItems($items);
 		self::createLldRules($lld_rules);
@@ -190,6 +198,7 @@ class CTestDataHelper {
 			return;
 		}
 
+		$macro_hosts = [];
 		$value_maps = [];
 		$items = [];
 		$lld_rules = [];
@@ -202,6 +211,10 @@ class CTestDataHelper {
 				],
 				'templates' => []
 			];
+
+			if (array_key_exists('macros', $host)) {
+				$macro_hosts[] = ':host:'.$host['host'];
+			}
 
 			if (array_key_exists('value_maps', $host)) {
 				foreach ($host['value_maps'] as $value_map) {
@@ -245,6 +258,7 @@ class CTestDataHelper {
 			self::$objectids['host'][$host['host']] = array_shift($result['hostids']);
 		}
 
+		self::prepareMacroReferences($macro_hosts);
 		self::createValueMaps($value_maps);
 		self::createItems($items);
 		self::createLldRules($lld_rules);
@@ -256,6 +270,35 @@ class CTestDataHelper {
 		self::convertPropertyReference($hosts, 'groups.groupid');
 		self::convertPropertyReference($hosts, 'templates.templateid');
 		self::convertPropertyReference($hosts, 'proxyid');
+	}
+
+	/**
+	 * Store references to macros of the given hosts or templates, keyed by macro and owner, so that both
+	 * `:user_macro:{$X}:host:my.name` and the short `:user_macro:{$X}` (last created owner) can be resolved.
+	 *
+	 * @param array $host_refs  Owner references, e.g. `:host:my.name` or `:template:my.name`.
+	 */
+	private static function prepareMacroReferences(array $host_refs): void {
+		if (!$host_refs) {
+			return;
+		}
+
+		$host_refs = array_combine(self::getConvertedValueReferences($host_refs), $host_refs);
+
+		$db_macros = CDataHelper::call('usermacro.get', [
+			'output' => ['hostmacroid', 'hostid', 'macro'],
+			'hostids' => array_keys($host_refs)
+		]);
+
+		foreach ($db_macros as $db_macro) {
+			self::$objectids['user_macro'][$db_macro['macro']][$host_refs[$db_macro['hostid']]] =
+				$db_macro['hostmacroid'];
+		}
+	}
+
+	public static function convertUserMacroReferences(array &$host_macro): void {
+		self::convertPropertyReference($host_macro, 'hostmacroid');
+		self::convertPropertyReference($host_macro, 'hostid');
 	}
 
 	/**
@@ -997,6 +1040,22 @@ class CTestDataHelper {
 		self::convertPropertyReference($mediatypes, 'mediatypeid');
 	}
 
+	public static function createCepRules(array $ceprules): void {
+		if (!$ceprules) {
+			return;
+		}
+
+		$result = CDataHelper::call('ceprule.create', $ceprules);
+
+		foreach ($ceprules as $ceprule) {
+			self::$objectids['ceprule'][$ceprule['name']] = array_shift($result['cep_ruleids']);
+		}
+	}
+
+	public static function convertCepRuleReferences(array &$ceprules): void {
+		self::convertPropertyReference($ceprules, 'cep_ruleid');
+	}
+
 	/**
 	 * Check for, and replace a reference ID in the given object property with the corresponding object's record ID.
 	 *
@@ -1209,6 +1268,10 @@ class CTestDataHelper {
 
 		if (array_key_exists('media_type', self::$objectids)) {
 			CDataHelper::call('mediatype.delete', array_values(self::$objectids['media_type']));
+		}
+
+		if (array_key_exists('ceprule', self::$objectids)) {
+			CDataHelper::call('ceprule.delete', array_values(self::$objectids['ceprule']));
 		}
 
 		self::$objectids = [];

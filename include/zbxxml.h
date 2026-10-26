@@ -21,13 +21,12 @@
 #	include <libxml/tree.h>
 #endif
 
-int	zbx_xml_get_data_dyn(const char *xml, const char *tag, char **data);
-void	zbx_xml_free_data_dyn(char **data);
 char	*zbx_xml_escape_dyn(const char *data);
 void	zbx_xml_escape_xpath(char **data);
 
 int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg);
 int	zbx_query_xpath_contents(zbx_variant_t *value, const char *params, int *is_empty, char **errmsg);
+int	zbx_query_xpath_vector(zbx_variant_t *value, const char *params, char **errmsg);
 
 #ifdef HAVE_LIBXML2
 int	zbx_open_xml(char *data, int options, int maxerrlen, void **xml_doc, void **root_node, char **errmsg);

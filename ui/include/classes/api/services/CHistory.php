@@ -180,7 +180,6 @@ class CHistory extends CApiService {
 		}
 
 		$this->tableName = Manager::History()->getTableName($options['history']);
-		$result = [];
 		$sql_parts = [
 			'select'	=> [],
 			'from'		=> $this->tableName.' h',
@@ -194,16 +193,6 @@ class CHistory extends CApiService {
 			$sql_parts['where']['itemid'] = dbConditionId('h.itemid', $options['itemids']);
 		}
 
-		// time_from
-		if ($options['time_from'] !== null) {
-			$sql_parts['where']['clock_from'] = 'h.clock>='.$options['time_from'];
-		}
-
-		// time_till
-		if ($options['time_till'] !== null) {
-			$sql_parts['where']['clock_till'] = 'h.clock<='.$options['time_till'];
-		}
-
 		// filter
 		if ($options['filter'] !== null) {
 			$this->dbFilter($sql_parts['from'], $options, $sql_parts);
@@ -214,11 +203,81 @@ class CHistory extends CApiService {
 			zbx_db_search($sql_parts['from'], $options, $sql_parts);
 		}
 
+		$use_time_based_chunking = $options['limit'] !== null && reset($options['sortfield']) === 'clock'
+			&& $options['sortorder'] && ((array) $options['sortorder'])[0] === ZBX_SORT_DOWN;
+
+		return $use_time_based_chunking
+			? $this->getFromSqlUsingTimeBasedChunking($options, $sql_parts)
+			: $this->getFromSqlDirectly($options, $sql_parts);
+	}
+
+	private function getFromSqlUsingTimeBasedChunking(array $options, array $sql_parts) {
+		$result = [];
+		$count = 0;
+
+		$segments = self::getTimeRangeSegments($options);
+
+		foreach ($segments as $segment) {
+			if ($options['countOutput']) {
+				$count += $this->getFromSqlDirectly($segment + $options, $sql_parts);
+			}
+			else {
+				$result = array_merge($result, $this->getFromSqlDirectly(
+					$segment + ['limit' => $options['limit'] - count($result)] + $options,
+					$sql_parts
+				));
+
+				if (count($result) >= $options['limit']) {
+					return array_slice($result, 0, $options['limit'], true);
+				}
+			}
+		}
+
+		return $options['countOutput'] ? (string) $count : $result;
+	}
+
+	private static function getTimeRangeSegments(array $options): array {
+		$now = time();
+		$min_time_from = $options['time_from'] !== null ? $options['time_from'] : 0;
+		$max_time_till = $options['time_till'] !== null ? $options['time_till'] : $now;
+
+		if ($min_time_from > $max_time_till) {
+			return [];
+		}
+
+		$window_sizes = [SEC_PER_HOUR, SEC_PER_DAY, SEC_PER_WEEK, SEC_PER_MONTH];
+
+		$segments = [];
+		$time_from = null;
+
+		do {
+			$window_size = array_shift($window_sizes);
+			$time_till = $time_from === null ? $max_time_till : ($time_from - 1);
+			$time_from = $window_size !== null ? max($time_till - $window_size + 1, $min_time_from) : $min_time_from;
+
+			$segments[] = ($time_from > 0 ? ['time_from' => $time_from] : [])
+				+ ($time_till < $now ? ['time_till' => $time_till] : []);
+		}
+		while ($time_from != $min_time_from);
+
+		return $segments;
+	}
+
+	private function getFromSqlDirectly(array $options, array $sql_parts) {
+		if ($options['time_from'] !== null) {
+			$sql_parts['where']['clock_from'] = 'h.clock>='.$options['time_from'];
+		}
+
+		if ($options['time_till'] !== null) {
+			$sql_parts['where']['clock_till'] = 'h.clock<='.$options['time_till'];
+		}
+
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
 		$sql_parts = $this->applyQuerySortOptions($this->tableName, $this->tableAlias(), $options, $sql_parts);
 
 		$db_res = DBselect(self::createSelectQueryFromParts($sql_parts), $options['limit']);
 
+		$result = [];
 		while ($data = DBfetch($db_res)) {
 			if ($options['countOutput']) {
 				$result = $data['rowscount'];
@@ -268,6 +327,7 @@ class CHistory extends CApiService {
 			$query['query']['bool']['must'][] = [
 				'range' => [
 					'clock' => [
+						'format' => CElasticsearchHelper::DATE_FORMAT,
 						'gte' => $options['time_from']
 					]
 				]
@@ -279,6 +339,7 @@ class CHistory extends CApiService {
 			$query['query']['bool']['must'][] = [
 				'range' => [
 					'clock' => [
+						'format' => CElasticsearchHelper::DATE_FORMAT,
 						'lte' => $options['time_till']
 					]
 				]
@@ -287,18 +348,32 @@ class CHistory extends CApiService {
 
 		// filter
 		if ($options['filter'] !== null) {
+			if (array_key_exists('clock', $options['filter']) && $options['filter']['clock'] !== null) {
+				$options['filter']['clock'] = array_map('strval', $options['filter']['clock']);
+			}
+
 			$query = CElasticsearchHelper::addFilter($schema, $query, $options);
 		}
 
 		// search
 		if ($options['search'] !== null) {
-			$query = CElasticsearchHelper::addSearch($schema, $query, $options);
+			$query = CElasticsearchHelper::addSearch($table, $query, $options);
+		}
+
+		// count
+		if ($options['countOutput']) {
+			$endpoints = Manager::History()->getElasticsearchEndpoints($options['history'], '_count');
+			if (!$endpoints) {
+				return null;
+			}
+
+			$result = CElasticsearchHelper::query('POST', reset($endpoints), $query);
+
+			return $result['count'] ?? 0;
 		}
 
 		// output
-		if ($options['countOutput'] === false && $options['output'] !== API_OUTPUT_EXTEND) {
-			$query['_source'] = $options['output'];
-		}
+		$query['_source'] = $options['output'];
 
 		// sorting
 		if ($options['sortfield']) {
@@ -311,7 +386,7 @@ class CHistory extends CApiService {
 		}
 
 		if ($options['history'] === ITEM_VALUE_TYPE_JSON && $options['maxValueSize'] !== null
-				&& in_array('value', $options['output']) && !$options['countOutput']) {
+				&& in_array('value', $options['output'])) {
 			$query['_source'] = array_values(array_diff($options['output'], ['value']));
 
 			if (!$query['_source']) {
@@ -325,11 +400,18 @@ class CHistory extends CApiService {
 		}
 
 		$endpoints = Manager::History()->getElasticsearchEndpoints($options['history']);
-		if ($endpoints) {
-			return CElasticsearchHelper::query('POST', reset($endpoints), $query);
+		if (!$endpoints) {
+			return null;
 		}
 
-		return null;
+		$result = CElasticsearchHelper::query('POST', reset($endpoints), $query);
+
+		foreach ($result as &$row) {
+			$row = CElasticsearchHelper::normalizeDocument($row, $options['history']);
+		}
+		unset($row);
+
+		return $result;
 	}
 
 	/**

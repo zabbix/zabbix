@@ -59,6 +59,7 @@ zabbix_agent2 \- Zabbix agent 2
 .IR config\-file ]
 .B \-R
 .I runtime\-option
+.RI [ parameters... ]
 .br
 .B zabbix_agent2
 .RB [ \-c
@@ -74,8 +75,8 @@ is an application for monitoring parameters of various services.
 .SH OPTIONS
 .IP "\fB\-c\fR, \fB\-\-config\fR \fIconfig\-file\fR"
 Use the alternate \fIconfig\-file\fR instead of the default one.
-.IP "\fB\-R\fR, \fB\-\-runtime\-control\fR \fIruntime\-option\fR"
-Perform administrative functions according to \fIruntime\-option\fR.
+.IP "\fB\-R\fR, \fB\-\-runtime\-control\fR \fIruntime\-option\fR [\fIparameters...\fR]"
+Perform administrative functions according to \fIruntime\-option\fR and any parameters it accepts.
 .SS
 .RS 4
 Runtime control options
@@ -83,6 +84,34 @@ Runtime control options
 .TP 4
 \fBuserparameter_reload\fR
 Reload user parameters from the configuration file
+.RE
+.RS 4
+.TP 4
+\fBperiodic_prof_enable\fR
+Enable periodic profiling
+
+Periodic CPU data is collected into a hidden temporary file.
+When an interval ends, the file is published as a CPU profile and the configured number of completed files is retained.
+The temporary file does not count toward ProfilerMaxFilesPerProfile.
+.RE
+.RS 4
+.TP 4
+\fBperiodic_prof_disable\fR
+Disable periodic profiling
+.RE
+.RS 4
+.TP 4
+\fBperiodic_prof_execute\fR
+Write profiles after a 5-second sample
+
+When periodic profiling is enabled, this command finishes the current CPU interval, writes a separate 5-second CPU profile, and starts a new periodic CPU file.
+Explicitly requested profiles are rotated according to ProfilerMaxFilesPerProfile when the command completes.
+While this command is collecting profiles, all profiler runtime commands are rejected with "profiler is busy".
+.RE
+.RS 4
+.TP 4
+\fBperiodic_prof_set_interval\fR \fIseconds\fR
+Set profiling interval
 .RE
 .RS 4
 .TP 4

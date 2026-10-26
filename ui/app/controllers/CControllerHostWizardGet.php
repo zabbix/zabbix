@@ -76,6 +76,18 @@ class CControllerHostWizardGet extends CController {
 	}
 
 	protected function doAction(): void {
+		if (!$this->hasInput('hostid') && !CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)) {
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => [_('You do not have permission to add a host monitored by Zabbix server.')]
+					]
+				])])
+			);
+
+			return;
+		}
+
 		$host = null;
 		$interfaces_by_type = [];
 

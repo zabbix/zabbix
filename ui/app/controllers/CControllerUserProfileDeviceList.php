@@ -88,13 +88,15 @@ class CControllerUserProfileDeviceList extends CController {
 		$options = [
 			'userids' => CWebUser::$data['userid'],
 			'filter' => ['status' => ZBX_DEVICE_STATUS_ACTIVATED],
+			'output' => ['deviceid', 'uuid', 'name', 'activated_at', 'lastaccess'],
 			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 		];
 
 		$devices = API::Device()->get($options);
 
 		CArrayHelper::sort($devices, [
-			['field' => $filter['sort'], 'order' => $filter['sortorder']]
+			['field' => $filter['sort'], 'order' => $filter['sortorder']],
+			['field' => 'deviceid', 'order' => ZBX_SORT_DOWN]
 		]);
 
 		return $devices;

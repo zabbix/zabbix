@@ -201,9 +201,10 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 		// Emulate item discovery in DB.
 		foreach ($discovered_items as $discovered_item) {
 			DBexecute('INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags, query_fields,'.
-					' params, posts, headers, status) VALUES ('.zbx_dbstr($discovered_item['itemid']).', 2, '.
+					' params, posts, headers, query, status) VALUES ('.zbx_dbstr($discovered_item['itemid']).', 2, '.
 					zbx_dbstr(self::$hint_hostid).', '.zbx_dbstr($discovered_item['item_name']).', \'\', '.
-					zbx_dbstr($discovered_item['key_']).', NULL, 4, \'\', \'\', \'\', \'\', '.zbx_dbstr($discovered_item['status']).')'
+					zbx_dbstr($discovered_item['key_']).', NULL, 4, \'\', \'\', \'\', \'\', \'{}\', '.
+					zbx_dbstr($discovered_item['status']).')'
 			);
 			DBexecute('INSERT INTO item_discovery (itemdiscoveryid, itemid, parent_itemid, lastcheck, ts_delete, disable_source,'.
 					' ts_disable, status) VALUES ('.zbx_dbstr($discovered_item['itemdiscoveryid']).', '.
@@ -240,9 +241,13 @@ class testLowLevelDiscoveryDisabledObjects extends CWebTest {
 
 		// Emulate triggers discovery in DB.
 		foreach ($discovered_triggers as $discovered_trigger) {
-			DBexecute('INSERT INTO triggers (triggerid, description, expression, status, value, priority, comments, state, flags)'.
+			DBexecute('INSERT INTO triggers (triggerid, description, expression, status, priority, comments, flags)'.
 					' VALUES ('.zbx_dbstr($discovered_trigger['triggerid']).', '.zbx_dbstr($discovered_trigger['description']).
-					', '.zbx_dbstr('{'.$discovered_trigger['functionid'].'}=0').', '.$discovered_trigger['status'].', 0, 0, \'\', 0, 4)'
+					', '.zbx_dbstr('{'.$discovered_trigger['functionid'].'}=0').', '.$discovered_trigger['status'].', 0, \'\', 4)'
+			);
+
+			DBexecute('INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES ('.
+					zbx_dbstr($discovered_trigger['triggerid']).', 0, 0, 0, \'\')'
 			);
 
 			DBexecute('INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES ('.

@@ -329,7 +329,7 @@ class CControllerPopupAcknowledgeCreate extends CController {
 		$events = API::Event()->get([
 			'output' => ['eventid', 'objectid', 'acknowledged', 'r_eventid'],
 			'selectAcknowledges' => $this->close_problems || $this->suppress || $this->unsuppress ? ['action'] : null,
-			'selectSuppressionData' => $this->unsuppress ? ['maintenanceid'] : null,
+			'selectSuppressionData' => $this->unsuppress ? ['maintenanceid', 'cep_ruleid'] : null,
 			'eventids' => $eventids,
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
@@ -438,12 +438,13 @@ class CControllerPopupAcknowledgeCreate extends CController {
 	 * @param array  $event                                         Event object.
 	 * @param array  $event['suppression_data']                     List of problem suppression data.
 	 * @param string $event['suppression_data'][]['maintenanceid']  Problem maintenanceid.
+	 * @param string $event['suppression_data'][]['cep_ruleid']     Problem cep_ruleid.
 	 *
 	 * @return bool
 	 */
 	protected function isEventSuppressed(array $event): bool {
 		foreach ($event['suppression_data'] as $suppression) {
-			if ($suppression['maintenanceid'] == 0) {
+			if ($suppression['maintenanceid'] == 0 && $suppression['cep_ruleid'] == 0) {
 				return true;
 			}
 		}

@@ -26,6 +26,8 @@ zabbix_export:
           value: '{EVENT.UPDATE.STATUS}'
         - name: event_value
           value: '{EVENT.VALUE}'
+        - name: tls_verify
+          value: '{$HTTP.TLS.VERIFY:"Zammad"}'
         - name: trigger_id
           value: '{TRIGGER.ID}'
         - name: zabbix_url
@@ -51,6 +53,31 @@ zabbix_export:
         		Zabbix.log(level, '[' + this.serviceName + '] ' + msg);
         	}
         }
+        
+        const CTlsConfig = function (raw_value) {
+        	raw_value = String(raw_value).trim().toLowerCase();
+        
+        	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+        		raw_value = 'full';
+        	}
+        
+        	this.options = {
+        		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+        		SSLVerifyHost: (raw_value === 'full')
+        	};
+        
+        	this.enabled = (raw_value !== 'none');
+        
+        	this.checkURL = function (url) {
+        		if (this.enabled && !/^https:\/\//i.test(url)) {
+        			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+        			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+        		}
+        
+        		return url;
+        	};
+        }
+        
         
         const CWebhook = function(value) {
         	try {
@@ -132,6 +159,7 @@ zabbix_export:
         				}
         			}
         		}
+        		this.tlsConfig = new CTlsConfig(params.tls_verify);
         		this.httpProxy = params.http_proxy;
         		this.params = params;
         		this.runCallback('onCheckParams', {});
@@ -349,8 +377,16 @@ zabbix_export:
         	}
         }
         
-        const CHttpRequest = function(logger) {
-        	this.request = new HttpRequest();
+        const CHttpRequest = function (logger, tls_config) {
+        	if (typeof tls_config === 'object' && tls_config !== null) {
+        		this.tls_config = tls_config;
+        	}
+        	else {
+        		this.tls_config = new CTlsConfig('full');
+        	}
+        
+        	this.request = new HttpRequest(this.tls_config.options);
+        
         	if (typeof logger !== 'object' || logger === null) {
         		this.logger = Zabbix;
         	}
@@ -358,16 +394,16 @@ zabbix_export:
         		this.logger = logger;
         	}
         
-        	this.clearHeader = function() {
+        	this.clearHeader = function () {
         		this.request.clearHeader();
         	}
         
-        	this.addHeaders = function(value) {
+        	this.addHeaders = function (value) {
         		var headers = [];
         
         		if (typeof value === 'object' && value !== null) {
         			if (!Array.isArray(value)) {
-        				Object.keys(value).forEach(function(key) {
+        				Object.keys(value).forEach(function (key) {
         					headers.push(key + ': ' + value[key]);
         				});
         			}
@@ -376,7 +412,7 @@ zabbix_export:
         			}
         		}
         		else if (typeof value === 'string') {
-        			value.split('\r\n').forEach(function(header) {
+        			value.split('\r\n').forEach(function (header) {
         				headers.push(header);
         			});
         		}
@@ -386,12 +422,15 @@ zabbix_export:
         		}
         	}
         
-        	this.setProxy = function(proxy) {
+        	this.setProxy = function (proxy) {
         		this.request.setProxy(proxy);
         	}
         
-        	this.plainRequest = function(method, url, data) {
+        	this.plainRequest = function (method, url, data) {
         		var resp = null;
+        		if (this.tls_config.enabled) {
+        			this.tls_config.checkURL(url);
+        		}
         		method = method.toLowerCase();
         		this.logger.log(4, 'Sending ' + method + ' request:' + JSON.stringify(data));
         		if (['get', 'post', 'put', 'patch', 'delete', 'trace'].indexOf(method) !== -1) {
@@ -408,7 +447,7 @@ zabbix_export:
         		return resp;
         	}
         
-        	this.jsonRequest = function(method, url, data) {
+        	this.jsonRequest = function (method, url, data) {
         		this.addHeaders('Content-Type: application/json');
         		var resp = this.plainRequest(method, url, JSON.stringify(data));
         		try {
@@ -421,7 +460,7 @@ zabbix_export:
         		return resp;
         	}
         
-        	this.getStatus = function() {
+        	this.getStatus = function () {
         		return this.request.getStatus();
         	}
         }
@@ -599,7 +638,7 @@ zabbix_export:
         
         try {
         	var hook = new Zammad(value);
-        	hook.request = new CHttpRequest(Logger);
+        	hook.request = new CHttpRequest(Logger, hook.tlsConfig);
         	return hook.run();
         }
         catch (error) {

@@ -20,7 +20,6 @@
 #include "zbxlog.h"
 #include "zbxself.h"
 #include "zbxnix.h"
-#include "zbxservice.h"
 #include "zbxrtc.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
@@ -29,21 +28,11 @@
 #include "zbxdb.h"
 #include "zbxipcservice.h"
 #include "zbxcacheconfig.h"
+#include "zbx_cep_client.h"
 
 static void	housekeep_service_problems(const zbx_vector_uint64_t *eventids)
 {
-	unsigned char	*data = NULL;
-	size_t		data_alloc = 0, data_offset = 0;
-
-	for (int i = 0; i < eventids->values_num; i++)
-		zbx_service_serialize_id(&data, &data_alloc, &data_offset, eventids->values[i]);
-
-	if (NULL == data)
-		return;
-
-	if (0 != zbx_dc_get_itservices_num())
-		zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_PROBLEMS_DELETE, data, (zbx_uint32_t)data_offset);
-	zbx_free(data);
+	zbx_cep_send_deleted_events(eventids->values, eventids->values_num);
 }
 
 static int	housekeep_problems_events(const zbx_vector_uint64_t *eventids, int events_mode,

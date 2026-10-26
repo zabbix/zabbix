@@ -51,6 +51,15 @@ class CControllerTriggerMassupdate extends CController {
 	}
 
 	protected function checkPermissions() {
+		$has_access = match ($this->getInput('context')) {
+			'host' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
+			'template' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+		};
+
+		if (!$has_access) {
+			return false;
+		}
+
 		$parent_lld = [];
 
 		if ($this->hasInput('prototype')) {

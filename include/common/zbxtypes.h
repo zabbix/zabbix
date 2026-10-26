@@ -209,4 +209,10 @@ typedef struct zbx_variant zbx_variant_t;
 #define	SEND_ERROR	-10
 #define	RECV_ERROR	-11
 
+#if !defined(_WINDOWS)
+/* database connection pool */
+typedef struct zbx_dbconn_pool zbx_dbconn_pool_t;
+
+#endif
+
 #endif

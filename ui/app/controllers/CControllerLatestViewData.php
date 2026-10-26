@@ -93,7 +93,7 @@ class CControllerLatestViewData extends CControllerDataTable {
 
 		if ($maintenanceids) {
 			$db_maintenances = API::Maintenance()->get([
-				'output' => ['name', 'description', 'status'],
+				'output' => ['name', 'description', 'status', 'maintenance_type'],
 				'maintenanceids' => array_keys($maintenanceids),
 				'preservekeys' => true
 			]);

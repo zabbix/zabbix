@@ -176,6 +176,7 @@ class testDashboardProblemsWidgetDisplay extends testWidgets {
 				'priority' => TRIGGER_SEVERITY_WARNING
 			]
 		]);
+		$triggerids = CDataHelper::getIds('description');
 
 		foreach (array_values($problem_itemids) as $itemid) {
 			CDataHelper::addItemData($itemid, 0);
@@ -190,9 +191,8 @@ class testDashboardProblemsWidgetDisplay extends testWidgets {
 		CDBHelper::setTriggerProblem(array_keys(CDataHelper::getIds('description')), TRIGGER_VALUE_TRUE, ['clock' => self::$time]);
 
 		// Manual close is true for the problem: Trigger for widget 1 char.
-		DBexecute('UPDATE triggers SET value=1, manual_close=1 WHERE description='.
-				zbx_dbstr('Trigger for widget 1 char')
-		);
+		DBexecute('UPDATE triggers SET manual_close=1 WHERE description='.zbx_dbstr('Trigger for widget 1 char'));
+		DBexecute('UPDATE trigger_rtdata SET value=1 WHERE triggerid='.zbx_dbstr($triggerids['Trigger for widget 1 char']));
 
 		// Get event ids.
 		$eventids = [];

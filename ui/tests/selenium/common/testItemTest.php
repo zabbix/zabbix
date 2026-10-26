@@ -1018,7 +1018,7 @@ class testItemTest extends CWebTest {
 
 						if ($is_host) {
 							$fields_value['proxy'] = '';
-							$fields_state['proxy'] = true;
+							$fields_state['proxy'] = false;
 						}
 
 						break;
