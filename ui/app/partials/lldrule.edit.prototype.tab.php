@@ -647,8 +647,8 @@ $formgrid
 				(new CTable())
 					->setId('columns-table')
 					->setHeader([
-						(new CColHeader(_('Name')))->setColSpan(2)->setWidth('43%'),
-						(new CColHeader())->setWidth('35%'),
+						(new CColHeader(_('Name')))->setColSpan(2)->setWidth('39%'),
+						(new CColHeader())->setWidth('39%'),
 						(new CColHeader(_('Action')))->setWidth('22%')
 					])
 					->setFooter(new CRow(
