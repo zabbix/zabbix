@@ -1295,6 +1295,12 @@ static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, cha
 				if (SUCCEED == is_user_macro(*field))
 					return;
 
+				if (0 != (item->item_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE) &&
+						SUCCEED == lld_is_lld_macro(*field))
+				{
+					return;
+				}
+
 				if (ZBX_FLAG_LLD_ITEM_UPDATE_TIME_SHIFT == flag)
 				{
 					ret = zbx_tq_validate_time_shift(*field, NULL, errmsg_buf,
@@ -1681,6 +1687,12 @@ static void	lld_validate_lookback_limit_and_granularity(zbx_lld_item_full_t *ite
 
 	if (SUCCEED == is_user_macro(item->lookback_limit) || SUCCEED == is_user_macro(item->granularity))
 		return;
+
+	if (0 != (item->item_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+	{
+		if (SUCCEED == lld_is_lld_macro(item->lookback_limit) || SUCCEED == lld_is_lld_macro(item->granularity))
+			return;
+	}
 
 	if (SUCCEED == zbx_tq_validate_lookback_limit_and_granularity(item->lookback_limit, NULL,
 			item->granularity, NULL, errmsg_buf, sizeof(errmsg_buf)))
@@ -2128,8 +2140,8 @@ static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_p
 	item->query_orig = NULL;
 
 	if (SUCCEED == ret && ITEM_TYPE_TELEMETRY_QUERY == item_prototype->type &&
-			FAIL == (ret = zbx_substitute_macros_in_telemetry_query(&item->query, lld_obj, err,
-			sizeof(err))))
+			FAIL == (ret = zbx_substitute_macros_in_telemetry_query(&item->query, lld_obj,
+			item_prototype->item_flags, err, sizeof(err))))
 	{
 		*error = zbx_strdcatf(*error, "Cannot create item, error in query: %s.\n", err);
 	}
@@ -2551,7 +2563,8 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	buffer = zbx_strdup(buffer, item_prototype->query);
 
 	if (ITEM_TYPE_TELEMETRY_QUERY == item_prototype->type &&
-			FAIL == zbx_substitute_macros_in_telemetry_query(&buffer, lld_obj, err, sizeof(err)))
+			FAIL == zbx_substitute_macros_in_telemetry_query(&buffer, lld_obj, item_prototype->item_flags,
+			err, sizeof(err)))
 	{
 		*error = zbx_strdcatf(*error, "Cannot update item, error in query: %s.\n", err);
 	}

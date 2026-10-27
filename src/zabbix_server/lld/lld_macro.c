@@ -881,7 +881,8 @@ exit:
 	return ret;
 }
 
-static int	lld_validate_telemetry_query(const zbx_tq_query_t *query, char *error, size_t max_error_len)
+static int	lld_validate_telemetry_query(const zbx_tq_query_t *query, int item_flags, char *error,
+		size_t max_error_len)
 {
 	for (int i = 0; i < query->conditions.values_num; i++)
 	{
@@ -974,6 +975,8 @@ static int	lld_validate_telemetry_query(const zbx_tq_query_t *query, char *error
 
 		if (SUCCEED == zbx_tq_column_type_requires_numeric_comparison(col_info->type) &&
 				SUCCEED != zbx_is_user_macro(cond->value) &&
+				(0 == (item_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE) ||
+				SUCCEED != lld_is_lld_macro(cond->value)) &&
 				SUCCEED != zbx_tq_validate_numeric_condition_value(cond->value))
 		{
 			zbx_snprintf(error, max_error_len, "\"%s\" is not numeric for numeric condition #%d",
@@ -994,8 +997,8 @@ static int	telemetry_query_lld_macro_expand_cb(char **text, void *ctx)
 	return SUCCEED;
 }
 
-int	zbx_substitute_macros_in_telemetry_query(char **data, const zbx_lld_entry_t *lld_obj, char *error,
-		int maxerrlen)
+int	zbx_substitute_macros_in_telemetry_query(char **data, const zbx_lld_entry_t *lld_obj, int item_flags,
+		char *error, int maxerrlen)
 {
 	int			ret = FAIL;
 	zbx_tq_query_t		query;
@@ -1013,7 +1016,7 @@ int	zbx_substitute_macros_in_telemetry_query(char **data, const zbx_lld_entry_t 
 
 	/* during LLD telemetry query is not fully validated (as it may not be possible, */
 	/* since fields in conditions may contain non-LLD macros) */
-	if (SUCCEED != lld_validate_telemetry_query(&query, error, maxerrlen))
+	if (SUCCEED != lld_validate_telemetry_query(&query, item_flags, error, maxerrlen))
 		goto clean;
 
 	zbx_free(*data);
