@@ -561,7 +561,7 @@ class CApiService {
 			$sql_parts['select'] = array_unique($sql_parts['select']);
 		}
 		// extended output
-		elseif ($options['output'] == API_OUTPUT_EXTEND) {
+		elseif ($options['output'] === API_OUTPUT_EXTEND) {
 			// TODO: API_OUTPUT_EXTEND must return ONLY the fields from the base table
 			$sql_parts = $this->addQuerySelect($this->fieldId('*', $table_alias), $sql_parts);
 		}
