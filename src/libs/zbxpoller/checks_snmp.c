@@ -403,14 +403,14 @@ static zbx_uint64_t	zbx_snmp_engineid_record_revision(const zbx_snmp_engineid_re
 	return revision;
 }
 
-static zbx_snmp_identity_t	*zbx_get_snmp_identity(const char *ip, zbx_uint64_t revision)
+static zbx_snmp_identity_t	*zbx_get_snmp_identity(const char *address, zbx_uint64_t revision)
 {
 	zbx_snmp_identity_t	*identity_ptr, local_identity;
 
 	if (0 == engineid_cache_initialized)
 		return NULL;
 
-	zbx_strlcpy(local_identity.address, ip, sizeof(local_identity.address));
+	zbx_strlcpy(local_identity.address, address, sizeof(local_identity.address));
 
 	if (NULL == (identity_ptr = zbx_hashset_search(&identity_cache, &local_identity)))
 		return NULL;
