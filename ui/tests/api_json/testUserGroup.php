@@ -193,6 +193,16 @@ class testUserGroup extends CAPITest {
 							'signal_type' => SIGNAL_TYPE_METRICS
 						]
 					]
+				],
+				[
+					'name' => 'user group update APM filter without signal_type',
+					'apm_filters' => [
+						[
+							'key' => 'attr_key1',
+							'value' => 'attr_value',
+							'signal_type' => SIGNAL_TYPE_METRICS
+						]
+					]
 				]
 			]
 		]);
@@ -322,6 +332,20 @@ class testUserGroup extends CAPITest {
 					]
 				],
 				'expected_error' => null
+			],
+			[
+				'group' => [
+					[
+						'name' => 'user group create APM filter without signal_type',
+						'apm_filters' => [
+							[
+								'key' => 'aatr_key',
+								'value' => 'attr_value'
+							]
+						]
+					]
+				],
+				'expected_error' => null
 			]
 		];
 	}
@@ -344,24 +368,7 @@ class testUserGroup extends CAPITest {
 				$this->assertEquals($dbRow['debug_mode'], 0);
 
 				if (array_key_exists('apm_filters', $group[$key])) {
-					$db_apm_filters = CDBHelper::getAll(
-						'SELECT signal_type,attribute_key,value'.
-						' FROM usrgrp_apm_filter'.
-						' WHERE usrgrpid='.zbx_dbstr($usrgrpid).
-						' ORDER BY usrgrp_apm_filterid'
-					);
-
-					$expected_apm_filters = [];
-
-					foreach ($group[$key]['apm_filters'] as $apm_filter) {
-						$expected_apm_filters[] = [
-							'signal_type'	=> (string) $apm_filter['signal_type'],
-							'attribute_key'	=> $apm_filter['key'],
-							'value'			=> array_key_exists('value', $apm_filter) ? $apm_filter['value'] : ''
-						];
-					}
-
-					$this->assertSame($expected_apm_filters, $db_apm_filters);
+					$this->assertSameApmFilters($usrgrpid, $group[$key]['apm_filters']);
 				}
 			}
 		}
@@ -578,6 +585,21 @@ class testUserGroup extends CAPITest {
 					]
 				],
 				'expected_error' => null
+			],
+			[
+				'group' => [
+					[
+						'usrgrpid' => ':user_group:user group update APM filter without signal_type',
+						'name' => 'user group update APM filter without signal_type',
+						'apm_filters' => [
+							[
+								'key' => 'new_attr_key',
+								'value' => 'new_attr_value'
+							]
+						]
+					]
+				],
+				'expected_error' => null
 			]
 		];
 	}
@@ -630,24 +652,7 @@ class testUserGroup extends CAPITest {
 				}
 
 				if (array_key_exists('apm_filters', $groups[$key])) {
-					$db_apm_filters = CDBHelper::getAll(
-						'SELECT signal_type,attribute_key,value'.
-						' FROM usrgrp_apm_filter'.
-						' WHERE usrgrpid='.zbx_dbstr($usrgrpid).
-						' ORDER BY usrgrp_apm_filterid'
-					);
-
-					$expected_apm_filters = [];
-
-					foreach ($groups[$key]['apm_filters'] as $apm_filter) {
-						$expected_apm_filters[] = [
-							'signal_type'	=> (string) $apm_filter['signal_type'],
-							'attribute_key'	=> $apm_filter['key'],
-							'value'			=> array_key_exists('value', $apm_filter) ? $apm_filter['value'] : ''
-						];
-					}
-
-					$this->assertSame($expected_apm_filters, $db_apm_filters);
+					$this->assertSameApmFilters($usrgrpid, $groups[$key]['apm_filters']);
 				}
 			}
 		}
@@ -660,6 +665,33 @@ class testUserGroup extends CAPITest {
 				}
 			}
 		}
+	}
+
+	public function assertSameApmFilters(string $usrgrpid, array $apm_filters): void {
+		$db_apm_filters = CDBHelper::getAll(
+			'SELECT signal_type,attribute_key,value'.
+			' FROM usrgrp_apm_filter'.
+			' WHERE usrgrpid='.zbx_dbstr($usrgrpid).
+			' ORDER BY signal_type,attribute_key,value'
+		);
+
+		$expected_apm_filters = [];
+
+		foreach ($apm_filters as $apm_filter) {
+			$signal_type = array_key_exists('signal_type', $apm_filter)
+				? (string) $apm_filter['signal_type']
+				: (string) SIGNAL_TYPE_ALL;
+
+			$value = array_key_exists('value', $apm_filter) ? $apm_filter['value'] : '';
+
+			$expected_apm_filters[] = [
+				'signal_type'	=> $signal_type,
+				'attribute_key'	=> $apm_filter['key'],
+				'value'			=> $value
+			];
+		}
+
+		$this->assertSame($expected_apm_filters, $db_apm_filters);
 	}
 
 	public static function usergroup_properties() {
