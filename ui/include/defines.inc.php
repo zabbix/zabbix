@@ -217,6 +217,9 @@ define('PASSWD_CHECK_SIMPLE', 0x08);
 define('ZBX_DB_MYSQL',		'MYSQL');
 define('ZBX_DB_POSTGRESQL',	'POSTGRESQL');
 
+// Max duration of APM traces (in seconds). Used for searching the related spans by the APM Trace API.
+define('APM_TRACE_MAX_DURATION',	3600);
+
 define('APM_GLOBAL_DB_STATUS_NOT_CONFIGURED',	0);
 define('APM_GLOBAL_DB_STATUS_CONFIGURED',		1);
 define('APM_GLOBAL_DB_AUTHTYPE_PASSWORD',		0);
@@ -410,12 +413,13 @@ define('APM_METRIC_TYPE_SUM',					1);
 define('APM_METRIC_TYPE_HISTOGRAM',				2);
 define('APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM',	3);
 
-define('APM_LOG_SEVERITY_TRACE',	0);
-define('APM_LOG_SEVERITY_DEBUG',	1);
-define('APM_LOG_SEVERITY_INFO',		2);
-define('APM_LOG_SEVERITY_WARNING',	3);
-define('APM_LOG_SEVERITY_ERROR',	4);
-define('APM_LOG_SEVERITY_FATAL',	5);
+define('APM_LOG_SEVERITY_UNSPECIFIED',	0);
+define('APM_LOG_SEVERITY_TRACE',		1);
+define('APM_LOG_SEVERITY_DEBUG',		2);
+define('APM_LOG_SEVERITY_INFO',			3);
+define('APM_LOG_SEVERITY_WARNING',		4);
+define('APM_LOG_SEVERITY_ERROR',		5);
+define('APM_LOG_SEVERITY_FATAL',		6);
 
 define('PROXY_OPERATING_MODE_ACTIVE',	0);
 define('PROXY_OPERATING_MODE_PASSIVE',	1);
@@ -2197,7 +2201,6 @@ define('ZBX_STYLE_INLINE_FILTER_FOOTER', 'inline-filter-footer');
 define('ZBX_STYLE_INLINE_FILTER_STATS', 'inline-filter-stats');
 define('ZBX_STYLE_INLINE_LIST', 'inline-list');
 define('ZBX_STYLE_LAYOUT_KIOSKMODE', 'layout-kioskmode');
-define('ZBX_STYLE_CONTAINER', 'container');
 define('ZBX_STYLE_LAYOUT_WRAPPER', 'wrapper');
 define('ZBX_STYLE_LEFT', 'left');
 define('ZBX_STYLE_LINE_CLAMP', 'line-clamp');
@@ -2462,6 +2465,7 @@ define('ZBX_ICON_CHEVRON_UP_SMALL', 'zi-chevron-up-small');
 define('ZBX_ICON_CIRCLE_INFO', 'zi-circle-info');
 define('ZBX_ICON_CIRCLE_QUESTION', 'zi-circle-question');
 define('ZBX_ICON_CIRCLE_QUESTION_FILLED', 'zi-circle-question-filled');
+define('ZBX_ICON_CIRCLE_WARNING', 'zi-circle-warning');
 define('ZBX_ICON_CLOCK', 'zi-clock');
 define('ZBX_ICON_COG_FILLED', 'zi-cog-filled');
 define('ZBX_ICON_CONTEXT', 'zi-context');

@@ -1,0 +1,107 @@
+  8534:20261007:114832.090 Starting Zabbix Agent [Zabbix server]. Zabbix 8.0.0rc1 (revision {ZABBIX_REVISION}).
+  8534:20261007:114832.090 **** Enabled features ****
+  8534:20261007:114832.090 IPv6 support:           NO
+  8534:20261007:114832.090 TLS support:            NO
+  8534:20261007:114832.090 **************************
+  8534:20261007:114832.090 using configuration file: /var/www/html/ZBX-27954-7.5/etc/zabbix_agentd.conf
+  8534:20261007:114832.090 agent #0 started [main process]
+  8535:20261007:114832.091 agent #1 started [collector]
+  8536:20261007:114832.091 agent #2 started [listener #1]
+  8537:20261007:114832.092 agent #3 started [listener #2]
+  8538:20261007:114832.092 agent #4 started [listener #3]
+  8540:20261007:114832.092 agent #6 started [listener #5]
+  8539:20261007:114832.092 agent #5 started [listener #4]
+  8541:20261007:114832.092 agent #7 started [listener #6]
+  8542:20261007:114832.092 agent #8 started [listener #7]
+  8543:20261007:114832.093 agent #9 started [listener #8]
+  8544:20261007:114832.093 agent #10 started [listener #9]
+  8545:20261007:114832.093 agent #11 started [listener #10]
+  8546:20261007:114832.093 agent #12 started [active checks #1]
+  8534:20261007:172827.296 One child process died (PID:8546,exitcode/signal:1). Exiting ...
+zabbix_agentd [8534]: child process exited (PID:8539,exitcode:1).
+zabbix_agentd [8534]: child process exited (PID:8540,exitcode:1).
+zabbix_agentd [8534]: child process exited (PID:8541,exitcode:1).
+zabbix_agentd [8534]: child process exited (PID:8542,exitcode:1).
+zabbix_agentd [8534]: child process exited (PID:8543,exitcode:1).
+zabbix_agentd [8534]: child process exited (PID:8544,exitcode:1).
+zabbix_agentd [8534]: child process exited (PID:8545,exitcode:1).
+zabbix_agentd [8534]: child process exited (PID:8546,exitcode:1).
+  8534:20261007:172827.299 Zabbix Agent stopped. Zabbix 8.0.0rc1 (revision {ZABBIX_REVISION}).
+  1721:20261009:100019.571 Starting Zabbix Agent [Zabbix server]. Zabbix 8.0.0rc1 (revision {ZABBIX_REVISION}).
+  1721:20261009:100019.572 **** Enabled features ****
+  1721:20261009:100019.572 IPv6 support:           NO
+  1721:20261009:100019.572 TLS support:            NO
+  1721:20261009:100019.572 **************************
+  1721:20261009:100019.572 using configuration file: /var/www/html/ZBX-27954-7.5/etc/zabbix_agentd.conf
+  1721:20261009:100019.572 agent #0 started [main process]
+  1722:20261009:100019.573 agent #1 started [collector]
+  1723:20261009:100019.573 agent #2 started [listener #1]
+  1725:20261009:100019.575 agent #4 started [listener #3]
+  1724:20261009:100019.575 agent #3 started [listener #2]
+  1726:20261009:100019.575 agent #5 started [listener #4]
+  1727:20261009:100019.575 agent #6 started [listener #5]
+  1728:20261009:100019.576 agent #7 started [listener #6]
+  1729:20261009:100019.576 agent #8 started [listener #7]
+  1731:20261009:100019.576 agent #10 started [listener #9]
+  1730:20261009:100019.576 agent #9 started [listener #8]
+  1732:20261009:100019.577 agent #11 started [listener #10]
+  1733:20261009:100019.577 agent #12 started [active checks #1]
+  1733:20261009:100019.577 Unable to connect to [127.0.0.1]:10051 [cannot connect to [[127.0.0.1]:10051]: connection error (POLLERR,POLLHUP)]
+  1733:20261009:100019.577 Unable to send heartbeat message to [127.0.0.1]:10051 [cannot connect to [[127.0.0.1]:10051]: connection error (POLLERR,POLLHUP)]
+  1733:20261009:100019.577 Unable to connect to [127.0.0.1]:10051 [cannot connect to [[127.0.0.1]:10051]: connection error (POLLERR,POLLHUP)]
+  1733:20261009:100019.577 Active check configuration update started to fail
+  1733:20261009:100025.578 Active check configuration update from [127.0.0.1:10051] is working again
+  1721:20261009:100120.889 Got signal [signal:2(SIGINT),sender_pid:0,sender_uid:0,reason:128]. Exiting ...
+  1721:20261009:100120.990 Zabbix Agent stopped. Zabbix 8.0.0rc1 (revision {ZABBIX_REVISION}).
+222082:20261022:104354.859 Starting Zabbix Agent [Zabbix server]. Zabbix 8.0.0rc3 (revision {ZABBIX_REVISION}).
+222082:20261022:104354.860 **** Enabled features ****
+222082:20261022:104354.860 IPv6 support:           NO
+222082:20261022:104354.860 TLS support:            NO
+222082:20261022:104354.860 **************************
+222082:20261022:104354.860 using configuration file: /var/www/html/ZBX-27954-7.5/etc/zabbix_agentd.conf
+222082:20261022:104354.860 agent #0 started [main process]
+222083:20261022:104354.861 agent #1 started [collector]
+222084:20261022:104354.861 agent #2 started [listener #1]
+222085:20261022:104354.862 agent #3 started [listener #2]
+222087:20261022:104354.862 agent #5 started [listener #4]
+222086:20261022:104354.863 agent #4 started [listener #3]
+222089:20261022:104354.863 agent #7 started [listener #6]
+222088:20261022:104354.875 agent #6 started [listener #5]
+222090:20261022:104354.876 agent #8 started [listener #7]
+222091:20261022:104354.876 agent #9 started [listener #8]
+222093:20261022:104354.877 agent #11 started [listener #10]
+222092:20261022:104354.877 agent #10 started [listener #9]
+222094:20261022:104354.878 agent #12 started [active checks #1]
+222082:20261022:104445.880 Got signal [signal:2(SIGINT),sender_pid:0,sender_uid:0,reason:128]. Exiting ...
+222082:20261022:104445.981 Zabbix Agent stopped. Zabbix 8.0.0rc3 (revision {ZABBIX_REVISION}).
+ 13126:20261023:134534.574 Starting Zabbix Agent [Zabbix server]. Zabbix 8.0.0rc3 (revision {ZABBIX_REVISION}).
+ 13126:20261023:134534.575 **** Enabled features ****
+ 13126:20261023:134534.575 IPv6 support:           NO
+ 13126:20261023:134534.575 TLS support:            NO
+ 13126:20261023:134534.575 **************************
+ 13126:20261023:134534.575 using configuration file: /var/www/html/ZBX-27954-7.5/etc/zabbix_agentd.conf
+ 13126:20261023:134534.575 agent #0 started [main process]
+ 13127:20261023:134534.575 agent #1 started [collector]
+ 13131:20261023:134534.576 agent #5 started [listener #4]
+ 13132:20261023:134534.576 agent #6 started [listener #5]
+ 13133:20261023:134534.576 agent #7 started [listener #6]
+ 13134:20261023:134534.577 agent #8 started [listener #7]
+ 13128:20261023:134534.577 agent #2 started [listener #1]
+ 13135:20261023:134534.577 agent #9 started [listener #8]
+ 13129:20261023:134534.577 agent #3 started [listener #2]
+ 13136:20261023:134534.577 agent #10 started [listener #9]
+ 13130:20261023:134534.577 agent #4 started [listener #3]
+ 13137:20261023:134534.577 agent #11 started [listener #10]
+ 13138:20261023:134534.577 agent #12 started [active checks #1]
+ 13126:20261023:145721.893 One child process died (PID:13130,exitcode/signal:1). Exiting ...
+zabbix_agentd [13126]: child process exited (PID:13129,exitcode:1).
+zabbix_agentd [13126]: child process exited (PID:13130,exitcode:1).
+zabbix_agentd [13126]: child process exited (PID:13131,exitcode:1).
+zabbix_agentd [13126]: child process exited (PID:13132,exitcode:1).
+zabbix_agentd [13126]: child process exited (PID:13133,exitcode:1).
+zabbix_agentd [13126]: child process exited (PID:13134,exitcode:1).
+zabbix_agentd [13126]: child process exited (PID:13135,exitcode:1).
+zabbix_agentd [13126]: child process exited (PID:13136,exitcode:1).
+zabbix_agentd [13126]: child process exited (PID:13137,exitcode:1).
+zabbix_agentd [13126]: child process exited (PID:13138,exitcode:1).
+ 13126:20261023:145721.894 Zabbix Agent stopped. Zabbix 8.0.0rc3 (revision {ZABBIX_REVISION}).

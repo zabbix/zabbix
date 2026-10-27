@@ -278,7 +278,7 @@
 
 							if (nested || show_symptoms) {
 								const symptom_icon = document.createElement('span');
-								symptom_icon.classList.add('icon', 'zi-arrow-top-right',
+								symptom_icon.classList.add(ZBX_STYLE_ICON, 'zi-arrow-top-right',
 									nested ? 'symptoms-right' : 'symptoms-left');
 								symptom_icon.setAttribute('title', <?= json_encode(_('Symptom')); ?>);
 
@@ -551,25 +551,6 @@
 					}
 
 					flex_wrapper.appendChild(update_link);
-
-					cell.appendChild(flex_wrapper);
-				})
-				.setCellRenderer('custom_text', ({column, cell_data, cell}) => {
-					const column_index = column.getColumnIndex();
-					const [custom_text] = cell_data;
-					const compact_view = this.#datatable.getOption('compact_view');
-
-					const wordbreak = document.createElement('span');
-					wordbreak.classList.add(compact_view.checked ? ZBX_STYLE_OVERFLOW_ELLIPSIS : ZBX_STYLE_WORDBREAK);
-					wordbreak.textContent = custom_text ? (custom_text[column_index] ?? '') : '';
-
-					const flex_wrapper = document.createElement('div');
-
-					if (compact_view.checked) {
-						flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
-					}
-
-					flex_wrapper.appendChild(wordbreak);
 
 					cell.appendChild(flex_wrapper);
 				})
