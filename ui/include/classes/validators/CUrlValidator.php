@@ -128,7 +128,7 @@ class CUrlValidator extends CValidator {
 	}
 
 	protected function validateUrl(string $value): bool {
-		$value = preg_replace('/[\r\n\t]/', '', trim($value, "\x00..\x20"));
+		$value = CUrlHelper::sanitize($value);
 
 		if ($value === '') {
 			$this->setError(_('unacceptable URL'));
