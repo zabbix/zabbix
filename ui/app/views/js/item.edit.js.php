@@ -47,8 +47,8 @@ window.item_edit_form = new class {
 	#tabs;
 
 	init({
-		rules, actions, field_switches, form_data, host, interface_types, inherited_timeouts, readonly, testable_item_types,
-		type_with_key_select, value_type_keys, source, return_url, test_rules, history_override,
+		rules, actions, field_switches, form_data, host, interface_types, inherited_timeouts, readonly,
+		testable_item_types, type_with_key_select, value_type_keys, source, return_url, test_rules, history_override,
 		history_override_hint_html, storage_value_types, telemetry_columns_config, telemetry_function_labels,
 		telemetry_operator_labels, telemetry_signal_type_metrics
 	}) {
@@ -211,15 +211,8 @@ window.item_edit_form = new class {
 				freeze_end: 1,
 				enable_sorting: !this.form_readonly
 			}
-		}).on('afteradd.dynamicRows', (e) => {
-			for (const select of e.target.querySelectorAll('.js-column')) {
-				if (select.getOptions().length === 0) {
-					this.#populateColumnSelect(select);
-					this.#toggleAttributeKey(select);
-				}
-			}
-
-			this.#selectNextColumn(e.target);
+		}).on('afteradd.dynamicRows', () => {
+			this.#selectNextColumn();
 		}).on('afterremove.dynamicRows', () => {
 			this.#toggleSelectedColumns();
 		});
@@ -278,41 +271,44 @@ window.item_edit_form = new class {
 		});
 	}
 
-	#selectNextColumn(table) {
-		const columns = table.querySelectorAll('.js-column');
+	#selectNextColumn() {
+		const selects = this.form_element.querySelectorAll('#columns-table .js-column');
 
-		if (columns.length === 0) {
+		if (selects.length === 0) {
 			return;
 		}
 
-		const selected_columns = [...columns].slice(0, -1).map(column => column.value);
-		const last_column = columns[columns.length - 1];
-		let next_option = last_column.getOptions().find(option => !selected_columns.includes(String(option.value)));
+		const last_select = selects[selects.length - 1];
+		const selected_options = [...selects].slice(0, -1).map(select => select.value);
+		const available_options = this.#getTelemetryColumnsOptions();
+
+		let next_option = available_options.find(option => !selected_options.includes(option));
 
 		if (next_option === undefined) {
 			const first_complex_value = this.telemetry_columns_config.complex
-				.filter(value => last_column.getOptions().some(option => option.value === value))
+				.filter(complex_option => available_options.some(option => option === complex_option))
 				.sort()[0];
-			next_option = last_column.getOptions().find(option => option.value === first_complex_value);
+			next_option = available_options.find(option => option === first_complex_value);
 		}
 
-		last_column.value = next_option.value;
-		last_column.dispatchEvent(new Event('change', {bubbles: true}));
+		this.#populateColumnSelect(last_select);
+		last_select.value = next_option;
+		this.#toggleAttributeKey(last_select);
 	}
 
 	#toggleSelectedColumns() {
-		const columns = this.form_element.querySelectorAll('#columns-table .js-column');
-		const selected_columns = [...columns]
-			.filter(column => !this.telemetry_columns_config.complex.includes(column.value))
-			.map(column => column.value);
-		const available_columns = this.#getTelemetryColumns();
+		const selects = this.form_element.querySelectorAll('#columns-table .js-column');
+		const selected_options = [...selects]
+			.filter(select => !this.telemetry_columns_config.complex.includes(select.value))
+			.map(select => select.value);
+		const available_options = this.#getTelemetryColumnsOptions();
 
-		for (const column of columns) {
-			const disabled_columns = selected_columns.filter(value => value !== column.value);
+		for (const select of selects) {
+			const disabled_options = selected_options.filter(option => option !== select.value);
 
-			for (const option of column.getOptions()) {
-				option.disabled = !available_columns.includes(String(option.value))
-					|| disabled_columns.includes(String(option.value));
+			for (const option of select.getOptions()) {
+				option.disabled = !available_options.includes(String(option.value))
+					|| disabled_options.includes(String(option.value));
 			}
 		}
 	}
@@ -342,10 +338,10 @@ window.item_edit_form = new class {
 		this.field.type.addEventListener('change', this.#typeChangeHandler.bind(this));
 		this.field.value_type.addEventListener('change', this.#valueTypeChangeHandler.bind(this));
 		this.field.request_method.addEventListener('change', this.updateFieldsVisibility.bind(this));
-		this.field.signal_type.addEventListener('change', this.#telemetrySignalChangeHandler.bind(this));
+		this.field.signal_type.addEventListener('change', this.updateFieldsVisibility.bind(this));
 
 		for (const radio of this.field.metric_point_type) {
-			radio.addEventListener('change', this.#telemetrySignalChangeHandler.bind(this));
+			radio.addEventListener('change', this.updateFieldsVisibility.bind(this));
 		}
 
 		this.field.evaltype.addEventListener('change', this.updateFieldsVisibility.bind(this));
@@ -356,12 +352,12 @@ window.item_edit_form = new class {
 		}
 
 		this.form_element.querySelector('.js-add-aggregated-column')
-			.addEventListener('click', (e) => this.#openAggregatedColumnModal(e.target));
+			.addEventListener('click', e => this.#openAggregatedColumnModal(e.target));
 
 		this.form_element.querySelector('.js-add-condition')
-			.addEventListener('click', (e) => this.#openConditionModal(e.target));
+			.addEventListener('click', e => this.#openConditionModal(e.target));
 
-		this.form_element.querySelector('#columns-table').addEventListener('change', (e) => {
+		this.form_element.querySelector('#columns-table').addEventListener('change', e => {
 			if (e.target.classList.contains('js-column')) {
 				this.#toggleAttributeKey(e.target);
 				this.#toggleSelectedColumns();
@@ -369,7 +365,7 @@ window.item_edit_form = new class {
 		});
 
 		for (const id of ['aggregated-columns-table', 'conditions-table']) {
-			this.form_element.querySelector(`#${id}`).addEventListener('click', (e) => {
+			this.form_element.querySelector(`#${id}`).addEventListener('click', e => {
 				if (e.target.classList.contains('js-remove-row')) {
 					const row = e.target.closest('tr');
 
@@ -381,13 +377,13 @@ window.item_edit_form = new class {
 			});
 		}
 
-		this.form_element.querySelector('#aggregated-columns-table').addEventListener('click', (e) => {
+		this.form_element.querySelector('#aggregated-columns-table').addEventListener('click', e => {
 			if (e.target.classList.contains('js-edit-row')) {
 				this.#openAggregatedColumnModal(e.target, e.target.closest('tr'));
 			}
 		});
 
-		this.form_element.querySelector('#conditions-table').addEventListener('click', (e) => {
+		this.form_element.querySelector('#conditions-table').addEventListener('click', e => {
 			if (e.target.classList.contains('js-edit-row')) {
 				this.#openConditionModal(e.target, e.target.closest('tr'));
 			}
@@ -604,7 +600,8 @@ window.item_edit_form = new class {
 		const key = this.field.key.value;
 		const username_required = type == ITEM_TYPE_SSH || type == ITEM_TYPE_TELNET;
 		const ipmi_sensor_required = type == ITEM_TYPE_IPMI && key !== 'ipmi.get';
-		const preprocessing_active = this.form_element.querySelector('[name^="preprocessing"][name$="[type]"]') !== null;
+		const preprocessing_active = this.form_element
+			.querySelector('[name^="preprocessing"][name$="[type]"]') !== null;
 
 		this.#updateActionButtons();
 		this.#updateCustomIntervalVisibility();
@@ -627,7 +624,7 @@ window.item_edit_form = new class {
 		);
 	}
 
-	#getTelemetryColumns() {
+	#getTelemetryColumnsOptions() {
 		const signal_type = this.field.signal_type.value;
 
 		if (signal_type == this.telemetry_signal_type_metrics) {
@@ -642,20 +639,19 @@ window.item_edit_form = new class {
 
 	#populateColumnSelect(select) {
 		const value = select.value;
-		const names = this.#getTelemetryColumns();
+		const names = this.#getTelemetryColumnsOptions();
 		const is_unavailable = value !== null && value !== '' && !names.includes(value);
 		const options = is_unavailable ? [...names, value].sort() : names;
 
-		select.clearOptions();
-		select.addOptions(options.map((name) => ({value: name, label: name})));
+		for (const option of select.getOptions()) {
+			option.hidden = !options.includes(option.value);
+		}
 
 		if (value === null || value === '') {
 			select.preselectHightlighted();
 
 			return;
 		}
-
-		select.value = value;
 
 		if (is_unavailable) {
 			select.getOptionByValue(value).disabled = true;
@@ -673,18 +669,13 @@ window.item_edit_form = new class {
 		}
 	}
 
-	#refreshTelemetryColumns() {
-		for (const select of this.form_element.querySelectorAll('#columns-table tbody .js-column')) {
+	#updateTelemetryColumns() {
+		for (const select of this.form_element.querySelectorAll('#columns-table .js-column')) {
 			this.#populateColumnSelect(select);
 			this.#toggleAttributeKey(select);
 		}
 
 		this.#toggleSelectedColumns();
-	}
-
-	#telemetrySignalChangeHandler() {
-		this.#refreshTelemetryColumns();
-		this.updateFieldsVisibility();
 		this.form.validateChanges(['columns', 'aggregated_columns', 'conditions']);
 	}
 
@@ -864,11 +855,6 @@ window.item_edit_form = new class {
 			return;
 		}
 
-		for (const select of this.form_element.querySelectorAll('#columns-table .js-column')) {
-			this.#populateColumnSelect(select);
-			this.#toggleAttributeKey(select);
-		}
-
 		this.form_data.aggregated_columns.forEach((column, row_index) => {
 			this.#addAggregatedColumnRow({...column, row_index});
 		});
@@ -876,8 +862,6 @@ window.item_edit_form = new class {
 		this.form_data.conditions.forEach((condition, row_index) => {
 			this.#addConditionRow({...condition, row_index});
 		});
-
-		this.#toggleSelectedColumns();
 	}
 
 	#updateTelemetryVisibility() {
@@ -918,6 +902,7 @@ window.item_edit_form = new class {
 		}
 
 		this.#updateTelemetryIndicators();
+		this.#updateTelemetryColumns();
 	}
 
 	#getTelemetryConditions() {

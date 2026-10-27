@@ -21,6 +21,19 @@ class CTelemetryHelper {
 	public const SECTION_AGGREGATED_COLUMNS = 'aggregated_columns';
 	public const SECTION_CONDITIONS = 'conditions';
 
+	private const METRIC_POINT_TYPES = [
+		CItemTypeTelemetryQuery::METRICS_POINT_SUM,
+		CItemTypeTelemetryQuery::METRICS_POINT_GAUGE,
+		CItemTypeTelemetryQuery::METRICS_POINT_HISTOGRAM,
+		CItemTypeTelemetryQuery::METRICS_POINT_EXPONENTIAL_HISTOGRAM
+	];
+
+	private const SIGNAL_TYPES = [
+		CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
+		CItemTypeTelemetryQuery::SIGNAL_TYPE_LOGS,
+		CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS
+	];
+
 	/**
 	 * Column names allowed in the given section for the given signal/metric type. An unknown section,
 	 * signal type or metric point type yields an empty list.
@@ -66,6 +79,41 @@ class CTelemetryHelper {
 	}
 
 	/**
+	 * Telemetry query item unique column options, keyed by name.
+	 *
+	 * @return array
+	 */
+
+	public static function getColumnOptions(): array {
+		$options = [];
+
+		foreach ([self::SECTION_COLUMNS, self::SECTION_AGGREGATED_COLUMNS, self::SECTION_CONDITIONS] as $section) {
+			foreach (self::SIGNAL_TYPES as $signal_type) {
+				if ($signal_type == CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS) {
+					foreach (self::METRIC_POINT_TYPES as $metric_point_type) {
+						$names = self::getSectionColumns($section, $signal_type, $metric_point_type);
+
+						foreach ($names as $name) {
+							$options[$name] = $name;
+						}
+					}
+				}
+				else {
+					$names = self::getSectionColumns($section, $signal_type);
+
+					foreach ($names as $name) {
+						$options[$name] = $name;
+					}
+				}
+			}
+		}
+
+		ksort($options);
+
+		return $options;
+	}
+
+	/**
 	 * Telemetry query item column configuration, keyed by section, then by signal_type (metrics keyed additionally
 	 * by metric_point_type).
 	 *
@@ -73,22 +121,11 @@ class CTelemetryHelper {
 	 */
 	public static function getColumnConfig(): array {
 		$config = [];
-		$metric_point_types = [
-			CItemTypeTelemetryQuery::METRICS_POINT_SUM,
-			CItemTypeTelemetryQuery::METRICS_POINT_GAUGE,
-			CItemTypeTelemetryQuery::METRICS_POINT_HISTOGRAM,
-			CItemTypeTelemetryQuery::METRICS_POINT_EXPONENTIAL_HISTOGRAM
-		];
-		$signal_types = [
-			CItemTypeTelemetryQuery::SIGNAL_TYPE_TRACES,
-			CItemTypeTelemetryQuery::SIGNAL_TYPE_LOGS,
-			CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS
-		];
 
 		foreach ([self::SECTION_COLUMNS, self::SECTION_AGGREGATED_COLUMNS, self::SECTION_CONDITIONS] as $section) {
-			foreach ($signal_types as $signal_type) {
+			foreach (self::SIGNAL_TYPES as $signal_type) {
 				if ($signal_type == CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS) {
-					foreach ($metric_point_types as $metric_point_type) {
+					foreach (self::METRIC_POINT_TYPES as $metric_point_type) {
 						$names = self::getSectionColumns($section, $signal_type, $metric_point_type);
 						sort($names);
 

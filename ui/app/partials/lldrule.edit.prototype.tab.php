@@ -664,6 +664,7 @@ $formgrid
 							->setValue('#{column}')
 							->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 							->setAttribute('data-changed', '')
+							->addOptions(CSelect::createOptionsFromArray(CTelemetryHelper::getColumnOptions()))
 							->setErrorLabel(_('Name'))
 							->setErrorContainer('columns_#{rowNum}_error_container')
 							->setReadonly($readonly),

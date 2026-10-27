@@ -698,6 +698,7 @@ $formgrid
 						(new CSelect('columns[#{rowNum}][column]'))
 							->addClass('js-column')
 							->setValue('#{column}')
+							->addOptions(CSelect::createOptionsFromArray(CTelemetryHelper::getColumnOptions()))
 							->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 							->setAttribute('data-changed', '')
 							->setErrorLabel(_('Name'))
