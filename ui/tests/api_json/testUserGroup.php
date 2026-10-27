@@ -667,7 +667,7 @@ class testUserGroup extends CAPITest {
 		}
 	}
 
-	public function assertSameApmFilters(string $usrgrpid, array $apm_filters): void {
+	private function assertSameApmFilters(string $usrgrpid, array $apm_filters): void {
 		$db_apm_filters = CDBHelper::getAll(
 			'SELECT signal_type,attribute_key,value'.
 			' FROM usrgrp_apm_filter'.
@@ -902,12 +902,12 @@ class testUserGroup extends CAPITest {
 				'group' => [
 					'name' => 'Check APM filter, empty resource attribute key',
 					'apm_filters' => [
-							[
-								'key' => '',
-								'value' => 'attr_value',
-								'signal_type' => SIGNAL_TYPE_ALL
-							]
+						[
+							'key' => '',
+							'value' => 'attr_value',
+							'signal_type' => SIGNAL_TYPE_ALL
 						]
+					]
 				],
 				'expected_error' => 'Invalid parameter "/1/apm_filters/1/key": cannot be empty.'
 			],
@@ -915,11 +915,11 @@ class testUserGroup extends CAPITest {
 				'group' => [
 					'name' => 'Check APM filter, missing resource attribute key',
 					'apm_filters' => [
-							[
-								'value' => 'attr_value',
-								'signal_type' => SIGNAL_TYPE_ALL
-							]
+						[
+							'value' => 'attr_value',
+							'signal_type' => SIGNAL_TYPE_ALL
 						]
+					]
 				],
 				'expected_error' => 'Invalid parameter "/1/apm_filters/1": the parameter "key" is missing.'
 			],
@@ -927,12 +927,12 @@ class testUserGroup extends CAPITest {
 				'group' => [
 					'name' => 'Check APM filter signal type, not valid number',
 					'apm_filters' => [
-							[
-								'key' => 'attr_key',
-								'value' => 'attr_value',
-								'signal_type' => 'abc'
-							]
+						[
+							'key' => 'attr_key',
+							'value' => 'attr_value',
+							'signal_type' => 'abc'
 						]
+					]
 				],
 				'expected_error' => 'Invalid parameter "/1/apm_filters/1/signal_type": an integer is expected.'
 			],
@@ -940,12 +940,12 @@ class testUserGroup extends CAPITest {
 				'group' => [
 					'name' => 'Check APM filter, incorrect signal type value',
 					'apm_filters' => [
-							[
-								'key' => 'attr_key',
-								'value' => 'attr_value',
-								'signal_type' => 5
-							]
+						[
+							'key' => 'attr_key',
+							'value' => 'attr_value',
+							'signal_type' => 5
 						]
+					]
 				],
 				'expected_error' => 'Invalid parameter "/1/apm_filters/1/signal_type": value must be one of -1, 0, 1, 2.'
 			]
@@ -1063,7 +1063,7 @@ class testUserGroup extends CAPITest {
 				'usergroup' => ['18', '19'],
 				'expected_error' => null
 			],
-			'Can delete group havig user with single group' => [
+			'Can delete group having user with single group' => [
 				'usergroup' => [':user_group:user group 2'],
 				'expected_error' => null
 			]
