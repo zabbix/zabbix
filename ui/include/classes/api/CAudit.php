@@ -545,10 +545,10 @@ class CAudit {
 	 * @var array
 	 */
 	private const SCALAR_VALUE_LIST_FIELD = [
-		'item.query.aggregated_columns.parameters',
-		'itemprototype.query.aggregated_columns.parameters',
 		'discoveryrule.query.aggregated_columns.parameters',
-		'discoveryruleprototype.query.aggregated_columns.parameters'
+		'discoveryruleprototype.query.aggregated_columns.parameters',
+		'item.query.aggregated_columns.parameters',
+		'itemprototype.query.aggregated_columns.parameters'
 	];
 
 	/**
@@ -601,8 +601,8 @@ class CAudit {
 		'discoveryrule.parameters' => 'item_parameterid',
 		'discoveryrule.preprocessing' => 'item_preprocid',
 		'discoveryrule.query_fields' => 'sortorder',
-		'discoveryrule.query.columns' => null,
 		'discoveryrule.query.aggregated_columns' => null,
+		'discoveryrule.query.columns' => null,
 		'discoveryrule.query.filter.conditions' => null,
 		'discoveryruleprototype.filter.conditions' => 'item_conditionid',
 		'discoveryruleprototype.headers' => 'sortorder',
@@ -615,8 +615,8 @@ class CAudit {
 		'discoveryruleprototype.parameters' => 'item_parameterid',
 		'discoveryruleprototype.preprocessing' => 'item_preprocid',
 		'discoveryruleprototype.query_fields' => 'sortorder',
-		'discoveryruleprototype.query.columns' => null,
 		'discoveryruleprototype.query.aggregated_columns' => null,
+		'discoveryruleprototype.query.columns' => null,
 		'discoveryruleprototype.query.filter.conditions' => null,
 		'hostgroup.hosts' => 'hostgroupid',
 		'hostprototype.groupLinks' => 'group_prototypeid',

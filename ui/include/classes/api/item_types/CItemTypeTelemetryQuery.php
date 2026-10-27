@@ -160,7 +160,8 @@ class CItemTypeTelemetryQuery extends CItemType {
 	public static function getCreateValidationRules(array $item): array {
 		$api_allow_lld_macro = ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
 				|| $item['flags'] == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE)
-			? API_ALLOW_LLD_MACRO : 0;
+			? API_ALLOW_LLD_MACRO
+			: 0;
 		$flags = API_NOT_EMPTY | API_ALLOW_USER_MACRO | $api_allow_lld_macro;
 
 		return [
@@ -179,7 +180,8 @@ class CItemTypeTelemetryQuery extends CItemType {
 	public static function getUpdateValidationRules(array $db_item): array {
 		$api_allow_lld_macro = ($db_item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
 				|| $db_item['flags'] == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE)
-			? API_ALLOW_LLD_MACRO : 0;
+			? API_ALLOW_LLD_MACRO
+			: 0;
 		$flags = API_NOT_EMPTY | API_ALLOW_USER_MACRO | $api_allow_lld_macro;
 
 		return [
@@ -198,7 +200,8 @@ class CItemTypeTelemetryQuery extends CItemType {
 	public static function getUpdateValidationRulesInherited(array $db_item): array {
 		$api_allow_lld_macro = ($db_item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
 				|| $db_item['flags'] == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE)
-			? API_ALLOW_LLD_MACRO : 0;
+			? API_ALLOW_LLD_MACRO
+			: 0;
 		$flags = API_NOT_EMPTY | API_ALLOW_USER_MACRO | $api_allow_lld_macro;
 
 		return [
@@ -341,9 +344,9 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 * - "filter.conditions[].value" of item and item prototype for numeric "filter.conditions.column" support user macro
 	 * - "filter.conditions[].value" of item prototype for numeric "filter.conditions.column" support lld macro
 	 *
-	 * @param array       $item        Telemetry item to validate.
-	 * @param string      $path        Path in validation message.
-	 * @param string|null $error       Error message when validation fails, set by reference.
+	 * @param array       $item   Telemetry item to validate.
+	 * @param string      $path   Path in validation message.
+	 * @param string|null $error  Error message when validation fails, set by reference.
 	 */
 	public static function validateFilter(array $item, string $path, ?string &$error): bool {
 		if ($item['query']['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
@@ -378,8 +381,9 @@ class CItemTypeTelemetryQuery extends CItemType {
 			self::SIGNAL_TYPE_LOGS =>		self::LOGS_CONDITIONS_COLUMN
 		};
 		$api_allow_lld_macro = ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
-			|| $item['flags'] == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE)
-				? API_ALLOW_LLD_MACRO : 0;
+				|| $item['flags'] == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE)
+			? API_ALLOW_LLD_MACRO
+			: 0;
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'column' =>		['type' => API_STRING_UTF8, 'in' => implode(',', $columns)],
 			'value' =>		['type' => API_MULTIPLE, 'rules' => [

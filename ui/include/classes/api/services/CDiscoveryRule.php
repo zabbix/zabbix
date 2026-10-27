@@ -269,7 +269,7 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 		}
 
 		if ($result) {
-			parent::prepareItemsForApi($result, false);
+			self::prepareItemsForApi($result, false);
 
 			foreach ($result as &$lldrule) {
 				if (array_key_exists('query', $lldrule) && $lldrule['query']) {

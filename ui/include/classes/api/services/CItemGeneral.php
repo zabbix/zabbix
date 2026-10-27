@@ -899,11 +899,11 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Validate effective granularity and lookback limit values of inherited telemetry query items, item prototypes,
-	 * lld rules and lld rule prototypes.
+	 * Validate the effective granularity and lookback limit values of inherited telemetry query items, item prototypes,
+	 * LLD rules, and LLD rule prototypes.
 	 *
-	 * An inherited entity can override these fields. Therefore, a valid template update can become invalid when combined
-	 * with a value already stored on a child item.
+	 * An inherited entity can override these fields. As a result, a template update that is valid on its own may become
+	 * invalid when combined with a value already stored on a child item.
 	 *
 	 * @param array $items
 	 * @param array $db_items
