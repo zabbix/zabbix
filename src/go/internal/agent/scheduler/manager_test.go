@@ -317,10 +317,10 @@ func (m *mockManager) mockTasks() {
 						},
 						item:   t.item,
 						client: t.client,
-						meta:   t.meta,
 					},
 					sink: m.sink,
 				}
+				copyMeta(&mockTask.meta, &t.meta)
 				p.enqueueTask(mockTask)
 				m.clients[index[t]].exporters[t.item.itemid] = mockTask
 			case *directExporterTask:
@@ -335,10 +335,10 @@ func (m *mockManager) mockTasks() {
 						},
 						item:   t.item,
 						client: t.client,
-						meta:   t.meta,
 					},
 					sink: m.sink,
 				}
+				copyMeta(&mockTask.meta, &t.meta)
 				p.enqueueTask(mockTask)
 			case *starterTask:
 				mockTask := &mockStarterTask{
@@ -472,6 +472,13 @@ func (m *mockManager) checkPluginTimeline(
 			m.checkTimeline(t, p.Name()+":"+key, tracker[key], offsets, iters)
 		}
 	}
+}
+
+// copyMeta copies item metadata state without copying the atomic values it holds.
+func copyMeta(dst, src *plugin.Meta) {
+	dst.SetLastLogsize(src.LastLogsize())
+	dst.SetMtime(src.Mtime())
+	dst.Data = src.Data
 }
 
 type mockExporterTask struct {
