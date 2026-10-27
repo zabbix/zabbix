@@ -685,9 +685,9 @@ class testUserGroup extends CAPITest {
 			$value = array_key_exists('value', $apm_filter) ? $apm_filter['value'] : '';
 
 			$expected_apm_filters[] = [
-				'signal_type'	=> $signal_type,
-				'attribute_key'	=> $apm_filter['key'],
-				'value'			=> $value
+				'signal_type'	=>	$signal_type,
+				'attribute_key'	=>	$apm_filter['key'],
+				'value'			=>	$value
 			];
 		}
 
