@@ -805,6 +805,8 @@ class CIntegrationTest extends CAPITest {
 			fwrite(STDOUT, "Press ENTER to continue ...");
 			fgets(STDIN);
 		} else {
+			$bin_path = 'valgrind --suppressions=/home/vso/Documents/dev_zabbix/minimal.supp --leak-check=full --trace-children=yes --max-threads=1200 --leak-resolution=high --log-file=/tmp/zabbix_server_valgrind.log '.$bin_path;
+
 			self::executeCommand($bin_path, ['-c', $config], $background);
 			self::waitForStartup($component, $waitLogLineOverride, $skip_pid);
 		}

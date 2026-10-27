@@ -155,6 +155,9 @@ class testSnmpEngineIdCache extends CIntegrationTest {
 
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
+		/* only lines logged with the new configuration are of interest */
+		self::clearLog(self::COMPONENT_SERVER);
+
 		return $since;
 	}
 
@@ -211,26 +214,20 @@ class testSnmpEngineIdCache extends CIntegrationTest {
 	}
 
 	/**
-	 * Wait until engine ID is cached for the address and subsequent check skips probing.
+	 * Wait until the item skips probing because engine ID is cached.
+	 *
+	 * Log is cleared after each configuration change, so it is read from the start for every item.
 	 */
-	private function waitForEngineIdCached(string $itemid, string $address): void {
-		$prefix = 'itemid:'.$itemid.' ';
-
-		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, [
-			$prefix.'EngineID added for address \''.$address.'\'',
-			$prefix.'updated EngineID for address \''.$address.'\'',
-			$prefix.'EngineID for address \''.$address.'\' already cached'
-		]);
-
+	private function waitForEngineIdCached(string $itemid): void {
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER,
-			$prefix.'EngineID already discovered, skipping probe'
+			'itemid:'.$itemid.' EngineID already discovered, skipping probe', false
 		);
 	}
 
-	private function waitForItemsCached(array $itemids, int $since, string $address, string $description): void {
+	private function waitForItemsCached(array $itemids, int $since, string $description): void {
 		foreach ($itemids as $itemid) {
 			$this->waitForItemValue($itemid, $since, $description);
-			$this->waitForEngineIdCached($itemid, $address);
+			$this->waitForEngineIdCached($itemid);
 		}
 	}
 
@@ -239,14 +236,14 @@ class testSnmpEngineIdCache extends CIntegrationTest {
 
 		$since = $this->updateSnmpInterface(self::getSnmpInterface());
 		$this->waitForItemValue(self::$itemid, $since, 'valid IP');
-		$this->waitForEngineIdCached(self::$itemid, self::SNMP_IP);
+		$this->waitForEngineIdCached(self::$itemid);
 
 		$since = $this->updateSnmpInterface(self::getSnmpInterface([
 			'useip' => INTERFACE_USE_DNS,
 			'dns' => self::SNMP_DNS
 		]));
 		$this->waitForItemValue(self::$itemid, $since, 'valid DNS');
-		$this->waitForEngineIdCached(self::$itemid, self::SNMP_DNS);
+		$this->waitForEngineIdCached(self::$itemid);
 
 		$this->updateSnmpInterface(self::getSnmpInterface([
 			'useip' => INTERFACE_USE_DNS,
@@ -260,7 +257,7 @@ class testSnmpEngineIdCache extends CIntegrationTest {
 			'dns' => self::SNMP_DNS
 		]));
 		$this->waitForItemValue(self::$itemid, $since, 'fixed DNS');
-		$this->waitForEngineIdCached(self::$itemid, self::SNMP_DNS);
+		$this->waitForEngineIdCached(self::$itemid);
 
 		$this->updateSnmpInterface(self::getSnmpInterface(['ip' => self::INVALID_IP]));
 		$error = $this->waitForItemFailure('invalid IP');
@@ -268,7 +265,7 @@ class testSnmpEngineIdCache extends CIntegrationTest {
 
 		$since = $this->updateSnmpInterface(self::getSnmpInterface());
 		$this->waitForItemValue(self::$itemid, $since, 'fixed IP');
-		$this->waitForEngineIdCached(self::$itemid, self::SNMP_IP);
+		$this->waitForEngineIdCached(self::$itemid);
 	}
 
 	public function testSnmpEngineIdCache_credentialsChange(): void {
@@ -276,7 +273,7 @@ class testSnmpEngineIdCache extends CIntegrationTest {
 
 		$since = $this->updateSnmpInterface(self::getSnmpInterface());
 		$this->waitForItemValue(self::$itemid, $since, 'valid credentials');
-		$this->waitForEngineIdCached(self::$itemid, self::SNMP_IP);
+		$this->waitForEngineIdCached(self::$itemid);
 
 		$invalid_details = [
 			'securityname' => 'invalid_user',
@@ -292,7 +289,7 @@ class testSnmpEngineIdCache extends CIntegrationTest {
 
 			$since = $this->updateSnmpInterface(self::getSnmpInterface());
 			$this->waitForItemValue(self::$itemid, $since, 'fixed '.$field);
-			$this->waitForEngineIdCached(self::$itemid, self::SNMP_IP);
+			$this->waitForEngineIdCached(self::$itemid);
 		}
 	}
 
@@ -319,16 +316,16 @@ class testSnmpEngineIdCache extends CIntegrationTest {
 		$itemids = array_merge([self::$itemid], $response['result']['itemids']);
 
 		$since = $this->updateSnmpInterface(self::getSnmpInterface());
-		$this->waitForItemsCached($itemids, $since, self::SNMP_IP, 'valid IP');
+		$this->waitForItemsCached($itemids, $since, 'valid IP');
 
 		$since = $this->updateSnmpInterface(self::getSnmpInterface([
 			'useip' => INTERFACE_USE_DNS,
 			'dns' => self::SNMP_DNS
 		]));
-		$this->waitForItemsCached($itemids, $since, self::SNMP_DNS, 'valid DNS');
+		$this->waitForItemsCached($itemids, $since, 'valid DNS');
 
 		$since = $this->updateSnmpInterface(self::getSnmpInterface());
-		$this->waitForItemsCached($itemids, $since, self::SNMP_IP, 'IP after DNS');
+		$this->waitForItemsCached($itemids, $since, 'IP after DNS');
 
 		$this->call('item.delete', array_slice($itemids, 1));
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
