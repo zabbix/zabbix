@@ -80,6 +80,8 @@ window.tag_filter_edit = new class {
 				[...this.form.querySelectorAll('input[name^="ms_new_tag_filter[groupids]"]')].map(input => input.value)
 			)
 		);
+
+		this.overlay.recoverFocus();
 	}
 
 	/**

@@ -447,7 +447,7 @@ void	pg_service_destroy(zbx_pg_service_t *pgs)
 
 	if (FAIL == zbx_ipc_socket_open(&sock, ZBX_IPC_SERVICE_PGSERVICE, ZBX_PG_SERVICE_TIMEOUT, &error))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot connect to to proxy group manager service: %s", error);
+		zabbix_log(LOG_LEVEL_ERR, "cannot connect to proxy group manager service: %s", error);
 		zbx_free(error);
 		return;
 	}

@@ -65,7 +65,7 @@ func TestGetAlias(t *testing.T) {
 		Result{input: `no.alias[*]`, key: `no.alias[a,b]`, fail: true},
 	}
 
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 	var options agent.AgentOptions
 	_ = conf.UnmarshalStrict([]byte{}, &options)
 	options.Alias = aliases

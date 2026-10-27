@@ -26,6 +26,11 @@ class testAuditlogIconMap extends testAuditlogCommon {
 	 */
 	private const ICONMAPID = 1;
 
+	/**
+	 * Resource type Icon mapping
+	 */
+	const RESOURCE_TYPE = 32;
+
 	public function testAuditlogIconMap_Create() {
 		$create = $this->call('iconmap.create', [
 			[
@@ -55,7 +60,7 @@ class testAuditlogIconMap extends testAuditlogCommon {
 			'iconmap.iconmapid' => ['add', $resourceid]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $created, $resourceid);
+		$this->getAuditDetails('details', self::ACTION_ADD, $created, $resourceid, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogIconMap_Update() {
@@ -87,11 +92,11 @@ class testAuditlogIconMap extends testAuditlogCommon {
 			'iconmap.mappings['.$icon_map['iconmappingid'].'].iconmappingid' => ['add', $icon_map['iconmappingid']]
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, self::ICONMAPID);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, self::ICONMAPID, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogIconMap_Delete() {
 		$this->call('iconmap.delete', [self::ICONMAPID]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid, 'updated_icon_mapping', self::ICONMAPID);
+		$this->getAuditDetails('resourcename', self::ACTION_DELETE, 'updated_icon_mapping', self::ICONMAPID, self::RESOURCE_TYPE);
 	}
 }

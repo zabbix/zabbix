@@ -448,6 +448,51 @@ static int	DBpatch_7000029(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7000030(void)
+{
+	int			ret = SUCCEED;
+	zbx_db_insert_t		db_insert;
+	zbx_db_row_t		row;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_result_t	result = zbx_db_select("select i.itemid,t.tag,t.value from httptest_tag t"
+		" join ("
+			"select hsi.itemid,hs.httptestid from httpstepitem hsi"
+			" join httpstep hs on hs.httpstepid=hsi.httpstepid"
+			" union"
+			" select hti.itemid,hti.httptestid from httptestitem hti"
+		") as i"
+		" on i.httptestid=t.httptestid"
+		" where not exists ("
+			"select null from item_tag it"
+			" where it.itemid=i.itemid and it.tag=t.tag"
+		")");
+
+	if (NULL == result)
+		return FAIL;
+
+	zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value", (char *)NULL);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	itemid;
+
+		ZBX_DBROW2UINT64(itemid, row[0]);
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), itemid, row[1], row[2]);
+	}
+
+	zbx_db_insert_autoincrement(&db_insert, "itemtagid");
+	ret = zbx_db_insert_execute(&db_insert);
+
+	zbx_db_insert_clean(&db_insert);
+
+	zbx_db_free_result(result);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(7000)
@@ -484,5 +529,6 @@ DBPATCH_ADD(7000026, 0, 0)
 DBPATCH_ADD(7000027, 0, 0)
 DBPATCH_ADD(7000028, 0, 0)
 DBPATCH_ADD(7000029, 0, 0)
+DBPATCH_ADD(7000030, 0, 0)
 
 DBPATCH_END()

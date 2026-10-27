@@ -704,8 +704,6 @@ class CTemplate extends CHostGeneral {
 			}
 		}
 
-		self::deleteHgSets($db_templates);
-
 		// Finally delete the template.
 		DB::delete('host_tag', ['hostid' => $templateids]);
 		DB::delete('hosts', ['hostid' => $templateids]);

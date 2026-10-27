@@ -2683,7 +2683,7 @@ class testLowLevelDiscovery extends CWebTest {
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$url);
 		$this->query('link', self::SIMPLE_UPDATE_CLONE_LLD)->waitUntilClickable()->one()->click();
 		$form = $this->query('id:host-discovery-form')->asForm()->waitUntilVisible()->one();
-		$form->query('button:Clone')->waitUntilClickable()->one()->click();
+		$form->query('button:Clone')->waitUntilClickable()->one()->click()->waitUntilNotVisible();
 		$form->invalidate();
 		$this->assertEquals(['Add', 'Test', 'Cancel'], $form->query('xpath:.//div[@class="form-actions"]/button')
 				->waitUntilVisible()->all()->filter(CElementFilter::CLICKABLE)->asText()
@@ -2721,7 +2721,7 @@ class testLowLevelDiscovery extends CWebTest {
 		if (array_key_exists('Overrides', $data) && CTestArrayHelper::get($data, 'change_overrides')) {
 			$form->selectTab('Overrides');
 			$form->query('link:Override')->waitUntilClickable()->one()->click();
-			$override_dialog_form = COverlayDialogElement::find()->all()->last()->asForm()->waitUntilReady();
+			$override_dialog_form = COverlayDialogElement::get('Override')->asForm();
 			$override_dialog_form->fill($data['Overrides']);
 			$override_dialog_form->submit();
 			$override_dialog_form->waitUntilNotVisible();
@@ -2750,7 +2750,7 @@ class testLowLevelDiscovery extends CWebTest {
 					? $data['Overrides']['Name']
 					: 'Override';
 				$form->query('link', $override_name)->waitUntilClickable()->one()->click();
-				$override_dialog_form = COverlayDialogElement::find()->all()->last()->asForm()->waitUntilReady();
+				$override_dialog_form = COverlayDialogElement::get('Override')->asForm();
 				$override_dialog_form->checkValue($data['Overrides']);
 				$override_dialog_form->submit();
 				$override_dialog_form->waitUntilNotVisible();
@@ -2890,7 +2890,7 @@ class testLowLevelDiscovery extends CWebTest {
 				$form->query('link:Cancel override')->waitUntilClickable()->one()->click();
 			}
 
-			$override_dialog_form = COverlayDialogElement::find()->all()->last()->asForm()->waitUntilReady();
+			$override_dialog_form = COverlayDialogElement::get('Override')->asForm();
 			$override_dialog_form->fill($fields['overrides_fields']['filters']);
 			$override_dialog_form->getFieldContainer('Operations')->query('button:Add')->waitUntilClickable()->one()->click();
 			$operation_dialog_form = COverlayDialogElement::find()->all()->last()->asForm()->waitUntilReady();

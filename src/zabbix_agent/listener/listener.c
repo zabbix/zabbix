@@ -108,7 +108,12 @@ static int	process_passive_checks_json(zbx_socket_t *s, int config_timeout, stru
 		if (SUCCEED == zbx_execute_agent_check(key, ZBX_PROCESS_WITH_ALIAS, &result, timeout))
 		{
 			if (NULL != (value = ZBX_GET_TEXT_RESULT(&result)))
-				zbx_json_addstring(&j, ZBX_PROTO_TAG_VALUE, *value, ZBX_JSON_TYPE_STRING);
+			{
+				if (0 == strcmp(*value, ZBX_NOTSUPPORTED))
+					zbx_json_addstring(&j, ZBX_PROTO_TAG_ERROR, "", ZBX_JSON_TYPE_STRING);
+				else
+					zbx_json_addstring(&j, ZBX_PROTO_TAG_VALUE, *value, ZBX_JSON_TYPE_STRING);
+			}
 			else
 				zbx_json_addraw(&j, ZBX_PROTO_TAG_VALUE, "null");
 		}
@@ -145,6 +150,9 @@ fail:
 static void	process_listener(zbx_socket_t *s, int config_timeout)
 {
 	int	ret;
+
+	if (0 == s->max_len_limit)
+		s->max_len_limit = ZBX_MAX_PASSIVE_CHECK_DATA_SIZE;
 
 	if (SUCCEED == (ret = zbx_tcp_recv_to(s, config_timeout)))
 	{

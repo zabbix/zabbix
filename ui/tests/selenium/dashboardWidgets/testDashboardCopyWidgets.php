@@ -27,13 +27,13 @@ class testDashboardCopyWidgets extends CWebTest {
 
 	// Constants for regular dashboard cases.
 	const NEW_PAGE_NAME = 'Test_page';
-	const PASTE_DASHBOARD_NAME = 'Dashboard for Paste widgets';
+	const PASTE_DASHBOARD_NAME = 'Widget pasting dashboard';
 
 	// Constants for templated dashboard cases.
 	const TEMPLATED_DASHBOARD_NAME = 'Templated dashboard with all widgets';
 	const TEMPLATED_PAGE_NAME = 'Page for pasting widgets';
 	const EMPTY_DASHBOARD_NAME = 'Dashboard without widgets';
-	const MODULES_DASHBOARD_NAME = 'Dashboard for Copying widgets _1';
+	const MODULES_DASHBOARD_NAME = 'Widget copy dashboard 1';
 	private static $templated_dashboardid;
 	private static $templated_empty_dashboardid;
 	private static $modules_dashboardid;
@@ -52,7 +52,7 @@ class testDashboardCopyWidgets extends CWebTest {
 	}
 
 	/**
-	 *  Get all widgets from dashboards with name starting with "Dashboard for Copying widgets".
+	 *  Get all widgets from dashboards with name starting with "Widget copy dashboard".
 	 */
 	public static function getDashboardsData() {
 		static $data = null;
@@ -67,7 +67,7 @@ class testDashboardCopyWidgets extends CWebTest {
 					' JOIN dashboard_page dp ON w.dashboard_pageid=dp.dashboard_pageid'.
 					' WHERE dp.dashboardid IN ('.
 						'SELECT dashboardid FROM dashboard '.
-						'WHERE name LIKE \'%Dashboard for Copying widgets%\''.
+						'WHERE name LIKE \'%Widget copy dashboard%\''.
 					') ORDER BY w.widgetid DESC'
 			);
 		}
@@ -155,7 +155,7 @@ class testDashboardCopyWidgets extends CWebTest {
 		else {
 			$dashboardid = $start_dashboardid;
 			$new_dashboardid = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name ='.
-					zbx_dbstr('Dashboard for Paste widgets')
+					zbx_dbstr('Widget pasting dashboard')
 			);
 			$new_page_name = self::NEW_PAGE_NAME;
 			$new_pageid = CDBHelper::getValue('SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid ='.
@@ -223,7 +223,7 @@ class testDashboardCopyWidgets extends CWebTest {
 		/* At the moment this is the only option how to wait for the loading spinner to disappear after pasting the widget,
 		 * since the widget header and the content block without the loading appear first,
 		 * and only after that the loading appears.
-		 * TODO: after ZBX-26280 remove sleep and change to ->asWidget()->waitUntilReady()->one();
+		 * Sleep is not removed because ZBX-26280 is not fixed for 7.0.
 		 */
 		$copied_widget = $dashboard->query('xpath:(.//div[contains(@class, "dashboard-grid-widget-header") or'.
 				' contains(@class, "dashboard-grid-iterator-header")]/h4[text()='.
@@ -241,6 +241,9 @@ class testDashboardCopyWidgets extends CWebTest {
 			$copied_widget = $dashboard->waitUntilReady()->getWidget($widget_name);
 		}
 
+		// The widget can briefly re-render with an empty header after copy; wait for the name before asserting.
+		$copied_widget->query('xpath:.//div[contains(@class, "dashboard-grid-widget-header") or'.
+				' contains(@class, "dashboard-grid-iterator-header")]/h4')->waitUntilTextPresent($widget_name);
 		$this->assertEquals($widget_name, $copied_widget->getHeaderText());
 		$copied_fields = $copied_widget->edit()->getFields()->filter(CElementFilter::VISIBLE);
 
@@ -744,6 +747,7 @@ class testDashboardCopyWidgets extends CWebTest {
 
 				// Check that no inaccessible widgets are present on the pasted page.
 				$dashboard->selectPage($page_name, 2);
+				$dashboard->waitUntilReady();
 				$this->assertFalse($dashboard->query($inaccessible_xpath)->one(false)->isValid());
 				break;
 		}

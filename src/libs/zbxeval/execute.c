@@ -1885,12 +1885,20 @@ static int	eval_execute_function_repeat(const zbx_eval_context_t *ctx, const zbx
 		return FAIL;
 	}
 
-	if (0 != (len_utf8 = zbx_strlen_utf8(str->data.str)))
+	if (0 != num->data.ui64 && 0 != (len_utf8 = zbx_strlen_utf8(str->data.str)))
 	{
-		if (num->data.ui64 * len_utf8 >= MAX_STRING_LEN)
+		if (num->data.ui64 > (MAX_STRING_LEN - 1) / len_utf8)
 		{
+			zbx_uint64_t	total_print_len;
+
+			if (num->data.ui64 < UINT64_MAX / len_utf8)
+				total_print_len = num->data.ui64 * len_utf8;
+			else
+				total_print_len = UINT64_MAX;
+
 			*error = zbx_dsprintf(*error, "maximum allowed string length (%d) exceeded: " ZBX_FS_UI64,
-					MAX_STRING_LEN, num->data.ui64 * len_utf8);
+					MAX_STRING_LEN - 1, total_print_len);
+
 			return FAIL;
 		}
 

@@ -143,7 +143,12 @@ class testFormUserPermissions extends CWebTest {
 		// Change user role.
 		$form = $this->query('xpath://form[@name="user_form"]')->waitUntilPresent()->one()->asForm();
 		$form->selectTab('Permissions');
-		$form->getField('Role')->fill($data['new_role']);
+		if (CTestArrayHelper::get($data, 'new_role') === '') {
+			$form->fill(['Role' => $data['new_role']]);
+		}
+		else {
+			$form->fill(['Role' => CFormElement::RELOADABLE_FILL($data['new_role'])]);
+		}
 
 		if (array_key_exists('User type', $data)) {
 			$form->checkValue(['User type' => $data['user_type']]);

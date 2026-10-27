@@ -94,7 +94,7 @@
 					}
 				}
 
-				location.href = location.href;
+				location.reload();
 			});
 		}
 
@@ -196,7 +196,7 @@
 						uncheckTableRows(this.parent_discoveryid);
 					}
 
-					location.href = location.href;
+					location.reload();
 				})
 				.catch(() => {
 					clearMessages();
@@ -301,7 +301,7 @@
 				location.href = curl.getUrl();
 			}
 			else {
-				location.href = location.href;
+				location.reload();
 			}
 		}
 	}

@@ -344,17 +344,13 @@ static int	validate_linked_templates(const zbx_vector_uint64_t *templateids, cha
 	if (SUCCEED == ret)
 	{
 		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select t1.description,h2.host"
-				" from items i1,functions f1,triggers t1,functions f2,items i2,hosts h2"
-				" where i1.itemid=f1.itemid"
-					" and f1.triggerid=t1.triggerid"
-					" and t1.triggerid=f2.triggerid"
-					" and f2.itemid=i2.itemid"
-					" and i2.hostid=h2.hostid"
-					" and h2.status=%d"
-					" and",
-				HOST_STATUS_TEMPLATE);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"select f1.triggerid,i2.hostid"
+				" from items i1"
+				" join functions f1 on f1.itemid=i1.itemid"
+				" join functions f2 on f2.triggerid=f1.triggerid"
+				" join items i2 on i2.itemid=f2.itemid"
+				" where");
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "i1.hostid",
 				templateids->values, templateids->values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and not");
@@ -365,10 +361,40 @@ static int	validate_linked_templates(const zbx_vector_uint64_t *templateids, cha
 
 		if (NULL != (row = zbx_db_fetch(result)))
 		{
+			zbx_uint64_t	triggerid, hostid;
+			zbx_db_result_t	error_result;
+			zbx_db_row_t	error_row;
+
+			ZBX_STR2UINT64(triggerid, row[0]);
+			ZBX_STR2UINT64(hostid, row[1]);
+
+			sql_offset = 0;
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"select t.description,h.host"
+					" from triggers t,hosts h"
+					" where t.triggerid=" ZBX_FS_UI64
+						" and h.hostid=" ZBX_FS_UI64,
+					triggerid, hostid);
+
+			error_result = zbx_db_select_n(sql, 1);
+
+			if (NULL != (error_row = zbx_db_fetch(error_result)))
+			{
+				zbx_snprintf(error, max_error_len,
+						"trigger \"%s\" has items from template \"%s\"",
+						error_row[0], error_row[1]);
+			}
+			else
+			{
+				zbx_snprintf(error, max_error_len,
+						"failed to retrieve trigger description or host for triggerid "
+						ZBX_FS_UI64 " and hostid " ZBX_FS_UI64, triggerid, hostid);
+				THIS_SHOULD_NEVER_HAPPEN;
+				zabbix_log(LOG_LEVEL_ERR, "%s", error);
+			}
+
 			ret = FAIL;
-			zbx_snprintf(error, max_error_len,
-					"trigger \"%s\" has items from template \"%s\"",
-					row[0], row[1]);
+			zbx_db_free_result(error_result);
 		}
 		zbx_db_free_result(result);
 	}
@@ -5696,21 +5722,6 @@ static zbx_uint64_t	permission_hgset_add(const char *hash_str, zbx_vector_uint64
 	return hgsetid;
 }
 
-static void	permission_hgset_remove(zbx_uint64_t hgsetid)
-{
-	char		*sql;
-	zbx_db_result_t	result;
-
-	sql = zbx_dsprintf(NULL, "select null from host_hgset where hgsetid=" ZBX_FS_UI64, hgsetid);
-	result = zbx_db_select_n(sql, 1);
-	zbx_free(sql);
-
-	if (NULL == zbx_db_fetch(result))
-		zbx_db_execute("delete from hgset where hgsetid=" ZBX_FS_UI64, hgsetid);
-
-	zbx_db_free_result(result);
-}
-
 static void	host_permissions_update(zbx_uint64_t hostid)
 {
 	zbx_uint64_t		hgsetid = 0, hgsetid_old = 0;
@@ -5748,11 +5759,9 @@ static void	host_permissions_update(zbx_uint64_t hostid)
 
 	if (0 != hgsetid_old)
 	{
-		if (ZBX_DB_OK <= zbx_db_execute("update host_hgset set hgsetid=" ZBX_FS_UI64
-				" where hostid=" ZBX_FS_UI64, hgsetid, hostid))
-		{
-			permission_hgset_remove(hgsetid_old);
-		}
+		/* cleanup of hgset will be performed by housekeeper because hgset becomes unlinked from hosts */
+		zbx_db_execute("update host_hgset set hgsetid=" ZBX_FS_UI64 " where hostid=" ZBX_FS_UI64, hgsetid,
+				hostid);
 	}
 	else
 	{
@@ -5948,10 +5957,10 @@ void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_st
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
-	/* delete host groups sets */
+	/* mark host group sets for complete removal by housekeeper by unlinking host group sets from hosts */
 	if (0 < hgsetids_del.values_num)
 	{
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hgset where");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from host_hgset where");
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hgsetid", hgsetids_del.values,
 				hgsetids_del.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
@@ -6020,6 +6029,48 @@ clean:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: retrieves IP of main interface of correct type for specified host *
+ *                                                                            *
+ * Parameters:                                                                *
+ *             hostid             - [IN] host id from database                *
+ *             type               - [IN] interface type                       *
+ *             ip_buffer          - [OUT] buffer for main interface IP        *
+ *             sz_ip_buffer       - [IN] size of ip_buffer                    *
+ *                                                                            *
+ * Return value: SUCCEED or FAIL                                              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_get_main_interface_ip(const zbx_uint64_t hostid, const unsigned char type,
+			char *ip_buffer, const size_t sz_ip_buffer)
+{
+	char		*sql;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	int		ret = FAIL;
+
+	sql = zbx_dsprintf(NULL,
+			"select ip"
+			" from interface"
+			" where hostid=" ZBX_FS_UI64
+				" and type=%d"
+				" and main<>0",
+			hostid, (int)type);
+
+	result = zbx_db_select_n(sql, 1);
+	zbx_free(sql);
+
+	if (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_strlcpy(ip_buffer, row[0], sz_ip_buffer);
+		ret = SUCCEED;
+	}
+	zbx_db_free_result(result);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: adds new interface to specified host                              *
  *          or update main interface of this type for specified host          *
  *                                                                            *
@@ -6047,6 +6098,7 @@ zbx_uint64_t	zbx_db_add_interface(zbx_uint64_t hostid, unsigned char type, unsig
 	unsigned short		db_port;
 	const char		*db_ip, *db_dns;
 	zbx_dc_um_handle_t	*um_handle;
+	zbx_dc_host_t		dc_host;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -6100,8 +6152,9 @@ zbx_uint64_t	zbx_db_add_interface(zbx_uint64_t hostid, unsigned char type, unsig
 		}
 
 		tmp = strdup(row[4]);
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL,
-					NULL, NULL, &tmp, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+		dc_host.hostid = hostid;
+		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &dc_host, NULL, NULL, NULL, NULL, NULL, NULL,
+					&tmp, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 		if (FAIL == zbx_is_ushort(tmp, &db_port) || db_port != port)
 		{
@@ -6827,12 +6880,19 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 		zbx_db_execute("%s", sql);
 	}
 
-	/* delete hgsets */
+	/* mark hgsets for complete removal by housekeeper by unlinking hgsets from hosts */
 
 	sql_offset = 0;
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hgset where");
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from host_hgset where");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hgsetid", hgsetids.values,
+			hgsetids.values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+	/* hgset_group has to be deleted to prevent error: */
+	/* update or delete on table "hstgrp" violates foreign key constraint on table "hgset_group" */
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hgset_group where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hgsetid", hgsetids.values,
 			hgsetids.values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");

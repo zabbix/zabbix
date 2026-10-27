@@ -494,11 +494,14 @@ int	dc_get_host_redirect(const char *host, const zbx_tls_conn_attr_t *attr, zbx_
 		now = (int)time(NULL);
 
 		/* check if proxy is not offline and the client redirect should be reset */
-		if (now - get_dc_config()->proxy_lastonline < get_dc_config()->proxy_failover_delay ||
-				now - hpi->lastreset < get_dc_config()->proxy_failover_delay)
+		if (now - get_dc_config()->proxy_lastonline < get_dc_config()->proxy_failover_delay * 1.5)
 		{
+			hpi->lastreset = 0;
 			return FAIL;
 		}
+
+		if (now - hpi->lastreset < SEC_PER_MIN * 5)
+			return FAIL;
 
 		hpi->lastreset = now;
 		redirect->reset = ZBX_REDIRECT_RESET;
@@ -682,4 +685,33 @@ zbx_uint64_t	zbx_dc_get_proxy_groupid(zbx_uint64_t proxyid)
 	}
 
 	return proxy_groupid;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: resolve effective proxyid for host name from host_proxy cache     *
+ *                                                                            *
+ * Parameters: host    - [IN] host name                                       *
+ *             proxyid - [OUT] effective proxyid                              *
+ *                                                                            *
+ * Return value: SUCCEED - proxy assignment found, FAIL - otherwise           *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_get_host_proxyid_by_name(const char *host, zbx_uint64_t *proxyid)
+{
+	int				ret = FAIL;
+	zbx_dc_host_proxy_index_t	*hpi, hpi_local = {.host = host};
+
+	RDLOCK_CACHE;
+
+	if (NULL != (hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_search(&get_dc_config()->host_proxy_index,
+			&hpi_local)))
+	{
+		*proxyid = hpi->host_proxy->proxyid;
+		ret = SUCCEED;
+	}
+
+	UNLOCK_CACHE;
+
+	return ret;
 }

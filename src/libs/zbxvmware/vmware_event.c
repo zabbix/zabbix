@@ -1395,7 +1395,9 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 	}
 
 	page.alloc = ZBX_INIT_UPD_XML_SIZE;
+	page.offset = 0;
 	page.data = (char *)zbx_malloc(NULL, page.alloc);
+	page.data[0] = '\0';
 
 	if (SUCCEED != vmware_curl_set_header(easyhandle, service->major_version, &headers, &evt_data->error))
 		goto clean;

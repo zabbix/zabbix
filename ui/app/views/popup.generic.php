@@ -456,8 +456,8 @@ switch ($data['popup_type']) {
 			$documentation_link = (new CLink(null, CDocHelper::getUrl($item['documentation_link'])))
 				->addClass(ZBX_STYLE_BTN_ICON)
 				->addClass(ZBX_ICON_HELP)
-				->setTitle(_('Help'))
-				->setTarget('_blank');
+				->setTarget('_blank')
+				->setAttribute('aria-label', _('Open Zabbix documentation in a new tab'));
 
 			$table->addRow([$name, $description, $documentation_link]);
 		}

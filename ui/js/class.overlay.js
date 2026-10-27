@@ -43,13 +43,15 @@ function Overlay(type, dialogueid) {
 
 	this.$dialogue.$header = jQuery('<h4>', {id: this.headerid});
 
-	const $close_btn = jQuery('<button>', {
+	// Hide the button to prevent incorrect screen reader announcements when opening a dialog.
+	this.$dialogue.$close_btn = jQuery('<button>', {
 		class: 'btn-overlay-close',
-		title: t('S_CLOSE')
 	}).click(function(e) {
 		overlayDialogueDestroy(this.dialogueid);
 		e.preventDefault();
-	}.bind(this));
+	}.bind(this))
+		.attr('aria-label', t('Close modal window'))
+		.hide();
 
 	this.$dialogue.$controls = jQuery('<div>', {class: 'overlay-dialogue-controls'});
 	this.$dialogue.$head = jQuery('<div>', {class: 'overlay-dialogue-header'});
@@ -58,7 +60,7 @@ function Overlay(type, dialogueid) {
 	this.$dialogue.$footer = jQuery('<div>', {class: 'overlay-dialogue-footer'});
 	this.$dialogue.$script = jQuery('<script>');
 
-	this.$dialogue.$head.append(this.$dialogue.$header, $close_btn);
+	this.$dialogue.$head.append(this.$dialogue.$header, this.$dialogue.$close_btn);
 
 	this.$dialogue.append(this.$dialogue.$head);
 	this.$dialogue.append(this.$dialogue.$body);
@@ -138,63 +140,50 @@ Overlay.prototype.centerDialog = function() {
 };
 
 /**
- * Determines element to place focus on and focuses it if found.
+ * Find the primary focusable element of the dialogue.
+ *
+ * @returns {HTMLElement|null}
  */
-Overlay.prototype.recoverFocus = function() {
-	if (this.$btn_focus) {
-		this.$btn_focus[0].focus({preventScroll: true});
-		return;
+Overlay.prototype.getFocusableElement = function() {
+	if (this.$btn_focus !== null && !this.$btn_focus[0].disabled) {
+		return this.$btn_focus[0];
 	}
 
-	if (jQuery('[autofocus=autofocus]', this.$dialogue).length) {
-		jQuery('[autofocus=autofocus]', this.$dialogue)[0].focus({preventScroll: true});
+	const autofocus_element = this.$dialogue[0].querySelector('[autofocus]');
+
+	if (autofocus_element !== null && !autofocus_element.disabled && isVisible(autofocus_element)) {
+		return autofocus_element;
 	}
-	else if (jQuery('.overlay-dialogue-body form :focusable', this.$dialogue).length) {
-		jQuery('.overlay-dialogue-body form :focusable', this.$dialogue)[0].focus({preventScroll: true});
+
+	const parents = [this.$dialogue.$body, this.$dialogue.$footer, this.$dialogue.$head, this.$dialogue.$controls];
+
+	for (const $parent of parents) {
+		if ($parent.length === 0 || !isVisible($parent[0])) {
+			continue;
+		}
+
+		const focusable_element = Focuser.getFocusableElement($parent[0]);
+
+		if (focusable_element !== null) {
+			return focusable_element;
+		}
 	}
-	else {
-		jQuery(':focusable:first', this.$dialogue)[0].focus({preventScroll: true});
-	}
+
+	return null;
 };
 
 /**
- * Binds keyboard events to contain focus within dialogue window.
+ * Focus and preselect the primary focusable element of the dialogue, mimicking the autofocus behavior.
+ */
+Overlay.prototype.recoverFocus = function() {
+	Focuser.focus(this.getFocusableElement());
+};
+
+/**
+ * Prevent the focus from running away from the dialogue window.
  */
 Overlay.prototype.containFocus = function() {
-	var focusable = jQuery(':focusable', this.$dialogue);
-
-	focusable.off('keydown.containFocus');
-
-	if (focusable.length > 1) {
-		var first_focusable = focusable.filter(':first'),
-			last_focusable = focusable.filter(':last');
-
-		first_focusable
-			.on('keydown.containFocus', function(e) {
-				// TAB and SHIFT
-				if (e.which == 9 && e.shiftKey) {
-					last_focusable[0].focus();
-					return false;
-				}
-			});
-
-		last_focusable
-			.on('keydown.containFocus', function(e) {
-				// TAB and not SHIFT
-				if (e.which == 9 && !e.shiftKey) {
-					first_focusable[0].focus();
-					return false;
-				}
-			});
-	}
-	else {
-		focusable
-			.on('keydown.containFocus', function(e) {
-				if (e.which == 9) {
-					return false;
-				}
-			});
-	}
+	Focuser.containFocus(this.$dialogue[0]);
 };
 
 /**
@@ -509,7 +498,7 @@ Overlay.prototype.setProperties = function(obj) {
 			case 'doc_url':
 				this.unsetProperty(key);
 				this.$dialogue.$header[0].insertAdjacentHTML('afterend', `
-					<a class="${ZBX_STYLE_BTN_ICON} ${ZBX_ICON_HELP_SMALL}" target="_blank" title="${t('Help')}" href="${obj[key]}"></a>
+					<a class="${ZBX_STYLE_BTN_ICON} ${ZBX_ICON_HELP_SMALL}" target="_blank" aria-label="${t('Open Zabbix documentation in a new tab')}" href="${obj[key]}"></a>
 				`);
 				break;
 

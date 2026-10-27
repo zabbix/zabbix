@@ -107,7 +107,8 @@ class CControllerLatestViewRefresh extends CControllerLatestView {
 					)
 				] + $prepared_data,
 				'subfilters' => $subfilters,
-				'subfilters_expanded' => array_flip($this->getInput('subfilters_expanded', []))
+				'subfilters_expanded' => array_flip($this->getInput('subfilters_expanded', [])),
+				'user' => ['debug_mode' => $this->getDebugMode()]
 			];
 
 			$response = new CControllerResponseData($data);

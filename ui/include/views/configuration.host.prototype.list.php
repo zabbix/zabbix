@@ -80,8 +80,8 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 		(new CUrl('host_prototypes.php'))
 			->setArgument('form', 'update')
 			->setArgument('parent_discoveryid', $data['discovery_rule']['itemid'])
-			->setArgument('hostid', $hostPrototype['hostid'])
 			->setArgument('context', $data['context'])
+			->setArgument('hostid', $hostPrototype['hostid'])
 	);
 
 	// template list
@@ -151,7 +151,6 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 				: 'hostprototype.massdisable'
 			)
 			->setArgument('context', $data['context'])
-			->setArgument('backurl', $url)
 			->getUrl()
 	))
 		->addCsrfToken($csrf_token)
@@ -166,7 +165,6 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 				->setArgument('action', 'hostprototype.updatediscover')
 				->setArgument('discover', $nodiscover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
 				->setArgument('context', $data['context'])
-				->setArgument('backurl', $url)
 				->getUrl()
 		))
 			->addCsrfToken($csrf_token)
@@ -214,6 +212,8 @@ $itemForm->addItem([
 $html_page
 	->addItem($itemForm)
 	->show();
+
+zbx_add_post_js("history.replaceState({}, '');");
 
 (new CScriptTag('
 	view.init('.json_encode([

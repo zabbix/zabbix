@@ -256,7 +256,6 @@ foreach ($data['templates'] as $template) {
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'template.dashboard.list')
 					->setArgument('templateid', $template['templateid'])
-					->setArgument('context', 'template')
 			),
 			CViewHelper::showNum($template['dashboards'])
 		],
@@ -292,7 +291,7 @@ $form->addItem([
 		'template.export' => [
 			'content' => new CButtonExport('export.templates',
 				(new CUrl('zabbix.php'))
-					->setArgument('action', 'templates.list')
+					->setArgument('action', 'template.list')
 					->setArgument('page', ($data['page'] == 1) ? null : $data['page'])
 					->getUrl()
 			)

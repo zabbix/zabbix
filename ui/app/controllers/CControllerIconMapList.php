@@ -61,10 +61,15 @@ class CControllerIconMapList extends CController {
 
 		$data['iconmaps'] = API::IconMap()->get([
 			'output' => ['iconmapid', 'name'],
-			'selectMappings' => ['inventory_link', 'expression', 'iconid'],
+			'selectMappings' => ['inventory_link', 'expression', 'iconid', 'sortorder'],
 			'editable' => true
 		]);
 		order_result($data['iconmaps'], 'name');
+
+		foreach ($data['iconmaps'] as &$iconmap) {
+			order_result($iconmap['mappings'], 'sortorder');
+		}
+		unset($iconmap);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of icon mapping'));

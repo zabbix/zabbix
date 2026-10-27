@@ -705,9 +705,7 @@ static int	process_history_push(zbx_socket_t *sock, const struct zbx_json_parse 
 
 	zbx_user_init(&user);
 
-	if (FAIL == zbx_get_user_from_json(jp, &user, NULL) ||
-			SUCCEED != zbx_db_check_user_perm2system(user.userid) ||
-			SUCCEED != check_user_role_permissions(&user))
+	if (FAIL == zbx_get_user_from_json(jp, &user, NULL) || SUCCEED != check_user_role_permissions(&user))
 	{
 		*error = zbx_strdup(NULL, "Permission denied.");
 		goto out;
@@ -804,7 +802,7 @@ int	trapper_process_history_push(zbx_socket_t *sock, const struct zbx_json_parse
 	else
 		zbx_tcp_send(sock, j.buffer);
 
-	zbx_json_clean(&j);
+	zbx_json_free(&j);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

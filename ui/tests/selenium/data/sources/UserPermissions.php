@@ -85,6 +85,11 @@ class UserPermissions {
 				]
 			]
 		]);
+
+		return [
+			'userids' => CDataHelper::getIds('username'),
+			'usrgrpids' => $usergroupids
+		];
 	}
 }
 

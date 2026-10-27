@@ -36,6 +36,10 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 		p.options.Timeout = global.Timeout
 	}
 
+	// Keep the default in configuration setup so it can be replaced with a plugin option later.
+	// A future option value of 0 will disable the consecutive-error cutoff; index bounds still apply.
+	p.maxConsecutiveRaidErrors = 3
+
 	p.ctl = NewSmartCtl(p.Logger, p.options.Path, p.options.Timeout)
 }
 

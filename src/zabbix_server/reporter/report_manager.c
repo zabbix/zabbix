@@ -329,6 +329,7 @@ static void	rm_register_writer(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_
 
 		writer = (zbx_rm_writer_t *)manager->writers.values[manager->next_writer_index++];
 		writer->client = client;
+		zbx_ipc_client_addref(client);
 
 		zbx_queue_ptr_push(&manager->free_writers, writer);
 	}
@@ -388,7 +389,7 @@ static char	*report_create_cookie(zbx_rm_t *manager, const char *sessionid)
 	zbx_json_addraw(&j, ZBX_PROTO_TAG_SIGN, out_str);
 	zbx_base64_encode_dyn(j.buffer, &cookie, j.buffer_size);
 
-	zbx_json_clean(&j);
+	zbx_json_free(&j);
 	zbx_free(out_str);
 
 	return cookie;
@@ -1505,6 +1506,7 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "mediatypeid", mediatypeids.values,
 				mediatypeids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by mediatypeid");
 
 		result = zbx_db_select("%s", sql);
 
@@ -1867,7 +1869,6 @@ static int	rm_schedule_jobs(zbx_rm_t *manager, int now)
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot process report: %s", error);
 			zbx_free(error);
 		}
-
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() jobs:%d", __func__, jobs_num);
@@ -2047,7 +2048,7 @@ static int	rm_process_jobs(zbx_rm_t *manager)
  ******************************************************************************/
 static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_message_t *message, char **error)
 {
-	zbx_uint64_t		dashboardid, userid, access_userid;
+	zbx_uint64_t		dashboardid, userid;
 	zbx_vector_ptr_pair_t	params;
 	int			report_time, ret;
 	unsigned char		period;
@@ -2056,8 +2057,7 @@ static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_m
 
 	zbx_vector_ptr_pair_create(&params);
 
-	report_deserialize_test_report(message->data, &name, &dashboardid, &userid, &access_userid, &report_time,
-			&period, &params);
+	report_deserialize_test_report(message->data, &name, &dashboardid, &userid, &report_time, &period, &params);
 
 	for (int i = 0; i < params.values_num; i++)
 	{
@@ -2069,7 +2069,7 @@ static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_m
 		}
 	}
 
-	if (NULL != (job = rm_create_job(manager, name, dashboardid, access_userid, report_time, period, &userid, 1,
+	if (NULL != (job = rm_create_job(manager, name, dashboardid, userid, report_time, period, &userid, 1,
 			&params, error)))
 	{
 		job->is_test_report = 1;

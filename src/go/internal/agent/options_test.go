@@ -623,6 +623,8 @@ func Test_ValidateOptions(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
+			tt.args.options.ProfilerDir = "profiles"
+
 			err := ValidateOptions(tt.args.options)
 
 			if (err != nil) != tt.wantErr {
@@ -631,6 +633,45 @@ func Test_ValidateOptions(t *testing.T) {
 
 			if tt.wantErr && err.Error() != tt.err.Error() {
 				t.Fatalf("ValidateOptions() unexpected error:\n%v\nexpected error:\n%v\n", err, tt.err)
+			}
+		})
+	}
+}
+
+func TestProfilerDirConfiguration(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name      string
+		config    []byte
+		wantError string
+	}{
+		{name: "default", config: []byte{}, wantError: ""},
+		{name: "empty", config: []byte("ProfilerDir="), wantError: "ProfilerDir cannot be empty."},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			var options AgentOptions
+
+			err := conf.UnmarshalStrict(tt.config, &options)
+			if err != nil {
+				t.Fatalf("cannot parse configuration: %v", err)
+			}
+
+			if tt.wantError == "" {
+				if options.ProfilerDir == "" {
+					t.Fatal("default ProfilerDir is empty")
+				}
+
+				return
+			}
+
+			err = ValidateOptions(&options)
+			if err == nil || err.Error() != tt.wantError {
+				t.Fatalf("unexpected error: %v", err)
 			}
 		})
 	}

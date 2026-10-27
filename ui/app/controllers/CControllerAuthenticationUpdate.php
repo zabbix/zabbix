@@ -221,9 +221,9 @@ class CControllerAuthenticationUpdate extends CController {
 	 * @return bool
 	 */
 	private function validateMfa(): bool {
-		$default_mfa = $this->hasInput('mfa_default_row_index') ? $this->getInput('mfa_default_row_index') : null;
 		$error = $this->getInput('mfa_status', MFA_DISABLED) == MFA_ENABLED
-			&& !array_key_exists($default_mfa, $this->getInput('mfa_methods', []));
+			&& (!$this->hasInput('mfa_default_row_index')
+				|| !array_key_exists($this->getInput('mfa_default_row_index'), $this->getInput('mfa_methods', [])));
 
 		if ($error) {
 			error(_('Default MFA method must be specified.'));

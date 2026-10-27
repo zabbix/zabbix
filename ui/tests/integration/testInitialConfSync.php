@@ -1699,6 +1699,7 @@ class testInitialConfSync extends CIntegrationTest
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
 		$stringpool_old = $this->getStringPoolCount();
+		$stringpool_old--;	/* timer for baselinedev is still running, remove it from calculation */
 
 		self::stopComponent(self::COMPONENT_SERVER);
 		self::clearLog(self::COMPONENT_SERVER);
@@ -1712,6 +1713,29 @@ class testInitialConfSync extends CIntegrationTest
 
 		$this->loadInitialConfiguration();
 		$this->disableAllHosts();
+
+		$this->clearLog(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
+
+		$this->clearLog(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
+
+		$got = $this->parseSyncResults();
+		foreach ($got as $obj_name => $ops)
+		{
+			if ($obj_name === 'config') {
+				continue;
+			}
+			if ($obj_name === 'hosts' && $ops['insert'] === '0' && $ops['update'] === '1'
+					&& $ops['delete'] === '0') {
+				continue;
+			}
+			$this->assertEquals('0', $ops['insert'], 'unexpected inserts for '.$obj_name);
+			$this->assertEquals('0', $ops['update'], 'unexpected updates for '.$obj_name);
+			$this->assertEquals('0', $ops['delete'], 'unexpected deletes for '.$obj_name);
+		}
 
 		return true;
 	}
@@ -1776,6 +1800,21 @@ class testInitialConfSync extends CIntegrationTest
 		$got = $this->parseSyncResults();
 		$this->assertSyncResults($got, $this->expected_update);
 
+		$this->clearLog(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
+
+		$got = $this->parseSyncResults();
+		foreach ($got as $obj_name => $ops)
+		{
+			if ($obj_name === 'config') {
+				continue;
+			}
+			$this->assertEquals('0', $ops['insert'], 'unexpected inserts for '.$obj_name);
+			$this->assertEquals('0', $ops['update'], 'unexpected updates for '.$obj_name);
+			$this->assertEquals('0', $ops['delete'], 'unexpected deletes for '.$obj_name);
+		}
+
 		return true;
 	}
 
@@ -1798,6 +1837,21 @@ class testInitialConfSync extends CIntegrationTest
 
 		$got = $this->parseSyncResults();
 		$this->assertSyncResults($got, $this->expected_delete);
+
+		$this->clearLog(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
+
+		$got = $this->parseSyncResults();
+		foreach ($got as $obj_name => $ops)
+		{
+			if ($obj_name === 'config') {
+				continue;
+			}
+			$this->assertEquals('0', $ops['insert'], 'unexpected inserts for '.$obj_name);
+			$this->assertEquals('0', $ops['update'], 'unexpected updates for '.$obj_name);
+			$this->assertEquals('0', $ops['delete'], 'unexpected deletes for '.$obj_name);
+		}
 
 		self::stopComponent(self::COMPONENT_SERVER);
 		self::clearLog(self::COMPONENT_SERVER);

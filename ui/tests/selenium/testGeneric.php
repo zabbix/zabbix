@@ -43,7 +43,6 @@ class testGeneric extends CWebTest {
 			// Dashboard.
 			[
 				[
-					//TODO: testGeneric#1 fails, if it runs alone due to another dashboard being opened, would be fixed in DEV-4728
 					'url' => 'zabbix.php?action=dashboard.view',
 					'title' => 'Dashboard',
 					'header' => 'Global view'

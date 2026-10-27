@@ -1,3 +1,5 @@
+include ../Makefile.include
+
 BINARIES_tests = \
 	zbx_join_hostport
 
@@ -7,12 +9,13 @@ COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
 IP_LIBS = \
-	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(ANY_GROUPED_LIBS) \
 	$(MOCK_DATA_DEPS) \
-zbx_iprange_ip2str_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+	$(MOCK_TEST_DEPS)
 
-zbx_iprange_ip2str_CFLAGS = $(IP_COMPILER_FLAGS)
+IP_COMPILER_FLAGS = \
+	-I@top_srcdir@/tests \
+	$(CMOCKA_CFLAGS)
 
 #zbx_join_hostport
 

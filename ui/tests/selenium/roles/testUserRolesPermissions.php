@@ -292,7 +292,7 @@ class testUserRolesPermissions extends CWebTest {
 					'list_link' => 'sysmaps.php',
 					'action_link' => 'zabbix.php?action=map.view&sysmapid=1',
 					'action' => 'Create and edit maps',
-					'check_links' => ['sysmap.php?sysmapid=1', 'sysmaps.php?form=Create+map']
+					'check_links' => ['sysmap.php?sysmapid=1', 'sysmaps.php?form=create']
 				]
 			],
 			// Dashboard creation/edit.
@@ -476,6 +476,7 @@ class testUserRolesPermissions extends CWebTest {
 			$row->getColumn('Update')->query('link:Update')->waitUntilClickable()->one()->click();
 			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 			$this->assertTrue($dialog->query('id', $data['activityid'])->one()->isEnabled($action_status));
+			$dialog->close();
 			$this->changeRoleRule([$data['action'] => !$action_status]);
 
 			// Check that problem actions works after they were turned on.
@@ -503,6 +504,7 @@ class testUserRolesPermissions extends CWebTest {
 					}
 
 					$dialog->query('button:Update')->one()->click();
+					$dialog->ensureNotPresent();
 					$this->page->waitUntilReady();
 					$status = $row->getColumn($data['column'])->getText();
 					$this->assertEquals($data['value'], $status);
@@ -1678,11 +1680,12 @@ class testUserRolesPermissions extends CWebTest {
 		$this->query('id:filter_tags_0_operator')->asDropdown()->waitUntilVisible()->one()->fill('Does not exist');
 
 		// Apply filter in order to see the list of available services.
+		$table = $this->query('class:list-table')->asTable()->one();
 		$this->query('name:filter_set')->waitUntilClickable()->one()->click();
+		$table->waitUntilReloaded();
 		$this->page->waituntilReady();
 
 		$this->assertTableDataColumn($column_content, 'Name');
-		$table = $this->query('class:list-table')->asTable()->one();
 
 		// Check buttons are not visible for user with no permissions, otherwise, check edit permissions per service.
 		if ($data['role_config']['Read-write access to services'] === 'None') {

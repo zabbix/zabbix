@@ -1,0 +1,40 @@
+{
+  "json_format_version": [1, 0],
+  "smartctl": {
+    "version": [7, 4],
+    "argv": ["smartctl", "-a", "/dev/nvme0n1", "-j"],
+    "messages": [
+      {
+        "string": "Read Self-test Log failed: Invalid Field in Command (0x002)",
+        "severity": "error"
+      }
+    ],
+    "exit_status": 4
+  },
+  "device": {
+    "name": "/dev/nvme0n1",
+    "info_name": "/dev/nvme0n1",
+    "type": "nvme",
+    "protocol": "NVMe"
+  },
+  "model_name": "TEST NVME 1TB",
+  "serial_number": "TEST-NVME-0001",
+  "firmware_version": "1.0",
+  "smart_status": {
+    "passed": true,
+    "nvme": {
+      "value": 0
+    }
+  },
+  "nvme_smart_health_information_log": {
+    "critical_warning": 0,
+    "temperature": 32,
+    "available_spare": 100,
+    "available_spare_threshold": 5,
+    "percentage_used": 2,
+    "power_on_hours": 1000,
+    "unsafe_shutdowns": 0,
+    "media_errors": 0,
+    "num_err_log_entries": 3
+  }
+}

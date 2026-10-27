@@ -180,12 +180,12 @@ class testLldLinking extends CIntegrationTest {
 			unlink(self::METADATA_FILE);
 		}
 
-		if (file_put_contents(self::METADATA_FILE, "\\".time()) === false) {
+		if (file_put_contents(self::METADATA_FILE, "\\".microtime()) === false) {
 			throw new Exception('Failed to create metadata_file');
 		}
 	}
 
-	private function setupAutoregToLinkTemplates($templateNumber, $LLDParametrs) {
+	private function setupAutoregToLinkTemplates($templateNumber, $lldparameters) {
 
 		$response = $this->call('action.create', [
 			'name' => 'create_host',
@@ -222,7 +222,7 @@ class testLldLinking extends CIntegrationTest {
 
 		for ($i = 0; $i < $templateNumber; $i++) {
 			$params = array_merge(
-				$LLDParametrs,
+				$lldparameters,
 				['hostid' => self::$templateids[$i]]
 			);
 			$response = $this->call('discoveryrule.create', $params);
@@ -299,14 +299,15 @@ class testLldLinking extends CIntegrationTest {
 
 		$this->killComponent(self::COMPONENT_AGENT);
 		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_2, $LLDRuleType);
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->metaDataItemUpdate();
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_AGENT);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
 			'End of zbx_db_copy_template_elements():SUCCEED', true, 120);
 		$this->stopComponent(self::COMPONENT_AGENT);
 		$this->unlinkTemplates();
 		$this->metaDataItemUpdate();
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_AGENT);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
 			'End of zbx_db_copy_template_elements():SUCCEED', true, 120);

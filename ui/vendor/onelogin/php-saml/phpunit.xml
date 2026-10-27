@@ -12,7 +12,7 @@
     </report>
   </coverage>
   <testsuites>
-    <testsuite name="OneLogin PHP-SAML Test Suite">
+    <testsuite name="PHP-SAML Test Suite">
       <directory>./tests/src</directory>
     </testsuite>
   </testsuites>

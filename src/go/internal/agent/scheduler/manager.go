@@ -291,7 +291,7 @@ func (m *Manager) processUpdateRequestRun(update *updateRequest) {
 				ok = keyaccess.CheckRules(key, params)
 			}
 			if !ok {
-				err = fmt.Errorf("Unknown metric %s", key)
+				err = errs.New("Unsupported item key.")
 			} else {
 				var timeout int
 				timeout, err = ParseItemTimeoutAny(r.Timeout)
@@ -560,7 +560,10 @@ func (m *Manager) run() {
 	lastTick := time.Now()
 	cleaned := lastTick
 	time.Sleep(time.Duration(1e9 - lastTick.Nanosecond()))
+
 	ticker := time.NewTicker(time.Second)
+	defer ticker.Stop()
+
 run:
 	for {
 		select {

@@ -3194,6 +3194,7 @@ void	zbx_unset_snmp_bulkwalk_options(void)
 static int	snmp_task_process(short event, void *data, int *fd, zbx_vector_address_t *addresses,
 		const char *reverse_dns, char *dnserr, struct event *timeout_event)
 {
+#define ZBX_SNMP_TIMEOUT_WATERMARK	30
 	zbx_bulkwalk_context_t	*bulkwalk_context;
 	zbx_snmp_context_t	*snmp_context = (zbx_snmp_context_t *)data;
 	char			error[MAX_STRING_LEN];
@@ -3211,6 +3212,8 @@ static int	snmp_task_process(short event, void *data, int *fd, zbx_vector_addres
 		zbx_update_selfmon_counter(poller_config->info, ZBX_PROCESS_STATE_BUSY);
 		poller_config->state = ZBX_PROCESS_STATE_BUSY;
 	}
+
+	SNMP_MT_INITLOCK;
 
 	if (ZABBIX_ASYNC_STEP_REVERSE_DNS == snmp_context->step)
 	{
@@ -3232,11 +3235,17 @@ static int	snmp_task_process(short event, void *data, int *fd, zbx_vector_addres
 			goto stop;
 		}
 
+		const char	*high_timeout_msg = "";
+
+		if (ZBX_SNMP_TIMEOUT_WATERMARK < snmp_context->config_timeout)
+			high_timeout_msg = " (timeout value may be too high)";
+
 		if (0 < snmp_context->retries--)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " cannot receive response from [[%s]:%hu]:"
-					" timed out, retrying", snmp_context->item.itemid,
-					snmp_context->item.interface.addr, snmp_context->item.interface.port);
+					" timed out%s, retrying", snmp_context->item.itemid,
+					snmp_context->item.interface.addr, snmp_context->item.interface.port,
+					high_timeout_msg);
 
 			snmp_sess_timeout(snmp_context->ssp);
 
@@ -3277,9 +3286,9 @@ static int	snmp_task_process(short event, void *data, int *fd, zbx_vector_addres
 		}
 
 		SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL,
-				"%s: '%s' from [[%s]:%hu]:"
-				" timed out", err_detail, buffer, snmp_context->item.interface.addr,
-				snmp_context->item.interface.port));
+				"%s: '%s' from [[%s]:%hu]: timed out%s", err_detail, buffer,
+				snmp_context->item.interface.addr, snmp_context->item.interface.port,
+				high_timeout_msg));
 
 		goto stop;
 	}
@@ -3426,6 +3435,8 @@ stop:
 				snmp_context->item.itemid, snmp_error);
 	}
 
+	SNMP_MT_UNLOCK;
+
 	if (ZBX_ASYNC_TASK_STOP == task_ret && ZBX_ISSET_MSG(&snmp_context->item.result))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s itemid:" ZBX_FS_UI64 " %s event:%d fd:%d size:"
@@ -3443,6 +3454,7 @@ stop:
 	}
 
 	return task_ret;
+#undef ZBX_SNMP_TIMEOUT_WATERMARK
 }
 
 zbx_dc_item_context_t	*zbx_async_check_snmp_get_item_context(zbx_snmp_context_t *snmp_context)

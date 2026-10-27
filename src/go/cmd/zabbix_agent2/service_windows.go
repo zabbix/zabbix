@@ -154,7 +154,7 @@ func fatalCloseOSItems() {
 
 func openEventLog() (err error) {
 	if isWinLauncher() {
-		eLog, err = eventlog.Open(serviceName)
+		eLog, err = eventlog.NewWithOptions(serviceName)
 	}
 	return
 }
@@ -253,7 +253,7 @@ func isInteractiveSession() (bool, error) {
 }
 
 func setHostname() error {
-	if err := log.Open(log.Console, log.None, "", 0); err != nil {
+	if err := log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(log.None)); err != nil {
 		return fmt.Errorf("cannot initialize logger: %s", err)
 	}
 

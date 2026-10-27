@@ -31,11 +31,11 @@ abstract class CControllerServiceListGeneral extends CController {
 	protected $service;
 
 	/**
-	 * @throws APIException
-	 *
-	 * @return bool
+	 * @var bool
 	 */
-	protected function checkPermissions(): bool {
+	protected $is_inaccessible = false;
+
+	protected function loadService(): void {
 		if ($this->hasInput('serviceid')) {
 			$db_service = API::Service()->get([
 				'output' => ['serviceid', 'name', 'status', 'readonly'],
@@ -44,14 +44,13 @@ abstract class CControllerServiceListGeneral extends CController {
 				'selectTags' => ['tag', 'value']
 			]);
 
-			if (!$db_service) {
-				return false;
+			if ($db_service) {
+				$this->service = $db_service[0];
 			}
-
-			$this->service = $db_service[0];
+			else {
+				$this->is_inaccessible = true;
+			}
 		}
-
-		return true;
 	}
 
 	/**
@@ -79,6 +78,8 @@ abstract class CControllerServiceListGeneral extends CController {
 	 * @throws APIException
 	 */
 	protected function doAction(): void {
+		$this->loadService();
+
 		if ($this->service !== null) {
 			$this->service['tags'] = makeTags([$this->service], true, 'serviceid');
 			$this->service['parents'] = API::Service()->get([
@@ -96,7 +97,7 @@ abstract class CControllerServiceListGeneral extends CController {
 	 */
 	protected function getPath(): array {
 		if ($this->service === null) {
-			return [];
+			return $this->is_inaccessible ? [$this->getInput('serviceid')] : [];
 		}
 
 		$path_serviceids = $this->getInput('path', []);
@@ -155,13 +156,18 @@ abstract class CControllerServiceListGeneral extends CController {
 		$parent_serviceids = [];
 
 		foreach ($path as $serviceid) {
-			$breadcrumbs[] = [
-				'name' => $db_services[$serviceid]['name'],
-				'curl' => (new CUrl('zabbix.php'))
-					->setArgument('action', $this->getAction())
-					->setArgument('path', $parent_serviceids)
-					->setArgument('serviceid', $serviceid)
-			];
+			if (array_key_exists($serviceid, $db_services)) {
+				$breadcrumbs[] = [
+					'name' => $db_services[$serviceid]['name'],
+					'curl' => (new CUrl('zabbix.php'))
+						->setArgument('action', $this->getAction())
+						->setArgument('path', $parent_serviceids)
+						->setArgument('serviceid', $serviceid)
+				];
+			}
+			else {
+				$breadcrumbs[] = ['name' => _('Inaccessible service')];
+			}
 
 			$parent_serviceids[] = $serviceid;
 		}
