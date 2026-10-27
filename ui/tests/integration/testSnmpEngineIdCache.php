@@ -49,7 +49,8 @@ class testSnmpEngineIdCache extends CIntegrationTest {
 		'authprotocol' => ITEM_SNMPV3_AUTHPROTOCOL_MD5,
 		'authpassphrase' => 'auctoritas',
 		'privprotocol' => ITEM_SNMPV3_PRIVPROTOCOL_DES,
-		'privpassphrase' => 'privatus'
+		'privpassphrase' => 'privatus',
+		'retries' => 2
 	];
 
 	private static string $hostid;
