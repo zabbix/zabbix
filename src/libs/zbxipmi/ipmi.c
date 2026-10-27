@@ -45,11 +45,13 @@
  ******************************************************************************/
 int	zbx_ipmi_port_expand_macros(zbx_uint64_t hostid, const char *port_orig, unsigned short *port, char **error)
 {
-	char	*tmp = zbx_strdup(NULL, port_orig);
-	int	ret = SUCCEED;
+	char		*tmp = zbx_strdup(NULL, port_orig);
+	int		ret = SUCCEED;
+	zbx_dc_host_t	dc_host;
 
-	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-			&tmp, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+	dc_host.hostid = hostid;
+	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &dc_host, NULL, NULL, NULL, NULL, NULL, NULL, &tmp,
+			ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 	if (FAIL == zbx_is_ushort(tmp, port) || 0 == *port)
 	{
