@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Copyright (C) 2001-2026 Zabbix SIA
 **
@@ -300,8 +300,7 @@ final class CClickHouseHelper {
 
 		$where = [];
 
-		$field_index = $query->getMetaAttribute('addAttributeFilter_'.$field, 0);
-		$query->setMetaAttribute('addAttributeFilter_'.$field, $field_index + 1);
+		$field_filter_index = $query->getNextFieldFilterIndex('addAttributeFilter_'.$field);
 
 		$index = 0;
 
@@ -321,7 +320,7 @@ final class CClickHouseHelper {
 				unset($operators[TAG_OPERATOR_NOT_EXISTS]);
 			}
 
-			$param_prefix = 'filter_'.str_replace('.', '_', $field).'_'.$field_index.'_'.$index;
+			$param_prefix = 'filter_'.str_replace('.', '_', $field).'_'.$field_filter_index.'_'.$index;
 
 			$query->param($param_prefix.'_key', 'String', $key);
 

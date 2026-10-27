@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Copyright (C) 2001-2026 Zabbix SIA
 **
@@ -140,5 +140,13 @@ class CClickHouseQuery {
 
 	public function getMetaAttribute(string $name, mixed $default = null): mixed {
 		return array_key_exists($name, $this->meta_attributes) ? $this->meta_attributes[$name] : $default;
+	}
+
+	public function getNextFieldFilterIndex(string $field_name): int {
+		$field_filter_index = $this->getMetaAttribute($field_name, 0);
+
+		$this->setMetaAttribute($field_name, $field_filter_index + 1);
+
+		return $field_filter_index;
 	}
 }
