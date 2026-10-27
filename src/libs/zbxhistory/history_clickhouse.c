@@ -1558,6 +1558,10 @@ static void	history_clickhouse_add_value_type_info(zbx_history_provider_info_t *
 			*value++ = '\0';
 			vti.ttl = (time_t)atol(value);
 
+			if (0 == strcmp(ttl, "Minute"))
+				vti.ttl *= SEC_PER_MIN;
+			else if (0 == strcmp(ttl, "Hour"))
+				vti.ttl *= SEC_PER_HOUR;
 			if (0 == strcmp(ttl, "Day"))
 				vti.ttl *= SEC_PER_DAY;
 			else if (0 == strcmp(ttl, "Week"))
