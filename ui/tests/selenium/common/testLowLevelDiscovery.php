@@ -164,7 +164,7 @@ class testLowLevelDiscovery extends CWebTest {
 			unset($fields['Host interface']);
 
 			// LLD rule type "Nested" is available only on LLD rules in templates and discovered hosts.
-			$fields['Type']['options'] = array_merge($fields['Type']['options'], ['Nested']);
+			array_splice($fields['Type']['options'], -1, 0, ['Nested']);
 		}
 
 		$this->checkFieldsParameters($fields);
@@ -253,9 +253,7 @@ class testLowLevelDiscovery extends CWebTest {
 					];
 					foreach ($calculation_types as $type => $formula) {
 						$evaluation_type->fill($type);
-						$this->assertEquals($formula, $form->query('xpath:.//div[@class="cell expression-cell"]')
-								->one()->getText()
-						);
+						$this->assertEquals($formula, $form->query('class:js-expression')->one()->getText());
 					}
 
 					foreach ([0 => 'A', 2 => 'B'] as $i => $letter) {
