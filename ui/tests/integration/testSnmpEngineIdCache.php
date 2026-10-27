@@ -34,7 +34,7 @@ class testSnmpEngineIdCache extends CIntegrationTest {
 	private const SNMP_DNS = 'localhost';
 	private const SNMP_PORT = '161';
 	private const SNMP_OID = 'get[.1.3.6.1.2.1.1.1.0]';
-	private const SAME_ADDRESS_ITEM_COUNT = 10;
+	private const SAME_ADDRESS_ITEM_COUNT = 64;
 
 	/* RFC 5737 TEST-NET-1 address and RFC 6761 reserved domain, both guaranteed to be unreachable */
 	private const INVALID_IP = '192.0.2.1';
