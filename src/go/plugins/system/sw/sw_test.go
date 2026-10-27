@@ -19,6 +19,7 @@ package sw
 import (
 	"strings"
 	"testing"
+	"time"
 )
 
 var testData = map[string]map[string]string{
@@ -32,7 +33,7 @@ install ok installed,dos2unix,7.4.1-1,amd64,1321`,
 		"input": `glibc-gconv-extra,2.34-48.el9,x86_64,8122308,1666100063,1669204555
 elfutils-default-yama-scope,0.187-5.el9,noarch,1810,1655411412,1659990239
 perl-Scalar-List-Utils,1.56-461.el9,x86_64,143652,1628565132,1662121942`,
-		"expectedOutput": `[{"name":"glibc-gconv-extra","manager":"rpm","version":"2.34-48.el9","size":8122308,"arch":"x86_64","buildtime":{"timestamp":1666100063,"value":"Tue Oct 18 16:34:23 2022"},"installtime":{"timestamp":1669204555,"value":"Wed Nov 23 13:55:55 2022"}},{"name":"elfutils-default-yama-scope","manager":"rpm","version":"0.187-5.el9","size":1810,"arch":"noarch","buildtime":{"timestamp":1655411412,"value":"Thu Jun 16 23:30:12 2022"},"installtime":{"timestamp":1659990239,"value":"Mon Aug  8 23:23:59 2022"}},{"name":"perl-Scalar-List-Utils","manager":"rpm","version":"1.56-461.el9","size":143652,"arch":"x86_64","buildtime":{"timestamp":1628565132,"value":"Tue Aug 10 06:12:12 2021"},"installtime":{"timestamp":1662121942,"value":"Fri Sep  2 15:32:22 2022"}}]`,
+		"expectedOutput": `[{"name":"glibc-gconv-extra","manager":"rpm","version":"2.34-48.el9","size":8122308,"arch":"x86_64","buildtime":{"timestamp":1666100063,"value":"Tue Oct 18 13:34:23 2022"},"installtime":{"timestamp":1669204555,"value":"Wed Nov 23 11:55:55 2022"}},{"name":"elfutils-default-yama-scope","manager":"rpm","version":"0.187-5.el9","size":1810,"arch":"noarch","buildtime":{"timestamp":1655411412,"value":"Thu Jun 16 20:30:12 2022"},"installtime":{"timestamp":1659990239,"value":"Mon Aug  8 20:23:59 2022"}},{"name":"perl-Scalar-List-Utils","manager":"rpm","version":"1.56-461.el9","size":143652,"arch":"x86_64","buildtime":{"timestamp":1628565132,"value":"Tue Aug 10 03:12:12 2021"},"installtime":{"timestamp":1662121942,"value":"Fri Sep  2 12:32:22 2022"}}]`,
 	},
 	"pacman": {
 		"input": ` wget, 1.21.3-1, x86_64, 3.03 MiB, Sun Mar 20 21:36:30 2022, Thu Nov 10 18:33:47 2022
@@ -54,6 +55,12 @@ perl-Scalar-List-Utils,1.56-461.el9,x86_64,143652,1628565132,1662121942`,
 }
 
 func TestPackagesGet(t *testing.T) {
+	// rpm build and install times are formatted in local time zone, expected output is in UTC
+	local := time.Local
+	time.Local = time.UTC
+
+	t.Cleanup(func() { time.Local = local })
+
 	managers := getManagers()
 
 	for _, m := range managers {
