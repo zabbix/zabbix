@@ -693,8 +693,8 @@ function renderApmAttrRow($index, array $attribute, array $options = []): array 
 		(new CCol(
 			(new CTextAreaFlexible($options['field_name'].'['.$index.'][key]', $attribute['key']))
 				->setErrorContainer($options['has_inline_validation'] ? 'attribute_'.$index.'_error_container' : null)
-				->setErrorLabel($options['has_inline_validation'] ? _('Name') : null)
-				->setAttribute('placeholder', _('name'))
+				->setErrorLabel($options['has_inline_validation'] ? _('Key') : null)
+				->setAttribute('placeholder', _('key'))
 				->setAdaptiveWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				->setReadonly($options['readonly'])
 		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
@@ -709,7 +709,7 @@ function renderApmAttrRow($index, array $attribute, array $options = []): array 
 		(new CCol(
 			(new CSelect($options['field_name'].'['.$index.'][signal_type]'))
 				->setErrorContainer($options['has_inline_validation'] ? 'attribute_'.$index.'_error_container' : null)
-				->setErrorLabel($options['has_inline_validation'] ? _('Type') : null)
+				->setErrorLabel($options['has_inline_validation'] ? _('Category') : null)
 				->setValue($attribute['signal_type'])
 				->addOptions(CSelect::createOptionsFromArray($options['signal_types']))
 				->setReadonly($options['readonly'])
