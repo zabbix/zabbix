@@ -164,10 +164,44 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 
 		$this->call('settings.update', ['auditlog_enabled' => 0, 'auditlog_mode' => 0]);
 
+		$this->deleteLeftovers();
 		$this->disablePreviousHosts();
 		$this->createCollector();
 
 		return true;
+	}
+
+	/**
+	 * Delete hosts, template and proxy left by a run that did not get to clearData (interrupted, or a failed
+	 * cleanup step), so they can be created again. Variants of the suite share the names.
+	 */
+	private function deleteLeftovers(): void {
+		$response = $this->call('host.get', [
+			'filter' => ['host' => self::hostNames()],
+			'output' => ['hostid']
+		]);
+		if ($response['result']) {
+			$response = $this->call('host.delete', array_column($response['result'], 'hostid'));
+			$this->assertArrayHasKey('hostids', $response['result']);
+		}
+
+		$response = $this->call('template.get', [
+			'filter' => ['host' => self::TEMPLATE_NAME],
+			'output' => ['templateid']
+		]);
+		if ($response['result']) {
+			$response = $this->call('template.delete', array_column($response['result'], 'templateid'));
+			$this->assertArrayHasKey('templateids', $response['result']);
+		}
+
+		$response = $this->call('proxy.get', [
+			'filter' => ['name' => self::PROXY_NAME],
+			'output' => ['proxyid']
+		]);
+		if ($response['result']) {
+			$response = $this->call('proxy.delete', array_column($response['result'], 'proxyid'));
+			$this->assertArrayHasKey('proxyids', $response['result']);
+		}
 	}
 
 	/**
