@@ -252,7 +252,7 @@ zbx_snmp_engineid_record_t;
 
 typedef struct
 {
-	char		address[ZBX_INTERFACE_IP_LEN_MAX];
+	char		address[ZBX_INTERFACE_ADDR_LEN_MAX];
 	unsigned char	engineid[ZBX_SNMP_MAX_ENGINEID_LEN];
 	size_t		engineid_len;
 }
@@ -3452,7 +3452,7 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 					snmp_sess_close(snmp_context->ssp);
 
 					if (1 == engineid_cache_initialized)
-						snmp_identity_remove(addresses->values[0].ip);
+						snmp_identity_remove(snmp_context->item.interface.addr);
 
 					SNMP_MT_UNLOCK;
 
@@ -3644,7 +3644,7 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 		size_t			securityPrivKeyLen = 0;
 
 		if (ZBX_IF_SNMP_VERSION_3 == snmp_context->snmp_version &&
-				NULL != (identity_ptr = zbx_get_snmp_identity(addresses->values[0].ip,
+				NULL != (identity_ptr = zbx_get_snmp_identity(snmp_context->item.interface.addr,
 				snmp_context->item.interface.revision)))
 		{
 				securityEngineID = identity_ptr->engineid;
@@ -3701,7 +3701,7 @@ stop:
 	if (ZBX_ASYNC_TASK_STOP == task_ret && ZBX_ISSET_MSG(&snmp_context->item.result))
 	{
 		if (1 == engineid_cache_initialized)
-			snmp_identity_remove(addresses->values[0].ip);
+			snmp_identity_remove(snmp_context->item.interface.addr);
 
 		if (ZBX_IF_SNMP_VERSION_3 == snmp_context->snmp_version &&
 				0 == snmp_context->probe_processed && 0 == snmp_context->probe)
