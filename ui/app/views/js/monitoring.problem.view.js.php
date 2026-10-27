@@ -110,7 +110,7 @@
 						.setSortField('clock')
 						.setSortable(true),
 					new CDataTableColumn('severity', <?= json_encode(_('Severity')); ?>)
-						.setFields(['severity'])
+						.setFields(['severity', 'trigger_value'])
 						.setRenderer('severity')
 						.setSortable(true),
 					new CDataTableColumn('recovery', <?= json_encode(_('Recovery time')); ?>)
@@ -374,13 +374,15 @@
 					}
 				})
 				.setCellRenderer('severity', ({cell_data, cell}) => {
-					const [severity] = cell_data;
+					const [severity, trigger_value] = cell_data;
 					const severity_data = severities.find(data => data.value == severity);
 
-					cell.classList.add(CDataTable.ZBX_STYLE_CELL_BG);
-
 					if (severity_data) {
-						cell.classList.add(severity_data.style);
+						if (trigger_value != TRIGGER_VALUE_FALSE) {
+							cell.classList.add(CDataTable.ZBX_STYLE_CELL_BG);
+							cell.classList.add(severity_data.style);
+						}
+
 						cell.textContent = severity_data.label;
 					}
 				})
