@@ -132,13 +132,14 @@ abstract class CControllerCharts extends CController {
 	}
 
 	/**
-	 * Prepares graph display details (graph dimensions, URL and sBox-ing flag).
+	 * Prepares graph display details (graph dimensions, title, URL and sBox-ing flag).
 	 *
-	 * @param array $graphids  Graph IDs for which details need to be prepared.
+	 * @param array $graphs  Graphs and items of the current page.
 	 *
 	 * @return array
 	 */
 	protected function getCharts(array $graphs): array {
+		$titles = $this->getChartTitles($graphs);
 		$charts = [];
 
 		foreach ($graphs as $graph) {
@@ -168,10 +169,95 @@ abstract class CControllerCharts extends CController {
 				];
 			}
 
-			$charts[] = $chart;
+			// Graph or item may have been removed after the list was built - fall back to the unresolved name.
+			$charts[] = $chart + ($titles[$chart['chartid']] ?? ['name' => $graph['name'], 'url' => null]);
 		}
 
 		return $charts;
+	}
+
+	/**
+	 * Prepares the title and the link of each chart.
+	 *
+	 * Title repeats the header that chart.php, chart2.php and chart6.php draw into the image (see
+	 * CGraphDraw::drawHeader): the view clips that header away and shows this text instead, so both must be built
+	 * by the same rules - host name prefix only when a single host is involved, and macros in graph names expanded.
+	 *
+	 * @param array $graphs  Graphs and items of the current page.
+	 *
+	 * @return array  Title and link of each chart, keyed by chart ID.
+	 */
+	private function getChartTitles(array $graphs): array {
+		$graph_names = [];
+		$itemids = [];
+
+		foreach ($graphs as $graph) {
+			if (array_key_exists('graphid', $graph)) {
+				$graph_names[$graph['graphid']] = $graph['name'];
+			}
+			else {
+				$itemids[] = $graph['itemid'];
+			}
+		}
+
+		$titles = [];
+
+		if ($graph_names) {
+			$db_graphs = API::Graph()->get([
+				'output' => ['graphid', 'name'],
+				'selectHosts' => ['hostid', 'name'],
+				'graphids' => array_keys($graph_names),
+				'expandName' => true,
+				'preservekeys' => true
+			]);
+
+			$can_view_hosts = $this->checkAccess(CRoleHelper::UI_MONITORING_HOSTS);
+
+			foreach ($db_graphs as $graphid => $db_graph) {
+				$host_names = array_unique(array_column($db_graph['hosts'], 'name'));
+
+				$titles['graph_'.$graphid] = [
+					'name' => count($host_names) == 1
+						? reset($host_names).NAME_DELIMITER.$db_graph['name']
+						: $db_graph['name'],
+					// Filtering is done on the stored name, hence the unexpanded one.
+					'url' => $can_view_hosts
+						? (new CUrl('zabbix.php'))
+							->setArgument('action', 'charts.view')
+							->setArgument('filter_hostids', array_column($db_graph['hosts'], 'hostid'))
+							->setArgument('filter_name', $graph_names[$graphid])
+							->setArgument('filter_show', GRAPH_FILTER_HOST)
+							->setArgument('filter_set', '1')
+							->getUrl()
+						: null
+				];
+			}
+		}
+
+		if ($itemids) {
+			$db_items = API::Item()->get([
+				'output' => ['itemid', 'name_resolved'],
+				'selectHosts' => ['name'],
+				'itemids' => $itemids,
+				'preservekeys' => true
+			]);
+
+			$can_view_history = $this->checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA);
+
+			foreach ($db_items as $itemid => $db_item) {
+				$titles['item_'.$itemid] = [
+					'name' => $db_item['hosts'][0]['name'].NAME_DELIMITER.$db_item['name_resolved'],
+					'url' => $can_view_history
+						? (new CUrl('history.php'))
+							->setArgument('action', HISTORY_GRAPH)
+							->setArgument('itemids', [$itemid])
+							->getUrl()
+						: null
+				];
+			}
+		}
+
+		return $titles;
 	}
 
 	/**
