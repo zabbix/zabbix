@@ -62,8 +62,8 @@ class testSnmpEngineIdCache extends CIntegrationTest {
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 3,
 				'LogFileSize' => 0,
-				'UnreachablePeriod' => 5,
-				'UnavailableDelay' => 5,
+				'UnreachablePeriod' => 1,
+				'UnavailableDelay' => 1,
 				'UnreachableDelay' => 1
 			]
 		];
@@ -96,6 +96,7 @@ class testSnmpEngineIdCache extends CIntegrationTest {
 			'snmp_oid' => self::SNMP_OID,
 			'value_type' => ITEM_VALUE_TYPE_TEXT,
 			'delay' => '1s',
+			'timeout' => '1s',
 			'interfaceid' => self::$interfaceid
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
@@ -307,6 +308,7 @@ class testSnmpEngineIdCache extends CIntegrationTest {
 				'snmp_oid' => self::SNMP_OID,
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'delay' => '1s',
+				'timeout' => '1s',
 				'interfaceid' => self::$interfaceid
 			];
 		}
