@@ -1078,7 +1078,6 @@ static const char	*history_clickhouse_parse_itemid(const struct zbx_json_parse *
 	return p;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: parse single row of ClickHouse response and add to records vector *
@@ -1599,19 +1598,17 @@ static void	history_clickhouse_get_table_ttl(zbx_clickhouse_data_t *d, CURLM *mh
 
 	if (FAIL == clickhouse_conn_post(conn, d, mhandle, d->fetch_url, sql, CLICKHOUSE_RETRIES_OFF, &error))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot get TTL information for table %s from ClickHouse: %s",
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get TTL information for table \"%s\" from ClickHouse: %s",
 				table_name, error);
 		zbx_free(error);
 	}
 	else if (NULL == conn->resp.page.data)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot get TTL information for table %s:"
+		zabbix_log(LOG_LEVEL_WARNING, "cannot get TTL information for table \"%s\":"
 				" empty response received from ClickHouse", table_name);
 	}
 	else
-	{
 		history_clickhouse_add_value_type_info(info, value_type, conn->resp.page.data, local_table_name);
-	}
 
 	zbx_free(sql);
 }
@@ -1628,12 +1625,16 @@ static void	history_clickhouse_get_value_type_data(zbx_clickhouse_data_t *d, CUR
 		if (FAIL == ZBX_HISTORY_CHECK_TYPE_FLAGS(d->value_type_flags, i))
 			continue;
 
-		history_clickhouse_get_table_ttl(d, mhandle, conn, info, i, clickhouse_history_tables[i], &local_table);
+		history_clickhouse_get_table_ttl(d, mhandle, conn, info, (unsigned char)i, clickhouse_history_tables[i],
+				&local_table);
 
 		if (NULL != local_table)
 		{
 			if ('\0' != *local_table)
-				history_clickhouse_get_table_ttl(d, mhandle, conn, info, i, local_table, NULL);
+			{
+				history_clickhouse_get_table_ttl(d, mhandle, conn, info, (unsigned char)i, local_table,
+						NULL);
+			}
 
 			zbx_free(local_table);
 		}
@@ -1740,7 +1741,6 @@ zbx_history_provider_t	*history_clickhouse_open(const zbx_config_option_t *optio
 
 	if (NULL == (data = history_clickhouse_create_data(options, options_num, error)))
 		return NULL;
-
 
 	provider = (zbx_history_provider_t *)zbx_malloc(NULL, sizeof(zbx_history_provider_t));
 
