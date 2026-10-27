@@ -120,6 +120,9 @@ class CUserGroup extends CApiService {
 			elseif ($options['output'] === API_OUTPUT_EXTEND) {
 				$options['output'] = $usrgrps_output_fields;
 			}
+			else {
+				$options['output'] = [];
+			}
 		}
 
 		// usrgrpids

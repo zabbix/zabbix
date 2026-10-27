@@ -103,11 +103,14 @@ class CMediatype extends CApiService {
 
 		// output
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			if ($options['output'] == API_OUTPUT_EXTEND) {
+			if ($options['output'] === API_OUTPUT_EXTEND) {
 				$options['output'] = self::LIMITED_OUTPUT_FIELDS;
 			}
 			elseif (is_array($options['output'])) {
 				$options['output'] = array_intersect($options['output'], self::LIMITED_OUTPUT_FIELDS);
+			}
+			else {
+				$options['output'] = [];
 			}
 		}
 
