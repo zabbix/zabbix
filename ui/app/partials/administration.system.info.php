@@ -34,7 +34,6 @@ if (array_key_exists('serverid', $data) && $data['serverid'] !== '') {
 			(new CSpan($data['serverid']))
 				->setHint($data['serverid'])
 				->addClass(ZBX_STYLE_MIDDLE)
-				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
 				->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton())
 				->removeId()
