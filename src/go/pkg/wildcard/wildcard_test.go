@@ -23,79 +23,531 @@ package wildcard
 
 import (
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
-func TestWilcardMinimize(t *testing.T) {
-	var input = []string{
-		"pat*ern***123**",
-		"**",
-		"*",
-		"",
-	}
-	var expectedResult = []string{
-		"pat*ern*123*",
-		"*",
-		"*",
-		"",
+func TestMinimize(t *testing.T) {
+	t.Parallel()
+
+	type args struct {
+		pattern string
 	}
 
-	for i := range input {
-		w := Minimize(input[i])
-		if expectedResult[i] != w {
-			t.Errorf("Result \"%s\" does not match with expectations \"%s\"", w, expectedResult[i])
-		}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "+valid",
+			args: args{
+				pattern: "pat*ern***123**",
+			},
+			want: "pat*ern*123*",
+		},
+		{
+			name: "+collapsesConsecutiveAsterisks",
+			args: args{
+				pattern: "**",
+			},
+			want: "*",
+		},
+		{
+			name: "+singleAsterisk",
+			args: args{
+				pattern: "*",
+			},
+			want: "*",
+		},
+		{
+			name: "-emptyPattern",
+			args: args{
+				pattern: "",
+			},
+			want: "",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			got := Minimize(tt.args.pattern)
+
+			diff := cmp.Diff(tt.want, got)
+			if diff != "" {
+				t.Fatalf("Minimize() mismatch (+want -got):\n%s", diff)
+			}
+		})
 	}
 }
 
-func TestWildcardMatch(t *testing.T) {
-	type Scenario struct {
+func TestMatch(t *testing.T) {
+	t.Parallel()
+
+	type args struct {
+		value   string
 		pattern string
-		values  []string
 	}
 
-	var scenarios = []Scenario{
-		{pattern: "foo", values: []string{"foo"}},
-		{pattern: "*", values: []string{"abc", "123", ""}},
-		{pattern: "", values: []string{""}},
-		{pattern: "lo*ip*m", values: []string{"lorem_ipsum"}},
-		{pattern: "a*bc", values: []string{"aaa123bc", "aXbXbcXbc"}},
-		{pattern: "a*bc*d", values: []string{"aXbXbcXXd", "aXbXabcXXd"}},
-		{pattern: "abc*", values: []string{"abc", "abcdef"}},
-		{pattern: "*abc", values: []string{"abc", "123abc"}},
-		{pattern: "*abc*", values: []string{"abc", "123abcdef"}},
-		{pattern: "a***c", values: []string{"ac", "abc", "a_whatever_c"}},
-		{pattern: "***c*e", values: []string{"cde", "abce", "whatever_c123e"}},
-		{pattern: "a*c***", values: []string{"ac", "abc", "a1c_whatever"}},
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "+valid",
+			args: args{
+				value:   "fabc",
+				pattern: "fabc",
+			},
+			want: true,
+		},
+		{
+			name: "+singleAsteriskMatchesAnyValue",
+			args: args{
+				value:   "abcd",
+				pattern: "*",
+			},
+			want: true,
+		},
+		{
+			name: "+singleAsteriskMatchesNumericValue",
+			args: args{
+				value:   "123",
+				pattern: "*",
+			},
+			want: true,
+		},
+		{
+			name: "+singleAsteriskMatchesEmptyValue",
+			args: args{
+				value:   "",
+				pattern: "*",
+			},
+			want: true,
+		},
+		{
+			name: "+emptyPatternMatchesEmptyValue",
+			args: args{
+				value:   "",
+				pattern: "",
+			},
+			want: true,
+		},
+		{
+			name: "+multipleAsterisksInMiddle",
+			args: args{
+				value:   "lorem_ipsum",
+				pattern: "lo*ip*m",
+			},
+			want: true,
+		},
+		{
+			name: "+asteriskMatchesMultipleCharacters",
+			args: args{
+				value:   "aaa123bc",
+				pattern: "a*bc",
+			},
+			want: true,
+		},
+		{
+			name: "+asteriskBacktracksToLaterMatch",
+			args: args{
+				value:   "aXbXbcXbc",
+				pattern: "a*bc",
+			},
+			want: true,
+		},
+		{
+			name: "+twoAsterisksMatch",
+			args: args{
+				value:   "aXbXbcXXd",
+				pattern: "a*bc*d",
+			},
+			want: true,
+		},
+		{
+			name: "+twoAsterisksBacktrack",
+			args: args{
+				value:   "aXbXabcXXd",
+				pattern: "a*bc*d",
+			},
+			want: true,
+		},
+		{
+			name: "+trailingAsteriskMatchesEmptySuffix",
+			args: args{
+				value:   "abcd",
+				pattern: "abcd*",
+			},
+			want: true,
+		},
+		{
+			name: "+trailingAsteriskMatchesSuffix",
+			args: args{
+				value:   "abcdef",
+				pattern: "abcd*",
+			},
+			want: true,
+		},
+		{
+			name: "+leadingAsteriskMatchesEmptyPrefix",
+			args: args{
+				value:   "ab",
+				pattern: "*ab",
+			},
+			want: true,
+		},
+		{
+			name: "+leadingAsteriskMatchesPrefix",
+			args: args{
+				value:   "123ab",
+				pattern: "*ab",
+			},
+			want: true,
+		},
+		{
+			name: "+surroundingAsterisksMatchExact",
+			args: args{
+				value:   "abcde",
+				pattern: "*abcde*",
+			},
+			want: true,
+		},
+		{
+			name: "+surroundingAsterisksMatchWithPrefixAndSuffix",
+			args: args{
+				value:   "123abcdef",
+				pattern: "*abcde*",
+			},
+			want: true,
+		},
+		{
+			name: "+consecutiveAsterisksMatchEmptyGap",
+			args: args{
+				value:   "ac",
+				pattern: "a***c",
+			},
+			want: true,
+		},
+		{
+			name: "+consecutiveAsterisksMatchSingleCharGap",
+			args: args{
+				value:   "abc",
+				pattern: "a***c",
+			},
+			want: true,
+		},
+		{
+			name: "+consecutiveAsterisksMatchMultiCharGap",
+			args: args{
+				value:   "a_whatever_c",
+				pattern: "a***c",
+			},
+			want: true,
+		},
+		{
+			name: "+leadingConsecutiveAsterisksMatch",
+			args: args{
+				value:   "cde",
+				pattern: "***c*e",
+			},
+			want: true,
+		},
+		{
+			name: "+leadingConsecutiveAsterisksMatchWithPrefix",
+			args: args{
+				value:   "abce",
+				pattern: "***c*e",
+			},
+			want: true,
+		},
+		{
+			name: "+leadingConsecutiveAsterisksMatchLongPrefix",
+			args: args{
+				value:   "whatever_c123e",
+				pattern: "***c*e",
+			},
+			want: true,
+		},
+		{
+			name: "+trailingConsecutiveAsterisksMatchEmptySuffix",
+			args: args{
+				value:   "ac",
+				pattern: "a*c***",
+			},
+			want: true,
+		},
+		{
+			name: "+trailingConsecutiveAsterisksMatchSingleCharSuffix",
+			args: args{
+				value:   "axc",
+				pattern: "a*c***",
+			},
+			want: true,
+		},
+		{
+			name: "+trailingConsecutiveAsterisksMatchLongSuffix",
+			args: args{
+				value:   "a1c_whatever",
+				pattern: "a*c***",
+			},
+			want: true,
+		},
+		{
+			name: "+literalCommandMatches",
+			args: args{
+				value:   "/usr/bin/uptime",
+				pattern: "/usr/bin/uptime",
+			},
+			want: true,
+		},
+		{
+			name: "+explicitAsteriskMatchesRepeatedLiteral",
+			args: args{
+				value:   "fooXfoo",
+				pattern: "foo*foo",
+			},
+			want: true,
+		},
+		{
+			name: "+utf8LiteralMatches",
+			args: args{
+				value:   "é",
+				pattern: "é",
+			},
+			want: true,
+		},
+		{
+			name: "+utf8PrefixMatches",
+			args: args{
+				value:   "é args",
+				pattern: "é*",
+			},
+			want: true,
+		},
+		{
+			name: "+utf8SuffixBacktracks",
+			args: args{
+				value:   "éXé",
+				pattern: "*é",
+			},
+			want: true,
+		},
+		{
+			name: "-literalValueDiffers",
+			args: args{
+				value:   "bar",
+				pattern: "foo",
+			},
+			want: false,
+		},
+		{
+			name: "-literalValueLongerThanPattern",
+			args: args{
+				value:   "fooo",
+				pattern: "foo",
+			},
+			want: false,
+		},
+		{
+			name: "-literalValueShorterThanPattern",
+			args: args{
+				value:   "fo",
+				pattern: "foo",
+			},
+			want: false,
+		},
+		{
+			name: "-literalValueEmpty",
+			args: args{
+				value:   "",
+				pattern: "foo",
+			},
+			want: false,
+		},
+		{
+			name: "-literalValueRepeated",
+			args: args{
+				value:   "foofoo",
+				pattern: "foo",
+			},
+			want: false,
+		},
+		{
+			name: "-literalValueSandwiched",
+			args: args{
+				value:   "fooXfoo",
+				pattern: "foo",
+			},
+			want: false,
+		},
+		{
+			name: "-literalCommandSandwiched",
+			args: args{
+				value:   "/usr/bin/uptime; cat /etc/passwd; /usr/bin/uptime",
+				pattern: "/usr/bin/uptime",
+			},
+			want: false,
+		},
+		{
+			name: "-utf8PrefixDiffers",
+			args: args{
+				value:   "é",
+				pattern: "ê*",
+			},
+			want: false,
+		},
+		{
+			name: "-utf8PrefixDiffersWithSuffix",
+			args: args{
+				value:   "é args",
+				pattern: "ê*",
+			},
+			want: false,
+		},
+		{
+			name: "-emptyPatternNonEmptyValue",
+			args: args{
+				value:   "abc",
+				pattern: "",
+			},
+			want: false,
+		},
+		{
+			name: "-emptyPatternNonEmptyNumericValue",
+			args: args{
+				value:   "123",
+				pattern: "",
+			},
+			want: false,
+		},
+		{
+			name: "-asteriskNoValidBacktrack",
+			args: args{
+				value:   "aXbXbcXb",
+				pattern: "a*bc",
+			},
+			want: false,
+		},
+		{
+			name: "-twoAsterisksNoValidBacktrack",
+			args: args{
+				value:   "aXbXbcXb",
+				pattern: "a*bc*d",
+			},
+			want: false,
+		},
+		{
+			name: "-prefixAndSuffixCannotOverlap",
+			args: args{
+				value:   "abc",
+				pattern: "ab*bc",
+			},
+			want: false,
+		},
+		{
+			name: "-middleCannotOverlapSuffix",
+			args: args{
+				value:   "abc",
+				pattern: "a*b*bc",
+			},
+			want: false,
+		},
+		{
+			name: "-middlePartsCannotOverlap",
+			args: args{
+				value:   "abbc",
+				pattern: "a*bb*b*c",
+			},
+			want: false,
+		},
+		{
+			name: "+literalFooMatches",
+			args: args{
+				value:   "foo",
+				pattern: "foo",
+			},
+			want: true,
+		},
+		{
+			name: "+singleAsteriskMatchesAbc",
+			args: args{
+				value:   "abc",
+				pattern: "*",
+			},
+			want: true,
+		},
+		{
+			name: "+trailingAsteriskMatchesAbc",
+			args: args{
+				value:   "abc",
+				pattern: "abc*",
+			},
+			want: true,
+		},
+		{
+			name: "+trailingAsteriskMatchesAbcWithSuffix",
+			args: args{
+				value:   "abcdef",
+				pattern: "abc*",
+			},
+			want: true,
+		},
+		{
+			name: "+leadingAsteriskMatchesAbc",
+			args: args{
+				value:   "abc",
+				pattern: "*abc",
+			},
+			want: true,
+		},
+		{
+			name: "+leadingAsteriskMatchesAbcWithPrefix",
+			args: args{
+				value:   "123abc",
+				pattern: "*abc",
+			},
+			want: true,
+		},
+		{
+			name: "+surroundingAsterisksMatchAbc",
+			args: args{
+				value:   "abc",
+				pattern: "*abc*",
+			},
+			want: true,
+		},
+		{
+			name: "+surroundingAsterisksMatchAbcWithPrefixAndSuffix",
+			args: args{
+				value:   "123abcdef",
+				pattern: "*abc*",
+			},
+			want: true,
+		},
+		{
+			name: "+trailingConsecutiveAsterisksMatchAbc",
+			args: args{
+				value:   "abc",
+				pattern: "a*c***",
+			},
+			want: true,
+		},
 	}
 
-	for _, i := range scenarios {
-		for _, v := range i.values {
-			if !Match(v, i.pattern) {
-				t.Errorf("Value \"%s\" does not match \"%s\"", v, i.pattern)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			got := Match(tt.args.value, tt.args.pattern)
+
+			diff := cmp.Diff(tt.want, got)
+			if diff != "" {
+				t.Fatalf("Match() mismatch (+want -got):\n%s", diff)
 			}
-		}
-	}
-}
-
-func TestWildcardMatchNeagtive(t *testing.T) {
-	type Scenario struct {
-		pattern string
-		values  []string
-	}
-
-	var scenarios = []Scenario{
-		{pattern: "foo", values: []string{"fooo", "fo", "bar"}},
-		{pattern: "", values: []string{"abc"}},
-		{pattern: "", values: []string{"123"}},
-		{pattern: "a*bc", values: []string{"aXbXbcXb"}},
-		{pattern: "a*bc*d", values: []string{"aXbXbcXb"}},
-	}
-
-	for _, i := range scenarios {
-		for _, v := range i.values {
-			if Match(v, i.pattern) {
-				t.Errorf("Value \"%s\" unexpectedly matches \"%s\"", v, i.pattern)
-			}
-		}
+		})
 	}
 }
