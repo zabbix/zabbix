@@ -384,16 +384,25 @@
 				.setCellRenderer('severity', ({cell_data, cell}) => {
 					const [severity] = cell_data;
 					const severity_data = severities.find(data => data.value == severity);
+					const compact_view = this.#datatable.getOption('compact_view');
 
 					cell.classList.add(CDataTable.ZBX_STYLE_CELL_BG);
 
 					if (severity_data) {
 						const wordbreak = document.createElement('span');
-						wordbreak.classList.add(ZBX_STYLE_WORDBREAK);
+						wordbreak.classList.add(compact_view.checked ? ZBX_STYLE_OVERFLOW_ELLIPSIS : ZBX_STYLE_WORDBREAK);
 						wordbreak.textContent = severity_data.label;
 
+						const flex_wrapper = document.createElement('div');
+
+						if (compact_view.checked) {
+							flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+						}
+
+						flex_wrapper.appendChild(wordbreak);
+
 						cell.classList.add(severity_data.style);
-						cell.appendChild(wordbreak);
+						cell.appendChild(flex_wrapper);
 					}
 				})
 				.setCellRenderer('status', ({cell_data, cell}) => {
@@ -511,6 +520,8 @@
 						return;
 					}
 
+					const compact_view = this.#datatable.getOption('compact_view');
+
 					let update_link;
 
 					if (allowed.add_comments || allowed.change_severity || allowed.acknowledge || can_be_closed
@@ -523,16 +534,44 @@
 						});
 
 						update_link = document.createElement('a');
-						update_link.classList.add(ZBX_STYLE_LINK_ALT, ZBX_STYLE_WORDBREAK);
+						update_link.classList.add(ZBX_STYLE_LINK_ALT);
 						update_link.setAttribute('href', url);
 					}
 					else {
 						update_link = document.createElement('span');
 					}
 
+					update_link.classList.add(compact_view.checked ? ZBX_STYLE_OVERFLOW_ELLIPSIS : ZBX_STYLE_WORDBREAK);
 					update_link.textContent = <?= json_encode(_('Update')); ?>;
 
-					cell.appendChild(update_link);
+					const flex_wrapper = document.createElement('div');
+
+					if (compact_view.checked) {
+						flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+					}
+
+					flex_wrapper.appendChild(update_link);
+
+					cell.appendChild(flex_wrapper);
+				})
+				.setCellRenderer('custom_text', ({column, cell_data, cell}) => {
+					const column_index = column.getColumnIndex();
+					const [custom_text] = cell_data;
+					const compact_view = this.#datatable.getOption('compact_view');
+
+					const wordbreak = document.createElement('span');
+					wordbreak.classList.add(compact_view.checked ? ZBX_STYLE_OVERFLOW_ELLIPSIS : ZBX_STYLE_WORDBREAK);
+					wordbreak.textContent = custom_text ? (custom_text[column_index] ?? '') : '';
+
+					const flex_wrapper = document.createElement('div');
+
+					if (compact_view.checked) {
+						flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+					}
+
+					flex_wrapper.appendChild(wordbreak);
+
+					cell.appendChild(flex_wrapper);
 				})
 				.setCellRenderer('symptom_limit', ({cell, cell_data}) => {
 					const [paging] = cell_data;

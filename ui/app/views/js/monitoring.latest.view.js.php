@@ -215,7 +215,7 @@
 						.setWidth('20%'),
 					new CDataTableColumn('change', <?= json_encode(_('Change')); ?>)
 						.setFields(['change'])
-						.setRenderer(CDataTableColumn.RENDERER_TEXT),
+						.setRenderer('change'),
 					new CDataTableColumnTags('tags', <?= json_encode(_('Tags')); ?>)
 						.setColumnOptions({
 							object_type: ZBX_TAG_OBJECT_ITEM
@@ -298,7 +298,7 @@
 					const url_params = objectToSearchParams({action: 'latest.view', context: 'host'});
 
 					const name_link = document.createElement('a');
-					name_link.classList.add(ZBX_STYLE_LINK_ACTION);
+					name_link.classList.add(ZBX_STYLE_LINK_ACTION, ZBX_STYLE_WORDBREAK);
 					name_link.setAttribute('data-menu-popup', JSON.stringify({
 						type: 'item',
 						data: {

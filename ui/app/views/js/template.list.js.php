@@ -204,15 +204,18 @@
 						cell.appendChild(item_link);
 					}
 					else {
-						cell.innerHTML += <?= json_encode(_('Hosts')); ?>;
+						const hosts = document.createElement('span');
+						hosts.classList.add(ZBX_STYLE_WORDBREAK);
+						hosts.textContent = <?= json_encode(_('Hosts')); ?>;
+
+						cell.appendChild(hosts);
 					}
 
 					if (items > 0) {
 						const count = document.createElement('sup');
 						count.textContent = items;
 
-						cell.innerHTML += ' ';
-						cell.appendChild(count);
+						cell.append(' ', count);
 					}
 				})
 				.setCellRenderer('items', ({cell_data, cell}) => {
@@ -236,8 +239,7 @@
 						const count = document.createElement('sup');
 						count.textContent = items;
 
-						cell.innerHTML += ' ';
-						cell.appendChild(count);
+						cell.append(' ', count);
 					}
 				})
 				.setCellRenderer('triggers', ({cell_data, cell}) => {
@@ -261,8 +263,7 @@
 						const count = document.createElement('sup');
 						count.textContent = triggers;
 
-						cell.innerHTML += ' ';
-						cell.appendChild(count);
+						cell.append(' ', count);
 					}
 				})
 				.setCellRenderer('graphs', ({cell_data, cell}) => {
@@ -286,8 +287,7 @@
 						const count = document.createElement('sup');
 						count.textContent = graphs;
 
-						cell.innerHTML += ' ';
-						cell.appendChild(count);
+						cell.append(' ', count);
 					}
 				})
 				.setCellRenderer('dashboards', ({cell_data, cell}) => {
@@ -309,8 +309,7 @@
 						const count = document.createElement('sup');
 						count.textContent = dashboards;
 
-						cell.innerHTML += ' ';
-						cell.appendChild(count);
+						cell.append(' ', count);
 					}
 				})
 				.setCellRenderer('discovery', ({cell_data, cell}) => {
@@ -334,8 +333,7 @@
 						const count = document.createElement('sup');
 						count.textContent = discovery_rules;
 
-						cell.innerHTML += ' ';
-						cell.appendChild(count);
+						cell.append(' ', count);
 					}
 				})
 				.setCellRenderer('web', ({cell_data, cell}) => {
@@ -358,8 +356,7 @@
 						const count = document.createElement('sup');
 						count.textContent = http_tests;
 
-						cell.innerHTML += ' ';
-						cell.appendChild(count);
+						cell.append(' ', count);
 					}
 				})
 				.setCellRenderer('linked_templates', ({cell_data, cell, response}) => {

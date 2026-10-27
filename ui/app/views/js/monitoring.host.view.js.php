@@ -286,7 +286,7 @@
 					}
 					else {
 						const latest_data_link = document.createElement('span');
-						latest_data_link.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS, ZBX_STYLE_DISABLED);
+						latest_data_link.classList.add(ZBX_STYLE_DISABLED, ZBX_STYLE_WORDBREAK);
 						latest_data_link.textContent = <?= json_encode(_('Latest data')); ?>;
 
 						cell.appendChild(latest_data_link);
@@ -296,8 +296,7 @@
 						const count = document.createElement('sup');
 						count.textContent = items_count;
 
-						cell.innerHTML += ' ';
-						cell.appendChild(count);
+						cell.append(' ', count);
 					}
 				})
 				.setCellRenderer('graphs', ({cell_data, cell}) => {
@@ -320,8 +319,7 @@
 						const count = document.createElement('sup');
 						count.textContent = graphs;
 
-						cell.innerHTML += ' ';
-						cell.appendChild(count);
+						cell.append(' ', count);
 					}
 				})
 				.setCellRenderer('dashboards', ({cell_data, cell}) => {
@@ -343,8 +341,7 @@
 						const count = document.createElement('sup');
 						count.textContent = dashboards;
 
-						cell.innerHTML += ' ';
-						cell.appendChild(count);
+						cell.append(' ', count);
 					}
 				})
 				.setCellRenderer('web', ({cell_data, cell}) => {
@@ -367,8 +364,7 @@
 						const count = document.createElement('sup');
 						count.textContent = httpTests;
 
-						cell.innerHTML += ' ';
-						cell.appendChild(count);
+						cell.append(' ', count);
 					}
 				})
 				.setOptionsHandler('problems', CDataTableOptionsPopupMonitoringHostProblems)

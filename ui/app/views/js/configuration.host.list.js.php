@@ -370,7 +370,7 @@
 							}
 							else {
 								const discovery_rule = document.createElement('span');
-								discovery_rule.classList.add(ZBX_STYLE_ORANGE);
+								discovery_rule.classList.add(ZBX_STYLE_ORANGE, ZBX_STYLE_WORDBREAK);
 								discovery_rule.textContent = discovery.rule.name;
 
 								cell.appendChild(discovery_rule);
@@ -378,7 +378,7 @@
 						}
 						else {
 							const discovery_rule = document.createElement('span');
-							discovery_rule.classList.add(ZBX_STYLE_ORANGE);
+							discovery_rule.classList.add(ZBX_STYLE_ORANGE, ZBX_STYLE_WORDBREAK);
 							discovery_rule.textContent = <?= json_encode(_('Inaccessible discovery rule')); ?>;
 
 							cell.appendChild(discovery_rule);
@@ -453,8 +453,7 @@
 						const count = document.createElement('sup');
 						count.textContent = items;
 
-						cell.innerHTML += ' ';
-						cell.appendChild(count);
+						cell.append(' ', count);
 					}
 				})
 				.setCellRenderer('triggers', ({cell_data, cell}) => {
@@ -478,8 +477,7 @@
 						const count = document.createElement('sup');
 						count.textContent = items;
 
-						cell.innerHTML += ' ';
-						cell.appendChild(count);
+						cell.append(' ', count);
 					}
 				})
 				.setCellRenderer('graphs', ({cell_data, cell}) => {
@@ -503,8 +501,7 @@
 						const count = document.createElement('sup');
 						count.textContent = items;
 
-						cell.innerHTML += ' ';
-						cell.appendChild(count);
+						cell.append(' ', count);
 					}
 				})
 				.setCellRenderer('discovery', ({cell_data, cell}) => {
@@ -528,8 +525,7 @@
 						const count = document.createElement('sup');
 						count.textContent = items;
 
-						cell.innerHTML += ' ';
-						cell.appendChild(count);
+						cell.append(' ', count);
 					}
 				})
 				.setCellRenderer('web', ({cell_data, cell}) => {
@@ -552,8 +548,7 @@
 						const count = document.createElement('sup');
 						count.textContent = items;
 
-						cell.innerHTML += ' ';
-						cell.appendChild(count);
+						cell.append(' ', count);
 					}
 				})
 				.setCellRenderer('interface', ({cell_data, cell}) => {
@@ -563,11 +558,7 @@
 					wordbreak.classList.add(ZBX_STYLE_WORDBREAK);
 					wordbreak.textContent = host_port;
 
-					const flex_wrapper = document.createElement('div');
-					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
-					flex_wrapper.appendChild(wordbreak);
-
-					cell.appendChild(flex_wrapper);
+					cell.appendChild(wordbreak);
 				})
 				.setCellRenderer('status', ({cell_data, cell}) => {
 					const [hostid, status, disabled_by_lld] = cell_data;
@@ -621,8 +612,7 @@
 						description_icon.setAttribute('data-hintbox-static', '1');
 						description_icon.setAttribute('aria-expanded', 'false');
 
-						cell.innerHTML += ' ';
-						cell.appendChild(description_icon);
+						cell.append(' ', description_icon);
 					}
 				})
 				.setCellRenderer('proxy', ({cell_data, cell, response}) => {
@@ -651,7 +641,11 @@
 							cell.appendChild(proxy_link);
 						}
 						else {
-							cell.innerHTML = escapeHtml(proxy.name);
+							const proxy_name = document.createElement('span');
+							proxy_name.classList.add(ZBX_STYLE_WORDBREAK);
+							proxy_name.textContent = proxy.name;
+
+							cell.appendChild(proxy_name);
 						}
 					}
 					else if (monitored_by == ZBX_MONITORED_BY_PROXY_GROUP) {
@@ -670,7 +664,11 @@
 							cell.appendChild(proxy_group_link);
 						}
 						else {
-							cell.innerHTML = escapeHtml(proxy_group.name);
+							const proxy_group_name = document.createElement('span');
+							proxy_group_name.classList.add(ZBX_STYLE_WORDBREAK);
+							proxy_group_name.textContent = proxy_group.name;
+
+							cell.appendChild(proxy_group_name);
 						}
 
 						if (assigned_proxyid != 0 && !proxy_group.inaccessible) {
@@ -685,14 +683,17 @@
 
 								const proxy_link = document.createElement('a');
 								proxy_link.setAttribute('href', proxy_url);
-								proxy_link.classList.add(ZBX_STYLE_LINK_ALT);
-								proxy_link.classList.add(ZBX_STYLE_GREY);
+								proxy_link.classList.add(ZBX_STYLE_LINK_ALT, ZBX_STYLE_GREY, ZBX_STYLE_WORDBREAK);
 								proxy_link.textContent = assigned_proxy.name;
 
 								cell.appendChild(proxy_link);
 							}
 							else {
-								cell.innerHTML += escapeHtml(assigned_proxy.name);
+								const assigned_proxy_name = document.createElement('span');
+								assigned_proxy_name.classList.add(ZBX_STYLE_WORDBREAK);
+								assigned_proxy_name.textContent = assigned_proxy.name;
+
+								cell.appendChild(assigned_proxy_name);
 							}
 						}
 					}

@@ -151,7 +151,12 @@ class CControllerProblemViewData extends CControllerDataTable {
 			);
 
 			$problem['recovery'] = $problem['r_eventid'] != 0
-				? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock'])
+				? (new CDiv(
+					(new CSpan(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock'])))
+						->addClass($options['compact_view'] == 1 ? ZBX_STYLE_OVERFLOW_ELLIPSIS : ZBX_STYLE_WORDBREAK)
+				))
+					->addClass($options['compact_view'] == 1 ? ZBX_STYLE_FLEX_WRAPPER : null)
+					->toString()
 				: '';
 
 			$in_closing = false;
@@ -267,10 +272,10 @@ class CControllerProblemViewData extends CControllerDataTable {
 				}
 				else {
 					$opdata = (new CSpan($events[$problem['eventid']]['opdata']))->addClass('opdata');
+				}
 
-					if ($options['compact_view'] == 0) {
-						$opdata->addClass(ZBX_STYLE_WORDBREAK);
-					}
+				if ($options['compact_view'] == 0) {
+					$opdata->addClass(ZBX_STYLE_WORDBREAK);
 				}
 			}
 
@@ -296,19 +301,22 @@ class CControllerProblemViewData extends CControllerDataTable {
 					'show_rank_change_symptom' => true
 				]));
 
-			if (array_key_exists('opdata', $trigger) && $trigger['opdata'] != '' && !$options['compact_view']
-					&& ($options['show_opdata'] & OPERATIONAL_DATA_SHOW_WITH_PROBLEM)) {
-				$problem_link_item->addItem([' (', $opdata, ')']);
-			}
-
 			$problem_link_wrapper = (new CDiv(
 				array_key_exists($trigger['triggerid'], $data['dependencies'])
 					? makeTriggerDependencies($data['dependencies'][$trigger['triggerid']])
 					: []
 			))
 				->addClass($options['compact_view'] == 1 ? ZBX_STYLE_FLEX_WRAPPER : null)
-				->addItem($problem_link_item)
-				->addItem($problem['comments'] !== '' ? makeDescriptionIcon($problem['comments']) : null);
+				->addItem($problem_link_item);
+
+			if (array_key_exists('opdata', $trigger) && $trigger['opdata'] != '' && !$options['compact_view']
+					&& ($options['show_opdata'] & OPERATIONAL_DATA_SHOW_WITH_PROBLEM)) {
+				$problem_link_wrapper->addItem([' (', $opdata, ')']);
+			}
+
+			if ($problem['comments'] !== '') {
+				$problem_link_wrapper->addItem(makeDescriptionIcon($problem['comments']));
+			}
 
 			$description = [$problem_link_wrapper];
 
