@@ -1104,7 +1104,8 @@ class testFormAction extends CLegacyWebTest {
 
 		$this->page->login()->open('zabbix.php?action=action.list&eventsource='.$eventsource);
 		$this->zbxTestClickLinkTextWait($name);
-		$this->zbxTestClickButtonText('Update');
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$dialog->getFooter()->query('button:Update')->waitUntilClickable()->one()->click();
 		$this->zbxTestCheckTitle('Configuration of actions');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action updated');
 		$this->zbxTestCheckHeader($this->event_sources[$data['eventsource']]);
@@ -1618,7 +1619,7 @@ class testFormAction extends CLegacyWebTest {
 				'FROM actions a '.
 				'INNER JOIN conditions c ON c.actionid = a.actionid '.
 				'INNER JOIN operations o on o.actionid = c.actionid '.
-				'WHERE a.actionid='.zbx_dbstr($id).' ORDER BY o.operationid';
+				'WHERE a.actionid='.zbx_dbstr($id).' ORDER BY o.operationid, c.conditionid';
 
 		$original_hash = CDBHelper::getHash($sql);
 

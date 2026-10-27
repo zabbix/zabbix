@@ -1,5 +1,5 @@
 
-# MikroTik CRS317-1G-16SRM by SNMP
+# MikroTik CRS317-1G-16S+RM by SNMP
 
 ## Overview
 

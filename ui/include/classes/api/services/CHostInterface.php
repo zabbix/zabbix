@@ -20,12 +20,7 @@
 class CHostInterface extends CApiService {
 
 	public const ACCESS_RULES = [
-		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
-		'create' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'massadd' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'massremove' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
 	];
 
 	protected $tableName = 'interface';
@@ -190,7 +185,7 @@ class CHostInterface extends CApiService {
 		if ($this->outputIsRequested('details', $options['output'])) {
 			foreach ($result as &$value) {
 				$snmp_fields = ['version', 'bulk', 'community', 'securityname', 'securitylevel', 'authpassphrase',
-					'privpassphrase', 'authprotocol', 'privprotocol', 'contextname', 'max_repetitions'
+					'privpassphrase', 'authprotocol', 'privprotocol', 'contextname', 'max_repetitions', 'retries'
 				];
 
 				$interface_type = $value['type'];
@@ -384,6 +379,8 @@ class CHostInterface extends CApiService {
 
 			$this->checkSnmpMaxRepetitions($interface);
 
+			$this->checkSnmpRetries($interface);
+
 			$this->checkSnmpBulk($interface);
 
 			$this->checkSnmpSecurityLevel($interface);
@@ -404,7 +401,8 @@ class CHostInterface extends CApiService {
 	protected function sanitizeSnmpFields(array $interfaces): array {
 		$default_fields = [
 			'community' => '',
-			'max_repetitions' =>  DB::getDefault('interface_snmp', 'max_repetitions'),
+			'max_repetitions' => DB::getDefault('interface_snmp', 'max_repetitions'),
+			'retries' => DB::getDefault('interface_snmp', 'retries'),
 			'securityname' => '',
 			'securitylevel' => DB::getDefault('interface_snmp', 'securitylevel'),
 			'authpassphrase' => '',
@@ -532,26 +530,6 @@ class CHostInterface extends CApiService {
 		$this->createSnmpInterfaceDetails($snmp_interfaces);
 
 		return true;
-	}
-
-	/**
-	 * Update interfaces.
-	 *
-	 * @param array $interfaces   multidimensional array with Interfaces data
-	 *
-	 * @return array
-	 */
-	public function update(array $interfaces) {
-		$interfaces = zbx_toArray($interfaces);
-
-		$this->checkInput($interfaces, __FUNCTION__);
-		$this->checkMainInterfacesOnUpdate($interfaces);
-
-		$this->updateInterfaces($interfaces);
-
-		$this->updateInterfaceDetails($interfaces);
-
-		return ['interfaceids' => array_column($interfaces, 'interfaceid')];
 	}
 
 	/**
@@ -907,38 +885,6 @@ class CHostInterface extends CApiService {
 		$this->checkMainInterfaces($interfaces);
 	}
 
-	/**
-	 * Prepares data to validate main interface for every interface type. Executes main interface validation.
-	 *
-	 * @param array $interfaces                     Array of interfaces to validate.
-	 * @param int   $interfaces[]['hostid']         Updated interface's hostid.
-	 * @param int   $interfaces[]['interfaceid']    Updated interface's interfaceid.
-	 *
-	 * @throws APIException
-	 */
-	private function checkMainInterfacesOnUpdate(array $interfaces) {
-		$hostids = array_keys(array_flip(zbx_objectValues($interfaces, 'hostid')));
-
-		$dbInterfaces = API::HostInterface()->get([
-			'hostids' => $hostids,
-			'output' => ['hostid', 'main', 'type'],
-			'preservekeys' => true,
-			'nopermissions' => true
-		]);
-
-		// update interfaces from DB with data that will be updated.
-		foreach ($interfaces as $interface) {
-			if (isset($dbInterfaces[$interface['interfaceid']])) {
-				$dbInterfaces[$interface['interfaceid']] = array_merge(
-					$dbInterfaces[$interface['interfaceid']],
-					$interface
-				);
-			}
-		}
-
-		$this->checkMainInterfaces($dbInterfaces);
-	}
-
 	private function checkMainInterfacesOnDelete(array $interfaceIds) {
 		$this->checkIfInterfaceHasItems($interfaceIds);
 
@@ -1065,11 +1011,33 @@ class CHostInterface extends CApiService {
 	 */
 	protected function checkSnmpMaxRepetitions(array $interface) {
 		if (($interface['details']['version'] == SNMP_V2C || $interface['details']['version'] == SNMP_V3)
-				&& (array_key_exists('max_repetitions', $interface['details'])
-					&& (!is_numeric($interface['details']['max_repetitions'])
-						|| $interface['details']['max_repetitions'] < 1
-						|| $interface['details']['max_repetitions'] > ZBX_MAX_INT32))) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+				&& array_key_exists('max_repetitions', $interface['details'])) {
+			$rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+				'max_repetitions' =>	['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO, 'in' => implode(':', [1, ZBX_MAX_INT32]), 'length' => DB::getFieldLength('interface_snmp', 'max_repetitions')]
+			]];
+
+			if (!CApiInputValidator::validate($rules, $interface['details'], '', $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+			}
+		}
+	}
+
+	/**
+	 * Check SNMP retries.
+	 *
+	 * @param array $interface
+	 *
+	 * @throws APIException if "retries" value is incorrect.
+	 */
+	protected function checkSnmpRetries(array $interface) {
+		if (array_key_exists('retries', $interface['details'])) {
+			$rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+				'retries' =>	['type' => API_INT32, 'flags' => API_ALLOW_USER_MACRO, 'in' => implode(':', [SNMP_RETRIES_MIN, SNMP_RETRIES_MAX]), 'length' => DB::getFieldLength('interface_snmp', 'retries')]
+			]];
+
+			if (!CApiInputValidator::validate($rules, $interface['details'], '', $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+			}
 		}
 	}
 
@@ -1156,6 +1124,7 @@ class CHostInterface extends CApiService {
 			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.max_repetitions', '10', 'max_repetitions'),
 				$sqlParts
 			);
+			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.retries', '5', 'retries'), $sqlParts);
 			$sqlParts = $this->addQuerySelect(dbConditionCoalesce('his.securityname', '', 'securityname'), $sqlParts);
 			$sqlParts = $this->addQuerySelect(
 				dbConditionCoalesce('his.securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, 'securitylevel'),

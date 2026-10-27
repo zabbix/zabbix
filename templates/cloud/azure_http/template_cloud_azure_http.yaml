@@ -47,7 +47,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, `Azure Vault ID` and `Backup jobs period`.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Cloud
       items:
@@ -182,6 +182,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Azure = {
             	params: {},
             	token: null,
@@ -194,10 +219,11 @@ zabbix_export:
             		});
             
             		Azure.params = params;
+            		Azure.tls = new CTlsConfig(params.tls_verify);
             	},
             
             	login: function () {
-            		var response, login = new HttpRequest();
+            		var response, login = new HttpRequest(Azure.tls.options);
             
             		if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
             			login.setProxy(Azure.params.proxy);
@@ -228,7 +254,7 @@ zabbix_export:
             	},
             
             	request: function (url) {
-            		var response, request = new HttpRequest();
+            		var response, request = new HttpRequest(Azure.tls.options);
             
             		if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
             			request.setProxy(Azure.params.proxy);
@@ -335,6 +361,8 @@ zabbix_export:
               value: '{$AZURE.SUBSCRIPTION.ID}'
             - name: tenant_id
               value: '{$AZURE.TENANT.ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Azure Backup Jobs"}'
           tags:
             - tag: component
               value: raw
@@ -701,7 +729,7 @@ zabbix_export:
           description: 'Set the regex string to include backup jobs based on `entityFriendlyName`.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Filters
             label: 'Include backup job filter'
             description: 'Regex string to include discovered Azure backup jobs by `entityFriendlyName`.'
@@ -710,7 +738,7 @@ zabbix_export:
           description: 'Set the regex string to exclude backup jobs based on `entityFriendlyName`.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Filters
             label: 'Exclude backup job filter'
             description: 'Regex string to exclude discovered Azure backup jobs by `entityFriendlyName`.'
@@ -719,7 +747,7 @@ zabbix_export:
           description: 'Set the regex string to include backup jobs based on operation type.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Filters
             label: 'Include backup job operation type filter'
             description: 'Regex string to include discovered Azure backup jobs by operation type.'
@@ -728,7 +756,7 @@ zabbix_export:
           description: 'Set the regex string to exclude backup jobs based on operation type.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Filters
             label: 'Exclude backup job operation type filter'
             description: 'Regex string to exclude discovered Azure backup jobs by operation type.'
@@ -737,7 +765,7 @@ zabbix_export:
           description: 'Set the regex string to include backup jobs based on status.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Filters
             label: 'Include backup job status filter'
             description: 'Regex string to include discovered Azure backup jobs by status.'
@@ -746,7 +774,7 @@ zabbix_export:
           description: 'Set the regex string to exclude backup jobs based on status.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Filters
             label: 'Exclude backup job status filter'
             description: 'Regex string to exclude discovered Azure backup jobs by status.'
@@ -801,6 +829,22 @@ zabbix_export:
             description: 'Number of days over which to retrieve backup jobs. No less than 0.'
             required: 'YES'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure Backup Jobs", e.g. {$HTTP.TLS.VERIFY:"Azure Backup Jobs"}.'
+          config:
+            type: LIST
+            priority: '9'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: dd616732edf646cba117f8de257bafba
           name: 'Azure backup jobs'
@@ -1304,7 +1348,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`.
       vendor:
         name: Zabbix
-        version: 8.0-6
+        version: 8.0-7
       groups:
         - name: Templates/Cloud
       items:
@@ -1344,6 +1388,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Azure = {
             	params: {},
             	token: null,
@@ -1356,13 +1425,14 @@ zabbix_export:
             		});
             
             		Azure.params = params;
+            		Azure.tls = new CTlsConfig(params.tls_verify);
             	},
             
             	request: function (url, data) {
             		if (typeof data === 'undefined' || data === null) {
             			data = '';
             		}
-            		var response, request = new HttpRequest();
+            		var response, request = new HttpRequest(Azure.tls.options);
             		if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
             			request.setProxy(Azure.params.proxy);
             		}
@@ -1538,6 +1608,8 @@ zabbix_export:
               value: '{$AZURE.SUBSCRIPTION.ID}'
             - name: tenant_id
               value: '{$AZURE.TENANT.ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Azure"}'
           tags:
             - tag: component
               value: raw
@@ -1549,6 +1621,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Azure = {
             	params: {},
             	token: '',
@@ -1561,10 +1658,11 @@ zabbix_export:
             		});
             
             		Azure.params = params;
+            		Azure.tls = new CTlsConfig(params.tls_verify);
             	},
             
             	login: function () {
-            		var response, login = new HttpRequest();
+            		var response, login = new HttpRequest(Azure.tls.options);
             		if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
             			login.setProxy(Azure.params.proxy);
             		}
@@ -1591,7 +1689,7 @@ zabbix_export:
             	},
             
             	request: function (url) {
-            		var response, request = new HttpRequest();
+            		var response, request = new HttpRequest(Azure.tls.options);
             		if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
             			request.setProxy(Azure.params.proxy);
             		}
@@ -1677,6 +1775,8 @@ zabbix_export:
               value: '{$AZURE.SUBSCRIPTION.ID}'
             - name: tenant_id
               value: '{$AZURE.TENANT.ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Azure"}'
           tags:
             - tag: component
               value: raw
@@ -1736,6 +1836,31 @@ zabbix_export:
           key: azure.container_app.discovery
           delay: '{$AZURE.DISCOVERY.INTERVAL: "Container Apps"}'
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Azure = {
             	params: {},
             	token: null,
@@ -1748,10 +1873,11 @@ zabbix_export:
             		});
             
             		Azure.params = params;
+            		Azure.tls = new CTlsConfig(params.tls_verify);
             	},
             
             	login: function () {
-            		var response, login = new HttpRequest();
+            		var response, login = new HttpRequest(Azure.tls.options);
             
             		if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
             			login.setProxy(Azure.params.proxy);
@@ -1784,7 +1910,7 @@ zabbix_export:
             	},
             
             	request: function (url) {
-            		var response, request = new HttpRequest();
+            		var response, request = new HttpRequest(Azure.tls.options);
             
             		if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
             			request.setProxy(Azure.params.proxy);
@@ -1930,6 +2056,8 @@ zabbix_export:
               value: '{$AZURE.SUBSCRIPTION.ID}'
             - name: tenant_id
               value: '{$AZURE.TENANT.ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Azure"}'
           preprocessing:
             - type: NOT_MATCHES_REGEX
               parameters:
@@ -2471,6 +2599,31 @@ zabbix_export:
               history: '0'
               value_type: TEXT
               params: |
+                const CTlsConfig = function (raw_value) {
+                	raw_value = String(raw_value).trim().toLowerCase();
+                
+                	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+                		raw_value = 'full';
+                	}
+                
+                	this.options = {
+                		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+                		SSLVerifyHost: (raw_value === 'full')
+                	};
+                
+                	this.enabled = (raw_value !== 'none');
+                
+                	this.checkURL = function (url) {
+                		if (this.enabled && !/^https:\/\//i.test(url)) {
+                			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+                			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+                		}
+                
+                		return url;
+                	};
+                }
+                
+                
                 var AzureStorage = {
                 	params: {},
                 
@@ -2482,10 +2635,11 @@ zabbix_export:
                 		});
                 
                 		AzureStorage.params = params;
+                		AzureStorage.tls = new CTlsConfig(params.tls_verify);
                 	},
                 
                 	request: function (url) {
-                		var response, request = new HttpRequest();
+                		var response, request = new HttpRequest(AzureStorage.tls.options);
                 		if (typeof AzureStorage.params.proxy !== 'undefined' && AzureStorage.params.proxy !== '') {
                 			request.setProxy(AzureStorage.params.proxy);
                 		}
@@ -2567,6 +2721,8 @@ zabbix_export:
                   value: '{#ID}'
                 - name: proxy
                   value: '{$AZURE.PROXY}'
+                - name: tls_verify
+                  value: '{$HTTP.TLS.VERIFY:"Azure"}'
                 - name: token
                   value: '{#TOKEN}'
               tags:
@@ -4103,7 +4259,7 @@ zabbix_export:
           description: 'This macro is used in Azure Container App discovery rule.'
           config:
             type: TEXT
-            priority: '55'
+            priority: '56'
             section_name: Filters
             label: 'Include container app location filter'
             description: 'Regex string to include discovered Azure Container App locations by name.'
@@ -4112,7 +4268,7 @@ zabbix_export:
           description: 'This macro is used in Azure Container App discovery rule.'
           config:
             type: TEXT
-            priority: '56'
+            priority: '57'
             section_name: Filters
             label: 'Exclude container app location filter'
             description: 'Regex string to exclude discovered Azure Container App locations by name.'
@@ -4121,7 +4277,7 @@ zabbix_export:
           description: 'This macro is used in Azure Container App discovery rule.'
           config:
             type: TEXT
-            priority: '53'
+            priority: '54'
             section_name: Filters
             label: 'Include container app filter'
             description: 'Regex string to include discovered Azure Container App by name.'
@@ -4130,7 +4286,7 @@ zabbix_export:
           description: 'This macro is used in Azure Container App discovery rule.'
           config:
             type: TEXT
-            priority: '54'
+            priority: '55'
             section_name: Filters
             label: 'Exclude container app filter'
             description: 'Regex string to exclude discovered Azure Container App by name.'
@@ -4139,7 +4295,7 @@ zabbix_export:
           description: 'Regex string to include discovered Cosmos DB account locations by name.'
           config:
             type: TEXT
-            priority: '47'
+            priority: '48'
             section_name: Filters
             label: 'Include Cosmos DB account location filter'
             description: 'Regex string to include discovered Cosmos DB account locations by name.'
@@ -4148,7 +4304,7 @@ zabbix_export:
           description: 'Regex string to exclude discovered Cosmos DB account locations by name.'
           config:
             type: TEXT
-            priority: '48'
+            priority: '49'
             section_name: Filters
             label: 'Exclude Cosmos DB account location filter'
             description: 'Regex string to exclude discovered Cosmos DB account locations by name.'
@@ -4157,7 +4313,7 @@ zabbix_export:
           description: 'Regex string to include discovered Cosmos DB accounts by name.'
           config:
             type: TEXT
-            priority: '45'
+            priority: '46'
             section_name: Filters
             label: 'Include Cosmos DB account filter'
             description: 'Regex string to include discovered Cosmos DB accounts by name.'
@@ -4166,7 +4322,7 @@ zabbix_export:
           description: 'Regex string to exclude discovered Cosmos DB accounts by name.'
           config:
             type: TEXT
-            priority: '46'
+            priority: '47'
             section_name: Filters
             label: 'Exclude Cosmos DB account filter'
             description: 'Regex string to exclude discovered Cosmos DB accounts by name.'
@@ -4184,7 +4340,7 @@ zabbix_export:
           description: 'Azure resource discovery interval. Could be used with context.'
           config:
             type: TEXT
-            priority: '57'
+            priority: '58'
             section_name: Other
             label: 'Discovery interval'
             description: 'Azure resource discovery interval. Could be used with context.'
@@ -4193,7 +4349,7 @@ zabbix_export:
           description: 'Regex string to include discovered MSSQL database locations by name.'
           config:
             type: TEXT
-            priority: '42'
+            priority: '43'
             section_name: Filters
             label: 'Include MSSQL database location filter'
             description: 'Regex string to include discovered MSSQL database locations by name.'
@@ -4202,7 +4358,7 @@ zabbix_export:
           description: 'Regex string to exclude discovered MSSQL database locations by name.'
           config:
             type: TEXT
-            priority: '43'
+            priority: '44'
             section_name: Filters
             label: 'Exclude MSSQL database location filter'
             description: 'Regex string to exclude discovered MSSQL database locations by name.'
@@ -4211,7 +4367,7 @@ zabbix_export:
           description: 'Regex string to include discovered MSSQL databases by name.'
           config:
             type: TEXT
-            priority: '40'
+            priority: '41'
             section_name: Filters
             label: 'Include MSSQL database filter'
             description: 'Regex string to include discovered MSSQL databases by name.'
@@ -4220,7 +4376,7 @@ zabbix_export:
           description: 'Regex string to exclude discovered MSSQL databases by name.'
           config:
             type: TEXT
-            priority: '41'
+            priority: '42'
             section_name: Filters
             label: 'Exclude MSSQL database filter'
             description: 'Regex string to exclude discovered MSSQL databases by name.'
@@ -4229,7 +4385,7 @@ zabbix_export:
           description: 'Regex string to exclude discovered MSSQL database locations by SKU type.'
           config:
             type: TEXT
-            priority: '44'
+            priority: '45'
             section_name: Filters
             label: 'Exclude MSSQL database SKU type filter'
             description: 'Regex string to exclude discovered MSSQL database locations by SKU type.'
@@ -4238,7 +4394,7 @@ zabbix_export:
           description: 'Regex string to include discovered MySQL server locations by name.'
           config:
             type: TEXT
-            priority: '34'
+            priority: '35'
             section_name: Filters
             label: 'Include MySQL server location filter'
             description: 'Regex string to include discovered MySQL server locations by name.'
@@ -4247,7 +4403,7 @@ zabbix_export:
           description: 'Regex string to exclude discovered MySQL server locations by name.'
           config:
             type: TEXT
-            priority: '35'
+            priority: '36'
             section_name: Filters
             label: 'Exclude MySQL server location filter'
             description: 'Regex string to exclude discovered MySQL server locations by name.'
@@ -4256,7 +4412,7 @@ zabbix_export:
           description: 'Regex string to include discovered MySQL servers by name.'
           config:
             type: TEXT
-            priority: '32'
+            priority: '33'
             section_name: Filters
             label: 'Include MySQL server filter'
             description: 'Regex string to include discovered MySQL servers by name.'
@@ -4265,7 +4421,7 @@ zabbix_export:
           description: 'Regex string to exclude discovered MySQL servers by name.'
           config:
             type: TEXT
-            priority: '33'
+            priority: '34'
             section_name: Filters
             label: 'Exclude MySQL server filter'
             description: 'Regex string to exclude discovered MySQL servers by name.'
@@ -4283,7 +4439,7 @@ zabbix_export:
           description: 'Regex string to include discovered PostgreSQL server locations by name.'
           config:
             type: TEXT
-            priority: '38'
+            priority: '39'
             section_name: Filters
             label: 'Include PostgreSQL server location filter'
             description: 'Regex string to include discovered PostgreSQL server locations by name.'
@@ -4292,7 +4448,7 @@ zabbix_export:
           description: 'Regex string to exclude discovered PostgreSQL server locations by name.'
           config:
             type: TEXT
-            priority: '39'
+            priority: '40'
             section_name: Filters
             label: 'Exclude PostgreSQL server location filter'
             description: 'Regex string to exclude discovered PostgreSQL server locations by name.'
@@ -4301,7 +4457,7 @@ zabbix_export:
           description: 'Regex string to include discovered PostgreSQL servers by name.'
           config:
             type: TEXT
-            priority: '36'
+            priority: '37'
             section_name: Filters
             label: 'Include PostgreSQL server filter'
             description: 'Regex string to include discovered PostgreSQL servers by name.'
@@ -4310,7 +4466,7 @@ zabbix_export:
           description: 'Regex string to exclude discovered PostgreSQL servers by name.'
           config:
             type: TEXT
-            priority: '37'
+            priority: '38'
             section_name: Filters
             label: 'Exclude PostgreSQL server filter'
             description: 'Regex string to exclude discovered PostgreSQL servers by name.'
@@ -4327,7 +4483,7 @@ zabbix_export:
           description: 'Regex string to include discovered resource groups by name.'
           config:
             type: TEXT
-            priority: '30'
+            priority: '31'
             section_name: Filters
             label: 'Include resource group filter'
             description: 'Regex string to include discovered resource groups by name.'
@@ -4336,7 +4492,7 @@ zabbix_export:
           description: 'Regex string to exclude discovered resource groups by name.'
           config:
             type: TEXT
-            priority: '31'
+            priority: '32'
             section_name: Filters
             label: 'Exclude resource group filter'
             description: 'Regex string to exclude discovered resource groups by name.'
@@ -4345,7 +4501,7 @@ zabbix_export:
           description: 'Regex string to include discovered VM scale set locations by name.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Filters
             label: 'Include VM scale set location filter'
             description: 'Regex string to include discovered VM scale set locations by name.'
@@ -4354,7 +4510,7 @@ zabbix_export:
           description: 'Regex string to exclude discovered VM scale set locations by name.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Filters
             label: 'Exclude VM scale set location filter'
             description: 'Regex string to exclude discovered VM scale set locations by name.'
@@ -4363,7 +4519,7 @@ zabbix_export:
           description: 'Regex string to include discovered VM scale sets by name.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Filters
             label: 'Include VM scale set filter'
             description: 'Regex string to include discovered VM scale sets by name.'
@@ -4372,7 +4528,7 @@ zabbix_export:
           description: 'Regex string to exclude discovered VM scale sets by name.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Filters
             label: 'Exclude VM scale set filter'
             description: 'Regex string to exclude discovered VM scale sets by name.'
@@ -4381,7 +4537,7 @@ zabbix_export:
           description: 'Regex string to include discovered Azure SQL managed instance locations by name.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: Filters
             label: 'Include SQL instance location filter'
             description: 'Regex string to include discovered Azure SQL managed instance locations by name.'
@@ -4390,7 +4546,7 @@ zabbix_export:
           description: 'Regex string to exclude discovered Azure SQL managed instance locations by name.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: Filters
             label: 'Exclude SQL instance location filter'
             description: 'Regex string to exclude discovered Azure SQL managed instance locations by name.'
@@ -4399,7 +4555,7 @@ zabbix_export:
           description: 'Regex string to include discovered Azure SQL managed instances by name.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Filters
             label: 'Include SQL instance filter'
             description: 'Regex string to include discovered Azure SQL managed instances by name.'
@@ -4408,7 +4564,7 @@ zabbix_export:
           description: 'Regex string to exclude discovered Azure SQL managed instances by name.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Filters
             label: 'Exclude SQL instance filter'
             description: 'Regex string to exclude discovered Azure SQL managed instances by name.'
@@ -4417,7 +4573,7 @@ zabbix_export:
           description: 'The warning threshold of the storage account availability.'
           config:
             type: TEXT
-            priority: '27'
+            priority: '28'
             section_name: Thresholds
             label: 'Storage account availability warning threshold'
             description: 'Warning threshold of the storage account availability, expressed in %. In the range from 0 to 100 inclusive.'
@@ -4427,7 +4583,7 @@ zabbix_export:
           description: 'The warning threshold of the storage account blob services availability.'
           config:
             type: TEXT
-            priority: '28'
+            priority: '29'
             section_name: Thresholds
             label: 'Blob services availability warning threshold'
             description: 'Warning threshold of the storage account blob services availability, expressed in %. In the range from 0 to 100 inclusive.'
@@ -4437,7 +4593,7 @@ zabbix_export:
           description: 'Regex string to include discovered storage account locations by name.'
           config:
             type: TEXT
-            priority: '25'
+            priority: '26'
             section_name: Filters
             label: 'Include storage account location filter'
             description: 'Regex string to include discovered storage account locations by name.'
@@ -4446,7 +4602,7 @@ zabbix_export:
           description: 'Regex string to exclude discovered storage account locations by name.'
           config:
             type: TEXT
-            priority: '26'
+            priority: '27'
             section_name: Filters
             label: 'Exclude storage account location filter'
             description: 'Regex string to exclude discovered storage account locations by name.'
@@ -4455,7 +4611,7 @@ zabbix_export:
           description: 'Regex string to include discovered storage accounts by name.'
           config:
             type: TEXT
-            priority: '23'
+            priority: '24'
             section_name: Filters
             label: 'Include storage account filter'
             description: 'Regex string to include discovered storage accounts by name.'
@@ -4464,7 +4620,7 @@ zabbix_export:
           description: 'Regex string to exclude discovered storage accounts by name.'
           config:
             type: TEXT
-            priority: '24'
+            priority: '25'
             section_name: Filters
             label: 'Exclude storage account filter'
             description: 'Regex string to exclude discovered storage accounts by name.'
@@ -4473,7 +4629,7 @@ zabbix_export:
           description: 'The warning threshold of the storage account table services availability.'
           config:
             type: TEXT
-            priority: '29'
+            priority: '30'
             section_name: Thresholds
             label: 'Table services availability warning threshold'
             description: 'Warning threshold of the storage account table services availability, expressed in %. In the range from 0 to 100 inclusive.'
@@ -4499,7 +4655,7 @@ zabbix_export:
           description: 'Regex string to include discovered Azure Vault locations by name.'
           config:
             type: TEXT
-            priority: '21'
+            priority: '22'
             section_name: Filters
             label: 'Include vault location filter'
             description: 'Regex string to include discovered Azure Vault locations by name.'
@@ -4508,7 +4664,7 @@ zabbix_export:
           description: 'Regex string to exclude discovered Azure Vault locations by name.'
           config:
             type: TEXT
-            priority: '22'
+            priority: '23'
             section_name: Filters
             label: 'Exclude vault location filter'
             description: 'Regex string to exclude discovered Azure Vault locations by name.'
@@ -4517,7 +4673,7 @@ zabbix_export:
           description: 'Regex string to include discovered Azure Vaults by name.'
           config:
             type: TEXT
-            priority: '19'
+            priority: '20'
             section_name: Filters
             label: 'Include vaults filter'
             description: 'Regex string to include discovered Azure Vaults by name.'
@@ -4526,7 +4682,7 @@ zabbix_export:
           description: 'Regex string to exclude discovered Azure Vaults by name.'
           config:
             type: TEXT
-            priority: '20'
+            priority: '21'
             section_name: Filters
             label: 'Exclude vaults filter'
             description: 'Regex string to exclude discovered Azure Vaults by name.'
@@ -4535,7 +4691,7 @@ zabbix_export:
           description: 'Regex string to include discovered virtual machine locations by name.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Filters
             label: 'Include VM location filter'
             description: 'Regex string to include discovered virtual machine locations by name.'
@@ -4544,7 +4700,7 @@ zabbix_export:
           description: 'Regex string to exclude discovered virtual machine locations by name.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Filters
             label: 'Exclude VM location filter'
             description: 'Regex string to exclude discovered virtual machine locations by name.'
@@ -4553,7 +4709,7 @@ zabbix_export:
           description: 'Regex string to include discovered virtual machines by name.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: Filters
             label: 'Include virtual machines filter'
             description: 'Regex string to include discovered virtual machines by name.'
@@ -4562,7 +4718,7 @@ zabbix_export:
           description: 'Regex string to exclude discovered virtual machines by name.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Filters
             label: 'Exclude virtual machines filter'
             description: 'Regex string to exclude discovered virtual machines by name.'
@@ -4571,7 +4727,7 @@ zabbix_export:
           description: 'Regex string to include discovered workspace locations by name.'
           config:
             type: TEXT
-            priority: '51'
+            priority: '52'
             section_name: Filters
             label: 'Include VM scale set location filter'
             description: 'Regex string to include discovered workspace locations by name.'
@@ -4580,7 +4736,7 @@ zabbix_export:
           description: 'Regex string to exclude discovered workspace locations by name.'
           config:
             type: TEXT
-            priority: '52'
+            priority: '53'
             section_name: Filters
             label: 'Exclude VM scale set location filter'
             description: 'Regex string to exclude discovered workspace locations by name.'
@@ -4589,7 +4745,7 @@ zabbix_export:
           description: 'Regex string to include discovered workspace by name.'
           config:
             type: TEXT
-            priority: '49'
+            priority: '50'
             section_name: Filters
             label: 'Include VM scale set filter'
             description: 'Regex string to include discovered workspace by name.'
@@ -4598,10 +4754,26 @@ zabbix_export:
           description: 'Regex string to exclude discovered workspace by name.'
           config:
             type: TEXT
-            priority: '50'
+            priority: '51'
             section_name: Filters
             label: 'Exclude VM scale set filter'
             description: 'Regex string to exclude discovered workspace by name.'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure", e.g. {$HTTP.TLS.VERIFY:"Azure"}.'
+          config:
+            type: LIST
+            priority: '7'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: d30c78be41fe421cb98cedd7683a11f0
           name: 'Overview Azure Storage accounts'
@@ -4693,7 +4865,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Cloud
       items:
@@ -4866,6 +5038,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Azure = {
             	params: {},
             	token: null,
@@ -4878,10 +5075,11 @@ zabbix_export:
             		});
             
             		Azure.params = params;
+            		Azure.tls = new CTlsConfig(params.tls_verify);
             	},
             
             	login: function () {
-            		var response, login = new HttpRequest();
+            		var response, login = new HttpRequest(Azure.tls.options);
             
             		if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
             			login.setProxy(Azure.params.proxy);
@@ -4914,7 +5112,7 @@ zabbix_export:
             	},
             
             	request: function (url) {
-            		var response, request = new HttpRequest();
+            		var response, request = new HttpRequest(Azure.tls.options);
             
             		if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
             			request.setProxy(Azure.params.proxy);
@@ -5033,6 +5231,8 @@ zabbix_export:
               value: '{$AZURE.SUBSCRIPTION.ID}'
             - name: tenant_id
               value: '{$AZURE.TENANT.ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Azure Container Apps"}'
           tags:
             - tag: component
               value: raw
@@ -5909,7 +6109,7 @@ zabbix_export:
           description: 'Critical threshold for CPU utilization.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Thresholds
             label: 'Critical threshold for CPU'
             description: 'Critical threshold for CPU utilization. In the range from 0 to 100 inclusive.'
@@ -5919,7 +6119,7 @@ zabbix_export:
           description: 'Warning threshold for CPU utilization.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Thresholds
             label: 'Warning threshold for CPU'
             description: 'Warning threshold for CPU utilization. In the range from 0 to 100 inclusive.'
@@ -5929,7 +6129,7 @@ zabbix_export:
           description: 'Threshold for amount of Java garbage collectors.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: Thresholds
             label: 'Java garbage collectors limit'
             description: 'Threshold for amount of Java garbage collectors. No less than 0.'
@@ -5939,7 +6139,7 @@ zabbix_export:
           description: 'Threshold for duration of Java garbage collectors, in milliseconds.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: Thresholds
             label: 'Java garbage collector duration limit'
             description: 'Threshold for duration of Java garbage collectors, in ms. No less than 0.'
@@ -5949,7 +6149,7 @@ zabbix_export:
           description: 'Critical threshold for GPU utilization.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Thresholds
             label: 'Critical threshold for GPU'
             description: 'Critical threshold for GPU utilization. In the range from 0 to 100 inclusive.'
@@ -5959,7 +6159,7 @@ zabbix_export:
           description: 'Warning threshold for GPU utilization.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Thresholds
             label: 'Warning threshold for GPU'
             description: 'Warning threshold for GPU utilization. In the range from 0 to 100 inclusive.'
@@ -5969,7 +6169,7 @@ zabbix_export:
           description: 'Enable Java virtual machine metric collection. Useful for container apps with Java development stack.'
           config:
             type: LIST
-            priority: '8'
+            priority: '9'
             label: 'Get Java metrics'
             description: 'Enable JVM metrics collection.'
             options:
@@ -5982,7 +6182,7 @@ zabbix_export:
           description: 'Critical threshold for memory utilization.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Thresholds
             label: 'Critical threshold for memory'
             description: 'Critical threshold for memory utilization. In the range from 0 to 100 inclusive.'
@@ -5992,7 +6192,7 @@ zabbix_export:
           description: 'Warning threshold for memory utilization.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Thresholds
             label: 'Warning threshold for memory'
             description: 'Warning threshold for memory utilization. In the range from 0 to 100 inclusive.'
@@ -6002,7 +6202,7 @@ zabbix_export:
           description: 'Threshold for amount of reboots per minute for a replica.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Thresholds
             label: 'Reboots limit'
             description: 'Threshold for reboots per minute. No less than 0.'
@@ -6012,7 +6212,7 @@ zabbix_export:
           description: 'Threshold for average response time threshold, in milliseconds.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Thresholds
             label: 'Threshold for response time (ms)'
             description: 'Threshold for average response time threshold, in ms. No less than 0.'
@@ -6022,7 +6222,7 @@ zabbix_export:
           description: 'Threshold for amount of threads in Java virtual machine.'
           config:
             type: TEXT
-            priority: '19'
+            priority: '20'
             section_name: Thresholds
             label: 'Java thread limit'
             description: 'Threshold for amount of threads in JVM. No less than 0.'
@@ -6077,6 +6277,22 @@ zabbix_export:
             label: 'Azure tenant ID'
             description: 'Microsoft Azure tenant ID.'
             required: 'YES'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure Container Apps", e.g. {$HTTP.TLS.VERIFY:"Azure Container Apps"}.'
+          config:
+            type: LIST
+            priority: '8'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: d28f091242da4bd6b1f7572b0db178bd
           name: Overview
@@ -6606,7 +6822,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure Cosmos DB ID`.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Cloud
       items:
@@ -6661,6 +6877,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AzureCosmosDB = {
             	params: {},
             	token: null,
@@ -6673,10 +6914,11 @@ zabbix_export:
             		});
             
             		AzureCosmosDB.params = params;
+            		AzureCosmosDB.tls = new CTlsConfig(params.tls_verify);
             	},
             
             	login: function () {
-            		var response, login = new HttpRequest();
+            		var response, login = new HttpRequest(AzureCosmosDB.tls.options);
             		if (typeof AzureCosmosDB.params.proxy !== 'undefined' && AzureCosmosDB.params.proxy !== '') {
             			login.setProxy(AzureCosmosDB.params.proxy);
             		}
@@ -6702,7 +6944,7 @@ zabbix_export:
             	},
             
             	request: function (url) {
-            		var response, request = new HttpRequest();
+            		var response, request = new HttpRequest(AzureCosmosDB.tls.options);
             		if (typeof AzureCosmosDB.params.proxy !== 'undefined' && AzureCosmosDB.params.proxy !== '') {
             			request.setProxy(AzureCosmosDB.params.proxy);
             		}
@@ -6798,6 +7040,8 @@ zabbix_export:
               value: '{$AZURE.SUBSCRIPTION.ID}'
             - name: tenant_id
               value: '{$AZURE.TENANT.ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Azure Cosmos DB for MongoDB"}'
           tags:
             - tag: component
               value: raw
@@ -7192,6 +7436,22 @@ zabbix_export:
             label: 'Azure tenant ID'
             description: 'Microsoft Azure tenant ID.'
             required: 'YES'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure Cosmos DB for MongoDB", e.g. {$HTTP.TLS.VERIFY:"Azure Cosmos DB for MongoDB"}.'
+          config:
+            type: LIST
+            priority: '9'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: 323fb91b388a44bfbd4b7d634f6e6b6c
           name: 'Overview Azure Cosmos DB for MongoDB'
@@ -7351,7 +7611,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: Templates/Cloud
       items:
@@ -7488,6 +7748,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AzureCost = {
             	params: {},
             	token: null,
@@ -7499,11 +7784,12 @@ zabbix_export:
             			}
             		});
             		AzureCost.params = params;
+            		AzureCost.tls = new CTlsConfig(params.tls_verify);
             	},
             
             	login: function () {
             		var response,
-            			login = new HttpRequest();
+            			login = new HttpRequest(AzureCost.tls.options);
             
             		if (typeof AzureCost.params.proxy !== 'undefined' && AzureCost.params.proxy !== '') {
             			login.setProxy(AzureCost.params.proxy);
@@ -7539,7 +7825,7 @@ zabbix_export:
             			headers,
             			regex = /-retry-after":"(\d+)"/,
             			ratelimit,
-            			request = new HttpRequest();
+            			request = new HttpRequest(AzureCost.tls.options);
             
             		if (typeof AzureCost.params.proxy !== 'undefined' && AzureCost.params.proxy !== '') {
             			request.setProxy(AzureCost.params.proxy);
@@ -7768,6 +8054,8 @@ zabbix_export:
               value: '{$AZURE.SUBSCRIPTION.ID}'
             - name: tenant_id
               value: '{$AZURE.TENANT.ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Azure Cost Management"}'
           tags:
             - tag: component
               value: raw
@@ -7809,6 +8097,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AzureCost = {
             	params: {},
             	token: null,
@@ -7820,6 +8133,7 @@ zabbix_export:
             			}
             		});
             		AzureCost.params = params;
+            		AzureCost.tls = new CTlsConfig(params.tls_verify);
             
             		today = new Date();
             		AzureCost.params.end_date = today.toISOString();
@@ -7830,7 +8144,7 @@ zabbix_export:
             
             	login: function () {
             		var response,
-            			login = new HttpRequest();
+            			login = new HttpRequest(AzureCost.tls.options);
             
             		if (typeof AzureCost.params.proxy !== 'undefined' && AzureCost.params.proxy !== '') {
             			login.setProxy(AzureCost.params.proxy);
@@ -7866,7 +8180,7 @@ zabbix_export:
             			headers,
             			regex = /-retry-after":"(\d+)"/,
             			ratelimit,
-            			request = new HttpRequest();
+            			request = new HttpRequest(AzureCost.tls.options);
             
             		if (typeof AzureCost.params.proxy !== 'undefined' && AzureCost.params.proxy !== '') {
             			request.setProxy(AzureCost.params.proxy);
@@ -7995,6 +8309,8 @@ zabbix_export:
               value: '{$AZURE.SUBSCRIPTION.ID}'
             - name: tenant_id
               value: '{$AZURE.TENANT.ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Azure Cost Management"}'
           tags:
             - tag: component
               value: raw
@@ -10541,6 +10857,22 @@ zabbix_export:
             label: 'Azure tenant ID'
             description: 'Microsoft Azure tenant ID.'
             required: 'YES'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure Cost Management", e.g. {$HTTP.TLS.VERIFY:"Azure Cost Management"}.'
+          config:
+            type: LIST
+            priority: '25'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: a1c2ce224f07483b865ce48090338dc4
           name: 'Overview Azure Costs'
@@ -15223,7 +15555,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure MSSQL database ID`.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Cloud
       items:
@@ -15439,6 +15771,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AzureDB = {
             	params: {},
             	token: null,
@@ -15451,6 +15808,7 @@ zabbix_export:
             		});
             
             		AzureDB.params = params;
+            		AzureDB.tls = new CTlsConfig(params.tls_verify);
             	},
             
             
@@ -15459,7 +15817,7 @@ zabbix_export:
             			data = '';
             		}
             
-            		var response, request = new HttpRequest();
+            		var response, request = new HttpRequest(AzureDB.tls.options);
             		if (typeof AzureDB.params.proxy !== 'undefined' && AzureDB.params.proxy !== '') {
             			request.setProxy(AzureDB.params.proxy);
             		}
@@ -15629,6 +15987,8 @@ zabbix_export:
               value: '{$AZURE.SUBSCRIPTION.ID}'
             - name: tenant_id
               value: '{$AZURE.TENANT.ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Azure Microsoft SQL Database"}'
           tags:
             - tag: component
               value: raw
@@ -16087,6 +16447,22 @@ zabbix_export:
             label: 'Azure tenant ID'
             description: 'Microsoft Azure tenant ID.'
             required: 'YES'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure Microsoft SQL Database", e.g. {$HTTP.TLS.VERIFY:"Azure Microsoft SQL Database"}.'
+          config:
+            type: LIST
+            priority: '12'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: 72b6f0916b9245adadb3445327aed633
           name: 'Overview Azure Microsoft SQL Database'
@@ -16474,7 +16850,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID` and `Azure SQL DTU-based database ID`.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Cloud
       items:
@@ -16662,6 +17038,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Azure = {
             	params: {},
             	token: null,
@@ -16674,10 +17075,11 @@ zabbix_export:
             		});
             
             		Azure.params = params;
+            		Azure.tls = new CTlsConfig(params.tls_verify);
             	},
             
             	login: function () {
-            		var response, login = new HttpRequest();
+            		var response, login = new HttpRequest(Azure.tls.options);
             
             		if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
             			login.setProxy(Azure.params.proxy);
@@ -16708,7 +17110,7 @@ zabbix_export:
             	},
             
             	request: function (url) {
-            		var response, request = new HttpRequest();
+            		var response, request = new HttpRequest(Azure.tls.options);
             
             		if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
             			request.setProxy(Azure.params.proxy);
@@ -16815,6 +17217,8 @@ zabbix_export:
               value: '{$AZURE.SUBSCRIPTION.ID}'
             - name: tenant_id
               value: '{$AZURE.TENANT.ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Azure Microsoft SQL DTU Database"}'
           tags:
             - tag: component
               value: raw
@@ -17306,6 +17710,22 @@ zabbix_export:
             label: 'Azure tenant ID'
             description: 'Microsoft Azure tenant ID.'
             required: 'YES'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure Microsoft SQL DTU Database", e.g. {$HTTP.TLS.VERIFY:"Azure Microsoft SQL DTU Database"}.'
+          config:
+            type: LIST
+            priority: '12'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: 0e19ba53f50c48c3bce738d5420096cb
           name: 'Overview Azure Microsoft SQL Database'
@@ -17696,7 +18116,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure MSSQL database ID`.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Cloud
       items:
@@ -17962,6 +18382,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AzureDB = {
             	params: {},
             	token: null,
@@ -17974,6 +18419,7 @@ zabbix_export:
             		});
             
             		AzureDB.params = params;
+            		AzureDB.tls = new CTlsConfig(params.tls_verify);
             	},
             
             
@@ -17981,7 +18427,7 @@ zabbix_export:
             		if (typeof data === 'undefined' || data === null) {
             			data = '';
             		}
-            		var response, request = new HttpRequest();
+            		var response, request = new HttpRequest(AzureDB.tls.options);
             		if (typeof AzureDB.params.proxy !== 'undefined' && AzureDB.params.proxy !== '') {
             			request.setProxy(AzureDB.params.proxy);
             		}
@@ -18137,6 +18583,8 @@ zabbix_export:
               value: '{$AZURE.SUBSCRIPTION.ID}'
             - name: tenant_id
               value: '{$AZURE.TENANT.ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Azure Microsoft SQL Serverless Database"}'
           tags:
             - tag: component
               value: raw
@@ -18523,6 +18971,22 @@ zabbix_export:
             label: 'Azure tenant ID'
             description: 'Microsoft Azure tenant ID.'
             required: 'YES'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure Microsoft SQL Serverless Database", e.g. {$HTTP.TLS.VERIFY:"Azure Microsoft SQL Serverless Database"}.'
+          config:
+            type: LIST
+            priority: '12'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: 7a1b55d933ba4a529f2fccef44e5cff7
           name: 'Overview Azure Microsoft SQL Serverless Database'
@@ -18913,7 +19377,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure MySQL server ID`.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Cloud
       items:
@@ -19154,6 +19618,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AzureDB = {
             	params: {},
             	token: null,
@@ -19166,6 +19655,7 @@ zabbix_export:
             		});
             
             		AzureDB.params = params;
+            		AzureDB.tls = new CTlsConfig(params.tls_verify);
             	},
             
             
@@ -19174,7 +19664,7 @@ zabbix_export:
             			data = '';
             		}
             
-            		var response, request = new HttpRequest();
+            		var response, request = new HttpRequest(AzureDB.tls.options);
             		if (typeof AzureDB.params.proxy !== 'undefined' && AzureDB.params.proxy !== '') {
             			request.setProxy(AzureDB.params.proxy);
             		}
@@ -19323,6 +19813,8 @@ zabbix_export:
               value: '{$AZURE.SUBSCRIPTION.ID}'
             - name: tenant_id
               value: '{$AZURE.TENANT.ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Azure MySQL Flexible Server"}'
           tags:
             - tag: component
               value: raw
@@ -19619,6 +20111,22 @@ zabbix_export:
             label: 'Azure tenant ID'
             description: 'Microsoft Azure tenant ID.'
             required: 'YES'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure MySQL Flexible Server", e.g. {$HTTP.TLS.VERIFY:"Azure MySQL Flexible Server"}.'
+          config:
+            type: LIST
+            priority: '12'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: 12974ad6fc5a42ba9683af06f9166cef
           name: 'Overview Azure MySQL Flexible Server'
@@ -20017,7 +20525,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure MySQL server ID`.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Cloud
       items:
@@ -20212,6 +20720,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AzureDB = {
             	params: {},
             	token: null,
@@ -20224,6 +20757,7 @@ zabbix_export:
             		});
             
             		AzureDB.params = params;
+            		AzureDB.tls = new CTlsConfig(params.tls_verify);
             	},
             
             
@@ -20232,7 +20766,7 @@ zabbix_export:
             			data = '';
             		}
             
-            		var response, request = new HttpRequest();
+            		var response, request = new HttpRequest(AzureDB.tls.options);
             		if (typeof AzureDB.params.proxy !== 'undefined' && AzureDB.params.proxy !== '') {
             			request.setProxy(AzureDB.params.proxy);
             		}
@@ -20380,6 +20914,8 @@ zabbix_export:
               value: '{$AZURE.SUBSCRIPTION.ID}'
             - name: tenant_id
               value: '{$AZURE.TENANT.ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Azure MySQL Single Server"}'
           tags:
             - tag: component
               value: raw
@@ -20731,6 +21267,22 @@ zabbix_export:
             label: 'Azure tenant ID'
             description: 'Microsoft Azure tenant ID.'
             required: 'YES'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure MySQL Single Server", e.g. {$HTTP.TLS.VERIFY:"Azure MySQL Single Server"}.'
+          config:
+            type: LIST
+            priority: '13'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: 8760f5409fbd488d8b8e8ba24d9077ae
           name: 'Overview Azure MySQL Single Server'
@@ -21069,7 +21621,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure PostgreSQL server ID`.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Cloud
       items:
@@ -21301,6 +21853,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AzureDB = {
             	params: {},
             	token: null,
@@ -21313,6 +21890,7 @@ zabbix_export:
             		});
             
             		AzureDB.params = params;
+            		AzureDB.tls = new CTlsConfig(params.tls_verify);
             	},
             
             
@@ -21321,7 +21899,7 @@ zabbix_export:
             			data = '';
             		}
             
-            		var response, request = new HttpRequest();
+            		var response, request = new HttpRequest(AzureDB.tls.options);
             		if (typeof AzureDB.params.proxy !== 'undefined' && AzureDB.params.proxy !== '') {
             			request.setProxy(AzureDB.params.proxy);
             		}
@@ -21483,6 +22061,8 @@ zabbix_export:
               value: '{$AZURE.SUBSCRIPTION.ID}'
             - name: tenant_id
               value: '{$AZURE.TENANT.ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Azure PostgreSQL Flexible Server"}'
           tags:
             - tag: component
               value: raw
@@ -21873,6 +22453,22 @@ zabbix_export:
             label: 'Azure tenant ID'
             description: 'Microsoft Azure tenant ID.'
             required: 'YES'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure PostgreSQL Flexible Server", e.g. {$HTTP.TLS.VERIFY:"Azure PostgreSQL Flexible Server"}.'
+          config:
+            type: LIST
+            priority: '12'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: 89588d831e7348b6b41b47a2cca79190
           name: 'Overview Azure PostgreSQL Flexible Server'
@@ -22268,7 +22864,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure PostgreSQL server ID`.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Cloud
       items:
@@ -22453,6 +23049,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var AzureDB = {
             	params: {},
             	token: null,
@@ -22465,6 +23086,7 @@ zabbix_export:
             		});
             
             		AzureDB.params = params;
+            		AzureDB.tls = new CTlsConfig(params.tls_verify);
             	},
             
             
@@ -22473,7 +23095,7 @@ zabbix_export:
             			data = '';
             		}
             
-            		var response, request = new HttpRequest();
+            		var response, request = new HttpRequest(AzureDB.tls.options);
             		if (typeof AzureDB.params.proxy !== 'undefined' && AzureDB.params.proxy !== '') {
             			request.setProxy(AzureDB.params.proxy);
             		}
@@ -22622,6 +23244,8 @@ zabbix_export:
               value: '{$AZURE.SUBSCRIPTION.ID}'
             - name: tenant_id
               value: '{$AZURE.TENANT.ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Azure PostgreSQL Single Server"}'
           tags:
             - tag: component
               value: raw
@@ -22980,6 +23604,22 @@ zabbix_export:
             label: 'Azure tenant ID'
             description: 'Microsoft Azure tenant ID.'
             required: 'YES'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure PostgreSQL Single Server", e.g. {$HTTP.TLS.VERIFY:"Azure PostgreSQL Single Server"}.'
+          config:
+            type: LIST
+            priority: '12'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: 9ef73571560743379fa0b4929370e1b4
           name: 'Overview Azure PostgreSQL Single Server'
@@ -23325,7 +23965,7 @@ zabbix_export:
         4. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, `Azure workspace`, and `Period`.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Cloud
       items:
@@ -23681,6 +24321,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Azure = {
             	params: {},
             	token: null,
@@ -23693,10 +24358,11 @@ zabbix_export:
             		});
             
             		Azure.params = params;
+            		Azure.tls = new CTlsConfig(params.tls_verify);
             	},
             
             	login: function () {
-            		var response, login = new HttpRequest();
+            		var response, login = new HttpRequest(Azure.tls.options);
             
             		if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
             			login.setProxy(Azure.params.proxy);
@@ -23727,7 +24393,7 @@ zabbix_export:
             	},
             
             	request: function (url) {
-            		var response, request = new HttpRequest();
+            		var response, request = new HttpRequest(Azure.tls.options);
             
             		if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
             			request.setProxy(Azure.params.proxy);
@@ -23850,6 +24516,8 @@ zabbix_export:
               value: '{$AZURE.SUBSCRIPTION.ID}'
             - name: tenant_id
               value: '{$AZURE.TENANT.ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Azure Sentinel"}'
           tags:
             - tag: component
               value: raw
@@ -24314,7 +24982,7 @@ zabbix_export:
           description: 'The threshold for new incidents during the interval defined in the `{$AZURE.SENTINEL.INTERVAL}` macro. Can be used with context if needed (check the context values in relevant items).'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Thresholds
             label: 'Incidents threshold'
             description: 'The threshold for new incidents during the interval defined in the `{$AZURE.SENTINEL.INTERVAL}` macro. No less than 1.'
@@ -24325,7 +24993,7 @@ zabbix_export:
           description: 'The threshold for new high-severity incidents during the interval defined in the `{$AZURE.SENTINEL.INTERVAL}` macro.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Thresholds
             label: 'Incidents threshold'
             description: 'The threshold for new high-severity incidents during the interval defined in the `{$AZURE.SENTINEL.INTERVAL}` macro. No less than 1.'
@@ -24336,7 +25004,7 @@ zabbix_export:
           description: 'The threshold for new informational severity incidents during the interval defined in the `{$AZURE.SENTINEL.INTERVAL}` macro.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Thresholds
             label: 'Incidents threshold'
             description: 'The threshold for new informational severity incidents during the interval defined in the `{$AZURE.SENTINEL.INTERVAL}` macro. No less than 1.'
@@ -24347,7 +25015,7 @@ zabbix_export:
           description: 'The threshold for new low-severity incidents during the interval defined in the `{$AZURE.SENTINEL.INTERVAL}` macro.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Thresholds
             label: 'Incidents threshold'
             description: 'The threshold for new low-severity incidents during the interval defined in the `{$AZURE.SENTINEL.INTERVAL}` macro. No less than 1.'
@@ -24358,7 +25026,7 @@ zabbix_export:
           description: 'The threshold for new medium-severity incidents during the interval defined in the `{$AZURE.SENTINEL.INTERVAL}` macro.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Thresholds
             label: 'Incidents threshold'
             description: 'The threshold for new medium-severity incidents during the interval defined in the `{$AZURE.SENTINEL.INTERVAL}` macro. No less than 1.'
@@ -24369,7 +25037,7 @@ zabbix_export:
           description: 'The update interval for the script items that retrieve data from the API.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Other
             label: 'Data update interval'
             description: 'The update interval for the script items that retrieve data from the API.'
@@ -24379,7 +25047,7 @@ zabbix_export:
           description: 'The number of days during which to retrieve modified entities (incidents, alert rules, automation rules).'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             label: Period
             description: 'Number of days over which to retrieve modified entities. No less than 0.'
             required: 'YES'
@@ -24400,6 +25068,22 @@ zabbix_export:
             label: 'Azure tenant ID'
             description: 'Microsoft Azure tenant ID.'
             required: 'YES'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure Sentinel", e.g. {$HTTP.TLS.VERIFY:"Azure Sentinel"}.'
+          config:
+            type: LIST
+            priority: '8'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: 4ef5f12b11514942a2f5f1e8a4fe0512
           name: Overview
@@ -25000,7 +25684,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure SQL managed instance ID`.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: Templates/Cloud
       items:
@@ -25255,6 +25939,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Azure = {
             	params: {},
             	token: null,
@@ -25267,10 +25976,11 @@ zabbix_export:
             		});
             
             		Azure.params = params;
+            		Azure.tls = new CTlsConfig(params.tls_verify);
             	},
             
             	login: function () {
-            		var response, login = new HttpRequest();
+            		var response, login = new HttpRequest(Azure.tls.options);
             
             		if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
             			login.setProxy(Azure.params.proxy);
@@ -25301,7 +26011,7 @@ zabbix_export:
             	},
             
             	request: function (url) {
-            		var response, request = new HttpRequest();
+            		var response, request = new HttpRequest(Azure.tls.options);
             
             		if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
             			request.setProxy(Azure.params.proxy);
@@ -25400,6 +26110,8 @@ zabbix_export:
               value: '{$AZURE.SUBSCRIPTION.ID}'
             - name: tenant_id
               value: '{$AZURE.TENANT.ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Azure SQL Managed Instance"}'
           tags:
             - tag: component
               value: raw
@@ -25682,6 +26394,22 @@ zabbix_export:
             label: 'Azure tenant ID'
             description: 'Microsoft Azure tenant ID.'
             required: 'YES'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure SQL Managed Instance", e.g. {$HTTP.TLS.VERIFY:"Azure SQL Managed Instance"}.'
+          config:
+            type: LIST
+            priority: '12'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: 28e6b463ca7b429ca356cb61b5394841
           name: 'Azure SQL managed instance'
@@ -26064,7 +26792,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure virtual machine ID`.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Cloud
       items:
@@ -26541,6 +27269,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Azure = {
             	params: {},
             	token: null,
@@ -26553,10 +27306,11 @@ zabbix_export:
             		});
             
             		Azure.params = params;
+            		Azure.tls = new CTlsConfig(params.tls_verify);
             	},
             
             	login: function () {
-            		var response, login = new HttpRequest();
+            		var response, login = new HttpRequest(Azure.tls.options);
             
             		if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
             			login.setProxy(Azure.params.proxy);
@@ -26587,7 +27341,7 @@ zabbix_export:
             	},
             
             	request: function (url) {
-            		var response, request = new HttpRequest();
+            		var response, request = new HttpRequest(Azure.tls.options);
             
             		if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
             			request.setProxy(Azure.params.proxy);
@@ -26680,6 +27434,8 @@ zabbix_export:
               value: '{$AZURE.SUBSCRIPTION.ID}'
             - name: tenant_id
               value: '{$AZURE.TENANT.ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Azure Virtual Machine"}'
           tags:
             - tag: component
               value: raw
@@ -27420,6 +28176,22 @@ zabbix_export:
             label: 'CPU utilization critical threshold'
             description: 'Critical threshold of CPU utilization, expressed in %. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure Virtual Machine", e.g. {$HTTP.TLS.VERIFY:"Azure Virtual Machine"}.'
+          config:
+            type: LIST
+            priority: '9'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: 527e3c432d3842d0968480d8f91a712e
           name: 'Overview Azure Virtual Machine'
@@ -27790,7 +28562,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure scale set ID`.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Cloud
       items:
@@ -28271,6 +29043,31 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
             var Azure = {
             	params: {},
             	token: null,
@@ -28283,10 +29080,11 @@ zabbix_export:
             		});
             
             		Azure.params = params;
+            		Azure.tls = new CTlsConfig(params.tls_verify);
             	},
             
             	login: function () {
-            		var response, login = new HttpRequest();
+            		var response, login = new HttpRequest(Azure.tls.options);
             
             		if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
             			login.setProxy(Azure.params.proxy);
@@ -28317,7 +29115,7 @@ zabbix_export:
             	},
             
             	request: function (url) {
-            		var response, request = new HttpRequest();
+            		var response, request = new HttpRequest(Azure.tls.options);
             
             		if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
             			request.setProxy(Azure.params.proxy);
@@ -28413,6 +29211,8 @@ zabbix_export:
               value: '{$AZURE.SUBSCRIPTION.ID}'
             - name: tenant_id
               value: '{$AZURE.TENANT.ID}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Azure VM Scale Set"}'
           tags:
             - tag: component
               value: raw
@@ -29161,6 +29961,22 @@ zabbix_export:
             label: 'Azure tenant ID'
             description: 'Microsoft Azure tenant ID.'
             required: 'YES'
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Azure VM Scale Set", e.g. {$HTTP.TLS.VERIFY:"Azure VM Scale Set"}.'
+          config:
+            type: LIST
+            priority: '10'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
       dashboards:
         - uuid: 1a38b3783a6b41cca3e5cfadd64d4534
           name: 'Overview Azure VM Scale Set'

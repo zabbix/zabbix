@@ -23,7 +23,7 @@
  * Return value: The number of values in queue                                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_queue_ptr_values_num(zbx_queue_ptr_t *queue)
+int	zbx_queue_ptr_values_num(const zbx_queue_ptr_t *queue)
 {
 	int	values_num;
 
@@ -228,4 +228,23 @@ void	zbx_queue_ptr_remove_value(zbx_queue_ptr_t *queue, const void *value)
 			return;
 		}
 	}
+}
+
+void	zbx_queue_ptr_iter_reset(const zbx_queue_ptr_t *queue, zbx_queue_ptr_iter_t *iter)
+{
+	iter->pos = queue->tail_pos;
+	iter->queue = queue;
+}
+
+void	*zbx_queue_ptr_iter_next(zbx_queue_ptr_iter_t *iter)
+{
+	if (iter->pos == iter->queue->head_pos)
+		return NULL;
+
+	void	*value = iter->queue->values[iter->pos++];
+
+	if (iter->pos == iter->queue->alloc_num)
+		iter->pos = 0;
+
+	return value;
 }

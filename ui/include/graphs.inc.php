@@ -1096,17 +1096,16 @@ function calculateLogarithmicGraphScaleExtremes(float $min, float $max, ?float $
  *
  * @param float  $min             Minimum extreme of the scale.
  * @param float  $max             Maximum extreme of the scale.
- * @param bool   $min_calculated  Is minimum extreme of the scale calculated?
- * @param bool   $max_calculated  Is maximum extreme of the scale calculated?
  * @param float  $interval        Scale interval.
  * @param string $units           Scale units.
  * @param int    $power           Scale power.
  * @param int    $precision_max   Maximum precision to use for the scale.
+ * @param bool   $unsigned        Modify negative scale values to positive.
  *
  * @return array
  */
-function calculateGraphScaleValues(float $min, float $max, bool $min_calculated, bool $max_calculated, float $interval,
-		string $units, int $power, int $precision_max): array {
+function calculateGraphScaleValues(float $min, float $max, float $interval, string $units, int $power,
+		int $precision_max, bool $unsigned): array {
 	$rows = [];
 
 	$clearance = 0.5;
@@ -1164,7 +1163,7 @@ function calculateGraphScaleValues(float $min, float $max, bool $min_calculated,
 	$scale_values[] = [
 		'relative_pos' => 0,
 		'value' => convertUnits([
-			'value' => $min
+			'value' => $unsigned ? abs($min) : $min
 		] + $options)
 	];
 
@@ -1174,7 +1173,7 @@ function calculateGraphScaleValues(float $min, float $max, bool $min_calculated,
 				? ($value / 10 - $min / 10) / ($max / 10 - $min / 10)
 				: ($value - $min) / ($max - $min),
 			'value' => convertUnits([
-				'value' => $value
+				'value' => $unsigned ? abs($value) : $value
 			] + $options)
 		];
 	}
@@ -1182,7 +1181,7 @@ function calculateGraphScaleValues(float $min, float $max, bool $min_calculated,
 	$scale_values[] = [
 		'relative_pos' => 1,
 		'value' => convertUnits([
-			'value' => $max
+			'value' => $unsigned ? abs($max) : $max
 		] + $options)
 	];
 
@@ -1201,17 +1200,17 @@ function calculateGraphScaleValues(float $min, float $max, bool $min_calculated,
  * @param bool       $max_calculated     Is maximum extreme of the scale calculated?
  * @param int        $interval           Scale interval.
  * @param string     $units              Scale units.
- * @param bool       $is_binary          Is the scale binary (use 1024 base for units)?
  * @param int        $precision_max      Maximum precision to use for the scale.
  * @param float|null $lower_power_shift  Scale bottom positive power shift extreme.
  * @param float|null $upper_power_shift  Scale top positive power shift extreme.
+ * @param bool       $unsigned           Modify negative scale values to positive.
  *
  * @return array
  */
 function calculateLogarithmicGraphScaleValues(?float $min_negative_power, ?float $max_negative_power,
 		?float $min_positive_power, ?float $max_positive_power, bool $has_zero, bool $min_calculated,
 		bool $max_calculated, int $interval, string $units, int $precision_max, ?float $lower_power_shift,
-		?float $upper_power_shift): array {
+		?float $upper_power_shift, bool $unsigned): array {
 	$rows = [];
 
 	$start_index = 0;
@@ -1226,9 +1225,15 @@ function calculateLogarithmicGraphScaleValues(?float $min_negative_power, ?float
 		$min_position = -1 * ($max_negative_power - $min_negative_power);
 
 		if ($lower_power_shift > 0) {
+			$value = -10 ** $max_negative_power;
+
+			if ($unsigned) {
+				$value = abs($value);
+			}
+
 			$rows[] = [
 				'log_value' => -1 * ($max_negative_power - $min_negative_power),
-				'value' => -10 ** $max_negative_power
+				'value' => $value
 			];
 
 			$start_index++;
@@ -1256,17 +1261,29 @@ function calculateLogarithmicGraphScaleValues(?float $min_negative_power, ?float
 					break;
 				}
 
+				$value = -10 ** $log_value;
+
+				if ($unsigned) {
+					$value = abs($value);
+				}
+
 				$rows[] = [
 					'log_value' => -1 * ($log_value - $min_negative_power),
-					'value' => -10 ** $log_value
+					'value' => $value
 				];
 			}
 		}
 
 		if ($upper_power_shift > 0 && !$has_zero) {
+			$value = -10 ** $min_negative_power;
+
+			if ($unsigned) {
+				$value = abs($value);
+			}
+
 			$rows[] = [
 				'log_value' => 1,
-				'value' => -10 ** $min_negative_power
+				'value' => $value
 			];
 		}
 	}

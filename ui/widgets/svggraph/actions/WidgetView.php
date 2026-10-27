@@ -106,6 +106,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'left_y_units' => $this->fields_values['lefty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC
 					? $this->fields_values['lefty_static_units']
 					: null,
+				'left_y_unsigned' => $this->fields_values['lefty_unsigned'] == SVG_GRAPH_AXIS_UNSIGNED_ON,
 				'show_right_y_axis' => $this->fields_values['righty'] == SVG_GRAPH_AXIS_ON,
 				'right_y_scale' => $this->fields_values['righty_scale'],
 				'right_y_min' => $righty_min,
@@ -113,6 +114,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'right_y_units' => $this->fields_values['righty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC
 					? $this->fields_values['righty_static_units']
 					: null,
+				'right_y_unsigned' => $this->fields_values['righty_unsigned'] == SVG_GRAPH_AXIS_UNSIGNED_ON,
 				'show_x_axis' => $this->fields_values['axisx'] == SVG_GRAPH_AXIS_ON
 			],
 			'legend' => [

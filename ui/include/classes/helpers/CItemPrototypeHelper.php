@@ -35,9 +35,10 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 	 */
 	public static function convertApiInputForForm(array $item): array {
 		$item = parent::convertApiInputForForm($item);
+		$parent_templates = getItemParentTemplates([$item], ZBX_FLAG_DISCOVERY_PROTOTYPE);
 		$item['parent_items'] = makeItemTemplatesHtml(
 			$item['itemid'],
-			getItemParentTemplates([$item], ZBX_FLAG_DISCOVERY_PROTOTYPE),
+			$parent_templates,
 			ZBX_FLAG_DISCOVERY_PROTOTYPE,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		);
@@ -48,6 +49,11 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 			'usermacros' => true,
 			'lldmacros' => true
 		]);
+
+		if ($item['templated'] && $item['valuemap'] && !array_key_exists('inaccessible', $item['valuemap'])) {
+			$parent_template = $parent_templates['templates'][$item['valuemap']['hostid']];
+			$item['valuemap']['prefix'] = $parent_template['name'].NAME_DELIMITER;
+		}
 
 		if ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
 			$item = static::addDelayWithFlexibleIntervals($update_interval_parser, $item);
@@ -184,7 +190,7 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 	 * @return array
 	 */
 	private static function getSourceItemPrototypes(array $src_options): array {
-		return API::ItemPrototype()->get([
+		$src_items = API::ItemPrototype()->get([
 			'output' => ['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
 				'valuemapid', 'logtimefmt', 'description', 'status', 'discover',
 
@@ -213,7 +219,10 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 				'snmp_oid',
 
 				// SSH item type specific fields.
-				'publickey', 'privatekey'
+				'publickey', 'privatekey',
+
+				// Telemetry query
+				'time_shift', 'lookback_limit', 'granularity', 'query'
 			],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'selectTags' => ['tag', 'value'],
@@ -225,5 +234,23 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 			],
 			'preservekeys' => true
 		] + $src_options);
+
+		return self::prepareSourceItemsForCopy($src_items);
+	}
+
+	public static function convertFormInputForApi(array $input): array {
+		if ($input['history_mode'] == ITEM_STORAGE_OFF) {
+			$input['history'] = ITEM_NO_STORAGE_VALUE;
+		}
+
+		if ($input['trends_mode'] == ITEM_STORAGE_OFF) {
+			$input['trends'] = ITEM_NO_STORAGE_VALUE;
+		}
+
+		if ($input['request_method'] == HTTPCHECK_REQUEST_HEAD) {
+			$input['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_HEADERS;
+		}
+
+		return parent::convertFormInputForApi($input);
 	}
 }

@@ -28,7 +28,6 @@ $html_page = (new CHtmlPage())
 $csrf_token = CCsrfTokenHelper::get('userrole');
 
 $form = (new CForm())
-	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('userrole-form')
 	->setName('user_role_form')
@@ -97,13 +96,13 @@ foreach ($data['labels']['sections'] as $section_key => $section_label) {
 				(new CCheckBox('ui[]', $first_rule_key))
 					->setId($first_rule_key)
 					->setChecked(
-						array_key_exists($first_rule_key, $data['rules']['ui'])
-						&& $data['rules']['ui'][$first_rule_key]
+						array_key_exists($first_rule_key, $data['rules']['ui']) && $data['rules']['ui'][$first_rule_key]
 					)
 					->setReadonly($data['readonly'])
 			)
 		]);
-	} else {
+	}
+	else {
 		$ui = [];
 		foreach ($data['labels']['rules'][$section_key] as $rule_key => $rule_label) {
 			$ui[] = [
@@ -142,6 +141,42 @@ $form_grid->addItem([
 			->setUncheckedValue(0)
 	)
 ]);
+
+$form_grid
+	->addItem(
+		new CFormField(
+			(new CTag('h4', true, _('User profile settings')))->addClass('input-section-header')
+		)
+	)
+	->addItem([
+		new CLabel(
+			[
+				_('Enforce redirect after login'),
+				makeHelpIcon(sprintf('%1$s'."\n".'%2$s',
+					_('Enabled: Users are restricted to Redirect URL after login.'),
+					_('Disabled: Users can set personal URL (after login), Redirect URL after login is used as fallback.')
+				))
+			],
+			$data['readonly'] ? '' : 'profile-redirect-enforce'
+		),
+		new CFormField(
+			(new CCheckBox('profile_redirect_enforce', 1))
+				->setId('profile-redirect-enforce')
+				->setChecked($data['rules'][CRoleHelper::PROFILE_REDIRECT_ENFORCE])
+				->setReadonly($data['readonly'])
+				->setUncheckedValue(0)
+		)
+	])
+	->addItem([
+		(new CLabel(_('Redirect URL after login'), 'profile-redirect-url')),
+		new CFormField(
+			(new CTextAreaFlexible('profile_redirect_url', $data['rules'][CRoleHelper::PROFILE_REDIRECT_URL]))
+				->setId('profile-redirect-url')
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('role_rule', 'value_str'))
+				->setReadonly($data['readonly'])
+		)
+	]);
 
 $form_grid
 	->addItem(
@@ -323,8 +358,7 @@ $form_grid
 				->addValue(_('Allow list'), ZBX_ROLE_RULE_API_MODE_ALLOW)
 				->addValue(_('Deny list'), ZBX_ROLE_RULE_API_MODE_DENY)
 				->setModern(true)
-				->setReadonly($data['readonly'])
-				->setEnabled($data['rules']['api.access'])
+				->setReadonly($data['readonly'] || !$data['rules']['api.access'])
 				->addClass('js-userrole-apimode')
 		)
 	])
@@ -410,7 +444,7 @@ foreach ($data['labels']['actions'] as $action => $label) {
 	$actions[] = (new CDiv(
 		(new CCheckBox('actions[]', $action))
 			->setId($action)
-			->setChecked(array_key_exists($action, $data['rules']['actions'])&& $data['rules']['actions'][$action])
+			->setChecked(array_key_exists($action, $data['rules']['actions']) && $data['rules']['actions'][$action])
 			->setReadonly($data['readonly'])
 			->setLabel($label)
 	))

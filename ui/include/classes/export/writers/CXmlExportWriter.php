@@ -129,7 +129,9 @@ class CXmlExportWriter extends CExportWriter {
 			'valuemaps' => 'valuemap',
 			'variables' => 'variable',
 			'widgets' => 'widget',
-			'options' => 'option'
+			'options' => 'option',
+			'columns' => 'column',
+			'aggregated_columns' => 'aggregated_column'
 		];
 
 		return array_key_exists($name, $map) ? $map[$name] : false;

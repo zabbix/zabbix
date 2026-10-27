@@ -191,6 +191,10 @@ class testDataCollection extends CIntegrationTest {
 	 * @return array
 	 */
 	public function agentConfigurationProviderTLS() {
+		if ($this->detectTLSLibrary() === 'none') {
+			$this->markTestSkipped('Server compiled without TLS support; skipping TLS data collection test.');
+		}
+
 		self::$certBaseDirAgent = self::generateCertificates();
 		$baseDir = self::$certBaseDirAgent;
 		return [
@@ -233,8 +237,11 @@ class testDataCollection extends CIntegrationTest {
 			'resuming Zabbix agent checks on host "agent": connection restored'
 		]);
 
-		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'zbx_tls_connect() peer certificate' .
-			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_agent"');
+		if ('gnutls' !== $this->detectTLSLibrary()) {
+			// GnuTLS does not log peer certificate issuer/subject the way OpenSSL does.
+			self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'zbx_tls_connect() peer certificate' .
+				' issuer:"CN=ZabbixCA" subject:"CN=zabbix_agent"');
+		}
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_tls_connect():SUCCEED ' .
 			'(established TLS');
 		self::waitForLogLineToBePresent(self::COMPONENT_AGENT, 'End of zbx_tls_accept():SUCCEED ' .
@@ -430,6 +437,10 @@ class testDataCollection extends CIntegrationTest {
 	 * @return array
 	 */
 	public function proxyConfigurationProvider() {
+	if ($this->detectTLSLibrary() === 'none') {
+		$this->markTestSkipped('Server compiled without TLS support; skipping TLS data collection test.');
+	}
+
 	self::$certBaseDirProxy = self::generateCertificates();
 	$baseDir = self::$certBaseDirProxy;
 
@@ -492,20 +503,29 @@ class testDataCollection extends CIntegrationTest {
 			'resuming Zabbix agent checks on host "proxy_agent": connection restored'
 		]);
 
-		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'zbx_tls_accept() peer certificate' .
-			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_proxy"');
+		// GnuTLS does not log peer certificate issuer/subject the way OpenSSL does.
+		$openssl = ('gnutls' !== $this->detectTLSLibrary());
+
+		if ($openssl) {
+			self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'zbx_tls_accept() peer certificate' .
+				' issuer:"CN=ZabbixCA" subject:"CN=zabbix_proxy"');
+		}
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_tls_accept():SUCCEED ' .
 			'(established TLS');
 
-		self::waitForLogLineToBePresent(self::COMPONENT_PROXY, 'zbx_tls_connect() peer certificate' .
-			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_agent"');
-		self::waitForLogLineToBePresent(self::COMPONENT_PROXY, 'zbx_tls_connect() peer certificate' .
-			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_server"');
+		if ($openssl) {
+			self::waitForLogLineToBePresent(self::COMPONENT_PROXY, 'zbx_tls_connect() peer certificate' .
+				' issuer:"CN=ZabbixCA" subject:"CN=zabbix_agent"');
+			self::waitForLogLineToBePresent(self::COMPONENT_PROXY, 'zbx_tls_connect() peer certificate' .
+				' issuer:"CN=ZabbixCA" subject:"CN=zabbix_server"');
+		}
 		self::waitForLogLineToBePresent(self::COMPONENT_PROXY, 'End of zbx_tls_connect():SUCCEED ' .
 			'(established TLS');
 
-		self::waitForLogLineToBePresent(self::COMPONENT_AGENT, 'zbx_tls_connect() peer certificate' .
-			' issuer:"CN=ZabbixCA" subject:"CN=zabbix_proxy"');
+		if ($openssl) {
+			self::waitForLogLineToBePresent(self::COMPONENT_AGENT, 'zbx_tls_connect() peer certificate' .
+				' issuer:"CN=ZabbixCA" subject:"CN=zabbix_proxy"');
+		}
 		self::waitForLogLineToBePresent(self::COMPONENT_AGENT, 'End of zbx_tls_connect():SUCCEED ' .
 			'(established TLS');
 
@@ -707,6 +727,73 @@ class testDataCollection extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']));
 		$this->assertArrayHasKey('value', $response['result'][0]);
 		$this->assertEquals(444, $response['result'][0]['value']);
+	}
+
+	/**
+	 * Test that history data with a valid row followed by a non-object element is rejected without leaking the
+	 * already parsed row values, both for host/key (sender data) and itemid (agent data variant 2) based parsing.
+	 *
+	 * @required-components server
+	 */
+	public function testDataCollection_malformedHistoryDataRow() {
+		$host = 'malformed_data_host';
+		$key = 'malformed.trap';
+
+		$response = $this->call('host.create', [
+			'host' => $host,
+			'groups' => [['groupid' => 4]], // Zabbix servers
+			'status' => HOST_STATUS_MONITORED
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['hostids']);
+		$hostid = $response['result']['hostids'][0];
+		self::$hostids = array_merge(self::$hostids, [$hostid]);
+
+		$response = $this->call('item.create', [
+			'hostid' => $hostid,
+			'name' => $key,
+			'key_' => $key,
+			'type' => ITEM_TYPE_TRAPPER,
+			'value_type' => ITEM_VALUE_TYPE_LOG
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertEquals(1, count($response['result']['itemids']));
+		$itemid = $response['result']['itemids'][0];
+		self::$itemidsToDelete = array_merge(self::$itemidsToDelete, [$itemid]);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		// Both value and source fields of the first row are allocated before the second row fails to parse.
+		$payload = str_repeat('x', 4096);
+		$client = $this->getClient(self::COMPONENT_SERVER);
+
+		// Host/key based history data parsing.
+		$result = $client->sendDataValues('sender', [
+			['host' => $host, 'key' => $key, 'value' => $payload, 'source' => $payload],
+			1
+		]);
+		$this->assertNotFalse($result, 'Failed to send sender data: '.$client->getError());
+		$this->assertEquals(0, $result['processed'] ?? 0);
+
+		// Itemid based history data parsing.
+		$result = $client->sendAgentDataValues([
+			['itemid' => $itemid, 'value' => $payload, 'source' => $payload, 'clock' => time(), 'ns' => 0],
+			1
+		], md5(uniqid('', true)), $host);
+		$this->assertNotFalse($result, 'Failed to send agent data: '.$client->getError());
+		$this->assertEquals(0, $result['processed'] ?? 0);
+
+		// Trapper must still accept valid data afterwards.
+		$t = time();
+		$this->sendSenderValue($host, $key, 'valid', self::COMPONENT_SERVER, 0, $t);
+
+		$response = $this->callUntilDataIsPresent('history.get', [
+			'history' => ITEM_VALUE_TYPE_LOG,
+			'itemids' => [$itemid],
+			'time_from' => $t
+		], 60, 1);
+		$this->assertCount(1, $response['result']);
+		$this->assertEquals('valid', $response['result'][0]['value']);
 	}
 
 	public static function clearData(): void {

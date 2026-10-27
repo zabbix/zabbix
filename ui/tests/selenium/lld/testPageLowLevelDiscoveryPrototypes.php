@@ -24,7 +24,7 @@ require_once __DIR__.'/../common/testPagePrototypes.php';
 class testPageLowLevelDiscoveryPrototypes extends testPagePrototypes {
 	public $source = 'discovery';
 
-	const COMMON_URL = 'host_discovery_prototypes.php?parent_discoveryid=';
+	const COMMON_URL = 'zabbix.php?action=lldrule.prototype.list&parent_discoveryid=';
 	const HOST_NAME = 'Host for prototype check';
 	const TEMPLATE_NAME = 'Template for prototype check';
 	const SOURCE_TEMPLATE = 'Linked template for LLD prototypes test';
@@ -455,8 +455,7 @@ class testPageLowLevelDiscoveryPrototypes extends testPagePrototypes {
 		$prefixes = [
 			'template' => [
 				'name' => self::SOURCE_TEMPLATE,
-				'url' => 'host_discovery_prototypes.php?parent_discoveryid='.self::$ids['linked_template_ruleid'].
-						'&context=template',
+				'url' => self::COMMON_URL.self::$ids['linked_template_ruleid'].'&context=template',
 				'class' => 'grey'
 			],
 			'master_item' => [
@@ -467,7 +466,7 @@ class testPageLowLevelDiscoveryPrototypes extends testPagePrototypes {
 			],
 			'parent_lld_prototype' => [
 				'name' => self::PROTOTYPE_WITH_PROTOTYPES,
-				'url' => 'host_discovery_prototypes.php?form=update&parent_discoveryid='.
+				'url' => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&parent_discoveryid='.
 						self::$ids['lldid_for_prototypes'][$data['context']].'&itemid='.
 						self::$ids['protorypeid_for_prototype_discovery'][$data['context']].'&context='.$data['context'],
 				'class' => 'orange',
@@ -587,9 +586,9 @@ class testPageLowLevelDiscoveryPrototypes extends testPagePrototypes {
 	 */
 	public function testPageLowLevelDiscoveryPrototypes_Navigation($data) {
 		$urls = [
-			'Discovery list' => 'host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::$ids[$data['context']].
+			'Discovery list' => 'zabbix.php?action=lldrule.list&filter_set=1&filter_hostids%5B0%5D='.self::$ids[$data['context']].
 					'&context='.$data['context'],
-			self::PROTOTYPE_NAME_FOR_DISCOVERY => 'host_discovery_prototypes.php?form=update&itemid='.
+			self::PROTOTYPE_NAME_FOR_DISCOVERY => 'zabbix.php?action=popup&popup=lldrule.prototype.edit&itemid='.
 					self::$ids['protorypeid_for_prototype_discovery'][$data['context']].'&parent_discoveryid='.
 					self::$ids['lldid_for_prototypes'][$data['context']].'&context='.$data['context'],
 			self::PROTOTYPE_WITH_PROTOTYPES => self::COMMON_URL.self::$ids['lldid_for_prototypes'][$data['context']].

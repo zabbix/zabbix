@@ -16,7 +16,7 @@ COMMON_SRC_FILES = \
 COMMON_LIBS = \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(MOCK_TEST_DEPS) \
-	$(MOCK_DATA_DEPS) 
+	$(MOCK_DATA_DEPS)
 
 COMMON_COMPILER_FLAGS = -I@top_srcdir@/tests
 

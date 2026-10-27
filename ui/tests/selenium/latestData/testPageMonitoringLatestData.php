@@ -151,6 +151,14 @@ class testPageMonitoringLatestData extends CWebTest {
 				', maintenance_status=1, maintenance_type='.MAINTENANCE_TYPE_NORMAL.', maintenance_from='.zbx_dbstr(time()-1000).
 				' WHERE hostid='.zbx_dbstr($maintenace_hostid)
 		);
+
+		// Change datatable initial layout to make sure that the maintenance icon and tags column edit button are visible.
+		$layout = '{"columns":[{"id":"datatable-host","resized":true,"width":"249px"},{"id":"name","resized":true,"width":"239px"},'.
+				'{"id":"interval"},{"id":"history"},{"id":"trends"},{"id":"type"},{"id":"last_check","width":"79px"},'.
+				'{"id":"last_value","resized":true,"width":"142px"},{"id":"change","width":"62px"},'.
+				'{"id":"tags","resized":true,"width":"194px"},{"id":"tagvalue"},{"id":"actions","width":"60px"},'.
+				'{"id":"info","width":"83px"}],"options":{}}';
+		$this->updateDatatableLayout($layout, 'web.monitoring.latest.datatable');
 	}
 
 	public function testPageMonitoringLatestData_CheckLayout() {
@@ -588,7 +596,17 @@ class testPageMonitoringLatestData extends CWebTest {
 		$form->submit();
 		$this->page->waitUntilReady();
 		$table = $this->getDatatable()->waitUntilReady();
-		$table->waitUntilRowsCount(count($data['result']));
+
+		if ($data['result']) {
+			$table->waitUntilRowsCount(count($data['result']));
+		}
+		else {
+			/*
+			 * The row count is already zero while the previous result is still being cleared, so waiting for zero
+			 * rows settles too early and the column headers become stale right after. Wait for the placeholder.
+			 */
+			$this->query('class:datatable-body')->waitUntilTextPresent('No data found');
+		}
 
 		// Set the datatable layout from Tags column header.
 		$tag_number = CTestArrayHelper::get($data, 'header_settings.Tags.Number of tags', 3);
@@ -954,14 +972,6 @@ class testPageMonitoringLatestData extends CWebTest {
 	 * Maintenance icon hintbox.
 	 */
 	public function testPageMonitoringLatestData_checkMaintenanceIcon() {
-		// Change datatable layout to make sure that the maintenance icon is visible.
-		$layout = '{"columns":[{"id":"datatable-host","resized":true,"width":"249px"},{"id":"name","resized":true,"width":"239px"}'.
-				',{"id":"interval"},{"id":"history"},{"id":"trends"},{"id":"type"},{"id":"last_check","width":"79px"},'.
-				'{"id":"last_value","resized":true,"width":"142px"},{"id":"change","width":"62px"},'.
-				'{"id":"tags","resized":true,"width":"194px"},{"id":"tagvalue"},{"id":"actions","width":"60px"},'.
-				'{"id":"info","width":"83px"}],"options":{}}';
-		$this->updateDatatableLayout($layout, 'web.monitoring.latest.datatable');
-
 		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$form->fill(['Hosts' => self::MAINTENANCE_HOSTNAME]);

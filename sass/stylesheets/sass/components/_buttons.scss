@@ -69,16 +69,24 @@
 	border-color: $btn-border-color;
 
 	&:hover {
-		color: $btn-color;
-		background-color: $btn-hover-bg-color;
-		border-color: $btn-hover-border-color;
+		&,
+		&:link,
+		&:visited {
+			color: $btn-color;
+			background-color: $btn-hover-bg-color;
+			border-color: $btn-hover-border-color;
+		}
 	}
 
 	&:active,
 	&:focus {
-		color: $btn-color;
-		background-color: $btn-focus-bg-color;
-		border-color: $btn-focus-border-color;
+		&,
+		&:link,
+		&:visited {
+			color: $btn-color;
+			background-color: $btn-focus-bg-color;
+			border-color: $btn-focus-border-color;
+		}
 	}
 }
 
@@ -196,6 +204,11 @@ button {
 	@extend %button;
 	@extend %button-alt-colors;
 	@extend %button-disabled;
+
+	&:link,
+	&:visited {
+		color: $btn-alt-color;
+	}
 }
 
 .btn-grey {
@@ -381,4 +394,18 @@ button {
 	&.visible {
 		opacity: 0.75;
 	}
+}
+
+.btn-plus-more {
+	@extend %button;
+	@extend %button-form-colors;
+	@extend %button-disabled;
+
+	padding: 0 3px;
+	font-size: $font-h3-size;
+	height: 16px;
+	line-height: 15px;
+	color: $btn-plus-more;
+	background-color: $btn-plus-more-bg-color;
+	border-color: $btn-plus-more-border-color;
 }

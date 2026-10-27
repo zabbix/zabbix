@@ -520,12 +520,12 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 	 * @dataProvider getTriggerCreateData
 	 */
 	public function testHostTriggerDependencies_LinkedTriggerPrototypeUpdate($data) {
-		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.
-				self::$hostids['Host with everything'].'&context=host'
+		$this->page->login()->open('zabbix.php?action=lldrule.list&filter_set=1&context=host&filter_hostids[0]='.
+				self::$hostids['Host with everything']
 		)->waitUntilReady();
-		$this->query('link:Drule for linking')->one()->click();
-		$this->page->waitUntilReady();
-		$this->query('link:Trigger prototypes')->one()->click();
+
+		$this->query('class:list-table')->waitUntilPresent()->one()->asTable()->findRow('Name', 'Drule for linking', true)
+				->query('link:Trigger prototypes')->one()->click();
 		$this->page->waitUntilReady();
 		$this->query('link:trigger prototype linked update{#KEY}')->one()->click();
 		$this->triggerCreateUpdate($data, 'Trigger prototype updated', null, 'Cannot update trigger prototype',

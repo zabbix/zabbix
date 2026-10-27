@@ -376,6 +376,7 @@ switch ($data['method']) {
 				$proxies = API::Proxy()->get([
 					'output' => ['proxyid', 'name'],
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'proxy_groupids' => array_key_exists('without_proxy_group', $data) ? 0 : null,
 					'limit' => $limit
 				]);
 
@@ -624,33 +625,16 @@ switch ($data['method']) {
 
 			case 'valuemaps':
 			case 'template_valuemaps':
-				if ($data['context'] === 'host') {
-					$hosts = API::Host()->get([
-						'output' => ['name'],
-						'hostids' => $data['hostids'],
-						'preservekeys' => true
-					]);
-				}
-				else {
-					$hosts = API::Template()->get([
-						'output' => ['name'],
-						'templateids' => $data['hostids'],
-						'preservekeys' => true
-					]);
+				if (!array_key_exists('hostids', $data)) {
+					break;
 				}
 
 				$valuemaps = API::ValueMap()->get([
-					'output' => ['valuemapid', 'name', 'hostid'],
+					'output' => ['valuemapid', 'name'],
 					'hostids' => $data['hostids'],
-					'search' => ['name' => $data['search'] ? $data['search'] : null],
+					'search' => ['name' => $data['search'] ?: null],
 					'limit' => $limit
 				]);
-
-				foreach ($valuemaps as &$valuemap) {
-					$valuemap['prefix'] = $hosts[$valuemap['hostid']]['name'].NAME_DELIMITER;
-					unset($valuemap['hostid']);
-				}
-				unset($valuemap);
 
 				$result = CArrayHelper::renameObjectsKeys($valuemaps, ['valuemapid' => 'id']);
 				CArrayHelper::sort($result, ['name']);
@@ -928,7 +912,7 @@ switch ($data['method']) {
 		if ($db_result) {
 			$db_result = array_flip(array_column($db_result, 'name'));
 
-			if (array_key_exists($search, $db_result)) {
+			if ($search !== null && array_key_exists($search, $db_result)) {
 				unset($db_result[$search]);
 			}
 

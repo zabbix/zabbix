@@ -40,6 +40,7 @@ class CControllerPopup extends CController {
 		$this->supported_popups = [
 			'acknowledge.edit' => _('Update problem'),
 			'action.edit' => _('Action edit'),
+			'ceprule.edit' => _('CEP rule edit'),
 			'connector.edit' => _('Connector edit'),
 			'correlation.edit' => _('Correlation edit'),
 			'discovery.edit' => _('Discovery rule edit'),
@@ -51,6 +52,8 @@ class CControllerPopup extends CController {
 			'hostgroup.edit' => _('Host group edit'),
 			'item.edit' => _('Item edit'),
 			'item.prototype.edit' => _('Item prototype edit'),
+			'lldrule.edit' => _('Discovery rule edit'),
+			'lldrule.prototype.edit' => _('Discovery prototype edit'),
 			'maintenance.edit' => _('Maintenance edit'),
 			'mediatype.edit' => _('Media type edit'),
 			'module.edit' => _('Module edit'),
@@ -77,8 +80,7 @@ class CControllerPopup extends CController {
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			/** @var CRouter $router */
-			$router = clone APP::Component()->get('router');
+			$router = clone CRouter::getInstance();
 
 			$this->action = $this->getInput('popup');
 			$router->setAction($this->action);

@@ -1513,6 +1513,7 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "mediatypeid", mediatypeids.values,
 				mediatypeids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by mediatypeid");
 
 		result = zbx_db_select("%s", sql);
 
@@ -2092,7 +2093,7 @@ static int	rm_process_jobs(zbx_rm_t *manager)
  ******************************************************************************/
 static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_message_t *message, char **error)
 {
-	zbx_uint64_t		dashboardid, userid, access_userid;
+	zbx_uint64_t		dashboardid, userid;
 	zbx_vector_ptr_pair_t	params;
 	int			report_time, ret;
 	unsigned char		period;
@@ -2101,8 +2102,7 @@ static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_m
 
 	zbx_vector_ptr_pair_create(&params);
 
-	report_deserialize_test_report(message->data, &name, &dashboardid, &userid, &access_userid, &report_time,
-			&period, &params);
+	report_deserialize_test_report(message->data, &name, &dashboardid, &userid, &report_time, &period, &params);
 
 	for (int i = 0; i < params.values_num; i++)
 	{
@@ -2113,7 +2113,7 @@ static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_m
 		}
 	}
 
-	if (NULL != (job = rm_create_job(manager, name, dashboardid, access_userid, report_time, period, 0, &userid, 1,
+	if (NULL != (job = rm_create_job(manager, name, dashboardid, userid, report_time, period, 0, &userid, 1,
 			&params, error)))
 	{
 		job->is_test_report = 1;

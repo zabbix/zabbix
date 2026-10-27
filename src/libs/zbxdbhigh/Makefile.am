@@ -13,7 +13,8 @@ libzbxdbhigh_a_SOURCES = \
 	item_param.c \
 	lld_override.c \
 	mediatype.c \
-	sync.c
+	sync.c \
+	db_event.c
 
 libzbxdbhigh_a_CFLAGS = \
 	-I$(top_srcdir)/src/zabbix_server/ \

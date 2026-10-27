@@ -41,6 +41,7 @@ This template has been tested on:
 |{$YUGABYTEDB.PROJECT.ID}|<p>YugabyteDB project ID.</p>||
 |{$YUGABYTEDB.ACCESS.TOKEN}|<p>Access token for the YugabyteDB API.</p>||
 |{$YUGABYTEDB.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "YugabyteDB", e.g. {$HTTP.TLS.VERIFY:"YugabyteDB"}.</p>|`full`|
 
 ### Items
 
@@ -80,6 +81,7 @@ This template has been tested on:
 |{$YUGABYTEDB.IOPS.UTILIZATION.WARN}|<p>The percentage of IOPS use on the node - for the Warning trigger expression.</p>|`75`|
 |{$YUGABYTEDB.IOPS.UTILIZATION.CRIT}|<p>The percentage of IOPS use on the node - for the High trigger expression.</p>|`90`|
 |{$YUGABYTEDB.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "YugabyteDB Cluster", e.g. {$HTTP.TLS.VERIFY:"YugabyteDB Cluster"}.</p>|`full`|
 
 ### Items
 

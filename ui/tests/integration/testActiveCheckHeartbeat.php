@@ -63,6 +63,10 @@ class testActiveCheckHeartbeat extends CIntegrationTest {
 	 * @return array
 	 */
 	public function serverPSKConfigProvider() {
+		if ($this->detectTLSLibrary() === 'none') {
+			$this->markTestSkipped('Server compiled without TLS support; skipping PSK heartbeat test.');
+		}
+
 		return [
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 4,
@@ -114,6 +118,10 @@ class testActiveCheckHeartbeat extends CIntegrationTest {
 	 * @return array
 	 */
 	public function serverPSKForPlaintextConfigProvider() {
+		if ($this->detectTLSLibrary() === 'none') {
+			$this->markTestSkipped('Server compiled without TLS support; skipping PSK heartbeat test.');
+		}
+
 		return [
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 4,
@@ -137,6 +145,10 @@ class testActiveCheckHeartbeat extends CIntegrationTest {
 	 * @return array
 	 */
 	public function proxyPSKConfigProvider() {
+		if ($this->detectTLSLibrary() === 'none') {
+			$this->markTestSkipped('Server compiled without TLS support; skipping PSK heartbeat test.');
+		}
+
 		return [
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 4,
@@ -170,6 +182,10 @@ class testActiveCheckHeartbeat extends CIntegrationTest {
 	 * @return array
 	 */
 	public function proxyPSKForPlaintextConfigProvider() {
+		if ($this->detectTLSLibrary() === 'none') {
+			$this->markTestSkipped('Server compiled without TLS support; skipping PSK heartbeat test.');
+		}
+
 		return [
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 4,

@@ -272,9 +272,7 @@ class testFormNetworkDiscovery extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Local network',
-						// Update interval is changed to avoid the "This field cannot be empty." error appearing first.
-						'Update interval' => '2h'
+						'Name' => 'Local network'
 					],
 					'Checks' => [['default' => true]],
 					'inline_errors' => ['Name' => 'This object already exists.']

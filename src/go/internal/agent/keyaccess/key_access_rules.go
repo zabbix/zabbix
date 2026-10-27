@@ -22,11 +22,11 @@ import (
 	"regexp"
 	"slices"
 
-	"golang.zabbix.com/agent2/pkg/wildcard"
 	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin/itemutil"
+	"golang.zabbix.com/sdk/wildcard"
 )
 
 const (
@@ -129,7 +129,9 @@ func parse(rec Record) (r *Rule, err error) {
 			return nil, errRegexpPatternMustNotBeEmpty
 		}
 
-		r.Regexp, err = regexp.Compile(rec.Pattern)
+		anchored := fmt.Sprintf(`\A(?:%s)\z`, rec.Pattern)
+
+		r.Regexp, err = regexp.Compile(anchored)
 		if err != nil {
 			return nil, fmt.Errorf("failed to compile regular expression: %w", err)
 		}

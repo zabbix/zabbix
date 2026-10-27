@@ -157,6 +157,16 @@ class CDService extends CApiService {
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
 		}
+
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+			$sqlParts['join']['dh'] = ['table' => 'dhosts', 'using' => 'dhostid'];
+			$sqlParts['join']['dr'] = ['left_table' => 'dh', 'table' => 'drules', 'using' => 'druleid'];
+			$sqlParts['join']['p'] = ['type' => 'left', 'left_table' => 'dr', 'table' => 'proxy', 'using' => 'proxyid'];
+			$sqlParts['where'][] = '('.
+				'dr.proxyid IS NULL'.
+				' OR '.CApiUserGroupHelper::getProxyPermissionsCondition('p').
+			')';
+		}
 //-------
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);

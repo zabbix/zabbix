@@ -130,7 +130,7 @@ class testFormEventCorrelation extends CWebTest {
 	 * Test the layout and basic functionality of the form.
 	 */
 	public function testFormEventCorrelation_Layout() {
-		$this->page->login()->open('zabbix.php?action=correlation.list')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=ceprule.list')->waitUntilReady();
 
 		// Open 'New event correlation' modal.
 		$this->query('button:Create event correlation')->one()->click();
@@ -1072,7 +1072,7 @@ class testFormEventCorrelation extends CWebTest {
 	 * Test cloning of an Event Correlation.
 	 */
 	public function testFormEventCorrelation_Clone() {
-		$this->page->login()->open('zabbix.php?action=correlation.list')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=ceprule.list')->waitUntilReady();
 		$this->query('link:Event correlation for clone')->one()->click();
 
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
@@ -1107,17 +1107,19 @@ class testFormEventCorrelation extends CWebTest {
 	 * Test deletion of an Event Correlation.
 	 */
 	public function testFormEventCorrelation_Delete() {
-		$this->page->login()->open('zabbix.php?action=correlation.list')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=ceprule.list')->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one();
 		$row_count_before = $table->getRows()->count();
 
 		$name = 'Event correlation for delete';
 		$table->query('link', $name)->one()->click();
-		COverlayDialogElement::find()->waitUntilReady()->one()->query('button:Delete')->waitUntilClickable()->one()->click();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$dialog->query('button:Delete')->waitUntilClickable()->one()->click();
 		$this->assertEquals('Delete event correlation?', $this->page->getAlertText());
 		$this->page->acceptAlert();
+		$dialog->ensureNotPresent();
 
-		$this->assertMessage(TEST_GOOD, 'Event correlation deleted');
+		$this->assertMessage(TEST_GOOD, 'Event processing rule deleted');
 		$this->assertTableStats($row_count_before - 1);
 		$this->assertFalse($this->query('link', $name)->exists());
 		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM correlation WHERE name='.CDBHelper::escape($name)));
@@ -1187,7 +1189,7 @@ class testFormEventCorrelation extends CWebTest {
 		}
 
 		// Login and open Correlation list.
-		$this->page->login()->open('zabbix.php?action=correlation.list')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=ceprule.list')->waitUntilReady();
 
 		// Open the correct Correlation form.
 		$locator = $update ? 'link:'.self::$update_correlation_initial['name'] : 'button:Create event correlation';
@@ -1209,7 +1211,7 @@ class testFormEventCorrelation extends CWebTest {
 
 		foreach (CTestArrayHelper::get($data, 'conditions', []) as $condition) {
 			$add_button->click();
-			$condition_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+			$condition_dialog = COverlayDialogElement::find(1)->waitUntilReady()->one();
 			$condition_form = $condition_dialog->query('id:correlation-condition-form')->asForm()->one();
 			$this->fillConditionForm($condition_form, $condition);
 			$condition_form->submit();
@@ -1302,10 +1304,13 @@ class testFormEventCorrelation extends CWebTest {
 			COverlayDialogElement::closeAll();
 		}
 		else {
-			// When expecting an error in the 'New event correlation' modal.
+			// Correlation form has multiple messages, so if no inline validation, the "msg-bad" message is checked specifically.
 			// TODO: Remove the condition and the part for checking regular errors after DEV-4267 is fixed.
 			if (array_key_exists('errors', $data)) {
-				$this->assertMessage(TEST_BAD, 'Cannot '.($update ? 'update' : 'create').' event correlation', $data['errors']);
+				$message = $this->query('class:msg-bad')->waitUntilVisible()->asMessage()->one();
+				$this->assertTrue($message->isBad());
+				$this->assertEquals('Cannot '.($update ? 'update' : 'create').' event correlation', $message->getTitle());
+				$this->assertEquals($data['errors'], $message->getLines()->asText());
 			}
 			else {
 				$this->assertInlineError($form, $data['inline_errors']);
@@ -1333,7 +1338,7 @@ class testFormEventCorrelation extends CWebTest {
 	protected function checkCancelAction($action) {
 		$old_hash = CDBHelper::getHash(self::HASH_SQL);
 
-		$this->page->login()->open('zabbix.php?action=correlation.list')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=ceprule.list')->waitUntilReady();
 		$button_selector = ($action === 'create')
 			? 'button:Create event correlation'
 			: 'link:Event correlation for cancel';

@@ -108,7 +108,7 @@ func jobDoneListener(done chan<- error, cmd *exec.Cmd) {
 func timeoutListener(ctx context.Context, cmd *exec.Cmd) {
 	<-ctx.Done()
 
-	err := syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
+	err := syscall.Kill(-cmd.Process.Pid, syscall.SIGTERM)
 	if err != nil {
 		log.Debugf("failed to kill cmd processes %s", err)
 	}

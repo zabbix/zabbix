@@ -30,6 +30,8 @@ if ($this->data['drule']['druleid'] !== null) {
 	$form->addVar('druleid', $this->data['drule']['druleid']);
 }
 
+$can_select_server_for_discovery_by = CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING);
+
 // Create form grid.
 $form_grid = (new CFormGrid())
 	->addItem([
@@ -45,8 +47,9 @@ $form_grid = (new CFormGrid())
 		new CLabel(_('Discovery by'), 'discovery_by'),
 		new CFormField(
 			(new CRadioButtonList('discovery_by', $data['discovery_by']))
-				->addValue(_('Server'), ZBX_DISCOVERY_BY_SERVER)
+				->addValue(_('Server'), ZBX_DISCOVERY_BY_SERVER, disabled: !$can_select_server_for_discovery_by)
 				->addValue(_('Proxy'), ZBX_DISCOVERY_BY_PROXY)
+				->setReadonly(!$data['user']['can_edit_discovery_by'])
 				->setModern()
 		)
 	])
@@ -277,7 +280,8 @@ $output = [
 			'rules' => $data['js_validation_rules'],
 			'clone_rules' => $data['js_clone_validation_rules'],
 			'dchecks' => array_values($data['drule']['dchecks']),
-			'drule' => $data['drule']
+			'drule' => $data['drule'],
+			'can_select_server_for_discovery_by' => $can_select_server_for_discovery_by
 		]).');',
 	'dialogue_class' => 'modal-popup-large'
 ];

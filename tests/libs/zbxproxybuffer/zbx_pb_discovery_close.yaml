@@ -1,0 +1,63 @@
+---
+test case: close with 0 rows - nothing flushed to memory buffer
+in:
+  ip: "192.168.1.1"
+  dns: "host.example.com"
+  value: "42"
+  rows: 0
+out:
+  rows: 0
+---
+test case: close with 1 row - row flushed to memory buffer with correct fields
+in:
+  ip: "192.168.1.1"
+  dns: "host.example.com"
+  value: "42"
+  rows: 1
+out:
+  rows: 1
+---
+test case: close with 3 rows - all rows flushed to memory buffer
+in:
+  ip: "10.0.0.1"
+  dns: "proxy.internal"
+  value: "open"
+  rows: 3
+out:
+  rows: 3
+---
+test case: empty value field - empty string stored correctly
+in:
+  ip: "172.16.0.10"
+  dns: "scanner.lan"
+  value: ""
+  rows: 1
+out:
+  rows: 1
+---
+test case: empty dns field - empty dns stored correctly
+in:
+  ip: "10.10.10.10"
+  dns: ""
+  value: "1"
+  rows: 2
+out:
+  rows: 2
+---
+test case: empty ip and dns both empty - edge case all empty location fields
+in:
+  ip: ""
+  dns: ""
+  value: ""
+  rows: 1
+out:
+  rows: 1
+---
+test case: long value string - large payload stored in shared memory
+in:
+  ip: "203.0.113.5"
+  dns: "deep-scan.example.net"
+  value: "HTTP/1.1 200 OK Content-Type: text/html Server: Apache/2.4.54"
+  rows: 5
+out:
+  rows: 5

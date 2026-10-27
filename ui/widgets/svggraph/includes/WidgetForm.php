@@ -178,7 +178,7 @@ class WidgetForm extends CWidgetForm {
 		}
 
 		if (!$this->lefty_on) {
-			unset($values['lefty_min'], $values['lefty_max'], $values['lefty_units']);
+			unset($values['lefty_min'], $values['lefty_max'], $values['lefty_units'], $values['lefty_unsigned']);
 		}
 
 		if (array_key_exists('lefty_units', $values)) {
@@ -194,7 +194,7 @@ class WidgetForm extends CWidgetForm {
 		}
 
 		if (!$this->righty_on) {
-			unset($values['righty_min'], $values['righty_max'], $values['righty_units']);
+			unset($values['righty_min'], $values['righty_max'], $values['righty_units'], $values['righty_unsigned']);
 		}
 
 		if (array_key_exists('righty_units', $values)) {
@@ -336,6 +336,10 @@ class WidgetForm extends CWidgetForm {
 					->setMaxLength(255)
 			)
 			->addField(
+				(new CWidgetFieldCheckBox('lefty_unsigned', _('Unsigned')))
+					->setFlags(!$this->lefty_on ? CWidgetField::FLAG_DISABLED : 0x00)
+			)
+			->addField(
 				(new CWidgetFieldCheckBox('righty', _('Right Y'), _('Show')))->setDefault(SVG_GRAPH_AXIS_ON)
 			)
 			->addField(
@@ -366,6 +370,10 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldTextBox('righty_static_units', null))
 					->setFlags(!$this->righty_on || !$this->righty_units_static ? CWidgetField::FLAG_DISABLED : 0x00)
 					->setMaxLength(255)
+			)
+			->addField(
+				(new CWidgetFieldCheckBox('righty_unsigned', _('Unsigned')))
+					->setFlags(!$this->righty_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
 				(new CWidgetFieldCheckBox('axisx', _('X-Axis'), _('Show')))->setDefault(SVG_GRAPH_AXIS_ON)

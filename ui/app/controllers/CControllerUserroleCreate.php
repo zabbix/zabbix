@@ -39,6 +39,10 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 				'messages' => ['not_empty' => _('At least one UI element must be checked.')]
 			],
 			'ui_default_access' => ['boolean'],
+			'profile_redirect_enforce' => ['integer', 'in' => [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED]],
+			'profile_redirect_url' => ['string', 'length' => DB::getFieldLength('role_rule', 'value_str'),
+				'use' => [CFrontendActionValidator::class]
+			],
 			'modules' => ['array', 'field' => ['boolean']],
 			'modules_default_access' => ['boolean'],
 			'actions' => ['array', 'required',
@@ -91,8 +95,7 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 						['service_write_tag_value', 'not_empty']
 					]
 				]
-			],
-			'form_refresh' => ['integer']
+			]
 		]];
 
 		if (CSettingsHelper::isMobileDevicesEnabled()) {
@@ -140,8 +143,8 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 	 */
 	protected function doAction(): void {
 		$role = [
-			'name' => trim($this->getInput('name')),
-			'type' => $this->getInput('type')
+			'name' => trim($this->getInput('name', '')),
+			'type' => $this->getInput('type', USER_TYPE_ZABBIX_USER)
 		];
 
 		$role['rules'] = $this->getRulesInput((int) $role['type']);
