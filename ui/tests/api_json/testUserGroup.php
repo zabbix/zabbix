@@ -136,14 +136,55 @@ class testUserGroup extends CAPITest {
 			]
 		]);
 
-		// usergroup.get
 		CTestDataHelper::createObjects([
 			'user_groups' => [
 				[
-					'name' => 'user group selectApmFilters check',
+					'name' => 'user group update APM filter',
+					'apm_filters' => [
+						[
+							'key' => 'attr_key1',
+							'value' => 'attr_value',
+							'signal_type' => SIGNAL_TYPE_METRICS
+						],
+						[
+							'key' => 'attr_key1',
+							'signal_type' => SIGNAL_TYPE_METRICS
+						]
+					]
+				],
+				[
+					'name' => 'user group selectApmFilters same signal_type fields',
 					'apm_filters' => [
 						[
 							'key' => 'attr_key2',
+							'value' => 'attr_value',
+							'signal_type' => SIGNAL_TYPE_METRICS
+						],
+						[
+							'key' => 'attr_key1',
+							'signal_type' => SIGNAL_TYPE_METRICS
+						]
+					]
+				],
+				[
+					'name' => 'user group selectApmFilters different signal_type fields',
+					'apm_filters' => [
+						[
+							'key' => 'attr_key2',
+							'value' => 'attr_value',
+							'signal_type' => SIGNAL_TYPE_METRICS
+						],
+						[
+							'key' => 'attr_key1',
+							'signal_type' => SIGNAL_TYPE_LOGS
+						]
+					]
+				],
+				[
+					'name' => 'user group selectApmFilters same key fields',
+					'apm_filters' => [
+						[
+							'key' => 'attr_key1',
 							'value' => 'attr_value',
 							'signal_type' => SIGNAL_TYPE_METRICS
 						],
@@ -306,20 +347,21 @@ class testUserGroup extends CAPITest {
 					$db_apm_filters = CDBHelper::getAll(
 						'SELECT signal_type,attribute_key,value'.
 						' FROM usrgrp_apm_filter'.
-						' WHERE usrgrpid='.$usrgrpid
+						' WHERE usrgrpid='.zbx_dbstr($usrgrpid).
+						' ORDER BY usrgrp_apm_filterid'
 					);
 
-					$expected_attributes= [];
+					$expected_apm_filters = [];
 
 					foreach ($group[$key]['apm_filters'] as $apm_filter) {
-						$expected_attributes[] = [
-							'signal_type'   => (string) $apm_filter['signal_type'],
-							'attribute_key' => $apm_filter['key'],
-							'value'         => array_key_exists('value', $apm_filter) ? $apm_filter['value'] : ''
+						$expected_apm_filters[] = [
+							'signal_type'	=> (string) $apm_filter['signal_type'],
+							'attribute_key'	=> $apm_filter['key'],
+							'value'			=> array_key_exists('value', $apm_filter) ? $apm_filter['value'] : ''
 						];
 					}
 
-					$this->assertSame($expected_attributes, $db_apm_filters);
+					$this->assertSame($expected_apm_filters, $db_apm_filters);
 				}
 			}
 		}
@@ -504,6 +546,38 @@ class testUserGroup extends CAPITest {
 					]
 				],
 				'expected_error' => null
+			],
+			// Check APM filter update.
+			[
+				'group' => [
+					[
+						'usrgrpid' => ':user_group:user group update APM filter',
+						'name' => 'user group update APM filter',
+						'apm_filters' => [
+							[
+								'key' => 'attr_key1',
+								'value' => 'attr_value',
+								'signal_type' => SIGNAL_TYPE_TRACES
+							],
+							[
+								'key' => 'attr_key2',
+								'value' => 'new_attr_value',
+								'signal_type' => SIGNAL_TYPE_METRICS
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'group' => [
+					[
+						'usrgrpid' => ':user_group:user group update APM filter',
+						'name' => 'user group update APM filter',
+						'apm_filters' => []
+					]
+				],
+				'expected_error' => null
 			]
 		];
 	}
@@ -553,6 +627,27 @@ class testUserGroup extends CAPITest {
 						$this->assertSame($db_right['id'], $rights['id']);
 						$this->assertSame($db_right['permission'], $rights['permission']);
 					}
+				}
+
+				if (array_key_exists('apm_filters', $groups[$key])) {
+					$db_apm_filters = CDBHelper::getAll(
+						'SELECT signal_type,attribute_key,value'.
+						' FROM usrgrp_apm_filter'.
+						' WHERE usrgrpid='.zbx_dbstr($usrgrpid).
+						' ORDER BY usrgrp_apm_filterid'
+					);
+
+					$expected_apm_filters = [];
+
+					foreach ($groups[$key]['apm_filters'] as $apm_filter) {
+						$expected_apm_filters[] = [
+							'signal_type'	=> (string) $apm_filter['signal_type'],
+							'attribute_key'	=> $apm_filter['key'],
+							'value'			=> array_key_exists('value', $apm_filter) ? $apm_filter['value'] : ''
+						];
+					}
+
+					$this->assertSame($expected_apm_filters, $db_apm_filters);
 				}
 			}
 		}
@@ -1298,10 +1393,10 @@ class testUserGroup extends CAPITest {
 
 	public static function getUserGroupApmFiltersGetData() {
 		return [
-			'usergroup.get with selectApmFilters' => [
+			'usergroup.get with selectApmFilters same signal_type fields' => [
 				'expected_result' => [
 					[
-						'usrgrpid' => ':user_group:user group selectApmFilters check',
+						'usrgrpid' => ':user_group:user group selectApmFilters same signal_type fields',
 						'apm_filters' => [
 							[
 								'key' => 'attr_key1',
@@ -1316,7 +1411,47 @@ class testUserGroup extends CAPITest {
 						]
 					]
 				],
-				'search' => 'user group selectApmFilters check'
+				'search' => 'user group selectApmFilters same signal_type fields'
+			],
+			'usergroup.get with selectApmFilters different signal_type fields' => [
+				'expected_result' => [
+					[
+						'usrgrpid' => ':user_group:user group selectApmFilters different signal_type fields',
+						'apm_filters' => [
+							[
+								'key' => 'attr_key2',
+								'value' => 'attr_value',
+								'signal_type' => (string) SIGNAL_TYPE_METRICS
+							],
+							[
+								'key' => 'attr_key1',
+								'value' => '',
+								'signal_type' => (string) SIGNAL_TYPE_LOGS
+							]
+						]
+					]
+				],
+				'search' => 'user group selectApmFilters different signal_type fields'
+			],
+			'usergroup.get with selectApmFilters same key fields' => [
+				'expected_result' => [
+					[
+						'usrgrpid' => ':user_group:user group selectApmFilters same key fields',
+						'apm_filters' => [
+							[
+								'key' => 'attr_key1',
+								'value' => '',
+								'signal_type' => (string) SIGNAL_TYPE_METRICS
+							],
+							[
+								'key' => 'attr_key1',
+								'value' => 'attr_value',
+								'signal_type' => (string) SIGNAL_TYPE_METRICS
+							]
+						]
+					]
+				],
+				'search' => 'user group selectApmFilters same key fields'
 			]
 		];
 	}
