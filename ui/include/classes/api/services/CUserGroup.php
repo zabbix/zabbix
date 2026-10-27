@@ -1303,7 +1303,7 @@ class CUserGroup extends CApiService {
 		}
 
 		if ($ins_apm_filters) {
-			$apm_filterids = DB::insertBatch('usrgrp_apm_filter', $ins_apm_filters);
+			$apm_filterids = DB::insert('usrgrp_apm_filter', $ins_apm_filters);
 		}
 
 		foreach ($user_groups as &$user_group) {
