@@ -1653,6 +1653,7 @@ static void	cep_operation_condition_update(zbx_cep_op_condition_t *op_condition,
 		case ZBX_CONDITION_TYPE_EVENT_SYMPTOM:
 		case ZBX_CONDITION_TYPE_EVENT_COPIED:
 		case ZBX_CONDITION_TYPE_EVENT_SUPPRESSED:
+			break;
 	}
 }
 
