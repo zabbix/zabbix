@@ -7,7 +7,7 @@ my ($db, $table, $tsdb_compression) = @ARGV;
 
 my @dbs = ('mysql', 'oracle', 'postgresql', 'timescaledb');
 my @tables = ('history', 'history_uint', 'history_str', 'history_log', 'history_text');
-my @tables_tsdb = ('history', 'history_uint', 'history_str', 'history_log', 'history_text', 'trends');
+my @tables_tsdb = ('history', 'history_uint', 'history_str', 'history_log', 'history_text', 'trends', 'proxy_history');
 
 my %mysql = (
 	'alter_table' => 'RENAME TABLE %TBL TO %TBL_old;',
@@ -138,6 +138,22 @@ HEREDOC
 	value_avg                DOUBLE PRECISION DEFAULT '0.0000'          NOT NULL,
 	value_max                DOUBLE PRECISION DEFAULT '0.0000'          NOT NULL,
 HEREDOC
+	, 'proxy_history' => <<'HEREDOC'
+	id                       bigint                                    NOT NULL,
+	itemid                   bigint                                    NOT NULL,
+	clock                    integer         DEFAULT '0'               NOT NULL,
+	timestamp                integer         DEFAULT '0'               NOT NULL,
+	source                   varchar(64)     DEFAULT ''                NOT NULL,
+	severity                 integer         DEFAULT '0'               NOT NULL,
+	value                    text            DEFAULT ''                NOT NULL,
+	logeventid               integer         DEFAULT '0'               NOT NULL,
+	ns                       integer         DEFAULT '0'               NOT NULL,
+	state                    integer         DEFAULT '0'               NOT NULL,
+	lastlogsize              bigint          DEFAULT '0'               NOT NULL,
+	mtime                    integer         DEFAULT '0'               NOT NULL,
+	flags                    integer         DEFAULT '0'               NOT NULL,
+	write_clock              integer         DEFAULT '0'               NOT NULL,
+HEREDOC
 );
 
 my $tsdb_compress_sql = <<'HEREDOC'
@@ -225,7 +241,7 @@ DECLARE
 	tsdb_version_minor	INTEGER;
 	compress_after		INTEGER;
 BEGIN
-	PERFORM create_hypertable('%HISTTBL', 'clock', chunk_time_interval => (
+	PERFORM create_hypertable('%HISTTBL', '%PARTCOL', chunk_time_interval => (
 		SELECT integer_interval FROM timescaledb_information.dimensions WHERE hypertable_name='%HISTTBL_old'
 	), migrate_data => true);
 
@@ -258,6 +274,10 @@ sub output_table {
 	{
 		$pk_constraint =~ s/%HISTPK/itemid,clock/g;
 	}
+	elsif ($tbl eq 'proxy_history')
+	{
+		$pk_constraint =~ s/%HISTPK/id/g;
+	}
 	else
 	{
 		$pk_constraint =~ s/%HISTPK/itemid,clock,ns/g;
@@ -281,14 +301,21 @@ sub output_tsdb {
 	{
 		$tsdb_compress_sql =~ s/%COMPRESS_ORDERBY/clock/g;
 		$tsdb_out =~ s/%HISTPK/itemid,clock/g;
+		$tsdb_out =~ s/%PARTCOL/clock/g;
+	}
+	elsif ($tbl eq 'proxy_history')
+	{
+		$tsdb_out =~ s/%HISTPK/id/g;
+		$tsdb_out =~ s/%PARTCOL/id/g;
 	}
 	else
 	{
 		$tsdb_compress_sql =~ s/%COMPRESS_ORDERBY/clock,ns/g;
 		$tsdb_out =~ s/%HISTPK/itemid,clock,ns/g;
+		$tsdb_out =~ s/%PARTCOL/clock/g;
 	}
 
-	if ((defined $tsdb_compression) && $tsdb_compression eq 'with_compression')
+	if ((defined $tsdb_compression) && $tsdb_compression eq 'with_compression' && $tbl ne 'proxy_history')
 	{
 		$tsdb_out =~ s/%COMPRESS/$tsdb_compress_sql/g;
 		$tsdb_out =~ s/%CONFIG_COMPR/UPDATE config SET compression_status=1;/g;
