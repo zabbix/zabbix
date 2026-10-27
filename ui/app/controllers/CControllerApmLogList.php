@@ -26,12 +26,12 @@ class CControllerApmLogList extends CController {
 	}
 
 	public static function getValidationRules(): array {
-		$filter_attributes_evaltype = ['integer', 'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]];
+		$filter_attributes_evaltype = ['integer', 'in' => [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]];
 		$filter_attributes = ['objects', 'fields' => [
 			'key' => ['string', 'required'],
 			'operator' => ['integer', 'required',
-				'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
-					CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS
+				'in' => [TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_LIKE,
+					TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS
 				]
 			],
 			'value' => ['string', 'required']
@@ -44,8 +44,8 @@ class CControllerApmLogList extends CController {
 			'filter_service_name' => ['string'],
 			'filter_scope_name' => ['string'],
 			'filter_severities' => ['array', 'field' => ['integer',
-				'in' => [APM_LOG_SEVERITY_TRACE, APM_LOG_SEVERITY_DEBUG, APM_LOG_SEVERITY_INFO,
-					APM_LOG_SEVERITY_WARNING, APM_LOG_SEVERITY_ERROR, APM_LOG_SEVERITY_FATAL
+				'in' => [APM_LOG_SEVERITY_UNSPECIFIED, APM_LOG_SEVERITY_TRACE, APM_LOG_SEVERITY_DEBUG,
+					APM_LOG_SEVERITY_INFO, APM_LOG_SEVERITY_WARNING, APM_LOG_SEVERITY_ERROR, APM_LOG_SEVERITY_FATAL
 				]
 			]],
 			'filter_log_attributes_evaltype' => $filter_attributes_evaltype,
@@ -113,7 +113,7 @@ class CControllerApmLogList extends CController {
 
 		foreach (['log', 'resource', 'scope'] as $type) {
 			$filter[$type.'_attributes_evaltype'] = CProfile::get('web.apm.log.filter_'.$type.'_attributes_evaltype',
-				CONDITION_EVAL_TYPE_AND_OR
+				TAG_EVAL_TYPE_AND_OR
 			);
 
 			$filter[$type.'_attributes'] = [];
@@ -177,7 +177,7 @@ class CControllerApmLogList extends CController {
 
 		foreach (['log', 'resource', 'scope'] as $type) {
 			CProfile::update('web.apm.log.filter_'.$type.'_attributes_evaltype',
-				$this->getInput('filter_'.$type.'_attributes_evaltype', CONDITION_EVAL_TYPE_AND_OR),
+				$this->getInput('filter_'.$type.'_attributes_evaltype', TAG_EVAL_TYPE_AND_OR),
 				PROFILE_TYPE_INT
 			);
 
