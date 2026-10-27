@@ -301,6 +301,26 @@ class testUserGroup extends CAPITest {
 				$this->assertEquals($dbRow['gui_access'], GROUP_GUI_ACCESS_SYSTEM);
 				$this->assertEquals($dbRow['users_status'], 0);
 				$this->assertEquals($dbRow['debug_mode'], 0);
+
+				if (array_key_exists('apm_filters', $group[$key])) {
+					$db_apm_filters = CDBHelper::getAll(
+						'SELECT signal_type,attribute_key,value'.
+						' FROM usrgrp_apm_filter'.
+						' WHERE usrgrpid='.$usrgrpid
+					);
+
+					$expected_attributes= [];
+
+					foreach ($group[$key]['apm_filters'] as $apm_filter) {
+						$expected_attributes[] = [
+							'signal_type'   => (string) $apm_filter['signal_type'],
+							'attribute_key' => $apm_filter['key'],
+							'value'         => array_key_exists('value', $apm_filter) ? $apm_filter['value'] : ''
+						];
+					}
+
+					$this->assertSame($expected_attributes, $db_apm_filters);
+				}
 			}
 		}
 	}
@@ -1284,14 +1304,14 @@ class testUserGroup extends CAPITest {
 						'usrgrpid' => ':user_group:user group selectApmFilters check',
 						'apm_filters' => [
 							[
-								'signal_type' => SIGNAL_TYPE_METRICS,
 								'key' => 'attr_key1',
-								'value' => ''
+								'value' => '',
+								'signal_type' => (string) SIGNAL_TYPE_METRICS
 							],
 							[
-								'signal_type' => SIGNAL_TYPE_METRICS,
 								'key' => 'attr_key2',
-								'value' => 'attr_value'
+								'value' => 'attr_value',
+								'signal_type' => (string) SIGNAL_TYPE_METRICS
 							]
 						]
 					]
@@ -1316,6 +1336,6 @@ class testUserGroup extends CAPITest {
 			'search' => ['name' => $search]
 		]);
 
-		$this->assertEqualsCanonicalizing($expected_result, $result['result']);
+		$this->assertSame($expected_result, $result['result']);
 	}
 }
