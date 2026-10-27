@@ -171,6 +171,8 @@ const ZBX_STYLE_DURATION_TIME_UNITS = 'duration-time-units';
 const ZBX_STYLE_DEBUG_OUTPUT = 'debug-output';
 const ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH = 'debug-output-table-refresh';
 
+const ZBX_STYLE_ICON = 'icon';
+
 const ZBX_ICON_ALERT_WITH_CONTENT = 'zi-alert-with-content';
 const ZBX_ICON_BELL = 'zi-bell';
 const ZBX_ICON_BELL_OFF = 'zi-bell-off';
@@ -181,6 +183,7 @@ const ZBX_ICON_CHEVRON_LEFT = 'zi-chevron-left';
 const ZBX_ICON_CHEVRON_RIGHT = 'zi-chevron-right';
 const ZBX_ICON_CHEVRON_UP = 'zi-chevron-up';
 const ZBX_ICON_CHEVRON_UP_SMALL = 'zi-chevron-up-small';
+const ZBX_ICON_CIRCLE_WARNING = 'zi-circle-warning';
 const ZBX_ICON_COG_FILLED = 'zi-cog-filled';
 const ZBX_ICON_CONTEXT = 'zi-context';
 const ZBX_ICON_CLOSE = 'zi-close';
@@ -225,6 +228,16 @@ const PROXY_APM_DATA_COLLECTION_ENABLED = 1;
 
 const PROXY_APM_QUOTA_MODE_UNLIMITED = 0;
 const PROXY_APM_QUOTA_MODE_CUSTOM = 1;
+
+const TAG_EVAL_TYPE_AND_OR = 0;
+const TAG_EVAL_TYPE_OR = 2;
+
+const TAG_OPERATOR_LIKE = 0;
+const TAG_OPERATOR_EQUAL = 1;
+const TAG_OPERATOR_NOT_LIKE = 2;
+const TAG_OPERATOR_NOT_EQUAL = 3;
+const TAG_OPERATOR_EXISTS = 4;
+const TAG_OPERATOR_NOT_EXISTS = 5;
 
 const CONDITION_OPERATOR_EQUAL = 0;
 const CONDITION_OPERATOR_NOT_EQUAL = 1;
@@ -276,8 +289,6 @@ const ZBX_HINTBOX_HTML_LIMIT = 8192;
 const ZBX_SECRET_MASK = '******';
 
 const PERM_READ = 2;
-
-const TAG_EVAL_TYPE_AND_OR = 0;
 
 const MAINTENANCE_TYPE_NORMAL = 0;
 const MAINTENANCE_TYPE_NODATA = 1;

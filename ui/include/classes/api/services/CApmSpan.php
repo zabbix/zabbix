@@ -85,16 +85,16 @@ class CApmSpan extends CApmGeneral {
 			'parent_spanids' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'resource_attributes' =>			['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'key' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-				'operator' =>						['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS]), 'default' => CONDITION_OPERATOR_LIKE],
+				'operator' =>						['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]), 'default' => TAG_OPERATOR_LIKE],
 				'value' =>							['type' => API_STRING_UTF8, 'default' => '']
 			]],
-			'resource_attributes_evaltype' =>	['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]), 'default' => CONDITION_EVAL_TYPE_AND_OR],
+			'resource_attributes_evaltype' =>	['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
 			'span_attributes' =>				['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'key' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-				'operator' =>						['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS]), 'default' => CONDITION_OPERATOR_LIKE],
+				'operator' =>						['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]), 'default' => TAG_OPERATOR_LIKE],
 				'value' =>							['type' => API_STRING_UTF8, 'default' => '']
 			]],
-			'span_attributes_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]), 'default' => CONDITION_EVAL_TYPE_AND_OR],
+			'span_attributes_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
 			'min_duration' =>					['type' => API_UINT64, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'max_duration' =>					['type' => API_UINT64, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'filter' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['traceid', 'spanid', 'parent_spanid', 'trace_state', 'span_name', 'span_kind', 'service_name', 'scope_name', 'scope_version', 'status_code', 'status_message']],
@@ -132,20 +132,28 @@ class CApmSpan extends CApmGeneral {
 		}
 
 		$query = (CClickHouseHelper::createQueryFromOptions('otel_traces', 't', $db_schema, $options))
-			->where('t.Timestamp>=toDateTime64({time_from:Int32},9)', ['time_from' => $options['time_from']])
-			->where('t.Timestamp<toDateTime64({time_till:Int32},9)', ['time_till' => $options['time_till']]);
+			->where('t.Timestamp>=toDateTime64({time_from:Int32},9)', ['time_from' => ['Int32', $options['time_from']]])
+			->where('t.Timestamp<toDateTime64({time_till:Int32},9)', ['time_till' => ['Int32', $options['time_till']]]);
+
+		if (!$options['countOutput']) {
+			$fallback_sortfields = array_diff(['TraceId', 'SpanId'], $options['sortfield']);
+
+			foreach ($fallback_sortfields as $sortfield) {
+				$query->order('t.'.$sortfield);
+			}
+		}
 
 		if ($options['traceids'] !== null) {
-			$query->where('t.TraceId IN {traceids:Array(String)}', ['traceids' => $options['traceids']]);
+			$query->where('t.TraceId IN {traceids:Array(String)}', ['traceids' => ['String', $options['traceids']]]);
 		}
 
 		if ($options['spanids'] !== null) {
-			$query->where('t.SpanId IN {spanids:Array(String)}', ['spanids' => $options['spanids']]);
+			$query->where('t.SpanId IN {spanids:Array(String)}', ['spanids' => ['String', $options['spanids']]]);
 		}
 
 		if ($options['parent_spanids'] !== null) {
 			$query->where('t.ParentSpanId IN {parent_spanids:Array(String)}', [
-				'parent_spanids' => $options['parent_spanids']
+				'parent_spanids' => ['String', $options['parent_spanids']]
 			]);
 		}
 
@@ -162,11 +170,15 @@ class CApmSpan extends CApmGeneral {
 		}
 
 		if ($options['min_duration'] !== null) {
-			$query->where('t.Duration>={min_duration:Int64}', ['min_duration' => $options['min_duration']]);
+			$query->where('toUInt64(t.Duration)>={min_duration:UInt64}', [
+				'min_duration' => ['UInt64', $options['min_duration']]
+			]);
 		}
 
 		if ($options['max_duration'] !== null) {
-			$query->where('t.Duration<={max_duration:Int64}', ['max_duration' => $options['max_duration']]);
+			$query->where('toUInt64(t.Duration)<={max_duration:UInt64}', [
+				'max_duration' => ['UInt64', $options['max_duration']]
+			]);
 		}
 
 		$db = ApmDbClickHouse::getInstance(ApmDb::getInstance()->getConfig());
@@ -175,7 +187,17 @@ class CApmSpan extends CApmGeneral {
 
 		foreach ($db->fetch($query->getSql(), $query->getParams()) as $row) {
 			if ($options['countOutput']) {
-				return $real_count_output ? (string) $row['rowscount'] : array_fill(0, $row['rowscount'], []);
+				if ($real_count_output) {
+					return (string) $row['rowscount'];
+				}
+
+				$count = $row['rowscount'];
+
+				if ($options['limit'] !== null) {
+					$count = min($options['limit'], $count);
+				}
+
+				return array_fill(0, $count, []);
 			}
 
 			$db_spans[] = self::translateRowForClickHouse($row, self::CLICKHOUSE_FIELDS);

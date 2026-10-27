@@ -149,22 +149,22 @@ class CApmMetric extends CApmGeneral {
 			'with_flags_off' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'resource_attributes' =>			['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'key' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-				'operator' =>						['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS]), 'default' => CONDITION_OPERATOR_LIKE],
+				'operator' =>						['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]), 'default' => TAG_OPERATOR_LIKE],
 				'value' =>							['type' => API_STRING_UTF8, 'default' => '']
 			]],
-			'resource_attributes_evaltype' =>	['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]), 'default' => CONDITION_EVAL_TYPE_AND_OR],
+			'resource_attributes_evaltype' =>	['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
 			'scope_attributes' =>				['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'key' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-				'operator' =>						['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS]), 'default' => CONDITION_OPERATOR_LIKE],
+				'operator' =>						['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]), 'default' => TAG_OPERATOR_LIKE],
 				'value' =>							['type' => API_STRING_UTF8, 'default' => '']
 			]],
-			'scope_attributes_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]), 'default' => CONDITION_EVAL_TYPE_AND_OR],
+			'scope_attributes_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
 			'attributes' =>						['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'key' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-				'operator' =>						['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS]), 'default' => CONDITION_OPERATOR_LIKE],
+				'operator' =>						['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]), 'default' => TAG_OPERATOR_LIKE],
 				'value' =>							['type' => API_STRING_UTF8, 'default' => '']
 			]],
-			'attributes_evaltype' =>			['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]), 'default' => CONDITION_EVAL_TYPE_AND_OR],
+			'attributes_evaltype' =>			['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
 			'filter' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['resource_schema_url', 'scope_name', 'scope_version', 'scope_schema_url', 'service_name', 'metric_name', 'metric_unit', 'flags']],
 			'search' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['resource_schema_url', 'scope_name', 'scope_version', 'scope_schema_url', 'service_name', 'metric_name', 'metric_description', 'metric_unit']],
 			'searchByAny' =>					['type' => API_BOOLEAN, 'default' => false],
@@ -214,6 +214,10 @@ class CApmMetric extends CApmGeneral {
 			? array_intersect_key(self::CLICKHOUSE_METRICS_TABLES, array_flip($options['types']))
 			: self::CLICKHOUSE_METRICS_TABLES;
 
+		$fallback_sortfields = $options['countOutput']
+			? []
+			: array_diff(['TimeUnix', 'MetricName', 'ServiceName'], $options['sortfield']);
+
 		$sub_query_options = $options['countOutput']
 			? array_diff_key($options, array_flip(['output', 'sortfield', 'sortorder', 'limit', 'offset']))
 			: array_diff_key($options, array_flip(['output', 'limit', 'offset']));
@@ -225,11 +229,15 @@ class CApmMetric extends CApmGeneral {
 				$sub_query_options
 			))
 				->where($table_alias.'.TimeUnix>=toDateTime64({time_from:Int32},9)', [
-					'time_from' => $options['time_from']
+					'time_from' => ['Int32', $options['time_from']]
 				])
 				->where($table_alias.'.TimeUnix<toDateTime64({time_till:Int32},9)', [
-					'time_till' => $options['time_till']
+					'time_till' => ['Int32', $options['time_till']]
 				]);
+
+			foreach ($fallback_sortfields as $sortfield) {
+				$sub_query->order($table_alias.'.'.$sortfield);
+			}
 
 			if ($options['limit'] !== null) {
 				$sub_query->limit($options['limit'] + ($options['offset'] ?? 0));
@@ -237,13 +245,13 @@ class CApmMetric extends CApmGeneral {
 
 			if ($options['with_flags_on'] !== null) {
 				$sub_query->where('bitAnd('.$table_alias.'.Flags, {flags_on:Int32})={flags_on:Int32}', [
-					'flags_on' => $options['with_flags_on']
+					'flags_on' => ['Int32', $options['with_flags_on']]
 				]);
 			}
 
 			if ($options['with_flags_off'] !== null) {
 				$sub_query->where('bitAnd('.$table_alias.'.Flags, {flags_off:Int32})=0', [
-					'flags_off' => $options['with_flags_off']
+					'flags_off' => ['Int32', $options['with_flags_off']]
 				]);
 			}
 
@@ -266,7 +274,9 @@ class CApmMetric extends CApmGeneral {
 			}
 
 			if (!$options['countOutput']) {
-				$select_fields = array_keys(array_flip($options['output']) + array_flip($options['sortfield']));
+				$select_fields = array_keys(array_flip($options['output']) + array_flip($options['sortfield']) +
+					array_flip($fallback_sortfields)
+				);
 
 				foreach (array_intersect(array_keys(self::CLICKHOUSE_FIELDS), $select_fields) as $field) {
 					if ($field === 'Type') {
@@ -276,9 +286,16 @@ class CApmMetric extends CApmGeneral {
 					}
 
 					if (array_key_exists($field, $db_schema[$table])) {
-						CClickHouseHelper::selectForType($sub_query, $db_schema[$table][$field]['type'], $field,
-							$table_alias
+						$custom_select = CClickHouseHelper::getCustomTypeSelect($db_schema[$table][$field]['type'],
+							$field, $table_alias
 						);
+
+						if ($custom_select !== null) {
+							$sub_query->select($custom_select, $field);
+						}
+						else {
+							$sub_query->select($table_alias.'.'.$field);
+						}
 					}
 					else {
 						$sub_query->select(self::CLICKHOUSE_FIELDS_DEFAULTS[$field], $field);
@@ -317,6 +334,10 @@ class CApmMetric extends CApmGeneral {
 				};
 
 				$query->order('u.'.$field, $sort_order);
+			}
+
+			foreach ($fallback_sortfields as $sortfield) {
+				$query->order('u.'.$sortfield);
 			}
 
 			$query
