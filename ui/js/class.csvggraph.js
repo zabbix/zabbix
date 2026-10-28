@@ -820,7 +820,7 @@
 					color_span.classList.add('svg-graph-hintbox-trigger-color');
 
 					const li = document.createElement('li');
-					li.append(color_span, `${val.trigger} [${val.constant}]`)
+					li.append(color_span, `${val.trigger} [${val.constant}]`);
 
 					hint_body.append(li);
 
