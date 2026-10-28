@@ -1,5 +1,6 @@
 include ../Makefile.include
 
+if SERVER
 BINARIES_tests = \
 	tq_sql_dyn_escape_string_unquoted \
 	zbx_tq_validate_numeric_condition_value \
@@ -57,3 +58,4 @@ tq_sql_dyn_normalize_numeric_condition_value_LDADD += @SERVER_LIBS@
 tq_sql_dyn_normalize_numeric_condition_value_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
 tq_sql_dyn_normalize_numeric_condition_value_CFLAGS = $(TELEMETRY_COMPILER_FLAGS)
+endif
