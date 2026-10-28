@@ -30,10 +30,10 @@ require_once __DIR__.'/../../include/classes/api/item_types/CItemTypeTelemetryQu
  * The query item, LLD rule and prototypes come from a template linked to every host, the site filter of the queries
  * is the {$SITE} user macro, which every host sets to its own name.
  *
- * Each query result row is a separate value, so every row is processed by all dependent items of its host:
- * LLD_DISCOVERY_COUNT * LLD_DISCOVERY_COUNT JSONPath lookups per host and round when every device reports, as in
- * the trigger rounds, where problem devices report status=1 among status=0 of all other devices (indexed, master
- * value parsed once).
+ * The query item returns all rows of a poll as a single JSON array value, which is processed by all dependent items
+ * of its host: LLD_DISCOVERY_COUNT JSONPath lookups in a value of LLD_DISCOVERY_COUNT rows per host and round when
+ * every device reports, as in the trigger rounds, where problem devices report status=1 among status=0 of all other
+ * devices (master value parsed once and indexed).
  *
  * Requires: proxy built with APM support, ClickHouse with otel_* tables, grpcurl in PATH.
  *
@@ -70,7 +70,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	const PREFLIGHT_DEVICE = 'apm_preflight';
 
 	const HOST_COUNT = 4;
-	/* every device is a row of the discovery query, which must not exceed ZBX_TQ_MAX_RESULT_ROWS (10000) */
+	/* every device is a row of the discovery query, which must not exceed ZBX_TQ_MAX_RESULT_ROWS */
 	const LLD_DISCOVERY_COUNT = 32768;
 	const PROBLEM_DEVICE_COUNT = 8192;
 	const OTLP_BATCH_SIZE = 1000;
@@ -79,8 +79,6 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	const CLICKHOUSE_WAIT_SECONDS = 60;
 	const PREFLIGHT_RESEND_SECONDS = 10;
 	const STORED_STATUS_WINDOW = '1d';
-	/* ZBX_TQ_STORAGE_MODE_SINGLE: one value with all buckets, "[]" when none (multiple values mode sets no value) */
-	const TQ_STORAGE_MODE_SINGLE = 1;
 
 	/* granularity == delay keeps query windows contiguous, so each sent data point yields exactly one row */
 	const TQ_GRANULARITY = '5s';
@@ -91,7 +89,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	/* granularity smaller than delay, every poll returns several buckets of a device that reported more than once */
 	const SMALL_TQ_GRANULARITY = '1s';
 	/* every status is sent twice a second apart, a poll may hold both buckets of a device, keep the rows of a host */
-	/* within ZBX_TQ_MAX_RESULT_ROWS (10000) */
+	/* within ZBX_TQ_MAX_RESULT_ROWS */
 	const SMALL_GRANULARITY_PROBLEM_DEVICE_COUNT = 4096;
 	const SMALL_GRANULARITY_SEND_COUNT = 2;
 
@@ -970,7 +968,6 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 			'time_shift' => '0s',
 			'lookback_limit' => self::STORED_STATUS_WINDOW,
 			'granularity' => self::STORED_STATUS_WINDOW,
-			'storage_mode' => self::TQ_STORAGE_MODE_SINGLE,
 			'query' => json_encode($query, JSON_THROW_ON_ERROR)
 		];
 	}
