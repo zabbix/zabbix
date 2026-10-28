@@ -154,7 +154,7 @@ func fatalCloseOSItems() {
 
 func openEventLog() (err error) {
 	if isWinLauncher() {
-		eLog, err = eventlog.NewWithOptions(serviceName)
+		eLog, err = eventlog.Open(serviceName)
 	}
 	return
 }
