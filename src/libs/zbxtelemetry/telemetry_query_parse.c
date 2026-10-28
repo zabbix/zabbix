@@ -165,6 +165,8 @@ static zbx_tq_operator_t	tq_match_operator(int x)
 		case ZBX_TQ_OPERATOR_NOT_EQUAL:
 		case ZBX_TQ_OPERATOR_CONTAINS:
 		case ZBX_TQ_OPERATOR_NOT_CONTAINS:
+		case ZBX_TQ_OPERATOR_MORE_EQUAL:
+		case ZBX_TQ_OPERATOR_LESS_EQUAL:
 		case ZBX_TQ_OPERATOR_EXISTS:
 			return x;
 		default:
@@ -614,22 +616,22 @@ static void	tq_set_column_info(zbx_tq_query_t *query)
 	{
 		zbx_tq_column_t	*col = &query->columns.values[i];
 
-		col->col_info = tq_get_column_info(query->signal_type, query->metric_point_type, col->column);
+		col->col_info = zbx_tq_get_column_info(query->signal_type, query->metric_point_type, col->column);
 	}
 
 	for (int i = 0; i < query->aggregated_columns.values_num; i++)
 	{
 		zbx_tq_aggr_column_t *aggr_col = &query->aggregated_columns.values[i];
 
-		aggr_col->col_info = tq_get_column_info(query->signal_type, query->metric_point_type, aggr_col->column);
+		aggr_col->col_info = zbx_tq_get_column_info(query->signal_type, query->metric_point_type,
+				aggr_col->column);
 	}
 
 	for (int i = 0; i < query->conditions.values_num; i++)
 	{
-		zbx_tq_condition_t	*condition = &query->conditions.values[i];
+		zbx_tq_condition_t	*cond = &query->conditions.values[i];
 
-		condition->col_info = tq_get_column_info(query->signal_type, query->metric_point_type,
-				condition->column);
+		cond->col_info = zbx_tq_get_column_info(query->signal_type, query->metric_point_type, cond->column);
 	}
 }
 
@@ -735,8 +737,8 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 						i);
 			}
 
-			if (!(ZBX_TQ_COLUMN_TYPE_NUM == aggr_col->col_info->type
-					|| ZBX_TQ_COLUMN_TYPE_TIMESTAMP == aggr_col->col_info->type))
+			if (!(ZBX_TQ_COLUMN_TYPE_NUM == aggr_col->col_info->type ||
+					ZBX_TQ_COLUMN_TYPE_TIMESTAMP == aggr_col->col_info->type))
 			{
 				return ret_errf(FAIL, error, max_error_len,
 						"Unsupported column type for aggregated column #%d", i);
@@ -833,13 +835,33 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 						ZBX_TQ_QUERY_TAG_VALUE, i);
 			}
 
-			if (!(ZBX_TQ_COLUMN_TYPE_ATTRIBUTES == cond->col_info->type ||
-					ZBX_TQ_COLUMN_TYPE_ARRAY_ATTRIBUTES == cond->col_info->type ||
-					ZBX_TQ_COLUMN_TYPE_STR == cond->col_info->type ||
-					ZBX_TQ_COLUMN_TYPE_ARRAY_STR == cond->col_info->type))
+			/* all column types are supported in conditions */
+
+			if (SUCCEED == zbx_tq_column_type_requires_numeric_comparison(cond->col_info->type))
 			{
-				return ret_errf(FAIL, error, max_error_len, "Unsupported column type for condition #%d",
-						i);
+				if (!(ZBX_TQ_OPERATOR_EQUAL == cond->operator ||
+						ZBX_TQ_OPERATOR_NOT_EQUAL == cond->operator ||
+						ZBX_TQ_OPERATOR_MORE_EQUAL == cond->operator ||
+						ZBX_TQ_OPERATOR_LESS_EQUAL == cond->operator))
+				{
+					return ret_errf(FAIL, error, max_error_len,
+							"Unsupported \"%s\" selected for numeric condition #%d",
+							ZBX_TQ_QUERY_TAG_OPERATOR, i);
+				}
+
+				if (SUCCEED != zbx_tq_validate_numeric_condition_value(cond->value))
+				{
+					return ret_errf(FAIL, error, max_error_len,
+							"\"%s\" is not numeric for numeric condition #%d",
+							ZBX_TQ_QUERY_TAG_VALUE, i);
+				}
+			}
+			else if (ZBX_TQ_OPERATOR_MORE_EQUAL == cond->operator ||
+					ZBX_TQ_OPERATOR_LESS_EQUAL == cond->operator)
+			{
+				return ret_errf(FAIL, error, max_error_len,
+							"Unsupported \"%s\" selected for non-numeric condition #%d",
+							ZBX_TQ_QUERY_TAG_OPERATOR, i);
 			}
 
 			if (ZBX_TQ_OPERATOR_EXISTS == cond->operator
@@ -940,7 +962,23 @@ static int	tq_expand_macros_field(char **str, char **str_orig, zbx_tq_macro_expa
 	return SUCCEED;
 }
 
-static int	tq_expand_macros_query(zbx_tq_query_t *query, zbx_tq_macro_expand_func_t macro_expand_cb,
+/******************************************************************************
+ *                                                                            *
+ * Purpose: expands macros in query, sets *_orig, does not validate field     *
+ *          presence or values in query, does not set col_info or formula_ctx *
+ *                                                                            *
+ * Parameters: query            - [IN/OUT]                                    *
+ *             macro_expand_cb  - [IN] callback called on every field in      *
+ *                                     query where macros are supported       *
+ *             macro_expand_ctx - [IN] context passed to macro_expand_cb      *
+ *             error            - [OUT]                                       *
+ *             max_error_len    - [IN]                                        *
+ *                                                                            *
+ * Return value: SUCCEED - macros were expanded successfully                  *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_tq_expand_macros_in_query(zbx_tq_query_t *query, zbx_tq_macro_expand_func_t macro_expand_cb,
 		void *macro_expand_ctx, char *error, size_t max_error_len)
 {
 	for (int i = 0; i < query->conditions.values_num; i++)
@@ -988,7 +1026,7 @@ int	zbx_tq_prepare_query(zbx_tq_query_t *query, zbx_tq_macro_expand_func_t macro
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
 
-	if (SUCCEED != tq_expand_macros_query(query, macro_expand_cb, macro_expand_ctx, error, max_error_len))
+	if (SUCCEED != zbx_tq_expand_macros_in_query(query, macro_expand_cb, macro_expand_ctx, error, max_error_len))
 		goto out;
 
 	tq_set_column_info(query);
@@ -1021,23 +1059,31 @@ out:
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Comments: query must be validated, all fields must be set (not NULL)       *
- *                                                                            *
- ******************************************************************************/
+static void	tq_write_string(struct zbx_json *j, const char *tag, const char *str)
+{
+	if (NULL == str)
+		return;
+
+	zbx_json_addstring(j, tag, str, ZBX_JSON_TYPE_STRING);
+}
+
+static void	tq_write_int_enum(struct zbx_json *j, const char *tag, int val, int val_unknown)
+{
+	if (val == val_unknown)
+		return;
+
+	zbx_json_addint64(j, tag, val);
+}
+
 char	*zbx_tq_serialize_query(const zbx_tq_query_t *query)
 {
 	struct zbx_json	j;
 	char		*str;
 
-	/* assuming that none of the field values are NULL, since query has to have been validated */
-
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_addint64(&j, ZBX_TQ_QUERY_TAG_SIGNAL_TYPE, query->signal_type);
-
-	if (ZBX_TQ_METRIC_POINT_TYPE_UNKNOWN != query->metric_point_type)
-		zbx_json_addint64(&j, ZBX_TQ_QUERY_TAG_METRIC_POINT_TYPE, query->metric_point_type);
+	tq_write_int_enum(&j, ZBX_TQ_QUERY_TAG_SIGNAL_TYPE, query->signal_type, ZBX_TQ_SIGNAL_TYPE_UNKNOWN);
+	tq_write_int_enum(&j, ZBX_TQ_QUERY_TAG_METRIC_POINT_TYPE, query->metric_point_type,
+			ZBX_TQ_METRIC_POINT_TYPE_UNKNOWN);
 
 	zbx_json_addarray(&j, ZBX_TQ_QUERY_TAG_COLUMNS);
 
@@ -1046,8 +1092,8 @@ char	*zbx_tq_serialize_query(const zbx_tq_query_t *query)
 		const zbx_tq_column_t	*col = &query->columns.values[i];
 
 		zbx_json_addobject(&j, NULL);
-		zbx_json_addstring(&j, ZBX_TQ_QUERY_TAG_COLUMN, col->column, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&j, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, col->attribute_key, ZBX_JSON_TYPE_STRING);
+		tq_write_string(&j, ZBX_TQ_QUERY_TAG_COLUMN, col->column);
+		tq_write_string(&j, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, col->attribute_key);
 		zbx_json_close(&j);
 	}
 
@@ -1060,25 +1106,28 @@ char	*zbx_tq_serialize_query(const zbx_tq_query_t *query)
 		const zbx_tq_aggr_column_t	*aggr_col = &query->aggregated_columns.values[i];
 
 		zbx_json_addobject(&j, NULL);
-		zbx_json_addstring(&j, ZBX_TQ_QUERY_TAG_COLUMN, aggr_col->column, ZBX_JSON_TYPE_STRING);
-		zbx_json_addint64(&j, ZBX_TQ_QUERY_TAG_FUNCTION, aggr_col->function);
+		tq_write_string(&j, ZBX_TQ_QUERY_TAG_COLUMN, aggr_col->column);
+		tq_write_int_enum(&j, ZBX_TQ_QUERY_TAG_FUNCTION, aggr_col->function, ZBX_TQ_FUNCTION_UNKNOWN);
 
 		zbx_json_addarray(&j, ZBX_TQ_QUERY_TAG_PARAMETERS);
 
 		for (int ii = 0; ii < aggr_col->parameters.values_num; ii++)
+		{
+			/* parsing the query never results in NULL parameter values */
 			zbx_json_addstring(&j, NULL, aggr_col->parameters.values[ii], ZBX_JSON_TYPE_STRING);
+		}
 
 		zbx_json_close(&j); /* parameters */
 
-		zbx_json_addstring(&j, ZBX_TQ_QUERY_TAG_ALIAS, aggr_col->alias, ZBX_JSON_TYPE_STRING);
+		tq_write_string(&j, ZBX_TQ_QUERY_TAG_ALIAS, aggr_col->alias);
 		zbx_json_close(&j);
 	}
 
 	zbx_json_close(&j); /* aggregated_columns */
 
 	zbx_json_addobject(&j, ZBX_TQ_QUERY_TAG_FILTER);
-	zbx_json_addint64(&j, ZBX_TQ_QUERY_TAG_EVALTYPE, query->evaltype);
-	zbx_json_addstring(&j, ZBX_TQ_QUERY_TAG_FORMULA, query->formula, ZBX_JSON_TYPE_STRING);
+	tq_write_int_enum(&j, ZBX_TQ_QUERY_TAG_EVALTYPE, query->evaltype, ZBX_TQ_EVAL_TYPE_UNKNOWN);
+	tq_write_string(&j, ZBX_TQ_QUERY_TAG_FORMULA, query->formula);
 
 	zbx_json_addarray(&j, ZBX_TQ_QUERY_TAG_CONDITIONS);
 
@@ -1087,11 +1136,11 @@ char	*zbx_tq_serialize_query(const zbx_tq_query_t *query)
 		const zbx_tq_condition_t	*cond = &query->conditions.values[i];
 
 		zbx_json_addobject(&j, NULL);
-		zbx_json_addstring(&j, ZBX_TQ_QUERY_TAG_COLUMN, cond->column, ZBX_JSON_TYPE_STRING);
+		tq_write_string(&j, ZBX_TQ_QUERY_TAG_COLUMN, cond->column);
 
-		zbx_json_addstring(&j, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, cond->attribute_key, ZBX_JSON_TYPE_STRING);
-		zbx_json_addint64(&j, ZBX_TQ_QUERY_TAG_OPERATOR, cond->operator);
-		zbx_json_addstring(&j, ZBX_TQ_QUERY_TAG_VALUE, cond->value, ZBX_JSON_TYPE_STRING);
+		tq_write_string(&j, ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, cond->attribute_key);
+		tq_write_int_enum(&j, ZBX_TQ_QUERY_TAG_OPERATOR, cond->operator, ZBX_TQ_OPERATOR_UNKNOWN);
+		tq_write_string(&j, ZBX_TQ_QUERY_TAG_VALUE, cond->value);
 
 		zbx_json_close(&j);
 	}
@@ -1149,14 +1198,11 @@ int	zbx_tq_validate_granularity(const char *granularity_str, int *granularity_ou
 			ZBX_TQ_GRANULARITY_MAX, "granularity", error, max_error_len);
 }
 
-int	zbx_tq_validate_time_params(const char *time_shift_str, int *time_shift_out, const char *lookback_limit_str,
-		int *lookback_limit_out, const char *granularity_str, int *granularity_out, char *error,
-		size_t max_error_len)
+int	zbx_tq_validate_lookback_limit_and_granularity(const char *lookback_limit_str, int *lookback_limit_out,
+		const char *granularity_str, int *granularity_out, char *error, size_t max_error_len)
 {
-	int	time_shift_tmp, lookback_limit_tmp, granularity_tmp;
+	int	lookback_limit_tmp, granularity_tmp;
 
-	if (SUCCEED != zbx_tq_validate_time_shift(time_shift_str, &time_shift_tmp, error, max_error_len))
-		return FAIL;
 	if (SUCCEED != zbx_tq_validate_lookback_limit(lookback_limit_str, &lookback_limit_tmp, error, max_error_len))
 		return FAIL;
 	if (SUCCEED != zbx_tq_validate_granularity(granularity_str, &granularity_tmp, error, max_error_len))
@@ -1165,12 +1211,26 @@ int	zbx_tq_validate_time_params(const char *time_shift_str, int *time_shift_out,
 	if (granularity_tmp > lookback_limit_tmp)
 		return ret_errf(FAIL, error, max_error_len, "\"granularity\" cannot be larger than \"lookback_limit\"");
 
-	if (NULL != time_shift_out)
-		*time_shift_out = time_shift_tmp;
 	if (NULL != lookback_limit_out)
 		*lookback_limit_out = lookback_limit_tmp;
 	if (NULL != granularity_out)
 		*granularity_out = granularity_tmp;
+
+	return SUCCEED;
+}
+
+int	zbx_tq_validate_time_params(const char *time_shift_str, int *time_shift_out, const char *lookback_limit_str,
+		int *lookback_limit_out, const char *granularity_str, int *granularity_out, char *error,
+		size_t max_error_len)
+{
+	if (SUCCEED != zbx_tq_validate_time_shift(time_shift_str, time_shift_out, error, max_error_len))
+		return FAIL;
+
+	if (SUCCEED != zbx_tq_validate_lookback_limit_and_granularity(lookback_limit_str, lookback_limit_out,
+			granularity_str, granularity_out, error, max_error_len))
+	{
+		return FAIL;
+	}
 
 	return SUCCEED;
 }

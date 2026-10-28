@@ -18,7 +18,6 @@
 #include "zbxpoller.h"
 #include "zbxtelemetry.h"
 #include "zbxcacheconfig.h"
-#include "zbxtime.h"
 
 #ifdef HAVE_LIBCURL
 #	include "zbxhttp.h"
@@ -34,7 +33,6 @@ typedef struct
 	unsigned char		preprocessing;
 	zbx_tq_query_t		*query;
 	time_t			newlasttimestamp;
-	zbx_timespec_t		min_free_ts;
 	zbx_apm_db_type_t	db_type;
 }
 zbx_dc_tq_item_context_t;

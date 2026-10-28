@@ -405,9 +405,11 @@ abstract class CItemGeneral extends CApiService {
 				}
 
 				if (array_key_exists('query', $item)) {
+					$db_item_flags = $db_item === null ? [] : ['flags' => $db_item['flags']];
+
 					if (!$item_type::validateColumns($item, $path, $error)
 							|| !$item_type::validateAggregatedColumns($item, $path, $error)
-							|| !$item_type::validateFilter($item, $path, $error)
+							|| !$item_type::validateFilter($item + $db_item_flags, $path, $error)
 							|| !$item_type::validateColumnsAggregatedColumnsUnique($item, $path, $error)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 					}
@@ -897,10 +899,11 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Validate effective granularity and lookback limit values of inherited telemetry query items and item prototypes.
+	 * Validate the effective granularity and lookback limit values of inherited telemetry query items, item prototypes,
+	 * LLD rules, and LLD rule prototypes.
 	 *
-	 * An inherited item can override these fields. Therefore, a valid template update can become invalid when combined
-	 * with a value already stored on a child item.
+	 * An inherited entity can override these fields. As a result, a template update that is valid on its own may become
+	 * invalid when combined with a value already stored on a child item.
 	 *
 	 * @param array $items
 	 * @param array $db_items
@@ -925,10 +928,20 @@ abstract class CItemGeneral extends CApiService {
 					? _('Cannot update inherited item prototype with key "%1$s" on template "%2$s" because granularity cannot be greater than lookback limit.')
 					: _('Cannot update inherited item prototype with key "%1$s" on host "%2$s" because granularity cannot be greater than lookback limit.');
 			}
-			else {
+			elseif (self::isDiscoveryRulePrototype()) {
+				$error = $item['host_status'] == HOST_STATUS_TEMPLATE
+					? _('Cannot update inherited discovery rule prototype with key "%1$s" on template "%2$s" because granularity cannot be greater than lookback limit.')
+					: _('Cannot update inherited discovery rule prototype with key "%1$s" on host "%2$s" because granularity cannot be greater than lookback limit.');
+			}
+			elseif (self::isItem()) {
 				$error = $item['host_status'] == HOST_STATUS_TEMPLATE
 					? _('Cannot update inherited item with key "%1$s" on template "%2$s" because granularity cannot be greater than lookback limit.')
 					: _('Cannot update inherited item with key "%1$s" on host "%2$s" because granularity cannot be greater than lookback limit.');
+			}
+			elseif (self::isDiscoveryRule()) {
+				$error = $item['host_status'] == HOST_STATUS_TEMPLATE
+					? _('Cannot update inherited discovery rule with key "%1$s" on template "%2$s" because granularity cannot be greater than lookback limit.')
+					: _('Cannot update inherited discovery rule with key "%1$s" on host "%2$s" because granularity cannot be greater than lookback limit.');
 			}
 
 			$hosts = DB::select('hosts', [

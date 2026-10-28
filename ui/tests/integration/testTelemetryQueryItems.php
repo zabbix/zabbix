@@ -14,6 +14,9 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
+require_once __DIR__.'/../../include/classes/parsers/CParser.php';
+require_once __DIR__.'/../../include/classes/parsers/CConditionFormulaParser.php';
+require_once __DIR__.'/../../include/classes/helpers/CConditionHelper.php';
 require_once __DIR__.'/../../include/classes/api/item_types/CItemType.php';
 require_once __DIR__.'/../../include/classes/api/item_types/CItemTypeTelemetryQuery.php';
 
@@ -21,39 +24,46 @@ require_once __DIR__.'/../../include/classes/api/item_types/CItemTypeTelemetryQu
  * @required-components server
  * @configurationDataProvider serverConfigurationProvider
  * @hosts test_telemetry_query_items
- * @backup history
- * @onBefore initEnv
  * @onAfter clearEnv
  */
 class testTelemetryQueryItems extends CIntegrationTest {
-	/* CLICKHOUSE_* constants must not contain \ or " (must not require escaping) */
-	const CLICKHOUSE_URL = 'http://127.0.0.1:8123';
-	const CLICKHOUSE_USERNAME = 'zb';
-	const CLICKHOUSE_PASSWORD = '2b';
-	const CLICKHOUSE_DB = 'zabbix';
+	const CLICKHOUSE_TIMEOUT = 10;
 
 	const COLLECTOR_ADDRESS = 'localhost:4317';
 	const PROTO_DIR = PHPUNIT_BASEDIR . '/src/zabbix_proxy/apm/';
+	const OTLP_TIMEOUT = 10;
+	const OTLP_SEND_WAIT_SECONDS = 30;
 
 	const HOST_NAME = 'test_telemetry_query_items';
 
 	const ITEM_KEY = 'test_tq_item';
+	const ITEM_TIMEOUT = '3s';
 	const ITEM_VALUE_TYPE = ITEM_VALUE_TYPE_TEXT;
 
 	private static int $hostid;
 
 	public function serverConfigurationProvider(): array {
+		// TelemetryProvider of server and proxy comes from $TELEMETRY_PROVIDERS of the frontend configuration.
 		return [
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 5,
 				'LogFileSize' => 0,
-				'LogFile' => self::getLogPath(self::COMPONENT_SERVER),
-				'TelemetryProvider' =>	'clickhouse;url="' . self::CLICKHOUSE_URL . '",' .
-										'username="' . self::CLICKHOUSE_USERNAME . '",' .
-										'password="' . self::CLICKHOUSE_PASSWORD . '",' .
-										'db="' . self::CLICKHOUSE_DB . '"'
+				'LogFile' => self::getLogPath(self::COMPONENT_SERVER)
 			]
 		];
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function prepareData() {
+		global $TELEMETRY_PROVIDERS;
+
+		if (empty($TELEMETRY_PROVIDERS)) {
+			$this->markTestSkipped('$TELEMETRY_PROVIDERS is not set in ui/conf/zabbix.conf.php.');
+		}
+
+		return true;
 	}
 
 	private function createTQItem(int $hostid, array $item_fields): int {
@@ -63,7 +73,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 			'key_' => self::ITEM_KEY,
 			'type' => ITEM_TYPE_TELEMETRY_QUERY,
 			'value_type' => self::ITEM_VALUE_TYPE,
-			'timeout' => '3s'
+			'timeout' => self::ITEM_TIMEOUT,
 		], $item_fields));
 
 		$this->assertArrayHasKey('itemids', $response['result']);
@@ -75,6 +85,22 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		return $itemid;
 	}
 
+	private function getItemForItemTest(array $item_fields): array {
+		$query = $item_fields['query'];
+		unset($item_fields['query']);
+
+		$query = CItemTypeTelemetryQuery::convertFilterFormulaToExpression($query);
+
+		return array_merge([
+			'name' => self::ITEM_KEY,
+			'key' => self::ITEM_KEY,
+			'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			'value_type' => self::ITEM_VALUE_TYPE,
+			'timeout' => self::ITEM_TIMEOUT,
+			'query' => json_encode($query, JSON_THROW_ON_ERROR)
+		], $item_fields);
+	}
+
 	private function deleteTQItem(int $itemid): void {
 		$response = $this->call('item.delete', [$itemid]);
 
@@ -83,37 +109,11 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		$this->assertEquals($itemid, $response['result']['itemids'][0]);
 	}
 
-	private function waitForBuckets(int $itemid, int $min_bucket_count, int $iterations, int $delay, string $msg): array {
-		/* TODO: maybe also check that there isn't more buckets than expected */
-		for ($i = 0; $i < $iterations; $i++) {
-			$response = $this->call('history.get', [
-				'output' => ['value'],
-				'itemids' => [$itemid],
-				'history' => self::ITEM_VALUE_TYPE,
-				'sortorder' => 'ASC',
-				'sortfield' => 'clock'
-			]);
-
-			if (isset($response['result']) && count($response['result']) >= $min_bucket_count) {
-				return $response;
-			}
-
-			sleep($delay);
-		}
-
-		$msg2 = "$msg\nFailed to wait for the minimum of $min_bucket_count buckets";
-
-		if (isset($response)) {
-			$msg2 .= "\nLast response:\n".json_encode($response);
-		}
-
-		$this->fail($msg2);
-	}
-
 	private function trySendOTLP(string $import_path, string $proto, string $payload, string $address, string $method, array &$output_lines): int {
 		$cmd =
 			'grpcurl '.
 			'-plaintext ' .
+			'-max-time ' . self::OTLP_TIMEOUT . ' ' .
 			'-import-path ' . escapeshellarg($import_path) . ' ' .
 			'-proto ' . escapeshellarg($proto) . ' ' .
 			'-d ' . escapeshellarg($payload) . ' ' .
@@ -131,13 +131,10 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		string $proto,
 		string $payload,
 		string $address,
-		string $method,
-		int $iterations = 30,
-		int $delay = 1): void {
-		$output_lines = [];
-		$exit_code = 0;
+		string $method): void {
+		$deadline = time() + self::OTLP_SEND_WAIT_SECONDS;
 
-		for ($i = 0; $i < $iterations; $i++) {
+		while (true) {
 			$output_lines = [];
 			$exit_code = $this->trySendOTLP($import_path, $proto, $payload, $address, $method, $output_lines);
 
@@ -145,7 +142,11 @@ class testTelemetryQueryItems extends CIntegrationTest {
 				return;
 			}
 
-			sleep($delay);
+			if (time() >= $deadline) {
+				break;
+			}
+
+			sleep(self::WAIT_ITERATION_DELAY);
 		}
 
 		$this->fail('Failed to send OTLP request: last exit_code: ' . $exit_code . ', last output_lines: ' . implode("\n", $output_lines));
@@ -195,26 +196,48 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		}
 	}
 
+	/**
+	 * The ClickHouse telemetry provider of the frontend configuration, the same one server and proxy are configured
+	 * with (see getDefaultComponentConfiguration()).
+	 */
+	private function getClickHouseProvider(): array {
+		global $TELEMETRY_PROVIDERS;
+
+		if (isset($TELEMETRY_PROVIDERS)) {
+			foreach ($TELEMETRY_PROVIDERS as $provider) {
+				if ($provider['provider'] === 'clickhouse') {
+					return $provider + ['db' => '', 'username' => '', 'password' => ''];
+				}
+			}
+		}
+
+		$this->fail('No ClickHouse provider in $TELEMETRY_PROVIDERS, set it in ui/conf/zabbix.conf.php.');
+	}
+
 	private function deleteOTData(): void {
+		$provider = $this->getClickHouseProvider();
 		$handle = curl_init();
 
-		$sql = "TRUNCATE ALL TABLES FROM " . self::CLICKHOUSE_DB . " LIKE 'otel_%'";
+		$sql = 'TRUNCATE ALL TABLES FROM '.$provider['db']." LIKE 'otel_%'";
 
 		curl_setopt_array($handle, [
-			CURLOPT_URL => self::CLICKHOUSE_URL,
+			CURLOPT_URL => rtrim($provider['url'], '/').'/?database='.urlencode($provider['db']),
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_POST => true,
 			CURLOPT_POSTFIELDS => $sql,
 			CURLOPT_HTTPHEADER => ['Content-Type: text/plain'],
 			CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
-			CURLOPT_USERNAME => self::CLICKHOUSE_USERNAME,
-			CURLOPT_PASSWORD => self::CLICKHOUSE_PASSWORD
+			CURLOPT_USERNAME => $provider['username'],
+			CURLOPT_PASSWORD => $provider['password'],
+			CURLOPT_CONNECTTIMEOUT => self::CLICKHOUSE_TIMEOUT,
+			CURLOPT_TIMEOUT => self::CLICKHOUSE_TIMEOUT
 		]);
 
 		$response = curl_exec($handle);
 		$http_code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
 
-		$this->assertEquals(200, $http_code, 'Unexpected http code: ' . $http_code . ', response: ' . $response);
+		$this->assertNotFalse($response, 'curl error: '.curl_error($handle).', query: '.$sql);
+		$this->assertEquals(200, $http_code, 'Unexpected http code: '.$http_code.', response: '.$response);
 	}
 
 	private static function normalizeValue(mixed $value): mixed {
@@ -225,15 +248,11 @@ class testTelemetryQueryItems extends CIntegrationTest {
 	}
 
 	private static function normalizeBucket(array $bucket): array {
-		if (isset($bucket['id'])) {
-			$bucket['id'] = self::normalizeValue($bucket['id']);
-		}
-
-		if (!isset($bucket['columns']) || !is_array($bucket['columns'])) {
+		if (!is_array($bucket)) {
 			return $bucket;
 		}
 
-		foreach ($bucket['columns'] as &$value) {
+		foreach ($bucket as &$value) {
 			$value = self::normalizeValue($value);
 		}
 		unset($value);
@@ -246,24 +265,39 @@ class testTelemetryQueryItems extends CIntegrationTest {
 
 		$this->deleteOTData();
 
-		$itemid = $this->createTQItem($hostid, $subcase['item']);
-
 		$now = time();
 		$this->sendInput($subcase['input_tmpl']($now));
 
+		$item = $this->getItemForItemTest($subcase['item']);
 
 		$expected_buckets = $subcase['buckets_tmpl']($now);
 
-		$response = $this->waitForBuckets($itemid, count($expected_buckets), 30, 1, $msg);
+		$this->callTestItemUntilCallback($item, function ($result) use ($expected_buckets, $msg) {
+			if ($result === false || !isset($result['item']['result'])) {
+				return false;
+			}
+
+			$buckets = json_decode($result['item']['result'], true, 512, JSON_THROW_ON_ERROR);
+			$this->assertTrue(is_array($buckets), $msg);
+
+			return count($expected_buckets) === count($buckets);
+		});
+
+		$itemid = $this->createTQItem($hostid, $subcase['item']);
+
+		$response = $this->callUntilDataIsPresent('history.get', [
+			'output' => ['value'],
+			'itemids' => [$itemid],
+			'history' => self::ITEM_VALUE_TYPE
+		]);
+
+		$buckets = json_decode($response['result'][0]['value'], true, 512, JSON_THROW_ON_ERROR);
 
 		for ($i = 0; $i < count($expected_buckets); $i++) {
-			$this->assertArrayHasKey('value', $response['result'][$i], $msg);
-			$value = json_decode($response['result'][$i]['value'], true, 512, JSON_THROW_ON_ERROR);
+			$this->assertArrayHasKey('clock', $buckets[$i], $msg);
+			unset($buckets[$i]['clock']);
 
-			$this->assertArrayHasKey('timestamp', $value, $msg);
-			unset($value['timestamp']);
-
-			$this->assertSame(self::normalizeBucket($expected_buckets[$i]), self::normalizeBucket($value), $msg);
+			$this->assertSame(self::normalizeBucket($expected_buckets[$i]), self::normalizeBucket($buckets[$i]), $msg);
 		}
 
 		$this->deleteTQItem($itemid);
@@ -790,15 +824,12 @@ class testTelemetryQueryItems extends CIntegrationTest {
 			'buckets_tmpl' => function (int $now) use ($funcs) {
 				$ret = [
 					[
-						'id' => 1,
-						'columns' => [
-							'MetricName' => 'test_gauge'
-						]
+						'MetricName' => 'test_gauge'
 					]
 				];
 
 				foreach ($funcs as $i => $v) {
-					$ret[0]['columns']['func_' . $i] = $v['expected'];
+					$ret[0]['func_' . $i] = $v['expected'];
 				}
 
 				return $ret;
@@ -850,17 +881,6 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		);
 	}
 
-	/*
-		TODO: add test cases for:
-			- time buckets with overlap
-			- time buckets with gaps
-			- time buckets with no gaps, no overlaps but in multiple requests
-			- custom expression
-			- array conditions
-			- exists condition
-			- utf-8 handling in attributes (both keys and values)
-	*/
-
 	/**
 	 * @onBeforeOnce createHost
 	 * @onAfterOnce deleteHost
@@ -876,7 +896,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 					[self::qagg('', AGGREGATE_COUNT, 'cnt')],
 					self::emptyFilter()
 				),
-				'buckets_tmpl' => fn(int $now) => [['id' => 1, 'columns' => ['cnt' => 1]]],
+				'buckets_tmpl' => fn(int $now) => [['cnt' => 1]],
 				'input_tmpl' => fn(int $now) => [
 					'traces' => [self::tmplTrace(self::tsOffStr($now, -10), self::tsOffStr($now, -5))]
 				]
@@ -890,7 +910,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 					[self::qagg('', AGGREGATE_COUNT, 'cnt')],
 					self::emptyFilter()
 				),
-				'buckets_tmpl' => fn(int $now) => [['id' => 1, 'columns' => ['cnt' => 1]]],
+				'buckets_tmpl' => fn(int $now) => [['cnt' => 1]],
 				'input_tmpl' => fn(int $now) => [
 					'logs' => [self::tmplLog(self::tsOffStr($now, -10))]
 				]
@@ -904,7 +924,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 					[self::qagg('', AGGREGATE_COUNT, 'cnt')],
 					self::emptyFilter()
 				),
-				'buckets_tmpl' => fn(int $now) => [['id' => 1, 'columns' => ['cnt' => 1]]],
+				'buckets_tmpl' => fn(int $now) => [['cnt' => 1]],
 				'input_tmpl' => fn(int $now) => [
 					'metrics' => [self::tmplMetricSum(self::tsOffStr($now, -10), self::tsOffStr($now, -5))]
 				]
@@ -918,7 +938,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 					[self::qagg('', AGGREGATE_COUNT, 'cnt')],
 					self::emptyFilter()
 				),
-				'buckets_tmpl' => fn(int $now) => [['id' => 1, 'columns' => ['cnt' => 1]]],
+				'buckets_tmpl' => fn(int $now) => [['cnt' => 1]],
 				'input_tmpl' => fn(int $now) => [
 					'metrics' => [self::tmplMetricGauge(self::tsOffStr($now, -10), self::tsOffStr($now, -5))]
 				]
@@ -932,7 +952,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 					[self::qagg('', AGGREGATE_COUNT, 'cnt')],
 					self::emptyFilter()
 				),
-				'buckets_tmpl' => fn(int $now) => [['id' => 1, 'columns' => ['cnt' => 1]]],
+				'buckets_tmpl' => fn(int $now) => [['cnt' => 1]],
 				'input_tmpl' => fn(int $now) => [
 					'metrics' => [self::tmplMetricHistogram(self::tsOffStr($now, -10), self::tsOffStr($now, -5))]
 				]
@@ -946,7 +966,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 					[self::qagg('', AGGREGATE_COUNT, 'cnt')],
 					self::emptyFilter()
 				),
-				'buckets_tmpl' => fn(int $now) => [['id' => 1, 'columns' => ['cnt' => 1]]],
+				'buckets_tmpl' => fn(int $now) => [['cnt' => 1]],
 				'input_tmpl' => fn(int $now) => [
 					'metrics' => [self::tmplMetricExponentialHistogram(self::tsOffStr($now, -10), self::tsOffStr($now, -5))]
 				]
@@ -958,7 +978,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 	 * @onBeforeOnce createHost
 	 * @onAfterOnce deleteHost
 	 */
-	public function testTelemetryQueryItems_checkDataAllCollumns(): void {
+	public function testTelemetryQueryItems_checkDataAllColumns(): void {
 		$this->executeSubcases([
 			[
 				'description' => 'Traces all columns test with EXPRESSION evaltype',
@@ -1008,38 +1028,37 @@ class testTelemetryQueryItems extends CIntegrationTest {
 							self::qcond('StatusCode', CONDITION_OPERATOR_EQUAL, 'Ok'),
 							self::qcond('StatusMessage', CONDITION_OPERATOR_LIKE, 'status'),
 							self::qcond('Events.Name', CONDITION_OPERATOR_EQUAL, 'test-span-event'),
-							self::qcond('Events.Attributes', CONDITION_OPERATOR_EXISTS, '', 'event.attr')
+							self::qcond('Events.Attributes', CONDITION_OPERATOR_EXISTS, '', 'event.attr'),
+							self::qcond('Timestamp', CONDITION_OPERATOR_MORE_EQUAL, '123'),
+							self::qcond('Duration', CONDITION_OPERATOR_LESS_EQUAL, '5')
 						],
-						'A and B and C and D and E or F and G and (H and I and (J or K)) and L and M and N and (O or not O)'
+						'A and B and C and D and E or F and G and (H and I and (J or K)) and L and M and N and (O or not O) and P and Q'
 					)
 				),
 				'buckets_tmpl' => fn(int $now) => [
 					[
-						'id' => 1,
-						'columns' => [
-							'Timestamp' => $now - 10,
-							'TraceId' => '4123456789abcdef0123456789abcdef',
-							'SpanId' => '5122334455667788',
-							'ParentSpanId' => '6122334455667788',
-							'TraceState' => 'vendor=value',
-							'SpanName' => 'test-span',
-							'SpanKind' => 'Server',
-							'ServiceName' => 'trace-test-service',
-							'ResourceAttributes.host.name' => 'trace-test-host',
-							'SpanAttributes.http.method' => 'GET',
-							'ScopeName' => 'trace-test-scope',
-							'ScopeVersion' => '1.0.0',
-							'Duration' => 5000000000,
-							'StatusCode' => 'Ok',
-							'StatusMessage' => 'trace status message',
-							'cnt' => 1,
-							'timestamp_min' => $now - 10,
-							'duration_min' => 5000000000,
-							'duration_max' => 5000000000,
-							'duration_avg' => 5000000000,
-							'duration_sum' => 5000000000,
-							'duration_p90' => 5000000000
-						]
+						'Timestamp' => $now - 10,
+						'TraceId' => '4123456789abcdef0123456789abcdef',
+						'SpanId' => '5122334455667788',
+						'ParentSpanId' => '6122334455667788',
+						'TraceState' => 'vendor=value',
+						'SpanName' => 'test-span',
+						'SpanKind' => 'Server',
+						'ServiceName' => 'trace-test-service',
+						'ResourceAttributes.host.name' => 'trace-test-host',
+						'SpanAttributes.http.method' => 'GET',
+						'ScopeName' => 'trace-test-scope',
+						'ScopeVersion' => '1.0.0',
+						'Duration' => 5000000000,
+						'StatusCode' => 'Ok',
+						'StatusMessage' => 'trace status message',
+						'cnt' => 1,
+						'timestamp_min' => $now - 10,
+						'duration_min' => 5000000000,
+						'duration_max' => 5000000000,
+						'duration_avg' => 5000000000,
+						'duration_sum' => 5000000000,
+						'duration_p90' => 5000000000
 					]
 				],
 				'input_tmpl' => fn(int $now) => [
@@ -1091,37 +1110,37 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						self::qcond('ResourceAttributes', CONDITION_OPERATOR_NOT_EQUAL, 'other-host', 'host.name'),
 						self::qcond('ScopeAttributes', CONDITION_OPERATOR_EXISTS, '', 'scope.attr'),
 						self::qcond('LogAttributes', CONDITION_OPERATOR_EXISTS, '', 'logger.name'),
-						self::qcond('EventName', CONDITION_OPERATOR_NOT_LIKE, 'missing-event')
+						self::qcond('EventName', CONDITION_OPERATOR_NOT_LIKE, 'missing-event'),
+						self::qcond('Timestamp', CONDITION_OPERATOR_NOT_EQUAL, '123'),
+						self::qcond('TraceFlags', CONDITION_OPERATOR_EQUAL, '1'),
+						self::qcond('SeverityNumber', CONDITION_OPERATOR_EQUAL, '9')
 					])
 				),
 				'buckets_tmpl' => fn(int $now) => [
 					[
-						'id' => 1,
-						'columns' => [
-							'Timestamp' => $now - 10,
-							'TraceId' => '6123456789abcdef0123456789abcdef',
-							'SpanId' => '8122334455667788',
-							'TraceFlags' => 1,
-							'SeverityText' => 'INFO',
-							'SeverityNumber' => 9,
-							'ServiceName' => 'log-test-service',
-							'Body' => 'test log body',
-							'ResourceSchemaUrl' => 'https://example.com/schemas/resource/log/1.0.0',
-							'ScopeSchemaUrl' => 'https://example.com/schemas/scope/log/1.0.0',
-							'ScopeName' => 'log-test-scope',
-							'ScopeVersion' => '1.0.0',
-							'ResourceAttributes.host.name' => 'log-test-host',
-							'ScopeAttributes.scope.attr' => 'log-scope-value',
-							'LogAttributes.logger.name' => 'test-logger',
-							'EventName' => 'test-log-event',
-							'cnt' => 1,
-							'timestamp_min' => $now - 10,
-							'severity_min' => 9,
-							'severity_max' => 9,
-							'severity_avg' => 9,
-							'severity_sum' => 9,
-							'severity_p50' => 9
-						]
+						'Timestamp' => $now - 10,
+						'TraceId' => '6123456789abcdef0123456789abcdef',
+						'SpanId' => '8122334455667788',
+						'TraceFlags' => 1,
+						'SeverityText' => 'INFO',
+						'SeverityNumber' => 9,
+						'ServiceName' => 'log-test-service',
+						'Body' => 'test log body',
+						'ResourceSchemaUrl' => 'https://example.com/schemas/resource/log/1.0.0',
+						'ScopeSchemaUrl' => 'https://example.com/schemas/scope/log/1.0.0',
+						'ScopeName' => 'log-test-scope',
+						'ScopeVersion' => '1.0.0',
+						'ResourceAttributes.host.name' => 'log-test-host',
+						'ScopeAttributes.scope.attr' => 'log-scope-value',
+						'LogAttributes.logger.name' => 'test-logger',
+						'EventName' => 'test-log-event',
+						'cnt' => 1,
+						'timestamp_min' => $now - 10,
+						'severity_min' => 9,
+						'severity_max' => 9,
+						'severity_avg' => 9,
+						'severity_sum' => 9,
+						'severity_p50' => 9
 					]
 				],
 				'input_tmpl' => fn(int $now) => [
@@ -1176,41 +1195,46 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						self::qcond('ScopeSchemaUrl', CONDITION_OPERATOR_LIKE, 'scope/sum'),
 						self::qcond('ServiceName', CONDITION_OPERATOR_EQUAL, 'sum-test-service'),
 						self::qcond('MetricDescription', CONDITION_OPERATOR_LIKE, 'sum description'),
-						self::qcond('MetricUnit', CONDITION_OPERATOR_EQUAL, 'requests')
+						self::qcond('MetricUnit', CONDITION_OPERATOR_EQUAL, 'requests'),
+						self::qcond('ScopeDroppedAttrCount', CONDITION_OPERATOR_NOT_EQUAL, '1.3E2'),
+						self::qcond('StartTimeUnix', CONDITION_OPERATOR_NOT_EQUAL, '1.3e2'),
+						self::qcond('TimeUnix', CONDITION_OPERATOR_NOT_EQUAL, '0'),
+						self::qcond('Value', CONDITION_OPERATOR_EQUAL, '42.5'),
+						self::qcond('Flags', CONDITION_OPERATOR_EQUAL, '1'),
+						self::qcond('Exemplars.Value', CONDITION_OPERATOR_MORE_EQUAL, '0.0'),
+						self::qcond('AggregationTemporality', CONDITION_OPERATOR_EQUAL, '2'),
+						self::qcond('IsMonotonic', CONDITION_OPERATOR_EQUAL, '1')
 					])
 				),
 				'buckets_tmpl' => fn(int $now) => [
 					[
-						'id' => 1,
-						'columns' => [
-							'ResourceAttributes.host.name' => 'sum-test-host',
-							'ResourceSchemaUrl' => 'https://example.com/schemas/resource/sum/1.0.0',
-							'ScopeName' => 'sum-test-scope',
-							'ScopeVersion' => '1.0.0',
-							'ScopeAttributes.scope.attr' => 'sum-scope-value',
-							'ScopeDroppedAttrCount' => 11,
-							'ScopeSchemaUrl' => 'https://example.com/schemas/scope/sum/1.0.0',
-							'ServiceName' => 'sum-test-service',
-							'MetricName' => 'test_sum',
-							'MetricDescription' => 'Test sum description',
-							'MetricUnit' => 'requests',
-							'Attributes.endpoint' => '/sum',
-							'StartTimeUnix' => $now - 10,
-							'TimeUnix' => $now - 5,
-							'Value' => 42.5,
-							'Flags' => 1,
-							'AggregationTemporality' => 2,
-							'IsMonotonic' => 1,
-							'cnt' => 1,
-							'start_min' => $now - 10,
-							'time_max' => $now - 5,
-							'scope_dropped_max' => 11,
-							'value_min' => 42.5,
-							'value_max' => 42.5,
-							'value_avg' => 42.5,
-							'value_sum' => 42.5,
-							'value_p50' => 42.5
-						]
+						'ResourceAttributes.host.name' => 'sum-test-host',
+						'ResourceSchemaUrl' => 'https://example.com/schemas/resource/sum/1.0.0',
+						'ScopeName' => 'sum-test-scope',
+						'ScopeVersion' => '1.0.0',
+						'ScopeAttributes.scope.attr' => 'sum-scope-value',
+						'ScopeDroppedAttrCount' => 11,
+						'ScopeSchemaUrl' => 'https://example.com/schemas/scope/sum/1.0.0',
+						'ServiceName' => 'sum-test-service',
+						'MetricName' => 'test_sum',
+						'MetricDescription' => 'Test sum description',
+						'MetricUnit' => 'requests',
+						'Attributes.endpoint' => '/sum',
+						'StartTimeUnix' => $now - 10,
+						'TimeUnix' => $now - 5,
+						'Value' => 42.5,
+						'Flags' => 1,
+						'AggregationTemporality' => 2,
+						'IsMonotonic' => 1,
+						'cnt' => 1,
+						'start_min' => $now - 10,
+						'time_max' => $now - 5,
+						'scope_dropped_max' => 11,
+						'value_min' => 42.5,
+						'value_max' => 42.5,
+						'value_avg' => 42.5,
+						'value_sum' => 42.5,
+						'value_p50' => 42.5
 					]
 				],
 				'input_tmpl' => fn(int $now) => [
@@ -1259,35 +1283,38 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						self::qcond('MetricDescription', CONDITION_OPERATOR_LIKE, 'Test description'),
 						self::qcond('MetricUnit', CONDITION_OPERATOR_EQUAL, 'ms'),
 						self::qcond('Attributes', CONDITION_OPERATOR_EQUAL, 'grpcurl', 'method'),
-						self::qcond('Exemplars.FilteredAttributes', CONDITION_OPERATOR_EXISTS, '', 'exemplar.attr')
+						self::qcond('Exemplars.FilteredAttributes', CONDITION_OPERATOR_EXISTS, '', 'exemplar.attr'),
+						self::qcond('ScopeDroppedAttrCount', CONDITION_OPERATOR_NOT_EQUAL, '1.3E2'),
+						self::qcond('StartTimeUnix', CONDITION_OPERATOR_NOT_EQUAL, '1.3e2'),
+						self::qcond('TimeUnix', CONDITION_OPERATOR_NOT_EQUAL, '0'),
+						self::qcond('Value', CONDITION_OPERATOR_EQUAL, '1.23456e2'),
+						self::qcond('Flags', CONDITION_OPERATOR_EQUAL, '1'),
+						self::qcond('Exemplars.Value', CONDITION_OPERATOR_MORE_EQUAL, '0.0')
 					])
 				),
 				'buckets_tmpl' => fn(int $now) => [
 					[
-						'id' => 1,
-						'columns' => [
-							'ResourceAttributes.host.name' => 'test-host',
-							'ResourceSchemaUrl' => 'https://example.com/schemas/1.0.0',
-							'ScopeName' => 'test-scope',
-							'ScopeVersion' => '1.0.0',
-							'ScopeAttributes.scope.attr' => 'scope-value',
-							'ScopeDroppedAttrCount' => 7,
-							'ScopeSchemaUrl' => 'https://example.com/schemas/scope/1.0.0',
-							'ServiceName' => 'gauge-test-service',
-							'MetricName' => 'test_gauge',
-							'MetricDescription' => 'Test description',
-							'MetricUnit' => 'ms',
-							'Attributes.method' => 'grpcurl',
-							'StartTimeUnix' => $now - 10,
-							'TimeUnix' => $now - 5,
-							'Value' => 123.456,
-							'Flags' => 1,
-							'cnt' => 1,
-							'start_min' => $now - 10,
-							'time_max' => $now - 5,
-							'scope_dropped_sum' => 7,
-							'value_avg' => 123.456
-						]
+						'ResourceAttributes.host.name' => 'test-host',
+						'ResourceSchemaUrl' => 'https://example.com/schemas/1.0.0',
+						'ScopeName' => 'test-scope',
+						'ScopeVersion' => '1.0.0',
+						'ScopeAttributes.scope.attr' => 'scope-value',
+						'ScopeDroppedAttrCount' => 7,
+						'ScopeSchemaUrl' => 'https://example.com/schemas/scope/1.0.0',
+						'ServiceName' => 'gauge-test-service',
+						'MetricName' => 'test_gauge',
+						'MetricDescription' => 'Test description',
+						'MetricUnit' => 'ms',
+						'Attributes.method' => 'grpcurl',
+						'StartTimeUnix' => $now - 10,
+						'TimeUnix' => $now - 5,
+						'Value' => 123.456,
+						'Flags' => 1,
+						'cnt' => 1,
+						'start_min' => $now - 10,
+						'time_max' => $now - 5,
+						'scope_dropped_sum' => 7,
+						'value_avg' => 123.456
 					]
 				],
 				'input_tmpl' => fn(int $now) => [
@@ -1344,43 +1371,50 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						self::qcond('ScopeSchemaUrl', CONDITION_OPERATOR_LIKE, 'scope/histogram'),
 						self::qcond('ServiceName', CONDITION_OPERATOR_EQUAL, 'histogram-test-service'),
 						self::qcond('MetricDescription', CONDITION_OPERATOR_LIKE, 'histogram description'),
-						self::qcond('MetricUnit', CONDITION_OPERATOR_EQUAL, 'ms')
+						self::qcond('MetricUnit', CONDITION_OPERATOR_EQUAL, 'ms'),
+						self::qcond('ScopeDroppedAttrCount', CONDITION_OPERATOR_NOT_EQUAL, '1.3E2'),
+						self::qcond('StartTimeUnix', CONDITION_OPERATOR_NOT_EQUAL, '1.3e2'),
+						self::qcond('TimeUnix', CONDITION_OPERATOR_NOT_EQUAL, '0'),
+						self::qcond('Count', CONDITION_OPERATOR_EQUAL, '6'),
+						self::qcond('Sum', CONDITION_OPERATOR_EQUAL, '6.3E1'),
+						self::qcond('Flags', CONDITION_OPERATOR_EQUAL, '1'),
+						self::qcond('Exemplars.Value', CONDITION_OPERATOR_MORE_EQUAL, '0.0'),
+						self::qcond('Min', CONDITION_OPERATOR_EQUAL, '5.0'),
+						self::qcond('Max', CONDITION_OPERATOR_EQUAL, '40'),
+						self::qcond('AggregationTemporality', CONDITION_OPERATOR_EQUAL, '1')
 					])
 				),
 				'buckets_tmpl' => fn(int $now) => [
 					[
-						'id' => 1,
-						'columns' => [
-							'ResourceAttributes.host.name' => 'histogram-test-host',
-							'ResourceSchemaUrl' => 'https://example.com/schemas/resource/histogram/1.0.0',
-							'ScopeName' => 'histogram-test-scope',
-							'ScopeVersion' => '1.0.0',
-							'ScopeAttributes.scope.attr' => 'histogram-scope-value',
-							'ScopeDroppedAttrCount' => 13,
-							'ScopeSchemaUrl' => 'https://example.com/schemas/scope/histogram/1.0.0',
-							'ServiceName' => 'histogram-test-service',
-							'MetricName' => 'test_histogram',
-							'MetricDescription' => 'Test histogram description',
-							'MetricUnit' => 'ms',
-							'Attributes.endpoint' => '/histogram',
-							'StartTimeUnix' => $now - 10,
-							'TimeUnix' => $now - 5,
-							'Count' => 6,
-							'Sum' => 63.0,
-							'Flags' => 1,
-							'Min' => 5.0,
-							'Max' => 40.0,
-							'AggregationTemporality' => 1,
-							'cnt' => 1,
-							'start_min' => $now - 10,
-							'time_max' => $now - 5,
-							'scope_dropped_max' => 13,
-							'count_sum' => 6,
-							'sum_avg' => 63.0,
-							'min_min' => 5.0,
-							'max_max' => 40.0,
-							'sum_p95' => 63.0
-						]
+						'ResourceAttributes.host.name' => 'histogram-test-host',
+						'ResourceSchemaUrl' => 'https://example.com/schemas/resource/histogram/1.0.0',
+						'ScopeName' => 'histogram-test-scope',
+						'ScopeVersion' => '1.0.0',
+						'ScopeAttributes.scope.attr' => 'histogram-scope-value',
+						'ScopeDroppedAttrCount' => 13,
+						'ScopeSchemaUrl' => 'https://example.com/schemas/scope/histogram/1.0.0',
+						'ServiceName' => 'histogram-test-service',
+						'MetricName' => 'test_histogram',
+						'MetricDescription' => 'Test histogram description',
+						'MetricUnit' => 'ms',
+						'Attributes.endpoint' => '/histogram',
+						'StartTimeUnix' => $now - 10,
+						'TimeUnix' => $now - 5,
+						'Count' => 6,
+						'Sum' => 63.0,
+						'Flags' => 1,
+						'Min' => 5.0,
+						'Max' => 40.0,
+						'AggregationTemporality' => 1,
+						'cnt' => 1,
+						'start_min' => $now - 10,
+						'time_max' => $now - 5,
+						'scope_dropped_max' => 13,
+						'count_sum' => 6,
+						'sum_avg' => 63.0,
+						'min_min' => 5.0,
+						'max_max' => 40.0,
+						'sum_p95' => 63.0
 					]
 				],
 				'input_tmpl' => fn(int $now) => [
@@ -1445,51 +1479,62 @@ class testTelemetryQueryItems extends CIntegrationTest {
 						self::qcond('ScopeSchemaUrl', CONDITION_OPERATOR_LIKE, 'scope/exponential-histogram'),
 						self::qcond('ServiceName', CONDITION_OPERATOR_EQUAL, 'exponential-histogram-test-service'),
 						self::qcond('MetricDescription', CONDITION_OPERATOR_LIKE, 'exponential histogram description'),
-						self::qcond('MetricUnit', CONDITION_OPERATOR_EQUAL, 'ms')
+						self::qcond('MetricUnit', CONDITION_OPERATOR_EQUAL, 'ms'),
+						self::qcond('ScopeDroppedAttrCount', CONDITION_OPERATOR_NOT_EQUAL, '1.3E2'),
+						self::qcond('StartTimeUnix', CONDITION_OPERATOR_NOT_EQUAL, '1.3e2'),
+						self::qcond('TimeUnix', CONDITION_OPERATOR_NOT_EQUAL, '0'),
+						self::qcond('Count', CONDITION_OPERATOR_EQUAL, '7'),
+						self::qcond('Sum', CONDITION_OPERATOR_EQUAL, '7.7e1'),
+						self::qcond('Flags', CONDITION_OPERATOR_EQUAL, '1'),
+						self::qcond('Exemplars.Value', CONDITION_OPERATOR_MORE_EQUAL, '0.0'),
+						self::qcond('Scale', CONDITION_OPERATOR_NOT_EQUAL, '0.0'),
+						self::qcond('ZeroCount', CONDITION_OPERATOR_NOT_EQUAL, '0.0'),
+						self::qcond('PositiveOffset', CONDITION_OPERATOR_NOT_EQUAL, '0.0'),
+						self::qcond('NegativeOffset', CONDITION_OPERATOR_NOT_EQUAL, '0.0'),
+						self::qcond('Min', CONDITION_OPERATOR_NOT_EQUAL, '0.0'),
+						self::qcond('Max', CONDITION_OPERATOR_NOT_EQUAL, '0.0'),
+						self::qcond('AggregationTemporality', CONDITION_OPERATOR_NOT_EQUAL, '0.0')
 					])
 				),
 				'buckets_tmpl' => fn(int $now) => [
 					[
-						'id' => 1,
-						'columns' => [
-							'ResourceAttributes.host.name' => 'exponential-histogram-test-host',
-							'ResourceSchemaUrl' => 'https://example.com/schemas/resource/exponential-histogram/1.0.0',
-							'ScopeName' => 'exponential-histogram-test-scope',
-							'ScopeVersion' => '1.0.0',
-							'ScopeAttributes.scope.attr' => 'exponential-histogram-scope-value',
-							'ScopeDroppedAttrCount' => 17,
-							'ScopeSchemaUrl' => 'https://example.com/schemas/scope/exponential-histogram/1.0.0',
-							'ServiceName' => 'exponential-histogram-test-service',
-							'MetricName' => 'test_exponential_histogram',
-							'MetricDescription' => 'Test exponential histogram description',
-							'MetricUnit' => 'ms',
-							'Attributes.endpoint' => '/exponential-histogram',
-							'StartTimeUnix' => $now - 10,
-							'TimeUnix' => $now - 5,
-							'Count' => 7,
-							'Sum' => 77.0,
-							'Scale' => 2,
-							'ZeroCount' => 1,
-							'PositiveOffset' => 1,
-							'NegativeOffset' => -2,
-							'Flags' => 1,
-							'Min' => -8.0,
-							'Max' => 32.0,
-							'AggregationTemporality' => 1,
-							'cnt' => 1,
-							'start_min' => $now - 10,
-							'time_max' => $now - 5,
-							'scope_dropped_max' => 17,
-							'count_sum' => 7,
-							'sum_avg' => 77.0,
-							'scale_max' => 2,
-							'zero_count_min' => 1,
-							'positive_offset_max' => 1,
-							'negative_offset_min' => -2,
-							'min_min' => -8.0,
-							'max_max' => 32.0,
-							'max_p99' => 32.0
-						]
+						'ResourceAttributes.host.name' => 'exponential-histogram-test-host',
+						'ResourceSchemaUrl' => 'https://example.com/schemas/resource/exponential-histogram/1.0.0',
+						'ScopeName' => 'exponential-histogram-test-scope',
+						'ScopeVersion' => '1.0.0',
+						'ScopeAttributes.scope.attr' => 'exponential-histogram-scope-value',
+						'ScopeDroppedAttrCount' => 17,
+						'ScopeSchemaUrl' => 'https://example.com/schemas/scope/exponential-histogram/1.0.0',
+						'ServiceName' => 'exponential-histogram-test-service',
+						'MetricName' => 'test_exponential_histogram',
+						'MetricDescription' => 'Test exponential histogram description',
+						'MetricUnit' => 'ms',
+						'Attributes.endpoint' => '/exponential-histogram',
+						'StartTimeUnix' => $now - 10,
+						'TimeUnix' => $now - 5,
+						'Count' => 7,
+						'Sum' => 77.0,
+						'Scale' => 2,
+						'ZeroCount' => 1,
+						'PositiveOffset' => 1,
+						'NegativeOffset' => -2,
+						'Flags' => 1,
+						'Min' => -8.0,
+						'Max' => 32.0,
+						'AggregationTemporality' => 1,
+						'cnt' => 1,
+						'start_min' => $now - 10,
+						'time_max' => $now - 5,
+						'scope_dropped_max' => 17,
+						'count_sum' => 7,
+						'sum_avg' => 77.0,
+						'scale_max' => 2,
+						'zero_count_min' => 1,
+						'positive_offset_max' => 1,
+						'negative_offset_min' => -2,
+						'min_min' => -8.0,
+						'max_max' => 32.0,
+						'max_p99' => 32.0
 					]
 				],
 				'input_tmpl' => fn(int $now) => [
@@ -1662,52 +1707,34 @@ class testTelemetryQueryItems extends CIntegrationTest {
 				),
 				'buckets_tmpl' => fn(int $now) => [
 					[
-						'id' => 1,
-						'columns' => [
-							'MetricName' => 'a',
-							'Value' => 1,
-							'cnt' => 1
-						]
+						'MetricName' => 'a',
+						'Value' => 1,
+						'cnt' => 1
 					],
 					[
-						'id' => 2,
-						'columns' => [
-							'MetricName' => 'b',
-							'Value' => null,
-							'cnt' => 1
-						]
+						'MetricName' => 'b',
+						'Value' => null,
+						'cnt' => 1
 					],
 					[
-						'id' => 3,
-						'columns' => [
-							'MetricName' => 'c',
-							'Value' => null,
-							'cnt' => 1
-						]
+						'MetricName' => 'c',
+						'Value' => null,
+						'cnt' => 1
 					],
 					[
-						'id' => 4,
-						'columns' => [
-							'MetricName' => 'd',
-							'Value' => null,
-							'cnt' => 1
-						]
+						'MetricName' => 'd',
+						'Value' => null,
+						'cnt' => 1
 					],
 					[
-						'id' => 5,
-						'columns' => [
-							'MetricName' => 'e',
-							'Value' => 0,
-							'cnt' => 1
-						]
+						'MetricName' => 'e',
+						'Value' => 0,
+						'cnt' => 1
 					],
 					[
-						'id' => 6,
-						'columns' => [
-							'MetricName' => 'f',
-							'Value' => 0.5,
-							'cnt' => 1
-						]
+						'MetricName' => 'f',
+						'Value' => 0.5,
+						'cnt' => 1
 					]
 				],
 				'input_tmpl' => fn(int $now) => [
@@ -1748,28 +1775,19 @@ class testTelemetryQueryItems extends CIntegrationTest {
 				),
 				'buckets_tmpl' => fn(int $now) => [
 					[
-						'id' => 1,
-						'columns' => [
-							'cnt' => 3,
-							'ts_min' => (int) ($now - 300.2), /* timestamp is rounded down to seconds in the query */
-							'ts_max' => $now - 300
-						]
+						'cnt' => 3,
+						'ts_min' => (int) ($now - 300.2), /* timestamp is rounded down to seconds in the query */
+						'ts_max' => $now - 300
 					],
 					[
-						'id' => 2,
-						'columns' => [
-							'cnt' => 1,
-							'ts_min' => $now - 200,
-							'ts_max' => $now - 200
-						]
+						'cnt' => 1,
+						'ts_min' => $now - 200,
+						'ts_max' => $now - 200
 					],
 					[
-						'id' => 3,
-						'columns' => [
-							'cnt' => 2,
-							'ts_min' => $now - 101,
-							'ts_max' => $now - 100
-						]
+						'cnt' => 2,
+						'ts_min' => $now - 101,
+						'ts_max' => $now - 100
 					]
 				],
 				'input_tmpl' => fn(int $now) => [
@@ -1810,60 +1828,36 @@ class testTelemetryQueryItems extends CIntegrationTest {
 				),
 				'buckets_tmpl' => fn(int $now) => [
 					[
-						'id' => 1,
-						'columns' => [
-							'SpanName' => '',
-							'cnt' => 1
-						]
+						'SpanName' => '',
+						'cnt' => 1
 					],
 					[
-						'id' => 2,
-						'columns' => [
-							'SpanName' => '  🙂🙃 ZaBbiX зАБбИкс āēīõšŗ  ',
-							'cnt' => 2
-						]
+						'SpanName' => '  🙂🙃 ZaBbiX зАБбИкс āēīõšŗ  ',
+						'cnt' => 2
 					],
 					[
-						'id' => 3,
-						'columns' => [
-							'SpanName' => 'ZABBIX',
-							'cnt' => 1
-						]
+						'SpanName' => 'ZABBIX',
+						'cnt' => 1
 					],
 					[
-						'id' => 4,
-						'columns' => [
-							'SpanName' => 'Zabbix',
-							'cnt' => 1
-						]
+						'SpanName' => 'Zabbix',
+						'cnt' => 1
 					],
 					[
-						'id' => 5,
-						'columns' => [
-							'SpanName' => '  a  ',
-							'cnt' => 1
-						]
+						'SpanName' => '  a  ',
+						'cnt' => 1
 					],
 					[
-						'id' => 6,
-						'columns' => [
-							'SpanName' => ' a ',
-							'cnt' => 1
-						]
+						'SpanName' => ' a ',
+						'cnt' => 1
 					],
 					[
-						'id' => 7,
-						'columns' => [
-							'SpanName' => 'ZABBIX',
-							'cnt' => 1
-						]
+						'SpanName' => 'ZABBIX',
+						'cnt' => 1
 					],
 					[
-						'id' => 8,
-						'columns' => [
-							'SpanName' => 'Zabbix',
-							'cnt' => 2
-						]
+						'SpanName' => 'Zabbix',
+						'cnt' => 2
 					]
 				],
 				'input_tmpl' => fn(int $now) => [
@@ -1915,14 +1909,11 @@ class testTelemetryQueryItems extends CIntegrationTest {
 				),
 				'buckets_tmpl' => fn(int $now) => [
 					[
-						'id' => 1,
-						'columns' => [
-							'SpanName' => 'd',
-							'SpanAttributes.k1' => 'v1',
-							'SpanAttributes.  🙂🙃 ZaBbiX зАБбИкс āēīõšŗ  ' => '  🙂🙃  ',
-							'SpanAttributes.unset' => '',
-							'cnt' => 1
-						]
+						'SpanName' => 'd',
+						'SpanAttributes.k1' => 'v1',
+						'SpanAttributes.  🙂🙃 ZaBbiX зАБбИкс āēīõšŗ  ' => '  🙂🙃  ',
+						'SpanAttributes.unset' => '',
+						'cnt' => 1
 					]
 				],
 				'input_tmpl' => fn(int $now) => [

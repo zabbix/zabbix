@@ -434,34 +434,101 @@ static char	*tq_sql_dyn_get_condition_exists(const char *atom, const char *key, 
 	return str;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: if the numeric literal contains leading or trailing decimal       *
+ *          point, inserts '0' before or after it respectively                *
+ *                                                                            *
+ * Parameters: value - [IN] a valid numeric literal string                    *
+ *                          (see zbx_tq_validate_numeric_condition_value)     *
+ *                                                                            *
+ ******************************************************************************/
+static char	*tq_sql_dyn_normalize_numeric_condition_value(const char *value)
+{
+	const char	*p_decimal_point;
+	char		*value_norm = zbx_strdup(NULL, value);
+
+	if (NULL == (p_decimal_point = strchr(value, '.')))
+		return value_norm;
+
+	if (p_decimal_point == value || 0 == isdigit((unsigned char)*(p_decimal_point - 1)))
+	{
+		size_t	l = p_decimal_point - value;
+		size_t	r = l;
+
+		zbx_replace_string(&value_norm, l, &r, "0.");
+	}
+	else if ('\0' == *(p_decimal_point + 1) || 0 == isdigit((unsigned char)*(p_decimal_point + 1)))
+	{
+		size_t	l = p_decimal_point - value;
+		size_t	r = l;
+
+		zbx_replace_string(&value_norm, l, &r, ".0");
+	}
+
+	return value_norm;
+}
+
 static char	*tq_sql_dyn_get_atom_condition(const char *atom, zbx_tq_column_type_t type, const char *key,
 		const char *value, zbx_tq_operator_t operator, const tq_sql_ctx_t *ctx)
 {
-	if (ZBX_TQ_OPERATOR_EQUAL == operator || ZBX_TQ_OPERATOR_NOT_EQUAL == operator)
+	if (ZBX_TQ_OPERATOR_EQUAL == operator || ZBX_TQ_OPERATOR_NOT_EQUAL == operator ||
+			ZBX_TQ_OPERATOR_MORE_EQUAL == operator || ZBX_TQ_OPERATOR_LESS_EQUAL == operator)
 	{
 		char		*str;
 		char		*operand = tq_sql_dyn_get_operand(atom, type, key, ctx);
-		char		*value_esc = tq_sql_dyn_escape_string(value, ctx);
-		const char	*operator_str = (ZBX_TQ_OPERATOR_EQUAL == operator ? "=" : "<>");
+		const char	*operator_str;
 
-		if (ZBX_TQ_COLUMN_TYPE_ATTRIBUTES == type)
+		switch (operator)
 		{
-			char	*exists_check = tq_sql_dyn_get_condition_exists(atom, key, ctx);
+			case ZBX_TQ_OPERATOR_EQUAL:
+				operator_str = "=";
+				break;
+			case ZBX_TQ_OPERATOR_NOT_EQUAL:
+				operator_str = "<>";
+				break;
+			case ZBX_TQ_OPERATOR_MORE_EQUAL:
+				operator_str = ">=";
+				break;
+			case ZBX_TQ_OPERATOR_LESS_EQUAL:
+				operator_str = "<=";
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+				operator_str = "";
+		}
 
-			/* ensure that "not equal" results in false if attribute key is missing */
-			str = zbx_dsprintf(NULL, "(%s and %s%s%s)", exists_check, operand, operator_str, value_esc);
-
-			zbx_free(exists_check);
+		if (SUCCEED == zbx_tq_column_type_requires_numeric_comparison(type))
+		{
+			char	*value_norm = tq_sql_dyn_normalize_numeric_condition_value(value);
+			str = zbx_dsprintf(NULL, "(%s%s%s)", operand, operator_str, value_norm);
+			zbx_free(value_norm);
 		}
 		else
 		{
-			str = zbx_dsprintf(NULL, "(%s%s%s)", operand, operator_str, value_esc);
+			char	*value_esc = tq_sql_dyn_escape_string(value, ctx);
+
+			if (ZBX_TQ_COLUMN_TYPE_ATTRIBUTES == type)
+			{
+				char	*exists_check = tq_sql_dyn_get_condition_exists(atom, key, ctx);
+
+				/* ensure that "not equal" results in false if attribute key is missing */
+				str = zbx_dsprintf(NULL, "(%s and %s%s%s)", exists_check, operand, operator_str,
+						value_esc);
+
+				zbx_free(exists_check);
+			}
+			else
+			{
+				str = zbx_dsprintf(NULL, "(%s%s%s)", operand, operator_str, value_esc);
+			}
+
+			zbx_free(value_esc);
 		}
 
 		zbx_free(operand);
-		zbx_free(value_esc);
 
-		return	str;
+		return str;
 	}
 	else if (ZBX_TQ_OPERATOR_CONTAINS == operator || ZBX_TQ_OPERATOR_NOT_CONTAINS == operator)
 	{
@@ -727,8 +794,8 @@ void	zbx_tq_sql_generate_clickhouse(zbx_tq_query_t *query, int time_shift, int l
 	/* where */
 	zbx_strcpy_alloc(sql, &alloc, &offset, "where ");
 	zbx_snprintf_alloc(sql, &alloc, &offset,
-			"\"%s\">=toDateTime(" ZBX_FS_TIME_T ") "
-			"and \"%s\"<toDateTime(" ZBX_FS_TIME_T ") ",
+			"\"%s\">=toDateTime64(" ZBX_FS_TIME_T ",9) "
+			"and \"%s\"<toDateTime64(" ZBX_FS_TIME_T ",9) ",
 			ts_col, (zbx_fs_time_t)timestamp_filter_lower_bound, ts_col,
 			(zbx_fs_time_t)timestamp_filter_upper_bound);
 	if (SUCCEED == query_has_conditions)

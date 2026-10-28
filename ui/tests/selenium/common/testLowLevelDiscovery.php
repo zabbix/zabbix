@@ -65,7 +65,8 @@ class testLowLevelDiscovery extends CWebTest {
 
 		// Check the whole form required labels.
 		$required_labels = ['Name', 'Key', 'URL', 'Script', 'Script', 'Master item', 'Host interface', 'SNMP OID', 'JMX endpoint',
-				'Public key file', 'Private key file', 'Executed script', 'SQL query', 'Update interval', 'Timeout',
+				'Public key file', 'Private key file', 'Executed script', 'SQL query', 'Aggregated columns',
+				'Update interval', 'Time shift', 'Lookback limit', 'Granularity', 'Timeout',
 				'Delete lost resources', 'Disable lost resources'
 		];
 
@@ -83,7 +84,7 @@ class testLowLevelDiscovery extends CWebTest {
 			'Name' => ['maxlength' => 255],
 			'Type' => ['value' => 'Zabbix agent', 'options' => ['Zabbix agent', 'Zabbix agent (active)', 'Simple check',
 				'SNMP agent', 'Zabbix internal', 'Zabbix trapper', 'External check', 'Database monitor', 'HTTP agent',
-				'IPMI agent', 'SSH agent', 'TELNET agent', 'JMX agent', 'Dependent item', 'Script', 'Browser']
+				'IPMI agent', 'SSH agent', 'TELNET agent', 'JMX agent', 'Dependent item', 'Script', 'Browser', 'Telemetry query']
 			],
 			'Key' => ['maxlength' => 2048],
 			'URL' => ['maxlength' => 2048],
@@ -149,11 +150,11 @@ class testLowLevelDiscovery extends CWebTest {
 
 			// Filters tab.
 			'Filters' => ['value' => [['macro' => '']]],
-			'id:conditions_0_macro' => ['placeholder' => '{#MACRO}', 'maxlength' => 64],
-			'name:conditions[0][operator]' => ['options' => ['matches', 'does not match', 'exists', 'does not exist'],
+			'id:filters_conditions_0_macro' => ['placeholder' => '{#MACRO}', 'maxlength' => 64],
+			'name:filters_conditions[0][operator]' => ['options' => ['matches', 'does not match', 'exists', 'does not exist'],
 				'value' => 'matches'
 			],
-			'id:conditions_0_value' => ['placeholder' => 'regular expression', 'maxlength' => 255],
+			'id:filters_conditions_0_value' => ['placeholder' => 'regular expression', 'maxlength' => 255],
 
 			// Overrides tab.
 			'Overrides' => ['value' => []]
@@ -163,7 +164,7 @@ class testLowLevelDiscovery extends CWebTest {
 			unset($fields['Host interface']);
 
 			// LLD rule type "Nested" is available only on LLD rules in templates and discovered hosts.
-			$fields['Type']['options'] = array_merge($fields['Type']['options'], ['Nested']);
+			array_splice($fields['Type']['options'], -1, 0, ['Nested']);
 		}
 
 		$this->checkFieldsParameters($fields);
@@ -215,26 +216,26 @@ class testLowLevelDiscovery extends CWebTest {
 
 				case 'Filters':
 					$filters_container = $form->getFieldContainer('Filters');
-					$this->assertTrue($form->query('id:conditions')->one()->isVisible());
+					$this->assertTrue($form->query('id:filters_conditions')->one()->isVisible());
 					$this->assertEquals(2, $filters_container->query('button', ['Add', 'Remove'])->all()
 							->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
 					);
-					$filter_table = $filters_container->query('id:conditions')->asTable()->one();
+					$filter_table = $filters_container->query('id:filters_conditions')->asTable()->one();
 					$this->assertEquals(['Label', 'Macro', '', 'Regular expression', ''],
 							$filter_table->getHeadersText()
 					);
-					$this->assertFalse($filters_container->query('id:evaltype')->exists());
+					$this->assertFalse($filters_container->query('id:filters_evaltype')->exists());
 					$filters_container->query('button:Add')->waitUntilClickable()->one()->click();
-					$evaluation_type = $form->getField('id:evaltype');
-					$form->checkValue(['id:evaltype' => 'And/Or']);
+					$evaluation_type = $form->getField('id:filters_evaltype');
+					$form->checkValue(['id:filters_evaltype' => 'And/Or']);
 					$evaluation_type->fill('Custom expression');
 
 					$filter_fields = [
-						'id:evaltype' => ['value' => 'Custom expression', 'options' => ['And/Or', 'And', 'Or', 'Custom expression']],
-						'id:formula' => ['value' => '', 'placeholder' => 'A or (B and C) ...', 'maxlength' => 255],
-						'id:conditions_0_macro' => ['value' => '', 'placeholder' => '{#MACRO}', 'maxlength' => 64],
-						'id:conditions_0_value' => ['value' => '', 'placeholder' => 'regular expression', 'maxlength' => 255],
-						'name:conditions[0][operator]' => [
+						'id:filters_evaltype' => ['value' => 'Custom expression', 'options' => ['And/Or', 'And', 'Or', 'Custom expression']],
+						'id:filters_formula' => ['value' => '', 'placeholder' => 'A or (B and C) ...', 'maxlength' => 255],
+						'id:filters_conditions_0_macro' => ['value' => '', 'placeholder' => '{#MACRO}', 'maxlength' => 64],
+						'id:filters_conditions_0_value' => ['value' => '', 'placeholder' => 'regular expression', 'maxlength' => 255],
+						'name:filters_conditions[0][operator]' => [
 							'value' => 'matches',
 							'options' => ['matches', 'does not match', 'exists', 'does not exist']
 						]
@@ -252,9 +253,7 @@ class testLowLevelDiscovery extends CWebTest {
 					];
 					foreach ($calculation_types as $type => $formula) {
 						$evaluation_type->fill($type);
-						$this->assertEquals($formula, $form->query('xpath:.//div[@class="cell expression-cell"]')
-								->one()->getText()
-						);
+						$this->assertEquals($formula, $form->query('class:js-expression')->one()->getText());
 					}
 
 					foreach ([0 => 'A', 2 => 'B'] as $i => $letter) {
@@ -1921,7 +1920,7 @@ class testLowLevelDiscovery extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'id:conditions_0_macro' => 'Expected LLD macro format is "{#MACRO}".'
+						'id:filters_conditions_0_macro' => 'Expected LLD macro format is "{#MACRO}".'
 					]
 				]
 			],
@@ -1943,7 +1942,7 @@ class testLowLevelDiscovery extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'id:formula' => 'This field cannot be empty.'
+						'id:filters_formula' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -2007,7 +2006,7 @@ class testLowLevelDiscovery extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'id:formula' => 'Incorrect syntax near "Wrong formula".'
+						'id:filters_formula' => 'Incorrect syntax near "Wrong formula".'
 					]
 				]
 			],
@@ -2029,7 +2028,7 @@ class testLowLevelDiscovery extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'id:formula' => 'Incorrect syntax near "Not B".'
+						'id:filters_formula' => 'Incorrect syntax near "Not B".'
 					]
 				]
 			],
@@ -2051,7 +2050,7 @@ class testLowLevelDiscovery extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'id:formula' => 'Incorrect syntax near " A and not B".'
+						'id:filters_formula' => 'Incorrect syntax near " A and not B".'
 					]
 				]
 			],
@@ -2073,7 +2072,7 @@ class testLowLevelDiscovery extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'id:formula' => 'Incorrect syntax near " not B".'
+						'id:filters_formula' => 'Incorrect syntax near " not B".'
 					]
 				]
 			],
@@ -2215,10 +2214,10 @@ class testLowLevelDiscovery extends CWebTest {
 			$this->fillComplexFields($data['Filters']['filters'], $form, 'Filters', 'z-textarea-flexible');
 
 			if (array_key_exists('calculation', $data['Filters'])) {
-				$form->fill(['id:evaltype' => $data['Filters']['calculation']]);
+				$form->fill(['id:filters_evaltype' => $data['Filters']['calculation']]);
 
 				if (array_key_exists('formula', $data['Filters'])) {
-					$form->fill(['id:formula' => $data['Filters']['formula']]);
+					$form->fill(['id:filters_formula' => $data['Filters']['formula']]);
 				}
 			}
 		}
@@ -2339,10 +2338,10 @@ class testLowLevelDiscovery extends CWebTest {
 				$this->checkComplexFields($data['Filters']['filters'], $form, 'Filters', 'z-textarea-flexible');
 
 				if (array_key_exists('calculation', $data['Filters'])) {
-					$form->checkValue(['id:evaltype' => $data['Filters']['calculation']]);
+					$form->checkValue(['id:filters_evaltype' => $data['Filters']['calculation']]);
 
 					if (array_key_exists('formula', $data['Filters'])) {
-						$form->checkValue(['id:formula' => $data['Filters']['formula']]);
+						$form->checkValue(['id:filters_formula' => $data['Filters']['formula']]);
 					}
 				}
 			}
@@ -2415,9 +2414,9 @@ class testLowLevelDiscovery extends CWebTest {
 						'id:lld_macro_paths_0_lld_macro' => '{#MACRO}',
 						'id:lld_macro_paths_0_path' => '$.path',
 						// Filters tab.
-						'id:conditions_0_macro' => '{#MACRO}',
-						'name:conditions[0][operator]' => 'does not match',
-						'id:conditions_0_value' => 'expression'
+						'id:filters_conditions_0_macro' => '{#MACRO}',
+						'name:filters_conditions[0][operator]' => 'does not match',
+						'id:filters_conditions_0_value' => 'expression'
 					],
 					'Overrides' => [
 						'Name' => 'Override',
@@ -2487,9 +2486,9 @@ class testLowLevelDiscovery extends CWebTest {
 						'id:lld_macro_paths_0_lld_macro' => '{#CLONED_MACRO}',
 						'id:lld_macro_paths_0_path' => '$.cloned.path.a',
 						// Filters tab.
-						'id:conditions_0_macro' => '{#CLONED_FILTER_MACRO}',
-						'name:conditions[0][operator]' => 'matches',
-						'id:conditions_0_value' => 'cloned_expression'
+						'id:filters_conditions_0_macro' => '{#CLONED_FILTER_MACRO}',
+						'name:filters_conditions[0][operator]' => 'matches',
+						'id:filters_conditions_0_value' => 'cloned_expression'
 					]
 				]
 			]
@@ -2682,9 +2681,9 @@ class testLowLevelDiscovery extends CWebTest {
 					'id:lld_macro_paths_0_path' => '$.new.path.to.node'
 				],
 				'filters_fields' => [
-					'id:conditions_0_macro' => '{#NEW_FILTERMACRO}',
-					'name:conditions[0][operator]' => 'does not match',
-					'id:conditions_0_value' => 'new value'
+					'id:filters_conditions_0_macro' => '{#NEW_FILTERMACRO}',
+					'name:filters_conditions[0][operator]' => 'does not match',
+					'id:filters_conditions_0_value' => 'new value'
 				],
 				'overrides_fields' => [
 					'filters' => [
@@ -2847,7 +2846,7 @@ class testLowLevelDiscovery extends CWebTest {
 
 			foreach ($data_row as $column => $value) {
 				if ($column === 'operator') {
-					$form->fill(['name:conditions['.$i.'][operator]' => $value]);
+					$form->fill(['name:filters_conditions['.$i.'][operator]' => $value]);
 				}
 				else {
 					$table_row->getColumn($column)->query('tag', $locator)->one()->fill($value);
@@ -2876,7 +2875,7 @@ class testLowLevelDiscovery extends CWebTest {
 
 			foreach ($data_row as $column => $value) {
 				if ($column === 'operator') {
-					$form->checkValue(['name:conditions['.$i.'][operator]' => $value]);
+					$form->checkValue(['name:filters_conditions['.$i.'][operator]' => $value]);
 				}
 				else {
 					$this->assertEquals($value, $row->getColumn($column)->query('tag', $locator)->one()->getValue());

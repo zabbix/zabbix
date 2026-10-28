@@ -683,8 +683,8 @@ $formgrid
 				(new CTable())
 					->setId('columns-table')
 					->setHeader([
-						(new CColHeader(_('Name')))->setColSpan(2)->setWidth('43%'),
-						(new CColHeader())->setWidth('35%'),
+						(new CColHeader(_('Name')))->setColSpan(2)->setWidth('39%'),
+						(new CColHeader())->setWidth('39%'),
 						(new CColHeader(_('Action')))->setWidth('22%')
 					])
 					->setFooter(new CRow(
@@ -698,6 +698,7 @@ $formgrid
 						(new CSelect('columns[#{rowNum}][column]'))
 							->addClass('js-column')
 							->setValue('#{column}')
+							->addOptions(CSelect::createOptionsFromArray(CTelemetryHelper::getColumnOptions()))
 							->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 							->setAttribute('data-changed', '')
 							->setErrorLabel(_('Name'))

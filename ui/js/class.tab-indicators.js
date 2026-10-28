@@ -975,13 +975,13 @@ class FiltersTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return [...document.querySelectorAll('#conditions tbody .form_row > td > z-textarea-flexible.js-macro')]
+		return [...document.querySelectorAll('#filters_conditions tbody .form_row > td > z-textarea-flexible.js-macro')]
 			.filter(el => el.value !== '')
 			.length;
 	}
 
 	initObserver() {
-		const target_node = document.querySelector('#conditions');
+		const target_node = document.querySelector('#filters_conditions');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {

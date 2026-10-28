@@ -31,8 +31,11 @@ window.lldrule_edit = new class {
 	#tabs;
 	#testable_item_types;
 
-	init({rules, test_rules, testable_item_types, lldrule, host, inherited_timeouts, field_switches, interface_types,
-			return_url}) {
+	init({
+		rules, test_rules, testable_item_types, lldrule, host, inherited_timeouts, field_switches, interface_types,
+		telemetry_columns_config, telemetry_function_labels, telemetry_operator_labels, telemetry_signal_type_metrics,
+		return_url
+	}) {
 		this.#overlay = overlays_stack.getById('lldrule.edit');
 		this.#dialogue = this.#overlay.$dialogue[0];
 		this.#form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
@@ -47,13 +50,19 @@ window.lldrule_edit = new class {
 
 		this.#tabs = {
 			lldrule: new LldRuleEditLldRuleTab({
+				form_element: this.#form_element,
+				form: this.#form,
 				container: document.getElementById('lldrule-tab'),
 				field_switches: field_switches,
 				interface_types: interface_types,
 				lldrule: lldrule,
 				host_interfaces: host.interfaces,
 				readonly: (lldrule.templated || lldrule.discovered),
-				inherited_timeouts: inherited_timeouts
+				inherited_timeouts: inherited_timeouts,
+				telemetry_columns_config: telemetry_columns_config,
+				telemetry_function_labels: telemetry_function_labels,
+				telemetry_operator_labels: telemetry_operator_labels,
+				telemetry_signal_type_metrics: telemetry_signal_type_metrics
 			}),
 			preprocessing: new ItemEditPreprocessingTab({
 				container: document.getElementById('processing-tab'),
@@ -90,6 +99,9 @@ window.lldrule_edit = new class {
 		this.#form.findFieldByName('interfaceid')?.setChanged();
 		this.#form.findFieldByName('type').setChanged();
 		this.#form.validateChanges(['interfaceid', 'type']);
+
+		this.#form.findFieldByName('aggregated_columns')
+			.setButtonOnBlur('js-add-aggregated-column', 'telemetry-aggregated-column');
 	}
 
 	#formIsReady() {

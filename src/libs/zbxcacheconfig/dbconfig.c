@@ -3199,8 +3199,6 @@ static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *o
 						sizeof(ZBX_DC_TQITEM));
 
 				item->itemtype.tqitem->lasttimestamp = 0;
-				item->itemtype.tqitem->min_free_ts.sec = 0;
-				item->itemtype.tqitem->min_free_ts.ns = 0;
 			}
 
 			dc_strpool_replace(found, &item->itemtype.tqitem->query, row[50]);
@@ -9857,7 +9855,6 @@ static void	DCget_telemetry_query_item(zbx_dc_telemetry_query_item_t *dst_item, 
 	zbx_strscpy(dst_item->granularity_orig, src_item->itemtype.tqitem->granularity);
 	dst_item->telemetry_query = NULL;
 	dst_item->lasttimestamp = src_item->itemtype.tqitem->lasttimestamp;
-	dst_item->min_free_ts = src_item->itemtype.tqitem->min_free_ts;
 }
 
 void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num)
@@ -12121,8 +12118,6 @@ static void	dc_set_cached_data(ZBX_DC_ITEM *dc_item, const zbx_dc_cached_data_t 
 	{
 		if (0 != (cached_data->upd_flags & ZBX_CACHED_DATA_FLAG_UPDATE_LASTTIMESTAMP))
 			dc_item->itemtype.tqitem->lasttimestamp = cached_data->lasttimestamp;
-		if (0 != (cached_data->upd_flags & ZBX_CACHED_DATA_FLAG_UPDATE_MIN_FREE_TS))
-			dc_item->itemtype.tqitem->min_free_ts = cached_data->min_free_ts;
 	}
 }
 

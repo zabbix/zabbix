@@ -41,6 +41,23 @@ class CItemTypeTelemetryQuery extends CItemType {
 		'Exemplars.FilteredAttributes'
 	];
 
+	public const NUMERIC_COLUMN_NAME = [
+		'Timestamp', 'Duration', 'TraceFlags', 'SeverityNumber', 'ScopeDroppedAttrCount', 'StartTimeUnix', 'TimeUnix',
+		'Value', 'Flags', 'Exemplars.Value', 'AggregationTemporality', 'IsMonotonic', 'Count', 'Sum', 'Min', 'Max',
+		'Scale', 'ZeroCount', 'PositiveOffset', 'NegativeOffset'
+	];
+
+	public const COMPLEX_COLUMN_OPERATORS = [
+		CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_EXISTS
+	];
+	public const NUMERIC_COLUMN_OPERATORS = [
+		CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_MORE_EQUAL,
+		CONDITION_OPERATOR_LESS_EQUAL
+	];
+	public const SIMPLE_COLUMN_OPERATORS = [
+		CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE
+	];
+
 	// SIGNAL_TYPE_TRACES column names
 	public const TRACES_COLUMNS_COLUMN = [
 		'Timestamp', 'TraceId', 'SpanId', 'ParentSpanId', 'TraceState', 'SpanName', 'SpanKind', 'ServiceName',
@@ -50,8 +67,9 @@ class CItemTypeTelemetryQuery extends CItemType {
 		'Timestamp', 'Duration'
 	];
 	public const TRACES_CONDITIONS_COLUMN = [
-		'TraceId', 'SpanId', 'ParentSpanId', 'TraceState', 'SpanName', 'SpanKind', 'ServiceName', 'ResourceAttributes',
-		'SpanAttributes', 'ScopeName', 'ScopeVersion', 'StatusCode', 'StatusMessage', 'Events.Attributes', 'Events.Name'
+		'Timestamp', 'TraceId', 'SpanId', 'ParentSpanId', 'TraceState', 'SpanName', 'SpanKind', 'ServiceName',
+		'ResourceAttributes', 'SpanAttributes', 'ScopeName', 'ScopeVersion', 'Duration', 'StatusCode', 'StatusMessage',
+		'Events.Attributes', 'Events.Name'
 	];
 
 	// SIGNAL_TYPE_METRICS column names
@@ -95,20 +113,29 @@ class CItemTypeTelemetryQuery extends CItemType {
 	];
 	public const METRICS_CONDITIONS_COLUMN = [
 		self::METRICS_POINT_SUM => [
-			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes', 'ScopeSchemaUrl',
-			'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit', 'Attributes', 'Exemplars.FilteredAttributes'
+			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes',
+			'ScopeDroppedAttrCount', 'ScopeSchemaUrl', 'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit',
+			'Attributes', 'StartTimeUnix', 'TimeUnix', 'Value', 'Flags', 'Exemplars.FilteredAttributes',
+			'Exemplars.Value', 'AggregationTemporality', 'IsMonotonic'
 		],
 		self::METRICS_POINT_GAUGE => [
-			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes', 'ScopeSchemaUrl',
-			'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit', 'Attributes', 'Exemplars.FilteredAttributes'
+			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes',
+			'ScopeDroppedAttrCount', 'ScopeSchemaUrl', 'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit',
+			'Attributes', 'StartTimeUnix', 'TimeUnix', 'Value', 'Flags', 'Exemplars.FilteredAttributes',
+			'Exemplars.Value'
 		],
 		self::METRICS_POINT_HISTOGRAM => [
-			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes', 'ScopeSchemaUrl',
-			'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit', 'Attributes', 'Exemplars.FilteredAttributes'
+			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes',
+			'ScopeDroppedAttrCount', 'ScopeSchemaUrl', 'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit',
+			'Attributes', 'StartTimeUnix', 'TimeUnix', 'Count', 'Sum', 'Flags', 'Exemplars.FilteredAttributes',
+			'Exemplars.Value', 'Min', 'Max', 'AggregationTemporality'
 		],
 		self::METRICS_POINT_EXPONENTIAL_HISTOGRAM => [
-			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes', 'ScopeSchemaUrl',
-			'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit', 'Attributes', 'Exemplars.FilteredAttributes'
+			'ResourceAttributes', 'ResourceSchemaUrl', 'ScopeName', 'ScopeVersion', 'ScopeAttributes',
+			'ScopeDroppedAttrCount', 'ScopeSchemaUrl', 'ServiceName', 'MetricName', 'MetricDescription', 'MetricUnit',
+			'Attributes', 'StartTimeUnix', 'TimeUnix', 'Count', 'Sum', 'Scale', 'ZeroCount', 'PositiveOffset',
+			'NegativeOffset', 'Flags', 'Exemplars.FilteredAttributes', 'Exemplars.Value', 'Min', 'Max',
+			'AggregationTemporality'
 		]
 	];
 
@@ -122,15 +149,19 @@ class CItemTypeTelemetryQuery extends CItemType {
 		'Timestamp', 'SeverityNumber'
 	];
 	public const LOGS_CONDITIONS_COLUMN = [
-		'TraceId', 'SpanId', 'SeverityText', 'ServiceName', 'Body', 'ResourceSchemaUrl', 'ScopeSchemaUrl', 'ScopeName',
-		'ScopeVersion', 'ResourceAttributes', 'ScopeAttributes', 'LogAttributes', 'EventName'
+		'Timestamp', 'TraceId', 'SpanId', 'TraceFlags', 'SeverityText', 'SeverityNumber', 'ServiceName', 'Body',
+		'ResourceSchemaUrl', 'ScopeSchemaUrl', 'ScopeName', 'ScopeVersion', 'ResourceAttributes', 'ScopeAttributes',
+		'LogAttributes', 'EventName'
 	];
 
 	/**
 	 * @inheritDoc
 	 */
 	public static function getCreateValidationRules(array $item): array {
-		$api_allow_lld_macro = $item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE ? API_ALLOW_LLD_MACRO : 0;
+		$api_allow_lld_macro = ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
+				|| $item['flags'] == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE)
+			? API_ALLOW_LLD_MACRO
+			: 0;
 		$flags = API_NOT_EMPTY | API_ALLOW_USER_MACRO | $api_allow_lld_macro;
 
 		return [
@@ -147,7 +178,10 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 * @inheritDoc
 	 */
 	public static function getUpdateValidationRules(array $db_item): array {
-		$api_allow_lld_macro = $db_item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE ? API_ALLOW_LLD_MACRO : 0;
+		$api_allow_lld_macro = ($db_item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
+				|| $db_item['flags'] == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE)
+			? API_ALLOW_LLD_MACRO
+			: 0;
 		$flags = API_NOT_EMPTY | API_ALLOW_USER_MACRO | $api_allow_lld_macro;
 
 		return [
@@ -164,7 +198,10 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 * @inheritDoc
 	 */
 	public static function getUpdateValidationRulesInherited(array $db_item): array {
-		$api_allow_lld_macro = $db_item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE ? API_ALLOW_LLD_MACRO : 0;
+		$api_allow_lld_macro = ($db_item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
+				|| $db_item['flags'] == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE)
+			? API_ALLOW_LLD_MACRO
+			: 0;
 		$flags = API_NOT_EMPTY | API_ALLOW_USER_MACRO | $api_allow_lld_macro;
 
 		return [
@@ -239,6 +276,7 @@ class CItemTypeTelemetryQuery extends CItemType {
 
 	/**
 	 * Validate "query.aggregated_columns":
+	 * - "alias" value cannot be equal "clock"
 	 * - for "function" AGGREGATE_PERCENTILE "parameters" array may have only single value
 	 * - "function" AGGREGATE_PERCENTILE "parameters" parameter cannot have more than 4 fractional digits
 	 * - "column" contains value allowed by "query.signal_type", "query.metric_point_type"
@@ -272,6 +310,14 @@ class CItemTypeTelemetryQuery extends CItemType {
 					return false;
 				}
 			}
+
+			if ($column['alias'] === 'clock') {
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path.'/query/aggregated_columns/'.($i + 1).'/alias',
+					_s('value must not be %1$s', '"clock"')
+				);
+
+				return false;
+			}
 		}
 
 		$columns = match($item['query']['signal_type']) {
@@ -295,6 +341,8 @@ class CItemTypeTelemetryQuery extends CItemType {
 	 * Validate "query.filter":
 	 * - for "evaltype" CONDITION_EVAL_TYPE_EXPRESSION each "formulaid" should be in use by "formula" field
 	 * - "filter.conditions[].column" contains value allowed by "query.signal_type", "query.metric_point_type"
+	 * - "filter.conditions[].value" of item and item prototype for numeric "filter.conditions.column" support user macro
+	 * - "filter.conditions[].value" of item prototype for numeric "filter.conditions.column" support lld macro
 	 *
 	 * @param array       $item   Telemetry item to validate.
 	 * @param string      $path   Path in validation message.
@@ -332,8 +380,16 @@ class CItemTypeTelemetryQuery extends CItemType {
 			self::SIGNAL_TYPE_METRICS =>	self::METRICS_CONDITIONS_COLUMN[$item['query']['metric_point_type']],
 			self::SIGNAL_TYPE_LOGS =>		self::LOGS_CONDITIONS_COLUMN
 		};
+		$api_allow_lld_macro = ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
+				|| $item['flags'] == ZBX_FLAG_DISCOVERY_RULE_PROTOTYPE)
+			? API_ALLOW_LLD_MACRO
+			: 0;
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'column' =>		['type' => API_STRING_UTF8, 'in' => implode(',', $columns)]
+			'column' =>		['type' => API_STRING_UTF8, 'in' => implode(',', $columns)],
+			'value' =>		['type' => API_MULTIPLE, 'rules' => [
+								['if' => ['field' => 'column', 'in' => implode(',', self::NUMERIC_COLUMN_NAME)], 'type' => API_FLOAT, 'flags' => API_ALLOW_USER_MACRO | $api_allow_lld_macro],
+								['else' => true, 'type' => API_STRING_UTF8]
+			]]
 		]];
 
 		return CApiInputValidator::validate($api_input_rules, $item['query']['filter']['conditions'],
@@ -481,12 +537,13 @@ class CItemTypeTelemetryQuery extends CItemType {
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'default' => '']
 			]],
 			'operator' =>		['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-									['if' => ['field' => 'column', 'in' => implode(',', self::COMPLEX_COLUMN_NAME)], 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_EXISTS])],
-									['else' => true, 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE])]
+									['if' => ['field' => 'column', 'in' => implode(',', self::COMPLEX_COLUMN_NAME)], 'type' => API_INT32, 'in' => implode(',', self::COMPLEX_COLUMN_OPERATORS)],
+									['if' => ['field' => 'column', 'in' => implode(',', self::NUMERIC_COLUMN_NAME)], 'type' => API_INT32, 'in' => implode(',', self::NUMERIC_COLUMN_OPERATORS)],
+									['else' => true, 'type' => API_INT32, 'in' => implode(',', self::SIMPLE_COLUMN_OPERATORS)]
 			]],
 			'value' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'operator', 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
-									['if' => ['field' => 'operator', 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
+									['if' => ['field' => 'operator', 'in' => implode(',', [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_MORE_EQUAL, CONDITION_OPERATOR_LESS_EQUAL])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => '', 'default' => '']
 			]]
 		];

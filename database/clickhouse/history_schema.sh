@@ -1,9 +1,10 @@
 #!/bin/bash
 
 DIR="$(dirname "$0")"
+CH_SCRIPT=schema
 . "$DIR/clickhouse.sh"
 
-cat << EOF | curl $CH_CURL_AUTH $CH_URL --data-binary @-
+cat << EOF | curl "${CH_CURL_OPTS[@]}" "$CH_URL" --data-binary @-
 CREATE TABLE $CH_DB.history$CH_LOCAL_SUFFIX$CH_ON_CLUSTER
 (
 	itemid UInt64,

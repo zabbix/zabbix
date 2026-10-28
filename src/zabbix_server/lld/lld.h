@@ -566,8 +566,8 @@ int	zbx_substitute_function_lld_param(const char *e, size_t len, unsigned char k
 int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const zbx_lld_entry_t *lld_obj,
 		char **error);
 int	zbx_substitute_macros_in_json_pairs(char **data, const zbx_lld_entry_t *lld_obj, char *error, int maxerrlen);
-int	zbx_substitute_macros_in_telemetry_query(char **data, const zbx_lld_entry_t *lld_obj, char *error,
-		int maxerrlen);
+int	zbx_substitute_macros_in_telemetry_query(char **data, const zbx_lld_entry_t *lld_obj, int item_flags,
+		char *error, int maxerrlen);
 
 void	lld_sync_exported_macros(const zbx_vector_uint64_t *ruleids, const zbx_lld_entry_t *entry);
 void	lld_rule_get_exported_macros(zbx_uint64_t ruleid, zbx_vector_lld_macro_t *macros);
@@ -591,5 +591,6 @@ int	lld_items_overrides_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_t
 int	lld_rule_macro_paths_save(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr_t *items, int *host_locked);
 
 int	lld_text_has_lld_macro(const char *text);
+int	lld_is_lld_macro(const char *str);
 
 #endif
