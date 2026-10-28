@@ -14,6 +14,9 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
+require_once __DIR__.'/../../include/classes/parsers/CParser.php';
+require_once __DIR__.'/../../include/classes/parsers/CConditionFormulaParser.php';
+require_once __DIR__.'/../../include/classes/helpers/CConditionHelper.php';
 require_once __DIR__.'/../../include/classes/api/item_types/CItemType.php';
 require_once __DIR__.'/../../include/classes/api/item_types/CItemTypeTelemetryQuery.php';
 
@@ -34,6 +37,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 	const HOST_NAME = 'test_telemetry_query_items';
 
 	const ITEM_KEY = 'test_tq_item';
+	const ITEM_TIMEOUT = '3s';
 	const ITEM_VALUE_TYPE = ITEM_VALUE_TYPE_TEXT;
 
 	private static int $hostid;
@@ -69,7 +73,7 @@ class testTelemetryQueryItems extends CIntegrationTest {
 			'key_' => self::ITEM_KEY,
 			'type' => ITEM_TYPE_TELEMETRY_QUERY,
 			'value_type' => self::ITEM_VALUE_TYPE,
-			'timeout' => '3s'
+			'timeout' => self::ITEM_TIMEOUT,
 		], $item_fields));
 
 		$this->assertArrayHasKey('itemids', $response['result']);
@@ -79,6 +83,22 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER, 0);
 
 		return $itemid;
+	}
+
+	private function getItemForItemTest(array $item_fields): array {
+		$query = $item_fields['query'];
+		unset($item_fields['query']);
+
+		$query = CItemTypeTelemetryQuery::convertFilterFormulaToExpression($query);
+
+		return array_merge([
+			'name' => self::ITEM_KEY,
+			'key' => self::ITEM_KEY,
+			'type' => ITEM_TYPE_TELEMETRY_QUERY,
+			'value_type' => self::ITEM_VALUE_TYPE,
+			'timeout' => self::ITEM_TIMEOUT,
+			'query' => json_encode($query, JSON_THROW_ON_ERROR)
+		], $item_fields);
 	}
 
 	private function deleteTQItem(int $itemid): void {
@@ -248,33 +268,28 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		$now = time();
 		$this->sendInput($subcase['input_tmpl']($now));
 
-		$itemid = $this->createTQItem($hostid, $subcase['item']);
+		$item = $this->getItemForItemTest($subcase['item']);
 
 		$expected_buckets = $subcase['buckets_tmpl']($now);
 
-		// The item may be polled before the sent data is visible in ClickHouse, wait for the expected bucket count.
+		$this->callTestItemUntilCallback($item, function ($result) use ($expected_buckets, $msg) {
+			if ($result === false || !isset($result['item']['result'])) {
+				return false;
+			}
+
+			$buckets = json_decode($result['item']['result'], true, 512, JSON_THROW_ON_ERROR);
+			$this->assertTrue(is_array($buckets), $msg);
+
+			return count($expected_buckets) === count($buckets);
+		});
+
+		$itemid = $this->createTQItem($hostid, $subcase['item']);
+
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'output' => ['value'],
 			'itemids' => [$itemid],
-			'history' => self::ITEM_VALUE_TYPE,
-			'sortfield' => 'clock',
-			'sortorder' => 'DESC',
-			'limit' => 1
-		], null, null, function (array $response) use ($expected_buckets, $msg) {
-			$buckets = json_decode($response['result'][0]['value'], true);
-
-			if (!is_array($buckets)) {
-				echo('asdfasdf');
-				return $msg.': invalid value: '.$response['result'][0]['value'];
-			}
-
-			if (count($expected_buckets) != count($buckets)) {
-				echo('asdfasdf2');
-				return $msg.': invalid bucket count, expected '.count($expected_buckets).', got '.count($buckets);
-			}
-
-			return true;
-		});
+			'history' => self::ITEM_VALUE_TYPE
+		]);
 
 		$buckets = json_decode($response['result'][0]['value'], true, 512, JSON_THROW_ON_ERROR);
 
