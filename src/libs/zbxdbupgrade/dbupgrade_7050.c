@@ -2199,6 +2199,76 @@ static int	DBpatch_7050196(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7050197(void)
+{
+	const zbx_db_field_t	field = {"scope", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("cep_operation", &field);
+}
+
+static int	DBpatch_7050198(void)
+{
+	const zbx_db_field_t	field = {"scope_evaltype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("cep_operation", &field);
+}
+
+static int	DBpatch_7050199(void)
+{
+	const zbx_db_field_t	field = {"scope_formula", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("cep_operation", &field);
+}
+
+static int	DBpatch_7050200(void)
+{
+	const zbx_db_table_t	table =
+			{"cep_operation_scope_condition", "cep_operation_scope_conditionid", 0,
+				{
+					{"cep_operation_scope_conditionid", NULL, NULL, NULL, 0, ZBX_TYPE_ID,
+							ZBX_NOTNULL, 0},
+					{"cep_operationid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"type", "29", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"operator", "10", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"tag_value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050201(void)
+{
+	return DBcreate_index("cep_operation_scope_condition", "cep_operation_scope_condition_1", "cep_operationid",
+			0);
+}
+
+static int	DBpatch_7050202(void)
+{
+	const zbx_db_field_t	field = {"cep_operationid", NULL, "cep_operation", "cep_operationid", 0, ZBX_TYPE_ID,
+			ZBX_NOTNULL, 0};
+
+	return DBadd_foreign_key("cep_operation_scope_condition", 1, &field);
+}
+
+static int	DBpatch_7050203(void)
+{
+	return DBcreate_changelog_insert_trigger("cep_operation_scope_condition", "cep_operation_scope_conditionid");
+}
+
+static int	DBpatch_7050204(void)
+{
+	return DBcreate_changelog_update_trigger("cep_operation_scope_condition", "cep_operation_scope_conditionid");
+}
+
+static int	DBpatch_7050205(void)
+{
+	return DBcreate_changelog_delete_trigger("cep_operation_scope_condition", "cep_operation_scope_conditionid");
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -2402,5 +2472,14 @@ DBPATCH_ADD(7050193, 0, 1)
 DBPATCH_ADD(7050194, 0, 1)
 DBPATCH_ADD(7050195, 0, 1)
 DBPATCH_ADD(7050196, 0, 1)
+DBPATCH_ADD(7050197, 0, 1)
+DBPATCH_ADD(7050198, 0, 1)
+DBPATCH_ADD(7050199, 0, 1)
+DBPATCH_ADD(7050200, 0, 1)
+DBPATCH_ADD(7050201, 0, 1)
+DBPATCH_ADD(7050202, 0, 1)
+DBPATCH_ADD(7050203, 0, 1)
+DBPATCH_ADD(7050204, 0, 1)
+DBPATCH_ADD(7050205, 0, 1)
 
 DBPATCH_END()

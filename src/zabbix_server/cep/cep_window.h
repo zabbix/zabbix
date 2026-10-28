@@ -15,6 +15,7 @@
 #ifndef ZABBIX_CEP_WINDOW_H
 #define ZABBIX_CEP_WINDOW_H
 
+#include "zbx_cep.h"
 #include "cep_event.h"
 #include "zbxmw.h"
 #include "zbxcacheconfig.h"
@@ -56,7 +57,7 @@ zbx_cep_window_sync_entry_t;
 
 ZBX_VECTOR_LITE_DECL(cep_window_sync_entry, zbx_cep_window_sync_entry_t)
 
-typedef struct
+struct zbx_cep_window
 {
 	zbx_uint64_t		ruleid;
 	zbx_uint64_t		windowid;
@@ -88,8 +89,7 @@ typedef struct
 	zbx_atomic_uint32_t	refcount;
 	zbx_cep_window_ref_t	*ref;
 	pthread_mutex_t		lock;
-}
-zbx_cep_window_t;
+};
 
 ZBX_PTR_VECTOR_LITE_DECL(cep_window_ptr, zbx_cep_window_t *)
 
@@ -107,6 +107,7 @@ struct zbx_cep_window_ref
 
 zbx_cep_window_t	*cep_window_addref(zbx_cep_window_t *window);
 void	cep_window_release(zbx_cep_window_t *window);
+
 void	cep_window_sync_detach(zbx_cep_window_t *window, zbx_vector_cep_window_sync_entry_t *sync);
 time_t	cep_window_get_time_created(zbx_cep_window_t *window);
 
@@ -164,6 +165,9 @@ void	cep_window_pool_get_stats(zbx_cep_window_pool_t *pool, zbx_cep_window_pool_
 void	cep_window_pool_dump(zbx_cep_window_pool_t *pool);
 
 void	cep_remove_windows_by_rule(zbx_uint64_t ruleid, zbx_vector_mw_task_ptr_t *tasks);
+
+void	cep_window_process_event_closed(zbx_cep_window_t *window, zbx_cep_event_handle_t hevent,
+		zbx_dbconn_pool_t *dbpool, zbx_vector_mw_task_ptr_t *tasks);
 
 #endif
 
