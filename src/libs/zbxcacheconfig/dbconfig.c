@@ -7527,7 +7527,8 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 			maintenance_trigger_sync, hgroup_host_sync, drules_sync, dchecks_sync, httptest_sync,
 			httptest_field_sync, httpstep_sync, httpstep_field_sync, autoreg_host_sync, connector_sync,
 			connector_tag_sync, proxy_sync, proxy_group_sync, hp_sync, autoreg_config_sync,
-			cep_rule_sync, cep_condition_sync, cep_window_sync, cep_operation_sync, cep_op_condition_sync;
+			cep_rule_sync, cep_condition_sync, cep_window_sync, cep_operation_sync, cep_op_condition_sync,
+			cep_op_scope_condition_sync;
 	zbx_uint64_t	update_flags = 0;
 	zbx_int64_t	used_size, update_size = 0, topology_size = 0, timers_size = 0, um_cache_dup_size = 0;
 	unsigned char	changelog_sync_mode = mode;	/* sync mode for objects using incremental sync */
@@ -7609,6 +7610,8 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 	zbx_dbsync_init_changelog(&cep_window_sync, "cep_window", changelog_sync_mode, db);
 	zbx_dbsync_init_changelog(&cep_operation_sync, "cep_operation", changelog_sync_mode, db);
 	zbx_dbsync_init_changelog(&cep_op_condition_sync, "cep_operation_condition", changelog_sync_mode, db);
+	zbx_dbsync_init_changelog(&cep_op_scope_condition_sync, "cep_operation_scope_condition", changelog_sync_mode,
+			db);
 
 	/* Action operation sync produces virtual rows with two columns - actionid, opflags. */
 	/* Because of this it cannot return the original database select and must always be  */
@@ -7906,8 +7909,11 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 	if (FAIL == zbx_dbsync_prepare_cep_operation_condition(&cep_op_condition_sync))
 		goto out;
 
+	if (FAIL == zbx_dbsync_prepare_cep_operation_scope_condition(&cep_op_scope_condition_sync))
+		goto out;
+
 	cep_config_sync(&cep_rule_sync, &cep_condition_sync, &cep_window_sync, &cep_operation_sync,
-			&cep_op_condition_sync, new_revision);
+			&cep_op_condition_sync, &cep_op_scope_condition_sync, new_revision);
 
 	START_SYNC;
 
@@ -8272,6 +8278,7 @@ clean:
 	zbx_dbsync_clear(&cep_window_sync);
 	zbx_dbsync_clear(&cep_operation_sync);
 	zbx_dbsync_clear(&cep_op_condition_sync);
+	zbx_dbsync_clear(&cep_op_scope_condition_sync);
 
 	if (ZBX_DBSYNC_INIT == mode)
 		zbx_hashset_destroy(&trend_queue);
@@ -11810,20 +11817,50 @@ out:
 	return num;
 }
 
-void	zbx_dc_config_get_apm_db_config(zbx_apm_db_config_t *out, const zbx_apm_db_config_t *local_apm_db_config,
-		const char *config_source_ip, const char *config_ssl_ca_location)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get APM database configuration                                    *
+ *                                                                            *
+ * Parameters: out                    - [OUT] APM database configuration      *
+ *             local_apm_db_config    - [IN] local configuration, used        *
+ *                                           instead of global configuration  *
+ *                                           when enabled (optional)          *
+ *             config_source_ip       - [IN] source IP (optional)             *
+ *             config_ssl_ca_location - [IN] SSL CA location (optional)       *
+ *             revision               - [IN/OUT] revision of the last         *
+ *                                           retrieved global configuration,  *
+ *                                           updated on retrieval (optional)  *
+ *                                                                            *
+ * Return value: SUCCEED - configuration was retrieved                        *
+ *               FAIL    - global configuration has not changed since the     *
+ *                         specified revision, out is left empty              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_config_get_apm_db_config(zbx_apm_db_config_t *out, const zbx_apm_db_config_t *local_apm_db_config,
+		const char *config_source_ip, const char *config_ssl_ca_location, zbx_uint64_t *revision)
 {
 	const zbx_config_apm_global_db_t	*global_config;
 
 	if (NULL != local_apm_db_config && 0 != local_apm_db_config->status)
 	{
 		zbx_apm_db_config_copy(out, local_apm_db_config);
-		return;
+		return SUCCEED;
 	}
 
 	memset(out, 0, sizeof(*out));
 
 	RDLOCK_CACHE;
+
+	if (NULL != revision)
+	{
+		if (*revision >= config->revision.settings_table)
+		{
+			UNLOCK_CACHE;
+			return FAIL;
+		}
+
+		*revision = config->revision.settings_table;
+	}
 
 	global_config = &config->config->apm_global_db;
 
@@ -11832,7 +11869,7 @@ void	zbx_dc_config_get_apm_db_config(zbx_apm_db_config_t *out, const zbx_apm_db_
 	if (0 == out->status)
 	{
 		UNLOCK_CACHE;
-		return;
+		return SUCCEED;
 	}
 
 	out->db_type = ZBX_APM_DB_TYPE_CLICKHOUSE;
@@ -11855,6 +11892,8 @@ void	zbx_dc_config_get_apm_db_config(zbx_apm_db_config_t *out, const zbx_apm_db_
 
 	if (NULL != config_ssl_ca_location)
 		out->ssl_ca_location = zbx_strdup(NULL, config_ssl_ca_location);
+
+	return SUCCEED;
 }
 
 int	zbx_dc_config_poller_type_has_cached_data(unsigned char poller_type)
@@ -17635,6 +17674,4 @@ char	*zbx_dc_get_apm_config(char *old_config, zbx_uint64_t *revision)
 
 	return apm_config;
 }
-
-
 

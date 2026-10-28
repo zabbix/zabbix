@@ -433,6 +433,8 @@ class CAudit {
 		'ceprule.operations' => 'cep_operation',
 		'ceprule.operations.filter' => 'cep_operation',
 		'ceprule.operations.filter.conditions' => 'cep_operation_condition',
+		'ceprule.operations.scope_filter' => 'cep_operation',
+		'ceprule.operations.scope_filter.conditions' => 'cep_operation_scope_condition',
 		'ceprule.window' => 'cep_rule_window',
 		'connector.tags' => 'connector_tag',
 		'correlation.filter' => 'correlation',
@@ -546,6 +548,7 @@ class CAudit {
 	 * @var array
 	 */
 	private const SCALAR_VALUE_LIST_FIELD = [
+		'ceprule.window.tags',
 		'item.query.aggregated_columns.parameters',
 		'itemprototype.query.aggregated_columns.parameters'
 	];
@@ -580,6 +583,7 @@ class CAudit {
 		'ceprule.filter.conditions' => 'cep_conditionid',
 		'ceprule.operations' => 'cep_operationid',
 		'ceprule.operations.filter.conditions' => 'cep_operation_conditionid',
+		'ceprule.operations.scope_filter.conditions' => 'cep_operation_scope_conditionid',
 		'connector.tags' => 'connector_tagid',
 		'correlation.filter.conditions' => 'corr_conditionid',
 		'correlation.operations' => 'corr_operationid',

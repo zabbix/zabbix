@@ -49,7 +49,7 @@ class testTelemetryQueryItemsWithProxyInput extends testTelemetryQueryItems {
 										'username="' . self::CLICKHOUSE_USERNAME . '",' .
 										'password="' . self::CLICKHOUSE_PASSWORD . '",' .
 										'db="' . self::CLICKHOUSE_DB . '"',
-				'StartAPMCollectors' => 1,
+				'StartAPMCollector' => 1,
 				'Hostname' => self::PROXY_NAME
 			]
 		];

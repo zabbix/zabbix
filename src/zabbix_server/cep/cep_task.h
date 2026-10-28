@@ -15,7 +15,6 @@
 #ifndef ZABBIX_CEP_TASK_H
 #define ZABBIX_CEP_TASK_H
 
-#include "cep_window.h"
 #include "cep_rule_operation.h"
 #include "cep_event.h"
 #include "zbx_cep.h"
@@ -156,7 +155,6 @@ typedef struct
 	zbx_uint64_t	ruleid;
 }
 zbx_cep_task_rule_reset_t;
-
 
 zbx_mw_task_t	*cep_create_task_remote(zbx_ipc_client_t *client, zbx_ipc_message_t *message, unsigned char *response,
 		zbx_uint32_t response_len);
