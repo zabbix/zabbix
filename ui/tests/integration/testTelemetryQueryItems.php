@@ -866,17 +866,6 @@ class testTelemetryQueryItems extends CIntegrationTest {
 		);
 	}
 
-	/*
-		TODO: add test cases for:
-			- time buckets with overlap
-			- time buckets with gaps
-			- time buckets with no gaps, no overlaps but in multiple requests
-			- custom expression
-			- array conditions
-			- exists condition
-			- utf-8 handling in attributes (both keys and values)
-	*/
-
 	/**
 	 * @onBeforeOnce createHost
 	 * @onAfterOnce deleteHost
