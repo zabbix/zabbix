@@ -213,8 +213,7 @@ var LldRuleEditPrototypeTab = class {
 
 		this.#form_element.querySelector('#columns-table').addEventListener('change', e => {
 			if (e.target.classList.contains('js-column')) {
-				this.#toggleAttributeKey(e.target);
-				this.#toggleSelectedColumns();
+				this.#onTelemetryColumnsSelectChange(e.target);
 			}
 		});
 
@@ -366,9 +365,12 @@ var LldRuleEditPrototypeTab = class {
 			next_option = available_options.find(option => option === first_complex_value);
 		}
 
-		this.#populateColumnSelect(last_select);
-		last_select.value = next_option;
-		this.#toggleAttributeKey(last_select);
+		if (last_select.value === next_option) {
+			this.#onTelemetryColumnsSelectChange(last_select);
+		}
+		else {
+			last_select.value = next_option;
+		}
 	}
 
 	#toggleSelectedColumns() {
@@ -533,6 +535,13 @@ var LldRuleEditPrototypeTab = class {
 		if (!is_complex) {
 			attribute_key.value = '';
 		}
+	}
+
+	#onTelemetryColumnsSelectChange(select) {
+		this.#populateColumnSelect(select);
+		this.#toggleAttributeKey(select);
+
+		this.#toggleSelectedColumns();
 	}
 
 	#updateTelemetryColumns() {
