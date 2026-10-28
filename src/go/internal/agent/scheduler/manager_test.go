@@ -684,7 +684,7 @@ func checkExporterTasks(t *testing.T, m *Manager, clientID uint64, items []*clie
 func newSystemRunTestManager(t *testing.T) *Manager {
 	t.Helper()
 
-	err := log.Open(log.Console, log.Debug, "", 0)
+	err := log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 	if err != nil {
 		t.Fatal(err)
 	}
