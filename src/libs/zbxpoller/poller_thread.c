@@ -741,8 +741,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				{
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 					errcodes[i] = CONFIG_ERROR;
-					zbx_free(timeout);
-					continue;
+					goto cleanup;
 				}
 
 				items[i].telemetry_query = zbx_malloc(NULL, sizeof(zbx_tq_query_t));
@@ -753,8 +752,17 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 					errcodes[i] = CONFIG_ERROR;
 					zbx_free(items[i].telemetry_query);
-					zbx_free(timeout);
-					continue;
+					goto cleanup;
+				}
+
+				if (SUCCEED != zbx_tq_prepare_query(items[i].telemetry_query, NULL, NULL, error,
+						sizeof(error)))
+				{
+					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+					errcodes[i] = CONFIG_ERROR;
+					zbx_tq_query_clean(items[i].telemetry_query);
+					zbx_free(items[i].telemetry_query);
+					goto cleanup;
 				}
 				break;
 		}
@@ -1076,20 +1084,41 @@ void	zbx_prepare_httpagent_items(zbx_dc_httpagent_item_t *items, int *errcodes, 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+typedef struct
+{
+	zbx_dc_um_handle_t			*um_handle;
+	const zbx_dc_telemetry_query_item_t	*item;
+}
+telemetry_query_macro_expand_ctx_t;
+
+static int	telemetry_query_macro_expand_cb(char **text, void *ctx)
+{
+	telemetry_query_macro_expand_ctx_t	*pctx = (telemetry_query_macro_expand_ctx_t *)ctx;
+
+	zbx_dc_expand_user_and_func_macros(pctx->um_handle, text, &pctx->item->hostid, 1, NULL);
+
+	return SUCCEED;
+}
+
 void	zbx_prepare_telemetry_query_items(zbx_dc_telemetry_query_item_t *items, int *errcodes, int num,
 		AGENT_RESULT *results)
 {
-	char			error[ZBX_ITEM_ERROR_LEN_MAX], *timeout = NULL;
-	char			*time_shift = NULL, *lookback_limit = NULL, *granularity = NULL;
-	zbx_dc_um_handle_t	*um_handle, *um_handle_secure;
+	char					error[ZBX_ITEM_ERROR_LEN_MAX], *timeout = NULL;
+	char					*time_shift = NULL, *lookback_limit = NULL, *granularity = NULL;
+	zbx_dc_um_handle_t			*um_handle, *um_handle_secure;
+	telemetry_query_macro_expand_ctx_t	query_macro_expand_ctx;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() num:%d", __func__, num);
 
 	um_handle = zbx_dc_open_user_macros_masked();
 	um_handle_secure = zbx_dc_open_user_macros_secure();
 
+	query_macro_expand_ctx.um_handle = um_handle;
+
 	for (int i = 0; i < num; i++)
 	{
+		query_macro_expand_ctx.item = &items[i];
+
 		zbx_init_agent_result(&results[i]);
 		errcodes[i] = SUCCEED;
 
@@ -1144,6 +1173,16 @@ void	zbx_prepare_telemetry_query_items(zbx_dc_telemetry_query_item_t *items, int
 		{
 			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 			errcodes[i] = CONFIG_ERROR;
+			zbx_free(items[i].telemetry_query);
+			continue;
+		}
+
+		if (SUCCEED != zbx_tq_prepare_query(items[i].telemetry_query, telemetry_query_macro_expand_cb,
+				&query_macro_expand_ctx, error, sizeof(error)))
+		{
+			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+			errcodes[i] = CONFIG_ERROR;
+			zbx_tq_query_clean(items[i].telemetry_query);
 			zbx_free(items[i].telemetry_query);
 			continue;
 		}

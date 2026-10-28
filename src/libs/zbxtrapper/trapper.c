@@ -183,8 +183,11 @@ int	zbx_check_frontend_conn_accept(zbx_socket_t *sock, const zbx_config_tls_t *c
 static void	recv_agenthistory(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, struct zbx_json_parse *jp,
 		zbx_timespec_t *ts, int config_timeout)
 {
-	char	*info = NULL, *ext = NULL;
-	int	ret;
+	char			*info = NULL, *ext = NULL, host[MAX_STRING_LEN], *error = NULL;
+	int			ret;
+	struct zbx_json_parse	jp_commands;
+	zbx_uint64_t		hostid = 0, revision = 0;
+	unsigned char		status = 0, monitored_by = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -214,7 +217,19 @@ static void	recv_agenthistory(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, s
 	else
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid agent history data from \"%s\": %s", sock->peer, info);
 
-	zbx_process_command_results(jp);
+	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_COMMANDS, &jp_commands) &&
+			SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, sizeof(host), NULL))
+	{
+		if (SUCCEED != zbx_dc_check_host_conn_permissions(host, sock, &hostid, &status, &monitored_by,
+				&revision, NULL, ZBX_AUTOREG_NO_CHANGES, &error))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot process command results from \"%s\": %s", sock->peer,
+					error);
+			zbx_free(error);
+		}
+		else if (0 != hostid)
+			zbx_process_command_results(&jp_commands, hostid);
+	}
 
 	zbx_send_response_json(sock, ret, info, NULL, sock->protocol, config_timeout, ext);
 
@@ -1166,7 +1181,6 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 	int			ret = SUCCEED;
 	static double		last_log_time;
 	double			now;
-	static int		dropped_count;
 	struct zbx_json_parse	jp;
 	char			value[MAX_STRING_LEN] = "";
 
@@ -1176,27 +1190,17 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 	zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
 #endif
 
+	if ('\0' == *s)
+		return FAIL;
+
 	if ('{' != *s)
 	{
 		now = zbx_time();
 
 		if (ZBX_NON_JSON_LOG_INTERVAL <= now - last_log_time)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "trapper got non-JSON data from \"%s\""
-					" (legacy protocols are not supported)", sock->peer);
-
-			if (0 != last_log_time && 0 < dropped_count)
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "trapper dropped %d packets in the last %d seconds",
-						dropped_count, (int)(now - last_log_time));
-			}
-
+			zabbix_log(LOG_LEVEL_WARNING, "received invalid JSON object from %s", sock->peer);
 			last_log_time = now;
-			dropped_count = 0;
-		}
-		else
-		{
-			dropped_count++;
 		}
 
 		return FAIL;

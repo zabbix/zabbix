@@ -438,7 +438,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 					array_column($inputs['item'][$field], 'value')
 				);
 				$texts_having_macros = array_filter($texts_having_macros, static function(string $str): bool {
-					return (strstr($str, '{') !== false);
+					return (str_contains($str, '{'));
 				});
 
 				if ($texts_having_macros) {
@@ -451,7 +451,28 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 					}
 				}
 			}
-			elseif (strstr($inputs['item'][$field], '{') !== false) {
+			elseif ($field === 'query') {
+				$query = json_decode($inputs['item'][$field], true);
+
+				$texts_having_macros = [];
+
+				foreach ($query['filter']['conditions'] ?? [] as $condition) {
+					foreach (['attribute_key', 'value'] as $name) {
+						if (str_contains($condition[$name], '{')) {
+							$texts_having_macros[] = $condition[$name];
+						}
+					}
+				}
+
+				if ($texts_having_macros) {
+					$texts_support_user_macros = array_merge($texts_support_user_macros, $texts_having_macros);
+
+					if ($support_lldmacros && $this->macros_by_item_props[$field]['support_lld_macros']) {
+						$texts_support_lld_macros = array_merge($texts_support_lld_macros, $texts_having_macros);
+					}
+				}
+			}
+			elseif (str_contains($inputs['item'][$field], '{')) {
 				if ($field === 'key') {
 					$item_key_parser = new CItemKey();
 

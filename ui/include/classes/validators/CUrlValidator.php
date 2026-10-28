@@ -128,7 +128,7 @@ class CUrlValidator extends CValidator {
 	}
 
 	protected function validateUrl(string $value): bool {
-		$value = preg_replace('/[\r\n\t]/', '', trim($value, "\x00..\x20"));
+		$value = CUrlHelper::sanitize($value);
 
 		if ($value === '') {
 			$this->setError(_('unacceptable URL'));
@@ -150,8 +150,16 @@ class CUrlValidator extends CValidator {
 			return false;
 		}
 
-		if (array_key_exists('scheme', $url_parts) && $this->options['schemes'] !== null) {
-			if (!in_array(strtolower($url_parts['scheme']), $this->options['schemes'], true)) {
+		if ($this->options['schemes'] !== null) {
+			if (array_key_exists('scheme', $url_parts)) {
+				if (!in_array(strtolower($url_parts['scheme']), $this->options['schemes'], true)) {
+					$this->setError(_('unacceptable URL scheme'));
+
+					return false;
+				}
+			}
+			elseif (str_starts_with(strtolower($value), 'javascript:')
+					&& !in_array('javascript', $this->options['schemes'], true)) {
 				$this->setError(_('unacceptable URL scheme'));
 
 				return false;
