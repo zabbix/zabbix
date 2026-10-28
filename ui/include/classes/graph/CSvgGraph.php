@@ -448,7 +448,7 @@ class CSvgGraph extends CSvg {
 						$side_fragment_points[] = [$clock, $prev_point[1], false];
 					}
 
-					$prev_point = [$clock, $point_value, true];
+					$prev_point = [$clock, $point_value, !array_key_exists('synthetic', $point)];
 					$side_fragment_points[] = $prev_point;
 				}
 
@@ -935,6 +935,10 @@ class CSvgGraph extends CSvg {
 					 */
 					$path_point = [];
 					foreach ($point as $type => $value) {
+						if ($type === 'synthetic') {
+							continue;
+						}
+
 						$x = $this->canvas_x + $this->canvas_width
 							- $this->canvas_width * ($this->time_till - $clock + $timeshift) / $time_range;
 
@@ -958,10 +962,12 @@ class CSvgGraph extends CSvg {
 						$path_point[$type] = [
 							(int) ceil($x),
 							(int) ceil($y),
-							convertUnits([
-								'value' => $value,
-								'units' => $metric['units']
-							])
+							array_key_exists('synthetic', $point)
+								? ''
+								: convertUnits([
+									'value' => $value,
+									'units' => $metric['units']
+								])
 						];
 					}
 
