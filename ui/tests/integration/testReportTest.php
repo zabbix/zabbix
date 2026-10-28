@@ -259,7 +259,7 @@ class testReportTest extends CIntegrationTest {
 		$this->assertFalse($client->sendRequest($data, self::$sessions[$session]));
 
 		if ($error !== 'Permission denied.') {
-			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'trapper got \'{"request":"report.test"', false, 10, 1);
+			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'trapper got request \'report.test\'', false, 10, 1);
 		}
 
 		$this->assertSame($error, $client->getError());
