@@ -108,6 +108,19 @@ The partition schema is applied to the record timestamp column.
 Example:
 ./otel_all.sh -s http://localhost:8123 -d zabbix -u user -p password -t 604800
 
+With the -c|--cluster option the data is stored in <otel table>_local tables and
+<otel table> is a Distributed table over them, the same as for history tables.
+Traces are sharded by trace (sharding key cityHash64(TraceId)), so all spans of
+a trace are stored on the same shard, logs and metrics are distributed randomly:
+
+./otel_all.sh -s <ClickHouse URL> -d zabbix -c <cluster> -e "ReplicatedMergeTree()"
+
+Unlike the history schema creation scripts, these scripts skip tables that
+already exist. An existing table created without the -c|--cluster option is not
+converted to a Distributed table, the script fails instead, drop the table first:
+
+echo "DROP TABLE zabbix.otel_logs SYNC" | curl -u <user>:<password> <ClickHouse URL> --data-binary @-
+
 Data Export Scripts:
 
 MySQL:

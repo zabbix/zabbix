@@ -204,3 +204,31 @@ CREATE TABLE $CH_DB.$1$CH_ON_CLUSTER AS $CH_DB.$1$CH_LOCAL_SUFFIX
 ENGINE = Distributed('$CH_CLUSTER', '$CH_DB', '$1$CH_LOCAL_SUFFIX', intHash64(itemid))
 EOF
 }
+
+# creates Distributed table $1 sharded by $2, an existing Distributed table is skipped, while any other
+# existing table is an error, as it would silently take the place of the Distributed table
+ch_create_otel_distributed_table()
+{
+	local engine
+
+	if [ -z "$CH_CLUSTER" ]; then
+		return
+	fi
+
+	engine=$(echo "SELECT engine FROM system.tables WHERE database = '$CH_DB' AND name = '$1'" | ch_query) \
+			|| return 1
+
+	if [ "$engine" = "Distributed" ]; then
+		return
+	fi
+
+	if [ -n "$engine" ]; then
+		echo "Table $CH_DB.$1 already exists with $engine engine, drop it to create Distributed table" >&2
+		return 1
+	fi
+
+	ch_query << EOF
+CREATE TABLE IF NOT EXISTS $CH_DB.$1$CH_ON_CLUSTER AS $CH_DB.$1$CH_LOCAL_SUFFIX
+ENGINE = Distributed('$CH_CLUSTER', '$CH_DB', '$1$CH_LOCAL_SUFFIX', $2)
+EOF
+}

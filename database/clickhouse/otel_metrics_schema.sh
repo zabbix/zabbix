@@ -44,7 +44,7 @@ TTL toDateTime(TimeUnix) + toIntervalSecond($CH_TTL)
 SETTINGS index_granularity = 8192, ttl_only_drop_parts = 1"
 
 ch_query << EOF || exit 1
-CREATE TABLE IF NOT EXISTS $CH_DB.otel_metrics_gauge
+CREATE TABLE IF NOT EXISTS $CH_DB.otel_metrics_gauge$CH_LOCAL_SUFFIX$CH_ON_CLUSTER
 ($COMMON_COLUMNS
 	Value Float64 CODEC(ZSTD(1)),
 	Flags UInt32 CODEC(ZSTD(1)),$EXEMPLARS$COMMON_INDEXES
@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS $CH_DB.otel_metrics_gauge
 EOF
 
 ch_query << EOF || exit 1
-CREATE TABLE IF NOT EXISTS $CH_DB.otel_metrics_sum
+CREATE TABLE IF NOT EXISTS $CH_DB.otel_metrics_sum$CH_LOCAL_SUFFIX$CH_ON_CLUSTER
 ($COMMON_COLUMNS
 	Value Float64 CODEC(ZSTD(1)),
 	Flags UInt32 CODEC(ZSTD(1)),$EXEMPLARS
@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS $CH_DB.otel_metrics_sum
 EOF
 
 ch_query << EOF || exit 1
-CREATE TABLE IF NOT EXISTS $CH_DB.otel_metrics_histogram
+CREATE TABLE IF NOT EXISTS $CH_DB.otel_metrics_histogram$CH_LOCAL_SUFFIX$CH_ON_CLUSTER
 ($COMMON_COLUMNS
 	Count UInt64 CODEC(Delta, ZSTD(1)),
 	Sum Float64 CODEC(ZSTD(1)),
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS $CH_DB.otel_metrics_histogram
 EOF
 
 ch_query << EOF || exit 1
-CREATE TABLE IF NOT EXISTS $CH_DB.otel_metrics_exponential_histogram
+CREATE TABLE IF NOT EXISTS $CH_DB.otel_metrics_exponential_histogram$CH_LOCAL_SUFFIX$CH_ON_CLUSTER
 ($COMMON_COLUMNS
 	Count UInt64 CODEC(Delta, ZSTD(1)),
 	Sum Float64 CODEC(ZSTD(1)),
@@ -92,3 +92,7 @@ CREATE TABLE IF NOT EXISTS $CH_DB.otel_metrics_exponential_histogram
 	AggregationTemporality Int32 CODEC(ZSTD(1)),$COMMON_INDEXES
 )$TABLE_OPTIONS
 EOF
+
+for table in otel_metrics_gauge otel_metrics_sum otel_metrics_histogram otel_metrics_exponential_histogram; do
+	ch_create_otel_distributed_table $table "rand()" || exit 1
+done

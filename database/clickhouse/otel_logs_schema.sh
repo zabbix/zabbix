@@ -5,7 +5,7 @@ CH_SCRIPT=schema
 . "$DIR/clickhouse.sh"
 
 ch_query << EOF || exit 1
-CREATE TABLE IF NOT EXISTS $CH_DB.otel_logs
+CREATE TABLE IF NOT EXISTS $CH_DB.otel_logs$CH_LOCAL_SUFFIX$CH_ON_CLUSTER
 (
 	Timestamp DateTime64(9) CODEC(Delta(8), ZSTD(1)),
 	TraceId String CODEC(ZSTD(1)),
@@ -38,3 +38,5 @@ ORDER BY (toStartOfFiveMinutes(Timestamp), ServiceName, Timestamp)
 TTL toDateTime(Timestamp) + toIntervalSecond($CH_TTL)
 SETTINGS index_granularity = 8192, ttl_only_drop_parts = 1
 EOF
+
+ch_create_otel_distributed_table otel_logs "rand()" || exit 1
