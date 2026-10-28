@@ -2299,6 +2299,13 @@ static int	DBpatch_7050208(void)
 	return DBadd_foreign_key("usrgrp_apm_filter", 1, &field);
 }
 
+static int	DBpatch_7050209(void)
+{
+	const zbx_db_field_t	field = {"opdata", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("triggers", &field, NULL);
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -2514,5 +2521,6 @@ DBPATCH_ADD(7050205, 0, 1)
 DBPATCH_ADD(7050206, 0, 1)
 DBPATCH_ADD(7050207, 0, 1)
 DBPATCH_ADD(7050208, 0, 1)
+DBPATCH_ADD(7050209, 0, 1)
 
 DBPATCH_END()
