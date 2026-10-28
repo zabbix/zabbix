@@ -280,24 +280,19 @@ namespace
 	 *                                                                            *
 	 * Return value: gRPC server credentials                                      *
 	 *                                                                            *
-	 * Comments: A CA file requires and verifies a client certificate;            *
-	 *           without one, only server-side TLS is used.                       *
-	 *                                                                            *
 	 ******************************************************************************/
 	static std::shared_ptr<grpc::ServerCredentials>	build_credentials(const zbx_apm_config_tls_t *tls)
 	{
 		if (NULL == tls)
 			return grpc::InsecureServerCredentials();
 
-		grpc::SslServerCredentialsOptions	opts(NULL != tls->ca_file ?
-				GRPC_SSL_REQUEST_AND_REQUIRE_CLIENT_CERTIFICATE_AND_VERIFY :
-				GRPC_SSL_DONT_REQUEST_CLIENT_CERTIFICATE);
+		grpc::SslServerCredentialsOptions	opts;
+
+		opts.client_certificate_request = GRPC_SSL_REQUEST_AND_REQUIRE_CLIENT_CERTIFICATE_AND_VERIFY;
 
 		/* private key first, then certificate chain */
 		opts.pem_key_cert_pairs.push_back({read_pem(tls->key_file), read_pem(tls->cert_file)});
-
-		if (NULL != tls->ca_file)
-			opts.pem_root_certs = read_pem(tls->ca_file);
+		opts.pem_root_certs = read_pem(tls->ca_file);
 
 		return grpc::SslServerCredentials(opts);
 	}

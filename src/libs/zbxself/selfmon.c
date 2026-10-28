@@ -196,7 +196,8 @@ void	zbx_get_selfmon_stats(unsigned char proc_type, unsigned char aggr_func, int
 		else
 			unit_count = get_config_forks_cb(proc_type);
 
-		if (SUCCEED != zbx_timekeeper_get_stat(collector.monitor, unit_index, unit_count, aggr_func, state, value, &error))
+		if (SUCCEED != zbx_timekeeper_get_stat(collector.monitor, unit_index, unit_count, aggr_func, state,
+				value, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot get self monitoring statistics: %s", error);
 			*value = 0;
