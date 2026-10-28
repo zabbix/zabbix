@@ -727,6 +727,72 @@ class testDataCollection extends CIntegrationTest {
 	}
 
 	/**
+	 * Test that history data with a valid row followed by a non-object element is rejected without leaking the
+	 * already parsed row values, both for host/key (sender data) and itemid (agent data variant 2) based parsing.
+	 *
+	 * @required-components server
+	 */
+	public function testDataCollection_malformedHistoryDataRow() {
+		$host = 'malformed_data_host';
+		$key = 'malformed.trap';
+
+		$response = $this->call('host.create', [
+			'host' => $host,
+			'groups' => [['groupid' => 4]], // Zabbix servers
+			'status' => HOST_STATUS_MONITORED
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['hostids']);
+		$hostid = $response['result']['hostids'][0];
+
+		$response = $this->call('item.create', [
+			'hostid' => $hostid,
+			'name' => $key,
+			'key_' => $key,
+			'type' => ITEM_TYPE_TRAPPER,
+			'value_type' => ITEM_VALUE_TYPE_LOG
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertEquals(1, count($response['result']['itemids']));
+		$itemid = $response['result']['itemids'][0];
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		// Both value and source fields of the first row are allocated before the second row fails to parse.
+		$payload = str_repeat('x', 4096);
+
+		// Host/key based history data parsing.
+		$client = $this->getClient(self::COMPONENT_SERVER);
+		$result = $client->sendDataValues('sender', [
+			['host' => $host, 'key' => $key, 'value' => $payload, 'source' => $payload],
+			1
+		]);
+		$this->assertNotFalse($result, 'Failed to send sender data: '.$client->getError());
+		$this->assertEquals(0, $result['processed'] ?? 0);
+
+		// Itemid based history data parsing, a new client is required as the connection is closed after a request.
+		$client = $this->getClient(self::COMPONENT_SERVER);
+		$result = $client->sendAgentDataValues([
+			['itemid' => $itemid, 'value' => $payload, 'source' => $payload, 'clock' => time(), 'ns' => 0],
+			1
+		], md5(uniqid('', true)), $host);
+		$this->assertNotFalse($result, 'Failed to send agent data: '.$client->getError());
+		$this->assertEquals(0, $result['processed'] ?? 0);
+
+		// Trapper must still accept valid data afterwards.
+		$t = time();
+		$this->sendSenderValue($host, $key, 'valid', self::COMPONENT_SERVER, 0, $t);
+
+		$response = $this->callUntilDataIsPresent('history.get', [
+			'history' => ITEM_VALUE_TYPE_LOG,
+			'itemids' => [$itemid],
+			'time_from' => $t
+		], 60, 1);
+		$this->assertCount(1, $response['result']);
+		$this->assertEquals('valid', $response['result'][0]['value']);
+	}
+
+	/**
 	 * Remove the certificate directories generated for the TLS tests.
 	 */
 	public static function clearCertificates(): void {
