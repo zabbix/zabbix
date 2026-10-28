@@ -20,15 +20,16 @@ require_once __DIR__.'/../../include/classes/api/item_types/CItemTypeTelemetryQu
 /**
  * Test suite that exercises APM (OpenTelemetry) data at scale: device status gauges are sent over OTLP/gRPC
  * to the proxy APM collector, stored in ClickHouse and read back by Telemetry query items on the server.
- * HOST_COUNT hosts stand for sites of LLD_DISCOVERY_COUNT devices each, every device reports the site it belongs
- * to in the "site" resource attribute and each host has a single Telemetry query item for the devices of its site.
+ * HOST_COUNT hosts stand for services of LLD_DISCOVERY_COUNT devices each, every device reports the service it belongs
+ * to in the "service.name" resource attribute (ServiceName column, first in the sorting key of the OTel tables) and
+ * each host has a single Telemetry query item for the devices of its service.
  * Devices are discovered from their own data by a second Telemetry query on each host, the LLD rule, which
  * returns one row per device that reported within DISCOVERY_WINDOW. Per-device status is fanned out to
  * LLD-discovered dependent items (one per device), and trigger prototypes on them must fire and recover for
  * exactly the devices whose status changed.
  *
- * The query item, LLD rule and prototypes come from a template linked to every host, the site filter of the queries
- * is the {$SITE} user macro, which every host sets to its own name.
+ * The query item, LLD rule and prototypes come from a template linked to every host, the service filter of the queries
+ * is the {$SERVICE} user macro, which every host sets to its own name.
  *
  * The query item returns all rows of a poll as a single JSON array value, which is processed by all dependent items
  * of its host: LLD_DISCOVERY_COUNT JSONPath lookups in a value of LLD_DISCOVERY_COUNT rows per host and round when
@@ -57,16 +58,15 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	const HOSTNAME = 'test_lld_telemetry_sync_at_scale';
 	const PROXY_NAME = 'test_lld_telemetry_sync_at_scale_proxy';
 	const TEMPLATE_NAME = 'test_lld_telemetry_sync_at_scale_template';
-	const SITE_MACRO = '{$SITE}';
-	const SERVICE_NAME = 'telemetry-sync-at-scale';
+	const SERVICE_MACRO = '{$SERVICE}';
+	const SCOPE_NAME = 'telemetry-sync-at-scale';
 	const METRIC_NAME = 'device.status';
 	const TQ_ITEM_KEY = 'apm.device.status.query';
 	const LLD_RULE_KEY = 'apm.device.discovery';
 	const LLD_MACRO = '{#SENSOR}';
 	const ITEM_PROTO_KEY = 'apm.device.status';
-	const SITE_ATTRIBUTE = 'site';
 	const SENSOR_BASE = 'sensor';
-	const PREFLIGHT_SITE = 'apm_preflight';
+	const PREFLIGHT_SERVICE = 'apm_preflight';
 	const PREFLIGHT_DEVICE = 'apm_preflight';
 
 	const HOST_COUNT = 4;
@@ -97,7 +97,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	const DISCOVERY_DELAY = '1m';
 	const DISCOVERY_WINDOW = '1h';
 
-	/* host name => hostid, host name is also the site of its devices */
+	/* host name => hostid, host name is also the service of its devices */
 	private static $hostids = [];
 	private static $templateid;
 	/* itemid of the Telemetry query item on the template */
@@ -248,10 +248,10 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	}
 
 	/**
-	 * Create the template and a host for every site linked to it, then collect the LLD rules inherited by the hosts.
+	 * Create the template and a host for every service linked to it, then collect the LLD rules inherited by the hosts.
 	 */
-	private function createSiteHosts(): void {
-		$this->createSiteTemplate();
+	private function createServiceHosts(): void {
+		$this->createServiceTemplate();
 
 		$response = $this->call('hostgroup.get', [
 			'filter' => ['name' => ['Zabbix servers']],
@@ -266,7 +266,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 				'interfaces' => [],
 				'groups' => [['groupid' => $groupid]],
 				'templates' => [['templateid' => self::$templateid]],
-				'macros' => [['macro' => self::SITE_MACRO, 'value' => $host]],
+				'macros' => [['macro' => self::SERVICE_MACRO, 'value' => $host]],
 				'status' => HOST_STATUS_MONITORED
 			]);
 			$this->assertArrayHasKey('hostids', $response['result']);
@@ -284,10 +284,10 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	}
 
 	/**
-	 * Create template with the Telemetry query item for devices of the site, Telemetry query LLD rule discovering the
-	 * devices of the site and per-device dependent items and triggers. The site comes from the host macro.
+	 * Create template with the Telemetry query item for devices of the service, Telemetry query LLD rule discovering
+	 * the devices of the service and per-device dependent items and triggers. The service comes from the host macro.
 	 */
-	private function createSiteTemplate(): void {
+	private function createServiceTemplate(): void {
 		$response = $this->call('templategroup.get', [
 			'filter' => ['name' => ['Templates']],
 			'output' => ['groupid']
@@ -302,7 +302,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 		$this->assertArrayHasKey(0, $response['result']['templateids']);
 		self::$templateid = $response['result']['templateids'][0];
 
-		// Single query for all devices of the site: one row per device that reported in the window.
+		// Single query for all devices of the service: one row per device that reported in the window.
 		$response = $this->call('item.create', [
 			'hostid' => self::$templateid,
 			'name' => 'APM device status query',
@@ -325,7 +325,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 				'aggregated_columns' => [
 					['column' => 'Value', 'function' => AGGREGATE_MAX, 'parameters' => [], 'alias' => 'value']
 				],
-				'filter' => self::siteStatusFilter(self::SITE_MACRO)
+				'filter' => self::serviceStatusFilter(self::SERVICE_MACRO)
 			]
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
@@ -354,7 +354,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 				'aggregated_columns' => [
 					['column' => '', 'function' => AGGREGATE_COUNT, 'parameters' => [], 'alias' => 'cnt']
 				],
-				'filter' => self::siteStatusFilter(self::SITE_MACRO)
+				'filter' => self::serviceStatusFilter(self::SERVICE_MACRO)
 			],
 			'lld_macro_paths' => [
 				['lld_macro' => self::LLD_MACRO, 'path' => '$["ResourceAttributes.host.name"]']
@@ -411,24 +411,24 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	}
 
 	/**
-	 * Query filter for status data points of devices of the site.
+	 * Query filter for status data points of devices of the service.
 	 */
-	private static function siteStatusFilter(string $site): array {
+	private static function serviceStatusFilter(string $service): array {
 		return [
 			'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 			'formula' => '',
 			'conditions' => [
 				[
+					'column' => 'ServiceName',
+					'attribute_key' => '',
+					'operator' => CONDITION_OPERATOR_EQUAL,
+					'value' => $service
+				],
+				[
 					'column' => 'MetricName',
 					'attribute_key' => '',
 					'operator' => CONDITION_OPERATOR_EQUAL,
 					'value' => self::METRIC_NAME
-				],
-				[
-					'column' => 'ResourceAttributes',
-					'attribute_key' => self::SITE_ATTRIBUTE,
-					'operator' => CONDITION_OPERATOR_EQUAL,
-					'value' => $site
 				]
 			]
 		];
@@ -488,7 +488,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 		while ($count === $baseline && time() < $deadline) {
 			if (time() >= $next_send) {
 				$error = null;
-				if (!$this->sendDeviceStatus([self::PREFLIGHT_SITE => [self::PREFLIGHT_DEVICE => 0]], $error)) {
+				if (!$this->sendDeviceStatus([self::PREFLIGHT_SERVICE => [self::PREFLIGHT_DEVICE => 0]], $error)) {
 					$send_error = $error;
 				}
 				$next_send = time() + self::PREFLIGHT_RESEND_SECONDS;
@@ -505,8 +505,8 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	}
 
 	/**
-	 * Create the site hosts, then every device reports status=0 once and the LLD rule of every host discovers the
-	 * devices of its site from the stored data. Wait until one dependent item and one trigger is discovered per
+	 * Create the service hosts, then every device reports status=0 once and the LLD rule of every host discovers the
+	 * devices of its service from the stored data. Wait until one dependent item and one trigger is discovered per
 	 * device.
 	 *
 	 * @depends testLLDTelemetrySyncAtScale_IngestPreflight
@@ -514,7 +514,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	public function testLLDTelemetrySyncAtScale_LLDDiscovery() {
 		$this->sendStatusAndWaitStored(self::allDeviceStatuses([], 0));
 
-		$this->createSiteHosts();
+		$this->createServiceHosts();
 		// Data is already stored when the first poll of the LLD rule runs, so devices are discovered by it.
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
@@ -543,7 +543,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	}
 
 	/**
-	 * Every device of every site reports status=0 again, now that the dependent items are discovered, so they get
+	 * Every device of every service reports status=0 again, now that the dependent items are discovered, so they get
 	 * a value without firing triggers.
 	 *
 	 * @depends testLLDTelemetrySyncAtScale_LLDDiscovery
@@ -576,9 +576,9 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	}
 
 	/**
-	 * Every device of every site reports, status=1 for the problem devices and status=0 for the rest, as devices
+	 * Every device of every service reports, status=1 for the problem devices and status=0 for the rest, as devices
 	 * that report periodically would, and wait until it is stored in ClickHouse. Every poll of the query item then
-	 * holds rows of healthy and problem devices of the site.
+	 * holds rows of healthy and problem devices of the service.
 	 *
 	 * @depends testLLDTelemetrySyncAtScale_LLDDiscovery
 	 */
@@ -600,7 +600,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	}
 
 	/**
-	 * Every device of every site reports status=0 and wait until it is stored in ClickHouse.
+	 * Every device of every service reports status=0 and wait until it is stored in ClickHouse.
 	 *
 	 * @depends testLLDTelemetrySyncAtScale_TriggerFiringVerify
 	 */
@@ -636,7 +636,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	}
 
 	/**
-	 * Send status=1 for the problem devices of all sites, then again a second later, so every device has a bucket
+	 * Send status=1 for the problem devices of all services, then again a second later, so every device has a bucket
 	 * per send, and wait until it is stored in ClickHouse.
 	 *
 	 * @depends testLLDTelemetrySyncAtScale_SmallGranularityUpdate
@@ -690,7 +690,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	}
 
 	/**
-	 * Device names are the same on every site, devices are told apart by the site resource attribute.
+	 * Device names are the same on every service, devices are told apart by the service.name resource attribute.
 	 */
 	private static function deviceNames(): array {
 		$devices = [];
@@ -702,7 +702,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	}
 
 	/**
-	 * Problem devices of every site.
+	 * Problem devices of every service.
 	 *
 	 * @return array  host name => device names
 	 */
@@ -716,15 +716,15 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	}
 
 	/**
-	 * Evenly spread devices, on the first site starting with sensor1, so prefix collisions (sensor1 vs
-	 * sensor10..19) are covered. Every next site starts one device later, so sites do not have the same problem
-	 * devices and rows of another site leaking into the query of a host fire a trigger that must not fire.
+	 * Evenly spread devices, on the first service starting with sensor1, so prefix collisions (sensor1 vs
+	 * sensor10..19) are covered. Every next service starts one device later, so services do not have the same problem
+	 * devices and rows of another service leaking into the query of a host fire a trigger that must not fire.
 	 */
-	private static function problemDeviceNames(int $site_index, int $count): array {
+	private static function problemDeviceNames(int $service_index, int $count): array {
 		$step = intdiv(self::LLD_DISCOVERY_COUNT, $count);
 		$devices = [];
 		for ($i = 0; $i < $count; $i++) {
-			$devices[] = self::SENSOR_BASE.(1 + ($i * $step + $site_index) % self::LLD_DISCOVERY_COUNT);
+			$devices[] = self::SENSOR_BASE.(1 + ($i * $step + $service_index) % self::LLD_DISCOVERY_COUNT);
 		}
 
 		return $devices;
@@ -733,25 +733,25 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	/**
 	 * Status of the given devices only.
 	 *
-	 * @param array $devices  site => device names
+	 * @param array $devices  service => device names
 	 *
-	 * @return array  site => [device name => status]
+	 * @return array  service => [device name => status]
 	 */
 	private static function deviceStatuses(array $devices, int $status): array {
 		$statuses = [];
-		foreach ($devices as $site => $names) {
-			$statuses[$site] = array_fill_keys($names, $status);
+		foreach ($devices as $service => $names) {
+			$statuses[$service] = array_fill_keys($names, $status);
 		}
 
 		return $statuses;
 	}
 
 	/**
-	 * Status of every device of every site, $status for the given devices and 0 for the rest.
+	 * Status of every device of every service, $status for the given devices and 0 for the rest.
 	 *
-	 * @param array $devices  site => device names
+	 * @param array $devices  service => device names
 	 *
-	 * @return array  site => [device name => status]
+	 * @return array  service => [device name => status]
 	 */
 	private static function allDeviceStatuses(array $devices, int $status): array {
 		$statuses = [];
@@ -770,7 +770,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 	 * Send the statuses $send_count times, a second apart, so with granularity of a second every send of a device
 	 * is a bucket of its own.
 	 *
-	 * @param array $statuses  site => [device name => status]
+	 * @param array $statuses  service => [device name => status]
 	 */
 	private function sendStatusAndWaitStored(array $statuses, int $send_count = 1): void {
 		$baseline = $this->getStoredStatusCounts();
@@ -805,7 +805,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 
 	/**
 	 * Assert that exactly the expected devices of the host have a trigger in PROBLEM state, so a matching count is
-	 * not made of the wrong devices (e.g. sensor1 rows matching sensor10..19, or rows of another site).
+	 * not made of the wrong devices (e.g. sensor1 rows matching sensor10..19, or rows of another service).
 	 */
 	private function assertProblemDevices(string $host, array $expected): void {
 		$response = $this->call('trigger.get', [
@@ -833,36 +833,35 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 
 	/**
 	 * Send one device.status gauge data point per device, one OTLP resource per device, batched. A batch may hold
-	 * devices of several sites, as when sent by a collector.
+	 * devices of several services, as when sent by a collector.
 	 *
-	 * @param array $statuses  site => [device name => status]
+	 * @param array $statuses  service => [device name => status]
 	 */
 	private function sendDeviceStatus(array $statuses, ?string &$error = null): bool {
-		$site_devices = [];
-		foreach ($statuses as $site => $device_statuses) {
+		$service_devices = [];
+		foreach ($statuses as $service => $device_statuses) {
 			foreach ($device_statuses as $device => $status) {
-				$site_devices[] = [$site, (string) $device, $status];
+				$service_devices[] = [$service, (string) $device, $status];
 			}
 		}
 
-		foreach (array_chunk($site_devices, self::OTLP_BATCH_SIZE) as $batch) {
+		foreach (array_chunk($service_devices, self::OTLP_BATCH_SIZE) as $batch) {
 			// Stamp every request when it is sent like a device would, with a single stamp for all requests the
 			// last ones could arrive after the query window of the stamp has been read.
 			$time_ns = (string) (int) (microtime(true) * 1e9);
 
 			$resource_metrics = [];
-			foreach ($batch as [$site, $device, $status]) {
+			foreach ($batch as [$service, $device, $status]) {
 				$resource_metrics[] = [
 					'resource' => [
 						'attributes' => [
-							['key' => 'service.name', 'value' => ['stringValue' => self::SERVICE_NAME]],
-							['key' => self::SITE_ATTRIBUTE, 'value' => ['stringValue' => (string) $site]],
+							['key' => 'service.name', 'value' => ['stringValue' => (string) $service]],
 							['key' => 'host.name', 'value' => ['stringValue' => $device]]
 						]
 					],
 					'scopeMetrics' => [
 						[
-							'scope' => ['name' => self::SERVICE_NAME],
+							'scope' => ['name' => self::SCOPE_NAME],
 							'metrics' => [
 								[
 									'name' => self::METRIC_NAME,
