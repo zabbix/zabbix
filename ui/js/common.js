@@ -461,6 +461,9 @@ function PopUp(action, parameters, {
 					]
 				});
 
+				// Display the close button after the screen reader announces the dialog title.
+				overlay.$dialogue.$head.$close_button.show();
+
 				overlay.recoverFocus();
 				overlay.containFocus();
 			}
