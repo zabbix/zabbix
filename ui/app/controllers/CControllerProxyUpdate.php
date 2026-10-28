@@ -127,7 +127,7 @@ class CControllerProxyUpdate extends CController {
 					]
 				],
 				'when' => [['data_collection_status', 'in' => [PROXY_APM_DATA_COLLECTION_ENABLED]]],
-				'messages' => ['uniq' => _('Attribute name and type is not unique.')]
+				'messages' => ['uniq' => _('Attribute key and category are not unique.')]
 			],
 			'custom_timeouts' => ['db proxy.custom_timeouts',
 				'in' => [ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED, ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED]

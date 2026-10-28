@@ -135,6 +135,77 @@ class testUserGroup extends CAPITest {
 				]
 			]
 		]);
+
+		CTestDataHelper::createObjects([
+			'user_groups' => [
+				[
+					'name' => 'user group update APM filter',
+					'apm_filters' => [
+						[
+							'key' => 'attr_key1',
+							'value' => 'attr_value',
+							'signal_type' => SIGNAL_TYPE_METRICS
+						],
+						[
+							'key' => 'attr_key1',
+							'signal_type' => SIGNAL_TYPE_METRICS
+						]
+					]
+				],
+				[
+					'name' => 'user group selectApmFilters same signal_type fields',
+					'apm_filters' => [
+						[
+							'key' => 'attr_key2',
+							'value' => 'attr_value',
+							'signal_type' => SIGNAL_TYPE_METRICS
+						],
+						[
+							'key' => 'attr_key1',
+							'signal_type' => SIGNAL_TYPE_METRICS
+						]
+					]
+				],
+				[
+					'name' => 'user group selectApmFilters different signal_type fields',
+					'apm_filters' => [
+						[
+							'key' => 'attr_key2',
+							'value' => 'attr_value',
+							'signal_type' => SIGNAL_TYPE_METRICS
+						],
+						[
+							'key' => 'attr_key1',
+							'signal_type' => SIGNAL_TYPE_LOGS
+						]
+					]
+				],
+				[
+					'name' => 'user group selectApmFilters same key fields',
+					'apm_filters' => [
+						[
+							'key' => 'attr_key1',
+							'value' => 'attr_value',
+							'signal_type' => SIGNAL_TYPE_METRICS
+						],
+						[
+							'key' => 'attr_key1',
+							'signal_type' => SIGNAL_TYPE_METRICS
+						]
+					]
+				],
+				[
+					'name' => 'user group update APM filter without signal_type',
+					'apm_filters' => [
+						[
+							'key' => 'attr_key1',
+							'value' => 'attr_value',
+							'signal_type' => SIGNAL_TYPE_METRICS
+						]
+					]
+				]
+			]
+		]);
 	}
 
 	public static function cleanTestData(): void {
@@ -227,6 +298,54 @@ class testUserGroup extends CAPITest {
 					]
 				],
 				'expected_error' => null
+			],
+			[
+				'group' => [
+					[
+						'name' => 'User group with APM filter',
+						'apm_filters' => [
+							[
+								'key' => 'attr_key',
+								'value' => 'attr_value',
+								'signal_type' => SIGNAL_TYPE_ALL
+							],
+							[
+								'key' => 'attr_key',
+								'value' => '',
+								'signal_type' => SIGNAL_TYPE_METRICS
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'group' => [
+					[
+						'name' => 'User group with APM filter without value',
+						'apm_filters' => [
+							[
+								'key' => 'aatr_key',
+								'signal_type' => SIGNAL_TYPE_LOGS
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'group' => [
+					[
+						'name' => 'user group create APM filter without signal_type',
+						'apm_filters' => [
+							[
+								'key' => 'aatr_key',
+								'value' => 'attr_value'
+							]
+						]
+					]
+				],
+				'expected_error' => null
 			]
 		];
 	}
@@ -247,6 +366,10 @@ class testUserGroup extends CAPITest {
 				$this->assertEquals($dbRow['gui_access'], GROUP_GUI_ACCESS_SYSTEM);
 				$this->assertEquals($dbRow['users_status'], 0);
 				$this->assertEquals($dbRow['debug_mode'], 0);
+
+				if (array_key_exists('apm_filters', $group[$key])) {
+					$this->assertSameApmFilters($usrgrpid, $group[$key]['apm_filters']);
+				}
 			}
 		}
 	}
@@ -430,6 +553,53 @@ class testUserGroup extends CAPITest {
 					]
 				],
 				'expected_error' => null
+			],
+			// Check APM filter update.
+			[
+				'group' => [
+					[
+						'usrgrpid' => ':user_group:user group update APM filter',
+						'name' => 'user group update APM filter',
+						'apm_filters' => [
+							[
+								'key' => 'attr_key1',
+								'value' => 'attr_value',
+								'signal_type' => SIGNAL_TYPE_TRACES
+							],
+							[
+								'key' => 'attr_key2',
+								'value' => 'new_attr_value',
+								'signal_type' => SIGNAL_TYPE_METRICS
+							]
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'group' => [
+					[
+						'usrgrpid' => ':user_group:user group update APM filter',
+						'name' => 'user group update APM filter',
+						'apm_filters' => []
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'group' => [
+					[
+						'usrgrpid' => ':user_group:user group update APM filter without signal_type',
+						'name' => 'user group update APM filter without signal_type',
+						'apm_filters' => [
+							[
+								'key' => 'new_attr_key',
+								'value' => 'new_attr_value'
+							]
+						]
+					]
+				],
+				'expected_error' => null
 			]
 		];
 	}
@@ -480,6 +650,10 @@ class testUserGroup extends CAPITest {
 						$this->assertSame($db_right['permission'], $rights['permission']);
 					}
 				}
+
+				if (array_key_exists('apm_filters', $groups[$key])) {
+					$this->assertSameApmFilters($usrgrpid, $groups[$key]['apm_filters']);
+				}
 			}
 		}
 		else {
@@ -491,6 +665,33 @@ class testUserGroup extends CAPITest {
 				}
 			}
 		}
+	}
+
+	private function assertSameApmFilters(string $usrgrpid, array $apm_filters): void {
+		$db_apm_filters = CDBHelper::getAll(
+			'SELECT signal_type,attribute_key,value'.
+			' FROM usrgrp_apm_filter'.
+			' WHERE usrgrpid='.zbx_dbstr($usrgrpid).
+			' ORDER BY signal_type,attribute_key,value'
+		);
+
+		$expected_apm_filters = [];
+
+		foreach ($apm_filters as $apm_filter) {
+			$signal_type = array_key_exists('signal_type', $apm_filter)
+				? (string) $apm_filter['signal_type']
+				: (string) SIGNAL_TYPE_ALL;
+
+			$value = array_key_exists('value', $apm_filter) ? $apm_filter['value'] : '';
+
+			$expected_apm_filters[] = [
+				'signal_type' => $signal_type,
+				'attribute_key' => $apm_filter['key'],
+				'value' => $value
+			];
+		}
+
+		$this->assertSame($expected_apm_filters, $db_apm_filters);
 	}
 
 	public static function usergroup_properties() {
@@ -695,6 +896,58 @@ class testUserGroup extends CAPITest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/templategroup_rights/1/permission": value must be one of 0, 2, 3.'
+			],
+			// Check user group APM filter.
+			[
+				'group' => [
+					'name' => 'Check APM filter, empty resource attribute key',
+					'apm_filters' => [
+						[
+							'key' => '',
+							'value' => 'attr_value',
+							'signal_type' => SIGNAL_TYPE_ALL
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/apm_filters/1/key": cannot be empty.'
+			],
+			[
+				'group' => [
+					'name' => 'Check APM filter, missing resource attribute key',
+					'apm_filters' => [
+						[
+							'value' => 'attr_value',
+							'signal_type' => SIGNAL_TYPE_ALL
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/apm_filters/1": the parameter "key" is missing.'
+			],
+			[
+				'group' => [
+					'name' => 'Check APM filter signal type, not valid number',
+					'apm_filters' => [
+						[
+							'key' => 'attr_key',
+							'value' => 'attr_value',
+							'signal_type' => 'abc'
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/apm_filters/1/signal_type": an integer is expected.'
+			],
+			[
+				'group' => [
+					'name' => 'Check APM filter, incorrect signal type value',
+					'apm_filters' => [
+						[
+							'key' => 'attr_key',
+							'value' => 'attr_value',
+							'signal_type' => 5
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/apm_filters/1/signal_type": value must be one of -1, 0, 1, 2.'
 			]
 		];
 	}
@@ -810,7 +1063,7 @@ class testUserGroup extends CAPITest {
 				'usergroup' => ['18', '19'],
 				'expected_error' => null
 			],
-			'Can delete group havig user with single group' => [
+			'Can delete group having user with single group' => [
 				'usergroup' => [':user_group:user group 2'],
 				'expected_error' => null
 			]
@@ -1168,5 +1421,88 @@ class testUserGroup extends CAPITest {
 
 		// Wait for frontend to get the new config from updated zabbix.conf.php file.
 		sleep((int)ini_get('opcache.revalidate_freq') + 1);
+	}
+
+	public static function getUserGroupApmFiltersGetData() {
+		return [
+			'usergroup.get with selectApmFilters same signal_type fields' => [
+				'expected_result' => [
+					[
+						'usrgrpid' => ':user_group:user group selectApmFilters same signal_type fields',
+						'apm_filters' => [
+							[
+								'key' => 'attr_key1',
+								'value' => '',
+								'signal_type' => (string) SIGNAL_TYPE_METRICS
+							],
+							[
+								'key' => 'attr_key2',
+								'value' => 'attr_value',
+								'signal_type' => (string) SIGNAL_TYPE_METRICS
+							]
+						]
+					]
+				],
+				'search' => 'user group selectApmFilters same signal_type fields'
+			],
+			'usergroup.get with selectApmFilters different signal_type fields' => [
+				'expected_result' => [
+					[
+						'usrgrpid' => ':user_group:user group selectApmFilters different signal_type fields',
+						'apm_filters' => [
+							[
+								'key' => 'attr_key2',
+								'value' => 'attr_value',
+								'signal_type' => (string) SIGNAL_TYPE_METRICS
+							],
+							[
+								'key' => 'attr_key1',
+								'value' => '',
+								'signal_type' => (string) SIGNAL_TYPE_LOGS
+							]
+						]
+					]
+				],
+				'search' => 'user group selectApmFilters different signal_type fields'
+			],
+			'usergroup.get with selectApmFilters same key fields' => [
+				'expected_result' => [
+					[
+						'usrgrpid' => ':user_group:user group selectApmFilters same key fields',
+						'apm_filters' => [
+							[
+								'key' => 'attr_key1',
+								'value' => '',
+								'signal_type' => (string) SIGNAL_TYPE_METRICS
+							],
+							[
+								'key' => 'attr_key1',
+								'value' => 'attr_value',
+								'signal_type' => (string) SIGNAL_TYPE_METRICS
+							]
+						]
+					]
+				],
+				'search' => 'user group selectApmFilters same key fields'
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getUserGroupApmFiltersGetData
+	 */
+	public function testUserGroupGetApmFilter(array $expected_result, string $search): void {
+		$usrgrpid = ['usrgrpid' => $expected_result[0]['usrgrpid']];
+		CTestDataHelper::convertValueReferences($usrgrpid);
+
+		$expected_result[0]['usrgrpid'] = $usrgrpid['usrgrpid'];
+
+		$result = $this->call('usergroup.get', [
+			'output' => ['usrgrpid'],
+			'selectApmFilters' => "extend",
+			'search' => ['name' => $search]
+		]);
+
+		$this->assertSame($expected_result, $result['result']);
 	}
 }

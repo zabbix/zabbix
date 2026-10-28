@@ -2297,6 +2297,14 @@ FIELD		|proxy_groupid		|t_id		|	|NOT NULL	|0	|2|proxy_group|proxy_groupid
 UNIQUE		|1			|usrgrpid,proxy_groupid
 INDEX		|2			|proxy_groupid
 
+TABLE|usrgrp_apm_filter|usrgrp_apm_filterid|0
+FIELD		|usrgrp_apm_filterid	|t_id		|	|NOT NULL	|0
+FIELD		|usrgrpid		|t_id		|	|NOT NULL	|0	|1|usrgrp|usrgrpid
+FIELD		|attribute_key		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|value			|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|signal_type		|t_integer	|'-1'	|NOT NULL	|0
+INDEX		|1			|usrgrpid
+
 TABLE|mfa|mfaid|ZBX_DATA
 FIELD		|mfaid		|t_id		|	|NOT NULL	|0
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
@@ -2490,4 +2498,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|7050205	|7050205
+ROW		|1		|7050208	|7050208

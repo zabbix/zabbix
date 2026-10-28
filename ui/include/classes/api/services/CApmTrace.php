@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Copyright (C) 2001-2026 Zabbix SIA
 **
@@ -177,7 +177,11 @@ class CApmTrace extends CApmGeneral {
 
 		$query->having('('.implode(' AND ', $having_root).') OR ('.implode(' AND ', $having_no_root).')');
 
-		$use_span_filtering = $options['filter'] || $options['search']
+		$apm_filter_resource_attributes = self::$userData['type'] != USER_TYPE_SUPER_ADMIN
+			? CApiUserGroupHelper::getApmFilterResourceAttributes(SIGNAL_TYPE_TRACES)
+			: [];
+
+		$use_span_filtering = $apm_filter_resource_attributes || $options['filter'] || $options['search']
 			|| ($options['resource_attributes'] !== null
 				&& array_filter($options['resource_attributes'],
 					static fn (array $attribute) => $attribute['key'] !== ''
@@ -199,6 +203,12 @@ class CApmTrace extends CApmGeneral {
 				->where('tf.TraceId=t.TraceId')
 				->where('tf.Timestamp>=toDateTime64({lookup_time_from:Int32},9)')
 				->where('tf.Timestamp<toDateTime64({lookup_time_till:Int32},9)');
+
+			if ($apm_filter_resource_attributes) {
+				CClickHouseHelper::addAttributeFilter($filter_query, 'tf.ResourceAttributes',
+					$apm_filter_resource_attributes, TAG_EVAL_TYPE_OR
+				);
+			}
 
 			if ($options['resource_attributes'] !== null) {
 				CClickHouseHelper::addAttributeFilter($filter_query, 'tf.ResourceAttributes',

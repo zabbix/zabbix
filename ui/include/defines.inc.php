@@ -17,7 +17,7 @@ define('ZABBIX_VERSION',		'8.0.0rc3');
 define('ZABBIX_API_VERSION',	'8.0.0');
 define('ZABBIX_EXPORT_VERSION',	'8.0');
 
-define('ZABBIX_DB_VERSION',		7050205);
+define('ZABBIX_DB_VERSION',		7050208);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -430,6 +430,7 @@ define('PROXY_APM_DATA_COLLECTION_ENABLED',		1);
 define('PROXY_APM_QUOTA_MODE_UNLIMITED',	0);
 define('PROXY_APM_QUOTA_MODE_CUSTOM',		1);
 
+define('SIGNAL_TYPE_ALL', 		-1);
 define('SIGNAL_TYPE_TRACES',	0);
 define('SIGNAL_TYPE_METRICS',	1);
 define('SIGNAL_TYPE_LOGS',		2);
@@ -1985,6 +1986,7 @@ define('ZBX_POPUP_CONDITION_TYPE_ACTION', 0);
 define('ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION', 1);
 
 // Tab indicator names.
+define('TAB_INDICATOR_APM_FILTER', 'apm-filter');
 define('TAB_INDICATOR_AUTH_HTTP', 'http');
 define('TAB_INDICATOR_AUTH_LDAP', 'ldap');
 define('TAB_INDICATOR_AUTH_SAML', 'saml');

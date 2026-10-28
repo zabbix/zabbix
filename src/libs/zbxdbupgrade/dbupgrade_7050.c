@@ -2269,6 +2269,36 @@ static int	DBpatch_7050205(void)
 	return DBcreate_changelog_delete_trigger("cep_operation_scope_condition", "cep_operation_scope_conditionid");
 }
 
+static int	DBpatch_7050206(void)
+{
+	const zbx_db_table_t	table =
+			{"usrgrp_apm_filter", "usrgrp_apm_filterid", 0,
+				{
+					{"usrgrp_apm_filterid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"usrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"attribute_key", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"signal_type", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050207(void)
+{
+	return DBcreate_index("usrgrp_apm_filter", "usrgrp_apm_filter_1", "usrgrpid", 0);
+}
+
+static int	DBpatch_7050208(void)
+{
+	const zbx_db_field_t	field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("usrgrp_apm_filter", 1, &field);
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -2481,5 +2511,8 @@ DBPATCH_ADD(7050202, 0, 1)
 DBPATCH_ADD(7050203, 0, 1)
 DBPATCH_ADD(7050204, 0, 1)
 DBPATCH_ADD(7050205, 0, 1)
+DBPATCH_ADD(7050206, 0, 1)
+DBPATCH_ADD(7050207, 0, 1)
+DBPATCH_ADD(7050208, 0, 1)
 
 DBPATCH_END()

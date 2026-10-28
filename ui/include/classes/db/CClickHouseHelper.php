@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Copyright (C) 2001-2026 Zabbix SIA
 **
@@ -300,6 +300,8 @@ final class CClickHouseHelper {
 
 		$where = [];
 
+		$field_filter_index = $query->getNextFieldFilterIndex('addAttributeFilter_'.$field);
+
 		$index = 0;
 
 		foreach ($list_grouped as $key => $operators) {
@@ -318,7 +320,7 @@ final class CClickHouseHelper {
 				unset($operators[TAG_OPERATOR_NOT_EXISTS]);
 			}
 
-			$param_prefix = 'filter_'.str_replace('.', '_', $field).'_'.$index;
+			$param_prefix = 'filter_'.str_replace('.', '_', $field).'_'.$field_filter_index.'_'.$index;
 
 			$query->param($param_prefix.'_key', 'String', $key);
 
@@ -329,7 +331,8 @@ final class CClickHouseHelper {
 
 			if (array_key_exists(TAG_OPERATOR_EQUAL, $operators)) {
 				$query->param($param_prefix.'_equal', 'String', $operators[TAG_OPERATOR_EQUAL]);
-				$where_or[] = $field_param.' IN {'.$param_prefix.'_equal:Array(String)}';
+				$where_or[] = '(mapContains('.$field.',{'.$param_prefix.'_key:String})'.
+					' AND '.$field_param.' IN {'.$param_prefix.'_equal:Array(String)})';
 			}
 
 			if (array_key_exists(TAG_OPERATOR_LIKE, $operators)) {
@@ -346,7 +349,8 @@ final class CClickHouseHelper {
 
 			if (array_key_exists(TAG_OPERATOR_NOT_EQUAL, $operators)) {
 				$query->param($param_prefix.'_not_equal', 'String', $operators[TAG_OPERATOR_NOT_EQUAL]);
-				$where_and[] = $field_param.' NOT IN {'.$param_prefix.'_not_equal:Array(String)}';
+				$where_and[] = '(NOT mapContains('.$field.',{'.$param_prefix.'_key:String})'.
+					' OR '.$field_param.' NOT IN {'.$param_prefix.'_not_equal:Array(String)})';
 			}
 
 			if (array_key_exists(TAG_OPERATOR_NOT_LIKE, $operators)) {

@@ -688,19 +688,19 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 	return array_filter([$fields_row, $error_container_row]);
 }
 
-function renderProxyApmAttrRow($index, array $attribute, array $options = []): array {
+function renderApmAttrRow($index, array $attribute, array $options = []): array {
 	$fields_row = (new CRow([
 		(new CCol(
 			(new CTextAreaFlexible($options['field_name'].'['.$index.'][key]', $attribute['key']))
-				->setErrorContainer($options['has_inline_validation'] ? 'attr_name_'.$index.'_error_container' : null)
-				->setErrorLabel($options['has_inline_validation'] ? _('Name') : null)
-				->setAttribute('placeholder', _('name'))
+				->setErrorContainer($options['has_inline_validation'] ? 'attribute_'.$index.'_error_container' : null)
+				->setErrorLabel($options['has_inline_validation'] ? _('Key') : null)
+				->setAttribute('placeholder', _('key'))
 				->setAdaptiveWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				->setReadonly($options['readonly'])
 		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol(
 			(new CTextAreaFlexible($options['field_name'].'['.$index.'][value]', $attribute['value']))
-				->setErrorContainer($options['has_inline_validation'] ? 'attr_value_'.$index.'_error_container' : null)
+				->setErrorContainer($options['has_inline_validation'] ? 'attribute_'.$index.'_error_container' : null)
 				->setErrorLabel($options['has_inline_validation'] ? _('Value') : null)
 				->setAttribute('placeholder', _('value'))
 				->setAdaptiveWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -708,8 +708,8 @@ function renderProxyApmAttrRow($index, array $attribute, array $options = []): a
 		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol(
 			(new CSelect($options['field_name'].'['.$index.'][signal_type]'))
-				->setErrorContainer($options['has_inline_validation'] ? 'attr_type_'.$index.'_error_container' : null)
-				->setErrorLabel($options['has_inline_validation'] ? _('Type') : null)
+				->setErrorContainer($options['has_inline_validation'] ? 'attribute_'.$index.'_error_container' : null)
+				->setErrorLabel($options['has_inline_validation'] ? _('Category') : null)
 				->setValue($attribute['signal_type'])
 				->addOptions(CSelect::createOptionsFromArray($options['signal_types']))
 				->setReadonly($options['readonly'])
@@ -722,13 +722,13 @@ function renderProxyApmAttrRow($index, array $attribute, array $options = []): a
 		))
 			->addClass(ZBX_STYLE_NOWRAP)
 			->addClass(ZBX_STYLE_TOP)
-	]))->addClass('form_row');
+	]))->addClass(ZBX_STYLE_FORM_ROW);
 
 	$error_container_row = $options['has_inline_validation']
 		? (new CRow(
 			(new CCol())
 				->addClass(ZBX_STYLE_ERROR_CONTAINER)
-				->setId('attr_'.$index.'_error_container')
+				->setId('attribute_'.$index.'_error_container')
 				->setColSpan(4)
 		))
 		: null;
