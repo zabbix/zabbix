@@ -350,7 +350,6 @@ function PopUp(action, parameters, {
 						}
 					]
 				});
-
 			}
 			else {
 				var buttons = resp.buttons !== null ? resp.buttons : [];
