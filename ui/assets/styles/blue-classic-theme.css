@@ -19,7 +19,7 @@
 
 .sidebar .server-name, .form-grid > label,
 .form-grid .collapsible > label,
-.form-grid .fields-group > label, .dashboard-navigation-tabs .sortable li div span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .datatable.compact-view .datatable-body .datatable-cell.datatable-cell-data .flex-wrapper > .link-action, .datatable.compact-view .datatable-body .datatable-cell.datatable-cell-data .tags-wrapper .tag, .datatable.compact-view .datatable-body .datatable-cell.datatable-cell-data .opdata, .datatable .datatable-options .datatable-options-list .datatable-options-list-item label .datatable-options-list-item-label, .datatable .datatable-cell.datatable-cell-header .header-name, .datatable .datatable-cell.datatable-cell-header.datatable-cell-header-link .header-link, .datatable .datatable-cell.datatable-cell-header.datatable-cell-header-link .header-link .name, .datatable .datatable-cell.datatable-cell-data .flex-wrapper > .link-action, .datatable .datatable-cell.datatable-cell-data .flex-wrapper .flex-item > .link-action, .datatable .datatable-cell.datatable-cell-data .timeline-date, .list-table .action-container .link-action, .tag, div.dashboard-widget-hostcard .host-card .sections-header .host-name .link-action, div.dashboard-widget-hostcard .host-card .sections .section .section-name, div.dashboard-widget-hostcard .host-card .sections .section.section-host-groups .host-groups .host-group .host-group-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitoring .monitoring .monitoring-item .monitoring-item-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitored-by .section-body, div.dashboard-widget-hostcard .host-card .sections .section.section-templates .templates .template .template-name, div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-name,
+.form-grid .fields-group > label, .dashboard-navigation-tabs .sortable li div span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .datatable.compact-view .datatable-body .datatable-cell.datatable-cell-data .flex-wrapper > .link-action, .datatable.compact-view .datatable-body .datatable-cell.datatable-cell-data .tags-wrapper .tag, .datatable.compact-view .datatable-body .datatable-cell.datatable-cell-data .opdata, .datatable .datatable-options .datatable-options-list .datatable-options-list-item label .datatable-options-list-item-label, .datatable .datatable-cell.datatable-cell-header .header-name, .datatable .datatable-cell.datatable-cell-header.datatable-cell-header-link .header-link, .datatable .datatable-cell.datatable-cell-header.datatable-cell-header-link .header-link .name, .datatable .datatable-cell.datatable-cell-data .flex-wrapper > .link-action, .datatable .datatable-cell.datatable-cell-data .flex-wrapper .flex-item > .link-action, .datatable .datatable-cell.datatable-cell-data .timeline-date, .list-table .action-container .link-action, .tag, .trace-view .trace-view-container .trace-scroll .trace-tree z-navigation-tree .trace-tree-title-content .title, div.dashboard-widget-hostcard .host-card .sections-header .host-name .link-action, div.dashboard-widget-hostcard .host-card .sections .section .section-name, div.dashboard-widget-hostcard .host-card .sections .section.section-host-groups .host-groups .host-group .host-group-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitoring .monitoring .monitoring-item .monitoring-item-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitored-by .section-body, div.dashboard-widget-hostcard .host-card .sections .section.section-templates .templates .template .template-name, div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-name,
 div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-value, div.dashboard-widget-itemcard .item-card .sections-header .section-item .item-name .link-action, div.dashboard-widget-itemcard .item-card .sections-header .section-path, div.dashboard-widget-itemcard .item-card .sections-header .section-path .path-element, div.dashboard-widget-itemcard .item-card .sections .section .section-name, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-triggers .triggers .trigger .trigger-name, div.dashboard-widget-itemcard .item-card .sections .section.section-single-parameter .section-body, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-scatterplot .dataset-head .head-row > label, form.dashboard-widget-scatterplot .dataset-body .form-grid > label, form.dashboard-widget-tophosts #list_columns .text, form.dashboard-widget-topitems #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a, .preprocessing-list .preprocessing-list-head .step-on-fail, .totals-list.totals-list-horizontal .count,
 .totals-list.totals-list-horizontal .name, .rules-status-container .status-green,
 .rules-status-container .status-grey {
@@ -891,11 +891,6 @@ body {
     position: sticky;
     inset-block-start: 0;
     z-index: 998; }
-  body > z-split-view:has(.side-drawer.closed) {
-    grid-template-columns: none; }
-    body > z-split-view:has(.side-drawer.closed) .side-drawer,
-    body > z-split-view:has(.side-drawer.closed) > z-split-view-handle {
-      display: none; }
   body > z-split-view,
   body > .wrapper {
     grid-area: content;
@@ -918,7 +913,8 @@ main {
   padding: 10px; }
 
 footer {
-  margin-top: auto; }
+  margin-top: auto;
+  min-width: var(--min-content-size); }
 
 output {
   display: block; }
@@ -1647,7 +1643,7 @@ button {
 .zi-chevron-left::before,
 .zi-chevron-right::before,
 .zi-chevron-up::before,
-.zi-chevron-up-small::before, .zi-users-filled-small::before {
+.zi-chevron-up-small::before, .zi-users-filled-small::before, .trace-view .trace-view-header .trace-view-header-error .icon::before, .trace-view .trace-view-container .trace-scroll .trace-tree z-navigation-tree .trace-tree-title-content .icon::before {
   font-size: 16px; }
 
 .zi-arrow-down-small::before, .zi-arrow-up-small::before, .zi-chevron-down-small::before, .zi-chevron-up-small::before, .zi-copy::before, .zi-help-small::before, .zi-help-filled-small::before, .zi-i-negative::before, .zi-i-positive::before, .zi-i-warning::before, .zi-link-external-small::before, .zi-plus-small::before, .zi-remove-small::before, .zi-tree-top-bottom-small::before, .zi-tree-top-right-small::before, .zi-tree-top-right-bottom-small::before, .zi-user-filled-small::before, .zi-wrench-alt-small::before, .overlay-dialogue .overlay-dialogue-header .btn-overlay-close::before, form.dashboard-widget-scatterplot .dataset-body .form-grid .marker-config .radio-list-control .icon::before {
@@ -2150,17 +2146,18 @@ button {
 .dashboard-grid-widget {
   position: absolute; }
   .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-header {
-    height: var(--surface-border-radius);
+    height: 0;
     z-index: 11;
-    transition: height 300ms ease-out, margin-top 300ms ease-out, box-shadow 300ms ease-out; }
+    border-top-width: 0;
+    transition: height 300ms ease-out, margin-top 300ms ease-out, box-shadow 300ms ease-out, border-top-width 0s linear 300ms; }
   .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents {
     margin-top: 0;
     height: 100%;
     padding-top: 8px;
-    border-top-color: transparent;
+    border-top-width: 1px;
     border-top-left-radius: var(--surface-border-radius);
     border-top-right-radius: var(--surface-border-radius);
-    transition-property: border-radius; }
+    transition: border-radius 300ms; }
     .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents.no-padding .dashboard-grid-widget-messages .msg-bad,
     .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents.no-padding .dashboard-grid-widget-messages .msg-good,
     .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents.no-padding .dashboard-grid-widget-messages .msg-warning {
@@ -2170,9 +2167,11 @@ button {
       .dashboard-grid-widget.dashboard-grid-widget-hidden-header .dashboard-grid-widget-contents .list-table.sticky-footer tfoot {
         bottom: 0; }
   .dashboard-grid-widget.dashboard-grid-widget-hidden-header.dashboard-grid-widget-focus .dashboard-grid-widget-header {
-    height: 2rem;
-    margin-top: -2rem;
-    box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15); }
+    height: 32px;
+    margin-top: -32px;
+    border-top-width: 1px;
+    box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
+    transition: height 300ms ease-out, margin-top 300ms ease-out, box-shadow 300ms ease-out; }
   .dashboard-grid-widget.dashboard-grid-widget-hidden-header.dashboard-grid-widget-focus .dashboard-grid-widget-contents {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
@@ -3079,6 +3078,11 @@ button {
   #datatable-logs .datatable-row:not(.row-selected):hover .datatable-cell {
     border-block-end-color: #dfe4e7;
     background-color: #e8f5ff; }
+#datatable-traces .datatable-row:focus,
+#datatable-metrics .datatable-row:focus,
+#datatable-logs .datatable-row:focus {
+  background-color: #e8f5ff;
+  outline: none; }
 
 #datatable-traces .span-count {
   color: #768d99; }
@@ -5029,7 +5033,7 @@ section {
 .status-warning-bg,
 .status-average-bg,
 .status-high-bg,
-.status-disaster-bg, .status-green, .status-disabled, .status-grey, .status-yellow, .status-red, .status-amp-severity-trace, .status-amp-severity-debug, .status-amp-severity-info, .status-amp-severity-warn, .status-amp-severity-error, .status-amp-severity-fatal {
+.status-disaster-bg, .status-green, .status-disabled, .status-grey, .status-yellow, .status-red, .status-amp-severity-trace, .status-amp-severity-debug, .status-amp-severity-info, .status-amp-severity-warn, .status-amp-severity-error, .status-amp-severity-fatal, .status-amp-severity-unspecified {
   box-sizing: border-box;
   display: inline-block;
   min-width: 16px;
@@ -5132,6 +5136,10 @@ section {
   color: #4b0c0c;
   background-color: #e45959;
   border-color: #BC5051; }
+
+.status-amp-severity-unspecified {
+  background-color: transparent;
+  border-color: transparent; }
 
 .subfilter-option-grid {
   grid-template-columns: minmax(75px, max-content) auto;
@@ -5907,6 +5915,15 @@ section {
       .trace-view .trace-view-header .trace-view-header-info .btn-icon {
         margin-inline-start: 5px;
         margin-inline-end: 2px; }
+    .trace-view .trace-view-header .trace-view-header-error {
+      display: inline-flex;
+      align-items: center;
+      line-height: 18px;
+      gap: 5px;
+      margin-right: 10px;
+      color: #e33734; }
+      .trace-view .trace-view-header .trace-view-header-error .icon {
+        color: #e33734; }
     .trace-view .trace-view-header .trace-view-close-button {
       flex: 0 0;
       margin-inline-end: -8px; }
@@ -5994,6 +6011,13 @@ section {
         .trace-view .trace-view-container .trace-scroll .trace-tree z-navigation-tree {
           --navigation-tree-row-block-size: var(--trace-row-block-size);
           grid-row: 2; }
+          .trace-view .trace-view-container .trace-scroll .trace-tree z-navigation-tree .trace-tree-title-content {
+            display: inline-flex;
+            gap: 5px;
+            width: 100%; }
+            .trace-view .trace-view-container .trace-scroll .trace-tree z-navigation-tree .trace-tree-title-content .icon {
+              color: #e33734;
+              font-weight: normal; }
       .trace-view .trace-view-container .trace-scroll .trace-time {
         display: grid;
         overflow-x: hidden;
@@ -6025,12 +6049,13 @@ section {
             box-sizing: border-box;
             min-inline-size: 0;
             min-block-size: var(--trace-row-block-size); }
-      .trace-view .trace-view-container .trace-scroll .trace-details {
-        min-inline-size: 0;
-        min-block-size: min-content; }
-        .trace-view .trace-view-container .trace-scroll .trace-details .details-panel {
-          inline-size: var(--trace-details-width);
-          border-inline-start: 1px solid var(--trace-border-color); }
+  .trace-view .trace-details {
+    min-inline-size: 0;
+    min-block-size: min-content;
+    overflow: auto; }
+    .trace-view .trace-details .details-panel {
+      min-inline-size: var(--trace-details-width);
+      border-inline-start: 1px solid var(--trace-border-color); }
   .trace-view .trace-grid-line {
     position: absolute;
     inset-inline-start: var(--trace-grid-line-position);
@@ -6068,8 +6093,8 @@ section {
     box-sizing: border-box;
     inline-size: var(--trace-marker-size);
     block-size: var(--trace-marker-size);
-    border: 1px solid var(--trace-bg-color);
-    background: #fff;
+    border: 1px solid var(--trace-marker-border-color);
+    background: var(--trace-marker-bg-color, #ffffff);
     transform: translate(-50%, -50%) rotate(45deg);
     cursor: default; }
     .trace-view .trace-event-marker[data-count]::after {
@@ -6080,7 +6105,7 @@ section {
       block-size: 12px;
       border-radius: 6px;
       background: #0275b8;
-      color: #fff;
+      color: #ffffff;
       font-size: 9px;
       line-height: 12px;
       text-align: center;
@@ -6301,11 +6326,15 @@ z-navigation-tree {
     padding-inline: calc(8px + var(--navigation-tree-depth) * var(--navigation-tree-indent-size)) 8px;
     grid-template-columns: 18px minmax(0, 1fr) auto;
     column-gap: 4px; }
+    z-navigation-tree .z-navigation-tree-row:focus {
+      outline: none; }
     z-navigation-tree .z-navigation-tree-row[selected] {
       background: var(--navigation-tree-selected-bg-color); }
     z-navigation-tree .z-navigation-tree-row:not([selected]):hover {
       background: var(--navigation-tree-hover-bg-color);
       cursor: pointer; }
+    z-navigation-tree .z-navigation-tree-row:not([selected]):focus {
+      background-color: #e8f5ff; }
   z-navigation-tree .z-navigation-tree-toggle {
     display: inline-flex;
     justify-content: center;
@@ -6586,6 +6615,11 @@ z-split-view {
       cursor: col-resize; }
     z-split-view[resizing][vertical] {
       cursor: row-resize; }
+  z-split-view:has(> z-split-view-pane.closed) {
+    grid-template-columns: none; }
+    z-split-view:has(> z-split-view-pane.closed) > .closed,
+    z-split-view:has(> z-split-view-pane.closed) > z-split-view-handle {
+      display: none; }
 
 z-textarea-flexible {
   display: inline-grid; }
@@ -9889,6 +9923,8 @@ main .server-name {
   float: right;
   margin: 10px;
   color: #768d99; }
+main .ha-nodes {
+  margin-top: 10px; }
 
 .uppercase {
   text-transform: uppercase; }

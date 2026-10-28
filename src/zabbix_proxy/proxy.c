@@ -908,22 +908,11 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if ((NULL != config_apm_cert_file || NULL != config_apm_key_file) && NULL == config_apm_ca_file)
+	if ((NULL != config_apm_cert_file || NULL != config_apm_key_file || NULL != config_apm_ca_file) &&
+			(NULL == config_apm_cert_file || NULL == config_apm_key_file || NULL == config_apm_ca_file))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "APMTLSCertFile and APMTLSKeyFile configuration parameters must be used with"
-				" APMTLSCAFile configuration parameter");
-		err = 1;
-	}
-	if (NULL == config_apm_cert_file && NULL != config_apm_key_file)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "APMTLSKeyFile configuration parameter must be used with APMTLSCertFile"
-				" configuration parameter");
-		err = 1;
-	}
-	if (NULL != config_apm_cert_file && NULL == config_apm_key_file)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "APMTLSCertFile configuration parameter must be used with APMTLSKeyFile"
-				" configuration parameter");
+		zabbix_log(LOG_LEVEL_CRIT, "APMTLSCAFile, APMTLSCertFile and APMTLSKeyFile configuration parameters"
+				" must be used together");
 		err = 1;
 	}
 #else
@@ -1221,7 +1210,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			1000},
 		{"WebDriverURL",		&config_webdriver_url,			ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
-		{"StartAPMCollectors",		&config_forks[ZBX_PROCESS_TYPE_APM_MANAGER],	ZBX_CFG_TYPE_INT,
+		{"StartAPMCollector",		&config_forks[ZBX_PROCESS_TYPE_APM_MANAGER],	ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	0,			1},
 		{"TelemetryProvider",			&config_telemetry_providers,	ZBX_CFG_TYPE_MULTISTRING,
 				ZBX_CONF_PARM_OPT,	0,			0},

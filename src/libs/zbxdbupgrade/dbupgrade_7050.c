@@ -2183,26 +2183,44 @@ static int	DBpatch_7050195(void)
 
 static int	DBpatch_7050196(void)
 {
-	const zbx_db_field_t	field = {"scope", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	if (ZBX_DB_OK > zbx_db_execute("delete from role_rule"
+			" where name like 'api.method.%%'"
+				" and value_str in ("
+					"'hostinterface.create',"
+					"'hostinterface.update',"
+					"'hostinterface.delete',"
+					"'hostinterface.massadd',"
+					"'hostinterface.massremove'"
+				")"))
+	{
+		return FAIL;
+	}
 
-	return DBadd_field("cep_operation", &field);
+	return SUCCEED;
 }
 
 static int	DBpatch_7050197(void)
 {
-	const zbx_db_field_t	field = {"scope_evaltype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"scope", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("cep_operation", &field);
 }
 
 static int	DBpatch_7050198(void)
 {
-	const zbx_db_field_t	field = {"scope_formula", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"scope_evaltype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("cep_operation", &field);
 }
 
 static int	DBpatch_7050199(void)
+{
+	const zbx_db_field_t	field = {"scope_formula", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("cep_operation", &field);
+}
+
+static int	DBpatch_7050200(void)
 {
 	const zbx_db_table_t	table =
 			{"cep_operation_scope_condition", "cep_operation_scope_conditionid", 0,
@@ -2222,13 +2240,13 @@ static int	DBpatch_7050199(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050200(void)
+static int	DBpatch_7050201(void)
 {
 	return DBcreate_index("cep_operation_scope_condition", "cep_operation_scope_condition_1", "cep_operationid",
 			0);
 }
 
-static int	DBpatch_7050201(void)
+static int	DBpatch_7050202(void)
 {
 	const zbx_db_field_t	field = {"cep_operationid", NULL, "cep_operation", "cep_operationid", 0, ZBX_TYPE_ID,
 			ZBX_NOTNULL, 0};
@@ -2236,17 +2254,17 @@ static int	DBpatch_7050201(void)
 	return DBadd_foreign_key("cep_operation_scope_condition", 1, &field);
 }
 
-static int	DBpatch_7050202(void)
+static int	DBpatch_7050203(void)
 {
 	return DBcreate_changelog_insert_trigger("cep_operation_scope_condition", "cep_operation_scope_conditionid");
 }
 
-static int	DBpatch_7050203(void)
+static int	DBpatch_7050204(void)
 {
 	return DBcreate_changelog_update_trigger("cep_operation_scope_condition", "cep_operation_scope_conditionid");
 }
 
-static int	DBpatch_7050204(void)
+static int	DBpatch_7050205(void)
 {
 	return DBcreate_changelog_delete_trigger("cep_operation_scope_condition", "cep_operation_scope_conditionid");
 }
@@ -2462,5 +2480,6 @@ DBPATCH_ADD(7050201, 0, 1)
 DBPATCH_ADD(7050202, 0, 1)
 DBPATCH_ADD(7050203, 0, 1)
 DBPATCH_ADD(7050204, 0, 1)
+DBPATCH_ADD(7050205, 0, 1)
 
 DBPATCH_END()

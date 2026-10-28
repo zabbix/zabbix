@@ -257,8 +257,8 @@ static int	tm_execute_test_item(struct zbx_json_parse *jp_data, const zbx_config
 	size_t			value_size;
 	zbx_apm_db_config_t	apm_db_config;
 
-	zbx_dc_config_get_apm_db_config(&apm_db_config, config_apm_db_config, config_comms->config_source_ip,
-			config_comms->config_ssl_ca_location);
+	(void)zbx_dc_config_get_apm_db_config(&apm_db_config, config_apm_db_config, config_comms->config_source_ip,
+			config_comms->config_ssl_ca_location, NULL);
 
 	ret = zbx_trapper_item_test_run(jp_data, 0, &value, config_comms,
 			config_startup_time, program_type, progname, get_config_forks,

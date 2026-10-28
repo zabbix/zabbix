@@ -1333,10 +1333,15 @@ class CDataTable {
 				}
 
 				if ('error' in response) {
-					const title = response.error.title || t('Unexpected server error.');
+					const title = response.error.title || null;
 					const messages = response.error.messages || [];
 
-					CMessageHelper.error(this.#element, messages, title);
+					if (title === null && messages.length === 0) {
+						CMessageHelper.error(this.#element, [], t('Unexpected server error.'));
+					}
+					else {
+						CMessageHelper.error(this.#element, messages, title);
+					}
 				}
 
 				return response;
@@ -1356,7 +1361,7 @@ class CDataTable {
 				this.dispatchEvent(CDataTable.EVENT_AFTER_RENDER, {response});
 			})
 			.catch(error => {
-				CMessageHelper.error(this.#element, [error.message], error.name);
+				CMessageHelper.error(this.#element, [error.message], error.name || t('Unexpected server error.'));
 
 				onError(error);
 			})
@@ -2140,6 +2145,18 @@ class CDataTable {
 	#renderBody(response) {
 		if ('error' in response) {
 			this.#renderEmptyState();
+
+			return;
+		}
+
+		if (this.#visible_columns.length === 0) {
+			this.#renderEmptyState({
+				icon: ZBX_ICON_SEARCH_LARGE,
+				message: t('No columns selected'),
+				description: t('Add columns in the Customize table panel'),
+			});
+
+			this.#footer.classList.add(ZBX_STYLE_HIDDEN);
 
 			return;
 		}

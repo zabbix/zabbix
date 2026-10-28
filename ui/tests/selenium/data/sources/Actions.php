@@ -49,6 +49,18 @@ class Actions {
 			]
 		])['hostids'];
 
+		CDataHelper::call('proxygroup.create',
+			[
+				[
+					'name' => 'Proxy group \'&quot;&lt;s&gt; for Actions'
+				],
+				[
+					'name' => 'Proxy group абц 頑張って 😀 for Actions'
+				]
+			]
+		);
+		$proxy_groupids = CDataHelper::getIds('name');
+
 		CDataHelper::call('proxy.create',
 			[
 				[
@@ -321,6 +333,11 @@ class Actions {
 							'conditiontype' => ZBX_CONDITION_TYPE_PROXY,
 							'operator' => CONDITION_OPERATOR_EQUAL,
 							'value' => $proxyids['Proxy for Actions 2']
+						],
+						[
+							'conditiontype' => ZBX_CONDITION_TYPE_PROXY_GROUP,
+							'operator' => CONDITION_OPERATOR_EQUAL,
+							'value' => $proxy_groupids['Proxy group \'&quot;&lt;s&gt; for Actions']
 						]
 					]
 				],
@@ -449,6 +466,34 @@ class Actions {
 						'operationtype' => OPERATION_TYPE_MESSAGE,
 						'opmessage' => ['mediatypeid' => 3], // SMS.
 						'opmessage_grp' => [['usrgrpid' => self::ZABBIX_ADMIN_GROUPID]]
+					]
+				]
+			],
+			// Discovery action.
+			[
+				'name' => 'Discovery action with proxy groups',
+				'eventsource' => EVENT_SOURCE_DISCOVERY,
+				'filter' => [
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+					'conditions' => [
+						[
+							'conditiontype' => ZBX_CONDITION_TYPE_PROXY_GROUP,
+							'operator' => CONDITION_OPERATOR_EQUAL,
+							'value' => $proxy_groupids['Proxy group абц 頑張って 😀 for Actions']
+						]
+					]
+				],
+				'operations' => [
+					[
+						'operationtype' => OPERATION_TYPE_MESSAGE,
+						'opmessage' => [
+							'mediatypeid' => self::EMAIL_MEDIATYPEID
+						],
+						'opmessage_grp' => [
+							[
+								'usrgrpid' => self::ZABBIX_ADMIN_GROUPID
+							]
+						]
 					]
 				]
 			]

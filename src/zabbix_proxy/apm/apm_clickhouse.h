@@ -56,9 +56,6 @@ int	apm_clickhouse_commit(zbx_apm_clickhouse_t *conn, const zbx_apm_clickhouse_c
 int	apm_clickhouse_cfg_init(zbx_apm_clickhouse_cfg_t *cfg, const zbx_apm_db_config_t *export_config,
 		char **error);
 void	apm_clickhouse_cfg_clear(zbx_apm_clickhouse_cfg_t *cfg);
-void	apm_clickhouse_cfg_copy(zbx_apm_clickhouse_cfg_t *dst, const zbx_apm_clickhouse_cfg_t *src);
-
-int	apm_clickhouse_cfg_compare_global(const zbx_apm_clickhouse_cfg_t *cfg_now, const zbx_apm_db_config_t *cfg_new);
-void	apm_clickhouse_cfg_copy_global(zbx_apm_clickhouse_cfg_t *dst, const zbx_apm_db_config_t *src);
+int	apm_clickhouse_cfg_compare(const zbx_apm_clickhouse_cfg_t *cfg, const zbx_apm_db_config_t *apm_config);
 
 #endif
