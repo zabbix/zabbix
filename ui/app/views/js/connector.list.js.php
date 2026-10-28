@@ -73,7 +73,7 @@
 					postMessageDetails('success', e.detail.messages);
 				}
 
-				location.href = location.href;
+				location.reload();
 			});
 		}
 
@@ -153,7 +153,7 @@
 						uncheckTableRows('connector');
 					}
 
-					location.href = location.href;
+					location.reload();
 				})
 				.catch(() => {
 					clearMessages();

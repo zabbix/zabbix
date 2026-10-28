@@ -1509,7 +1509,7 @@ fail:
 
 		if (SUCCEED == rc)
 		{
-			if (SUCCEED == (rc = zbx_script_prepare(&script, &host.hostid, error, sizeof(error))))
+			if (SUCCEED == (rc = zbx_script_prepare(&script, &host, error, sizeof(error))))
 			{
 				if (HOST_MONITORED_BY_SERVER == host.monitored_by ||
 						ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on ||

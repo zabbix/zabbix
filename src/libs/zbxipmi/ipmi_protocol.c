@@ -28,14 +28,16 @@ zbx_uint32_t	zbx_ipmi_serialize_request(unsigned char **data, zbx_uint64_t hosti
 	unsigned char	*ptr;
 	char		*user, *pwd;
 	zbx_uint32_t	data_len, addr_len, username_len, password_len, sensor_len, key_len;
+	zbx_dc_host_t	dc_host;
 
 	addr_len = strlen(addr) + 1;
 	user = zbx_strdup(NULL, username);
 	pwd = zbx_strdup(NULL, password);
-	zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-			&user, ZBX_MACRO_TYPE_COMMON, NULL, 0);
-	zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-			&pwd, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+	dc_host.hostid = hostid;
+	zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, &dc_host, NULL, NULL, NULL, NULL, NULL,
+			NULL, &user, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+	zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, &dc_host, NULL, NULL, NULL, NULL, NULL,
+			NULL, &pwd, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 	username_len = strlen(user) + 1;
 	password_len = strlen(pwd) + 1;
 	sensor_len = strlen(sensor) + 1;
