@@ -71,17 +71,26 @@ class CCepRuleHelper {
 	public const WHEN_EVENT_EVICTED = 2;
 	public const WHEN_WINDOW_CLOSED = 3;
 	public const WHEN_PATTERN_MATCHED = 4;
+	public const WHEN_EVENT_CLOSED = 5;
 
 	public const EXECUTE_WHEN_ORDER = [
 		self::WHEN_EVENT_OCCURRED,
 		self::WHEN_EVENT_ADDED,
 		self::WHEN_EVENT_EVICTED,
+		self::WHEN_EVENT_CLOSED,
 		self::WHEN_WINDOW_CLOSED,
 		self::WHEN_PATTERN_MATCHED
 	];
 
 	public const GROUP_BY_NO = 0;
 	public const GROUP_BY_YES = 1;
+
+	public const SCOPE_CURRENT_EVENT = 0;
+	public const SCOPE_OTHER_EVENTS = 1;
+	public const SCOPE_ALL_EVENTS = 2;
+
+	public const SCOPE_FILTER_YES = 1;
+	public const SCOPE_FILTER_NO = 0;
 
 	public const FILTER_SHOW_ALL = 0;
 	public const FILTER_SHOW_LEGACY = 1;
@@ -95,26 +104,30 @@ class CCepRuleHelper {
 			self::WHEN_EVENT_OCCURRED,
 			self::WHEN_EVENT_ADDED,
 			self::WHEN_EVENT_EVICTED,
-			self::WHEN_WINDOW_CLOSED
-		],
-		self::WINDOW_SIMPLE_ONCE => [
-			self::WHEN_EVENT_OCCURRED,
-			self::WHEN_EVENT_ADDED,
-			self::WHEN_EVENT_EVICTED,
-			self::WHEN_WINDOW_CLOSED
+			self::WHEN_WINDOW_CLOSED,
+			self::WHEN_EVENT_CLOSED
 		],
 		self::WINDOW_CAUSE_SYMPTOM => [
 			self::WHEN_EVENT_OCCURRED,
 			self::WHEN_EVENT_ADDED,
 			self::WHEN_EVENT_EVICTED,
-			self::WHEN_WINDOW_CLOSED
+			self::WHEN_WINDOW_CLOSED,
+			self::WHEN_EVENT_CLOSED
+		],
+		self::WINDOW_SIMPLE_ONCE => [
+			self::WHEN_EVENT_OCCURRED,
+			self::WHEN_EVENT_ADDED,
+			self::WHEN_EVENT_EVICTED,
+			self::WHEN_WINDOW_CLOSED,
+			self::WHEN_EVENT_CLOSED
 		],
 		self::WINDOW_PATTERN_MATCH => [
 			self::WHEN_EVENT_OCCURRED,
 			self::WHEN_EVENT_ADDED,
 			self::WHEN_EVENT_EVICTED,
 			self::WHEN_WINDOW_CLOSED,
-			self::WHEN_PATTERN_MATCHED
+			self::WHEN_PATTERN_MATCHED,
+			self::WHEN_EVENT_CLOSED
 		]
 	];
 
@@ -169,6 +182,16 @@ class CCepRuleHelper {
 			ZBX_CONDITION_TYPE_EVENT_SUPPRESSED
 		],
 		self::WHEN_PATTERN_MATCHED => [
+			ZBX_CONDITION_TYPE_EVENT_TAG,
+			ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
+			ZBX_CONDITION_TYPE_EVENT_OPEN,
+			ZBX_CONDITION_TYPE_EVENT_FIRST,
+			ZBX_CONDITION_TYPE_EVENT_LAST,
+			ZBX_CONDITION_TYPE_EVENT_SYMPTOM,
+			ZBX_CONDITION_TYPE_EVENT_COPIED,
+			ZBX_CONDITION_TYPE_EVENT_SUPPRESSED
+		],
+		self::WHEN_EVENT_CLOSED => [
 			ZBX_CONDITION_TYPE_EVENT_TAG,
 			ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
 			ZBX_CONDITION_TYPE_EVENT_OPEN,
@@ -254,8 +277,26 @@ class CCepRuleHelper {
 		],
 		self::WHEN_PATTERN_MATCHED => [
 			self::OP_SET_NAME,
-			self::OP_DISCARD,
 			self::OP_CLOSE_EVENT,
+			self::OP_DISCARD,
+			self::OP_SET_SEVERITY,
+			self::OP_INCREASE_SEVERITY,
+			self::OP_DECREASE_SEVERITY,
+			self::OP_SUPPRESS,
+			self::OP_UNSUPPRESS,
+			self::OP_CLONE_FIRST,
+			self::OP_CLONE_LAST,
+			self::OP_ADD_TAG,
+			self::OP_SET_TAG,
+			self::OP_SET_TAG_VALUE,
+			self::OP_INCREASE_TAG_VALUE,
+			self::OP_DECREASE_TAG_VALUE,
+			self::OP_RENAME_TAG,
+			self::OP_REMOVE_TAG,
+			self::OP_CLOSE_WINDOW
+		],
+		self::WHEN_EVENT_CLOSED => [
+			self::OP_SET_NAME,
 			self::OP_SET_SEVERITY,
 			self::OP_INCREASE_SEVERITY,
 			self::OP_DECREASE_SEVERITY,
@@ -402,6 +443,7 @@ class CCepRuleHelper {
 			self::WHEN_EVENT_OCCURRED => _('Event occurred'),
 			self::WHEN_EVENT_ADDED => _('Event added to window'),
 			self::WHEN_EVENT_EVICTED => _('Event evicted'),
+			self::WHEN_EVENT_CLOSED => _('Event closed'),
 			self::WHEN_WINDOW_CLOSED => _('Window closed'),
 			self::WHEN_PATTERN_MATCHED => _('Pattern matched')
 		];
@@ -431,6 +473,14 @@ class CCepRuleHelper {
 			self::OP_RENAME_TAG => _('Rename'),
 			self::OP_REMOVE_TAG => _('Remove'),
 			self::OP_CLOSE_WINDOW => _('Close (window)')
+		];
+	}
+
+	public static function getApplyToStrings(): array {
+		return [
+			self::SCOPE_CURRENT_EVENT => _('Current event'),
+			self::SCOPE_OTHER_EVENTS => _('Other events'),
+			self::SCOPE_ALL_EVENTS => _('All events')
 		];
 	}
 

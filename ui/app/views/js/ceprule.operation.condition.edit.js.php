@@ -47,9 +47,11 @@ window.ceprule_operation_condition_edit_popup = new class {
 	}
 
 	#setAvailableTypes(execute_when, used_property_types) {
-		if (execute_when == <?= CCepRuleHelper::WHEN_EVENT_OCCURRED ?>) {
-			used_property_types.push(<?= ZBX_CONDITION_TYPE_EVENT_FIRST ?>);
-			used_property_types.push(<?= ZBX_CONDITION_TYPE_EVENT_LAST ?>);
+		switch (execute_when) {
+			case <?= CCepRuleHelper::WHEN_EVENT_OCCURRED ?>:
+				used_property_types.push(<?= ZBX_CONDITION_TYPE_EVENT_FIRST ?>);
+				used_property_types.push(<?= ZBX_CONDITION_TYPE_EVENT_LAST ?>);
+				break;
 		}
 
 		const zselect = document.getElementById('ceprule-condition-type');

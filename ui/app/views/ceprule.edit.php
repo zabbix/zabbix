@@ -122,6 +122,7 @@ $form = (new CForm())
 					new CTag('em', true, ' #{arguments_str}')
 				]))->addClass(ZBX_STYLE_WORDBREAK),
 				'#{*condition_description_html}',
+				'#{scope_str}',
 				[
 					(new CButtonLink(_('Edit')))->addClass('js-operation-edit'),
 					(new CButtonLink(_('Remove')))->addClass('js-operation-remove'),
@@ -133,6 +134,7 @@ $form = (new CForm())
 						->setAttribute('data-changed', '')
 						->removeId(),
 					(new CVar('operations[#{row_index}][execute_when]', '#{execute_when}'))
+						->setAttribute('data-error-container', 'ceprule-operations-#{row_index}-error-container')
 						->setAttribute('data-changed', '')
 						->removeId(),
 					(new CVar('operations[#{row_index}][type]', '#{type}'))
@@ -142,6 +144,12 @@ $form = (new CForm())
 						->setAttribute('data-changed', '')
 						->removeId(),
 					(new CVar('operations[#{row_index}][filter][formula]', '#{filter.formula}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('operations[#{row_index}][scope_filter][evaltype]', '#{scope_filter.evaltype}'))
+						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('operations[#{row_index}][scope_filter][formula]', '#{scope_filter.formula}'))
 						->setAttribute('data-changed', '')
 						->removeId(),
 					(new CVar('operations[#{row_index}][event_name]', '#{event_name}'))
@@ -170,6 +178,9 @@ $form = (new CForm())
 						->removeId(),
 					(new CVar('operations[#{row_index}][suppress_duration]', '#{suppress_duration}'))
 						->setAttribute('data-changed', '')
+						->removeId(),
+					(new CVar('operations[#{row_index}][scope]', '#{scope}'))
+						->setAttribute('data-changed', '')
 						->removeId()
 				]
 			]))->setAttribute('data-row_index', '#{row_index}')
@@ -182,7 +193,7 @@ $form = (new CForm())
 				_('2) "Event added to window"').PHP_EOL,
 				_('3) "Event evicted"').PHP_EOL,
 				''.PHP_EOL,
-				_('Note: "Window closed" and "Pattern matched" operate independently and are not affected by this execution order.')
+				_('Note: "Event closed", "Window closed" and "Pattern matched" operate independently and are not affected by this execution order.')
 			]))
 		)
 		->addItem((new CFormField())
@@ -218,10 +229,13 @@ $form = (new CForm())
 							(new CColHeader())->setWidth('17')
 						)),
 						(new CTableColumn(
-							(new CColHeader(_('Details')))->setWidth('50%')
+							(new CColHeader(_('Details')))->setWidth('44%')
 						)),
 						(new CTableColumn(
-							(new CColHeader(_('Conditions')))->setWidth('50%')
+							(new CColHeader(_('Conditions')))->setWidth('44%')
+						)),
+						(new CTableColumn(
+							(new CColHeader(_('Applies to')))->setWidth('12%')
 						)),
 						(new CTableColumn(
 							(new CColHeader('Actions'))->setWidth('75')

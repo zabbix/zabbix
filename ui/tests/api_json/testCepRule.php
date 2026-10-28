@@ -2768,7 +2768,7 @@ class testCepRule extends CAPITest {
 			],
 			'Window tags accepts default value if group_by_tags=no' => [
 				'request' => [
-					'name' => 'ceprule',
+					'name' => 'ceprule.default.group_by_tags.no',
 					'sortorder' => 1,
 					'operations' => [
 						[
@@ -2786,6 +2786,54 @@ class testCepRule extends CAPITest {
 					]
 				],
 				'expected_error' => null
+			],
+			'Operation on WHEN_EVENT_CLOSED can\'t be invoked for window type WINDOW_NONE' => [
+				'request' => [
+					'name' => 'ceprule',
+					'sortorder' => 1,
+					'operations' => [
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_CLOSED,
+							'type' => CCepRuleHelper::OP_SET_NAME,
+							'event_name' => 'bla'
+						]
+					],
+					'window_type' => CCepRuleHelper::WINDOW_NONE
+				],
+				'expected_error' => 'Invalid parameter "/1/operations/1/execute_when": value must be '.CCepRuleHelper::WHEN_EVENT_OCCURRED.'.'
+			],
+			'Operation OP_CLOSE_EVENT can\'t be used for WHEN_EVENT_CLOSED' => [
+				'request' => [
+					'name' => 'ceprule',
+					'sortorder' => 1,
+					'operations' => [
+						[
+							'sortorder' => 1,
+							'execute_when' => CCepRuleHelper::WHEN_EVENT_CLOSED,
+							'type' => CCepRuleHelper::OP_CLOSE_EVENT
+						]
+					],
+					'window_type' => CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE
+				],
+				'expected_error' => 'Invalid parameter "/1/operations/1/type": value must be one of '.implode(', ', [
+						CCepRuleHelper::OP_SET_NAME,
+						CCepRuleHelper::OP_SET_SEVERITY,
+						CCepRuleHelper::OP_INCREASE_SEVERITY,
+						CCepRuleHelper::OP_DECREASE_SEVERITY,
+						CCepRuleHelper::OP_SUPPRESS,
+						CCepRuleHelper::OP_UNSUPPRESS,
+						CCepRuleHelper::OP_CLONE_FIRST,
+						CCepRuleHelper::OP_CLONE_LAST,
+						CCepRuleHelper::OP_ADD_TAG,
+						CCepRuleHelper::OP_SET_TAG,
+						CCepRuleHelper::OP_SET_TAG_VALUE,
+						CCepRuleHelper::OP_INCREASE_TAG_VALUE,
+						CCepRuleHelper::OP_DECREASE_TAG_VALUE,
+						CCepRuleHelper::OP_RENAME_TAG,
+						CCepRuleHelper::OP_REMOVE_TAG,
+						CCepRuleHelper::OP_CLOSE_WINDOW
+					]).'.'
 			]
 		];
 	}

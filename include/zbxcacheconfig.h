@@ -1844,6 +1844,11 @@ char	*zbx_dc_get_apm_config(char *old_config, zbx_uint64_t *revision);
 #define ZBX_CEP_WHEN_EVENT_EVICTED	2
 #define ZBX_CEP_WHEN_WINDOW_CLOSED	3
 #define ZBX_CEP_WHEN_PATTERN_MATCH	4
+#define ZBX_CEP_WHEN_EVENT_CLOSED	5
+
+#define ZBX_CEP_SCOPE_CURRENT		0
+#define ZBX_CEP_SCOPE_OTHERS		1
+#define ZBX_CEP_SCOPE_ALL		2
 
 typedef struct
 {
@@ -1924,18 +1929,27 @@ zbx_cep_op_args_t;
 
 typedef struct
 {
+	int				evaltype;
+	char				*formula;
+	zbx_vector_cep_op_condition_t	conditions;
+}
+zbx_cep_op_filter_t;
+
+typedef struct
+{
 	zbx_uint64_t			operationid;
 	int				type;
 	int				execute_when;
-	int				evaltype;
+	zbx_cep_op_filter_t		execute_filter;
+	int				scope;
+	zbx_cep_op_filter_t		scope_filter;
 	int				sortorder;
 	zbx_cep_op_args_t		args;
-	zbx_vector_cep_op_condition_t	conditions;
-	char				*formula;
 }
 zbx_cep_operation_t;
 
 ZBX_VECTOR_DECL(cep_operation, zbx_cep_operation_t)
+ZBX_CONST_PTR_VECTOR_LITE_DECL(const_cep_operation_ptr, const zbx_cep_operation_t *)
 
 /* keep union names in sync with CEP condition defines */
 typedef union
