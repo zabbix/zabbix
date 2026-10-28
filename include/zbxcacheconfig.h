@@ -1066,8 +1066,8 @@ void	zbx_dc_config_update_autoreg_host(const char *host, const char *listen_ip, 
 		unsigned int connection_type, int now);
 void	zbx_dc_config_delete_autoreg_host(const zbx_vector_str_t *autoreg_hosts);
 
-void	zbx_dc_config_get_apm_db_config(zbx_apm_db_config_t *out, const zbx_apm_db_config_t *local_apm_db_config,
-		const char *config_source_ip, const char *config_ssl_ca_location);
+int	zbx_dc_config_get_apm_db_config(zbx_apm_db_config_t *out, const zbx_apm_db_config_t *local_apm_db_config,
+		const char *config_source_ip, const char *config_ssl_ca_location, zbx_uint64_t *revision);
 
 int	zbx_dc_config_poller_type_has_cached_data(unsigned char poller_type);
 void	zbx_dc_config_cached_data_init(zbx_dc_cached_data_t *cached_data);

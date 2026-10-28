@@ -51,7 +51,7 @@ class testTelemetryQueryItemsWithProxyInput extends testTelemetryQueryItems {
 				'DebugLevel' => 4,
 				'LogFileSize' => 0,
 				'LogFile' => self::getLogPath(self::COMPONENT_PROXY),
-				'StartAPMCollectors' => 1
+				'StartAPMCollector' => 1
 			]
 		];
 	}

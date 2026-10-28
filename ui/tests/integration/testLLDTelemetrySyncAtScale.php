@@ -145,7 +145,7 @@ class testLLDTelemetrySyncAtScale extends CIntegrationTest {
 				'LogFileSize' => 8,
 				'DebugLevel' => 3,
 				'LogSlowQueries' => '60000',
-				'StartAPMCollectors' => 1
+				'StartAPMCollector' => 1
 			]
 		];
 	}
