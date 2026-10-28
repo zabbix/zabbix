@@ -1,1 +1,1 @@
-A.F.....S. [ZBXNEXT-10824] added option to invoke CEP operations when event is closed; added CEP operation condition 'Current event' (vmurzins, wiper)
+A.F.I...S. [ZBXNEXT-10824] added option to invoke CEP operations when event is closed; added CEP operation scope and filter for it (agriscenko, vmurzins, wiper)
