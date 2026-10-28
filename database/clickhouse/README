@@ -19,7 +19,7 @@ Schema Creation Scripts:
 These scripts create ClickHouse table schemas for corresponding value types.
 
 Usage:
-./<history table>_schema.sh -s <ClickHouse URL> -d <database> [-u <username>] [-p <password>] [-t <TTL>] [-P <partition schema>] [-e <engine>]
+./<history table>_schema.sh -s <ClickHouse URL> -d <database> [-u <username>] [-p <password>] [-t <TTL>] [-P <partition schema>] [-e <engine>] [-c <cluster>]
 
 Parameters:
 -s|--server: ClickHouse URL (default: http://localhost:8123), when the port
@@ -30,6 +30,7 @@ Parameters:
 -t|--ttl: Housekeeping interval in seconds (default: 2678400 (31 days))
 -P|--partition: Partitioning schema (default: toDate (by days))
 -e|--engine: Table engine (default: MergeTree())
+-c|--cluster: Cluster name, creates Distributed tables over local tables on all nodes (default: empty, no cluster)
 -i|--import-dir: Directory with the exported CSV files (default: /tmp)
 --ca: CA certificate file to verify the server certificate (default: system
       CA store)
@@ -60,6 +61,33 @@ configured for replication ReplicatedMergeTree can be used:
 If the engine takes a per table parameter, such as an explicit replica path,
 run the schema scripts individually rather than through history_all.sh, which
 passes the same arguments to all of them.
+
+On a sharded cluster the -c|--cluster option creates the tables on all nodes
+of the cluster defined in the server's remote_servers configuration. The data
+is stored in <history table>_local tables with the selected engine, partitioning
+and TTL, and <history table> is a Distributed table over them, sharded by item:
+
+./history_all.sh -s <ClickHouse URL> -d zabbix -c <cluster> -e "ReplicatedMergeTree()"
+
+The tables are created with ON CLUSTER queries, which require ClickHouse Keeper
+(or ZooKeeper) to be configured even when the MergeTree engine is used.
+
+All values of an item are stored on the same shard (sharding key intHash64(itemid)).
+By default every query is still sent to all shards, to send queries only to the
+shards holding the requested items enable optimize_skip_unused_shards=1 in the
+settings profile of the Zabbix user. While it is enabled do not change the number
+of shards or their weights: items would move to other shards and their older
+values would no longer be returned until they expire.
+
+The schema creation scripts never drop existing tables and fail if a table
+already exists. To recreate a table, together with all its data, drop it first:
+
+echo "DROP TABLE zabbix.history SYNC" | curl -u <user>:<password> <ClickHouse URL> --data-binary @-
+
+With a cluster drop both the Distributed and the local table on all nodes:
+
+echo "DROP TABLE zabbix.history ON CLUSTER <cluster> SYNC" | curl -u <user>:<password> <ClickHouse URL> --data-binary @-
+echo "DROP TABLE zabbix.history_local ON CLUSTER <cluster> SYNC" | curl -u <user>:<password> <ClickHouse URL> --data-binary @-
 
 OpenTelemetry Schema Creation Scripts:
 - otel_all.sh - invokes all OpenTelemetry schema creation scripts

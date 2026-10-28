@@ -11,6 +11,7 @@ display_help()
 		printf "  %-16s %s\n" "-t|--ttl" "Housekeeping interval in seconds ($CH_TTL)"
 		printf "  %-16s %s\n" "-P|--partition" "Partitioning schema ($CH_PARTITION)"
 		printf "  %-16s %s\n" "-e|--engine" "Table engine ($CH_ENGINE)"
+		printf "  %-16s %s\n" "-c|--cluster" "Cluster name, creates Distributed tables over local tables on all nodes"
 	fi
 	if [ "$CH_SCRIPT" = "import" ]; then
 		printf "  %-16s %s\n" "-i|--import-dir" "Directory with the exported CSV files ($CH_IMPORT_DIR)"
@@ -36,6 +37,8 @@ CH_TTL="2678400"
 CH_PARTITION="toDate"
 
 CH_ENGINE="MergeTree()"
+
+CH_CLUSTER=""
 
 # directory with the exported CSV files
 CH_IMPORT_DIR="/tmp"
@@ -86,6 +89,11 @@ while [ $# -gt 0 ]; do
 		[ "$CH_SCRIPT" = "schema" ] || display_help
 		shift
 		CH_ENGINE=$1
+		;;
+	-c|--cluster)
+		[ "$CH_SCRIPT" = "schema" ] || display_help
+		shift
+		CH_CLUSTER=$1
 		;;
 	-i|--import-dir)
 		[ "$CH_SCRIPT" = "import" ] || display_help
@@ -175,4 +183,24 @@ ch_query()
 	fi
 
 	printf "%s" "${out%$'\n'*}"
+}
+
+# with a cluster the data is stored in <table>_local on every node and <table> is a Distributed table over them
+CH_ON_CLUSTER=""
+CH_LOCAL_SUFFIX=""
+if [ -n "$CH_CLUSTER" ]; then
+	CH_ON_CLUSTER=" ON CLUSTER '$CH_CLUSTER'"
+	CH_LOCAL_SUFFIX="_local"
+fi
+
+ch_create_distributed_table()
+{
+	if [ -z "$CH_CLUSTER" ]; then
+		return
+	fi
+
+	cat << EOF | curl "${CH_CURL_OPTS[@]}" "$CH_URL" --data-binary @-
+CREATE TABLE $CH_DB.$1$CH_ON_CLUSTER AS $CH_DB.$1$CH_LOCAL_SUFFIX
+ENGINE = Distributed('$CH_CLUSTER', '$CH_DB', '$1$CH_LOCAL_SUFFIX', intHash64(itemid))
+EOF
 }
