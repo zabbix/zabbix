@@ -378,7 +378,7 @@
 					const severity_data = severities.find(data => data.value == severity);
 
 					if (severity_data) {
-						if (trigger_value != TRIGGER_VALUE_FALSE) {
+						if (trigger_value == TRIGGER_VALUE_TRUE) {
 							cell.classList.add(CDataTable.ZBX_STYLE_CELL_BG);
 							cell.classList.add(severity_data.style);
 						}
