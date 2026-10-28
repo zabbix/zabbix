@@ -164,7 +164,7 @@ var LldRuleEditPrototypeTab = class {
 			input.addEventListener('change', () => this.#update());
 		});
 
-		this.#container.querySelector('[name="type"]').addEventListener('change', (e) => {
+		this.#container.querySelector('[name="type"]').addEventListener('change', e => {
 			this.#host_interface_selector.setType(parseInt(e.target.value));
 			this.#container.dispatchEvent(new CustomEvent('update'));
 
@@ -249,9 +249,9 @@ var LldRuleEditPrototypeTab = class {
 		});
 
 		jQuery('#query-fields-table')
-			.on('tableupdate.dynamicRows', (e) => this.#updateSortOrder(e.target, 'query_fields'));
-		jQuery('#headers-table').on('tableupdate.dynamicRows', (e) => this.#updateSortOrder(e.target, 'headers'));
-		jQuery('#columns-table').on('tableupdate.dynamicRows', (e) => this.#updateSortOrder(e.target, 'columns'));
+			.on('tableupdate.dynamicRows', e => this.#updateSortOrder(e.target, 'query_fields'));
+		jQuery('#headers-table').on('tableupdate.dynamicRows', e => this.#updateSortOrder(e.target, 'headers'));
+		jQuery('#columns-table').on('tableupdate.dynamicRows', e => this.#updateSortOrder(e.target, 'columns'));
 		jQuery('#delay-flex-table').on('tableupdate.dynamicRows', () => this.#updateTelemetryIndicators());
 	}
 
@@ -462,8 +462,8 @@ var LldRuleEditPrototypeTab = class {
 			this.#form_element.querySelector('[name="granularity"]').value.trim(), false
 		);
 
-		const data_gaps = lookback_limit !== null && delays.some((delay) => lookback_limit < delay);
-		const data_overlap = granularity !== null && delays.some((delay) => granularity > delay);
+		const data_gaps = lookback_limit !== null && delays.some(delay => lookback_limit < delay);
+		const data_overlap = granularity !== null && delays.some(delay => granularity > delay);
 
 		this.#form_element.querySelector('.js-lookback-limit-warning').style.display = data_gaps ? '' : 'none';
 		this.#form_element.querySelector('.js-granularity-warning').style.display = data_overlap ? '' : 'none';
@@ -592,7 +592,7 @@ var LldRuleEditPrototypeTab = class {
 		});
 
 		overlay.$dialogue[0].addEventListener('telemetry_aggregated_column.submit',
-			(e) => this.#addAggregatedColumnRow(e.detail)
+			e => this.#addAggregatedColumnRow(e.detail)
 		);
 	}
 
@@ -600,8 +600,8 @@ var LldRuleEditPrototypeTab = class {
 		const rows = this.#form_element.querySelectorAll('#aggregated-columns-table tbody [data-row_index]');
 
 		return [...rows]
-			.filter((row) => row !== exclude_row)
-			.map((row) => row.querySelector(`[name="aggregated_columns[${row.dataset.row_index}][alias]"]`).value);
+			.filter(row => row !== exclude_row)
+			.map(row => row.querySelector(`[name="aggregated_columns[${row.dataset.row_index}][alias]"]`).value);
 	}
 
 	#addAggregatedColumnRow(data) {
@@ -675,7 +675,7 @@ var LldRuleEditPrototypeTab = class {
 			trigger_element: trigger
 		});
 
-		overlay.$dialogue[0].addEventListener('telemetry_condition.submit', (e) => {
+		overlay.$dialogue[0].addEventListener('telemetry_condition.submit', e => {
 			this.#addConditionRow(e.detail);
 			this.#update();
 		});

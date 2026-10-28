@@ -451,13 +451,13 @@ window.item_edit_form = new class {
 				}
 			});
 		};
-		jQuery('#query-fields-table').on('tableupdate.dynamicRows', (e) => updateSortOrder(e.target, 'query_fields'));
-		jQuery('#headers-table').on('tableupdate.dynamicRows', (e) => updateSortOrder(e.target, 'headers'));
-		jQuery('#columns-table').on('tableupdate.dynamicRows', (e) => updateSortOrder(e.target, 'columns'));
+		jQuery('#query-fields-table').on('tableupdate.dynamicRows', e => updateSortOrder(e.target, 'query_fields'));
+		jQuery('#headers-table').on('tableupdate.dynamicRows', e => updateSortOrder(e.target, 'headers'));
+		jQuery('#columns-table').on('tableupdate.dynamicRows', e => updateSortOrder(e.target, 'columns'));
 
 		// Tags tab events.
 		document.getElementById('show_inherited_tags')
-			.addEventListener('change', (e) => this.#updateTagsList(e.target.value));
+			.addEventListener('change', e => this.#updateTagsList(e.target.value));
 
 		// Preprocessing tab events.
 		this.field.value_type_steps.addEventListener('change', e => this.#valueTypeChangeHandler(e));
@@ -512,7 +512,7 @@ window.item_edit_form = new class {
 	}
 
 	initItemPrototypeEvents() {
-		this.form_element.querySelector('[name="master-item-prototype"]').addEventListener('click', (e) => {
+		this.form_element.querySelector('[name="master-item-prototype"]').addEventListener('click', e => {
 			this.#openMasterItemPrototypePopup();
 
 			return cancelEvent(e);
@@ -533,7 +533,7 @@ window.item_edit_form = new class {
 
 		curl.setArgument('action', this.actions.create);
 
-		this.form.validateSubmit(fields).then((result) => {
+		this.form.validateSubmit(fields).then(result => {
 			if (!result) {
 				this.overlay.unsetLoading();
 				return;
@@ -549,7 +549,7 @@ window.item_edit_form = new class {
 
 		curl.setArgument('action', this.actions.update);
 
-		this.form.validateSubmit(fields).then((result) => {
+		this.form.validateSubmit(fields).then(result => {
 			if (!result) {
 				this.overlay.unsetLoading();
 				return;
@@ -700,8 +700,8 @@ window.item_edit_form = new class {
 		const rows = this.form_element.querySelectorAll('#aggregated-columns-table tbody [data-row_index]');
 
 		return [...rows]
-			.filter((row) => row !== exclude_row)
-			.map((row) => row.querySelector(`[name="aggregated_columns[${row.dataset.row_index}][alias]"]`).value);
+			.filter(row => row !== exclude_row)
+			.map(row => row.querySelector(`[name="aggregated_columns[${row.dataset.row_index}][alias]"]`).value);
 	}
 
 	#openAggregatedColumnModal(trigger, row = null) {
@@ -742,7 +742,7 @@ window.item_edit_form = new class {
 		});
 
 		overlay.$dialogue[0].addEventListener('telemetry_aggregated_column.submit',
-			(e) => this.#addAggregatedColumnRow(e.detail)
+			e => this.#addAggregatedColumnRow(e.detail)
 		);
 	}
 
@@ -785,7 +785,7 @@ window.item_edit_form = new class {
 			trigger_element: trigger
 		});
 
-		overlay.$dialogue[0].addEventListener('telemetry_condition.submit', (e) => {
+		overlay.$dialogue[0].addEventListener('telemetry_condition.submit', e => {
 			this.#addConditionRow(e.detail);
 			this.updateFieldsVisibility();
 		});
@@ -945,8 +945,8 @@ window.item_edit_form = new class {
 			this.form_element.querySelector('[name="granularity"]').value.trim(), false
 		);
 
-		const data_gaps = lookback_limit !== null && delays.some((delay) => lookback_limit < delay);
-		const data_overlap = granularity !== null && delays.some((delay) => granularity > delay);
+		const data_gaps = lookback_limit !== null && delays.some(delay => lookback_limit < delay);
+		const data_overlap = granularity !== null && delays.some(delay => granularity > delay);
 
 		this.form_element.querySelector('.js-lookback-limit-warning').style.display = data_gaps ? '' : 'none';
 		this.form_element.querySelector('.js-granularity-warning').style.display = data_overlap ? '' : 'none';
@@ -1031,8 +1031,8 @@ window.item_edit_form = new class {
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify(data)
 		})
-			.then((response) => response.json())
-			.then((response) => {
+			.then(response => response.json())
+			.then(response => {
 				if ('error' in response) {
 					throw {error: response.error};
 				}
@@ -1059,7 +1059,7 @@ window.item_edit_form = new class {
 					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: {action, ...response}}));
 				}
 			})
-			.catch((exception) => {
+			.catch(exception => {
 				for (const element of this.form_element.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 						element.parentNode.removeChild(element);
@@ -1141,8 +1141,8 @@ window.item_edit_form = new class {
 			body: JSON.stringify(data),
 			signal: abort_controller.signal
 		})
-			.then((response) => response.json())
-			.then((response) => {
+			.then(response => response.json())
+			.then(response => {
 				this.tags_table.innerHTML = response.body;
 
 				if (!('readonly' in this.tags_table.dataset)) {
@@ -1151,7 +1151,7 @@ window.item_edit_form = new class {
 					$tags_table.data('dynamicRows').counter = this.tags_table.querySelectorAll('tr.form_row').length;
 				}
 			})
-			.catch((message) => {
+			.catch(message => {
 				if (abort_controller.signal.aborted) {
 					return;
 				}
