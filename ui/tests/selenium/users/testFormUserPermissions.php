@@ -102,24 +102,30 @@ class testFormUserPermissions extends CWebTest {
 		$this->assertArrayHasKey('userids', $user);
 		self::$admin_user = $user['userids'][0];
 
-		self::$proxy_access_usrgrpid = CDataHelper::call('usergroup.create', [
+		$proxy_user_group = CDataHelper::call('usergroup.create', [
 			[
 				'name' => 'User group for proxy access'
 			]
-		])['usrgrpids'][0];
+		]);
 
-		self::$proxy_access_userid = CDataHelper::call('user.create', [
+		$this->assertArrayHasKey('usrgrpids', $proxy_user_group);
+		self::$proxy_access_usrgrpid = $proxy_user_group['usrgrpids'][0];
+
+		$proxy_user = CDataHelper::call('user.create', [
 			[
 				'username' => 'user_proxy_access',
 				'passwd' => 'test5678',
-				'roleid' => USER_TYPE_ZABBIX_USER,
+				'roleid' => 1, // User role
 				'usrgrps' => [
 					[
 						'usrgrpid' => self::$proxy_access_usrgrpid
 					]
 				]
 			]
-		])['userids'][0];
+		]);
+
+		$this->assertArrayHasKey('userids', $proxy_user);
+		self::$proxy_access_userid = $proxy_user['userids'][0];
 	}
 
 	public function prepareProxyData() {
@@ -546,11 +552,9 @@ class testFormUserPermissions extends CWebTest {
 	 * Check proxy and proxy group permissions.
 	 */
 	public function testFormUserPermissions_UpdateProxyAccessList() {
-		// Add proxy and proxy group access to the user's group.
 		$this->page->login()->open('zabbix.php?action=usergroup.edit&usrgrpid='.self::$proxy_access_usrgrpid)->waitUntilReady();
 		$form = $this->query('id:user-group-form')->waitUntilPresent()->asForm()->one();
 
-		// Add proxy and proxy group access.
 		$form->selectTab('Proxy access list');
 
 		$form->getField('Proxies')->fill('Allow list');
@@ -562,7 +566,6 @@ class testFormUserPermissions extends CWebTest {
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'User group updated');
 
-		// Verify the effective proxy permissions for the user.
 		$this->page->open('zabbix.php?action=user.edit&userid='.self::$proxy_access_userid)->waitUntilReady();
 
 		$form = $this->query('xpath://form[@name="user_form"]')->waitUntilPresent()->asForm()->one();
