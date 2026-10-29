@@ -772,6 +772,68 @@ class testUserRolesPermissions extends CWebTest {
 		}
 	}
 
+	/**
+	 * Check "Monitored by" in host creation form and "Discovery by" in discovery rule creation form
+	 * when 'Select "Server" for monitoring and discovery' role rule is enabled and disabled.
+	 */
+	public function testUserRolesPermissions_SelectServer() {
+		$this->page->userLogin('user_for_role', 'zabbixzabbix');
+
+		foreach ([true, false] as $action_status) {
+			// Verify "Monitored by" options in the Host creation form.
+			$this->page->open('zabbix.php?action=host.list')->waitUntilReady();
+			$this->query('button:Create host')->waitUntilClickable()->one()->click();
+			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+			$monitored_by = $dialog->asForm()->getField('Monitored by')->asSegmentedRadio();
+
+			// Check default selected option ('Server' when allowed, 'Proxy' when 'Server' is disabled).
+			$this->assertEquals($action_status ? 'Server' : 'Proxy', $monitored_by->getText());
+
+			$this->assertTrue($dialog->query('id:monitored_by_0')->one()->isEnabled($action_status));
+			$this->assertTrue($dialog->query('id:monitored_by_1')->one()->isEnabled());
+			$this->assertTrue($dialog->query('id:monitored_by_2')->one()->isEnabled());
+
+			// Select the default option last so every fill() call tests an actual state change.
+			$host_options = $action_status ? ['Proxy', 'Proxy group', 'Server'] : ['Proxy group', 'Proxy'];
+			foreach ($host_options as $option) {
+				$monitored_by->fill($option);
+				$this->assertEquals($option, $monitored_by->getText());
+			}
+
+			$dialog->close();
+
+			// Verify "Discovery by" options in the Discovery rule creation form.
+			$this->page->open('zabbix.php?action=discovery.list')->waitUntilReady();
+			$this->query('button:Create discovery rule')->waitUntilClickable()->one()->click();
+			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+			$discovery_by = $dialog->asForm()->getField('Discovery by')->asSegmentedRadio();
+
+			// Check default selected option ('Server' when allowed, 'Proxy' when 'Server' is disabled).
+			$this->assertEquals($action_status ? 'Server' : 'Proxy', $discovery_by->getText());
+
+			$this->assertTrue($dialog->query('id:discovery_by_0')->one()->isEnabled($action_status));
+			$this->assertTrue($dialog->query('id:discovery_by_1')->one()->isEnabled());
+
+			// When 'Server' is disabled, 'Proxy' is already selected and is the only enabled option.
+			if ($action_status) {
+				foreach (['Proxy', 'Server'] as $option) {
+					$discovery_by->fill($option);
+					$this->assertEquals($option, $discovery_by->getText());
+				}
+			}
+
+			$dialog->close();
+
+			if ($action_status) {
+				$this->changeRoleRule(['Select "Server" for monitoring and discovery' => false]);
+			}
+			else {
+				$this->changeRoleRule(['Select "Server" for monitoring and discovery' => true]);
+			}
+		}
+	}
+
+
 	public static function getUIData() {
 		return [
 			[
