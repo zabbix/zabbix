@@ -20,7 +20,7 @@
 #include "zbxjson.h"
 
 int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_event *event,
-		const zbx_db_event *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid,
+		const zbx_db_event *r_event, const zbx_uint64_t *userid, const char *manualinput,
 		const zbx_dc_host_t *dc_host, const zbx_dc_item_t *dc_item, const zbx_db_alert *alert,
 		const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm, const zbx_db_service *service,
 		const char *tz, zbx_history_recv_item_t *history_data_item, char **data, int macro_type, char *error,

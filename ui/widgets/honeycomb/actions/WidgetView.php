@@ -178,13 +178,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 					])
 					: '';
 
+				$is_numeric_item = in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
+
 				$cells[] = [
 					'hostid' => $item['hostid'],
 					'itemid' => $item['itemid'],
 					'primary_label' => $primary_label,
 					'secondary_label' => $secondary_label,
-					'value' => $last_value,
-					'is_numeric' => in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]),
+					'value' => $is_numeric_item ? $last_value : null,
+					'is_numeric' => $is_numeric_item,
 					'is_binary_units' => isBinaryUnits($item['units']),
 					'key_' => $item['key_']
 				];
