@@ -34,13 +34,13 @@ $formgrid = (new CFormGrid());
 
 $formgrid
 	->addItem([
-		(new CLabel(_('Type of calculation'), 'label-evaltype'))
+		(new CLabel(_('Type of calculation'), 'label-filters-evaltype'))
 			->addClass('js-item-condition'),
 		(new CFormField([
 			(new CDiv(
-				(new CSelect('evaltype'))
-					->setFocusableElementId('label-evaltype')
-					->setId('evaltype')
+				(new CSelect('filters_evaltype'))
+					->setFocusableElementId('label-filters-evaltype')
+					->setId('filters_evaltype')
 					->setValue($filter['evaltype'])
 					->addOptions(CSelect::createOptionsFromArray([
 						CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
@@ -54,7 +54,7 @@ $formgrid
 			))->addClass(ZBX_STYLE_CELL),
 			(new CDiv([
 				(new CSpan(''))->addClass('js-expression'),
-				(new CTextBox('formula', $filter['formula'], $readonly))
+				(new CTextBox('filters_formula', $filter['formula'], $readonly))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					->setAttribute('placeholder', 'A or (B and C) ...')
 					->addClass('js-formula')
@@ -68,11 +68,11 @@ $formgrid
 		(new CFormField(
 			(new CDiv([
 				(new CTable())
-					->setId('conditions')
+					->setId('filters_conditions')
 					->setHeader([_('Label'), _('Macro'), '', _('Regular expression'), ''])
 					->addClass('js-lld-filters')
 					->setAttribute('data-field-type', 'set')
-					->setAttribute('data-field-name', 'conditions')
+					->setAttribute('data-field-name', 'filters_conditions')
 					->setFooter(
 						(new CCol(
 							(new CButtonLink(_('Add')))
@@ -84,28 +84,28 @@ $formgrid
 					(new CRow([
 						[
 							new CSpan('#{formulaid}'),
-							new CVar('conditions[#{rowNum}][formulaid]', '#{formulaid}')
+							new CVar('filters_conditions[#{rowNum}][formulaid]', '#{formulaid}')
 						],
-						(new CTextAreaFlexible('conditions[#{rowNum}][macro]', '#{macro}'))
+						(new CTextAreaFlexible('filters_conditions[#{rowNum}][macro]', '#{macro}'))
 							->setAttribute('placeholder', '{#MACRO}')
 							->addClass('js-macro')
 							->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 							->setMaxlength(DB::getFieldLength('item_condition', 'macro'))
 							->setReadonly($readonly)
-							->setErrorContainer('conditions-#{rowNum}-error-container'),
-						(new CSelect('conditions[#{rowNum}][operator]'))
+							->setErrorContainer('filters-conditions-#{rowNum}-error-container'),
+						(new CSelect('filters_conditions[#{rowNum}][operator]'))
 							->setValue('#{operator}')
 							->addClass('js-operator')
 							->setReadonly($readonly)
 							->addOptions($operators),
 						(new CDiv(
-							(new CTextAreaFlexible('conditions[#{rowNum}][value]', '#{value}'))
+							(new CTextAreaFlexible('filters_conditions[#{rowNum}][value]', '#{value}'))
 								->setAttribute('placeholder', _('regular expression'))
 								->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 								->setMaxlength(DB::getFieldLength('item_condition', 'value'))
 								->setReadonly($readonly)
 								->addClass('js-value')
-								->setErrorContainer('conditions-#{rowNum}-error-container')
+								->setErrorContainer('filters-conditions-#{rowNum}-error-container')
 						))->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH),
 						(new CButtonLink(_('Remove')))
 							->addClass('element-table-remove')
@@ -113,7 +113,7 @@ $formgrid
 					]))->addClass('form_row'),
 					(new CRow())
 						->addClass('error-container-row')
-						->addItem((new CCol())->setId('conditions-#{rowNum}-error-container')
+						->addItem((new CCol())->setId('filters-conditions-#{rowNum}-error-container')
 							->setColSpan(3)
 						)
 				]))->addClass('js-lld-filters-template')

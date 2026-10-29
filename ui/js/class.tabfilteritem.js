@@ -383,16 +383,13 @@ class CTabFilterItem extends CBaseComponent {
 		let form = this.getForm(),
 			params = null;
 
-		const TAG_OPERATOR_EXISTS = '4';
-		const TAG_OPERATOR_NOT_EXISTS = '5';
-
 		if (form instanceof HTMLFormElement) {
 			var form_data = new FormData(form);
 
 			// Unset tag filter values for exists/not exists tag filters.
 			for (const [key, value] of form_data.entries()) {
 				let check_tag = key.match(/tags\[(\d+)\]\[operator\]/);
-				if (check_tag && (value === TAG_OPERATOR_EXISTS || value === TAG_OPERATOR_NOT_EXISTS)) {
+				if (check_tag && [TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS].includes(Number(value))) {
 					form_data.set('tags['+check_tag[1]+'][value]', '');
 				}
 			}

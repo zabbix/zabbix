@@ -3199,8 +3199,6 @@ static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *o
 						sizeof(ZBX_DC_TQITEM));
 
 				item->itemtype.tqitem->lasttimestamp = 0;
-				item->itemtype.tqitem->min_free_ts.sec = 0;
-				item->itemtype.tqitem->min_free_ts.ns = 0;
 			}
 
 			dc_strpool_replace(found, &item->itemtype.tqitem->query, row[50]);
@@ -7527,7 +7525,8 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 			maintenance_trigger_sync, hgroup_host_sync, drules_sync, dchecks_sync, httptest_sync,
 			httptest_field_sync, httpstep_sync, httpstep_field_sync, autoreg_host_sync, connector_sync,
 			connector_tag_sync, proxy_sync, proxy_group_sync, hp_sync, autoreg_config_sync,
-			cep_rule_sync, cep_condition_sync, cep_window_sync, cep_operation_sync, cep_op_condition_sync;
+			cep_rule_sync, cep_condition_sync, cep_window_sync, cep_operation_sync, cep_op_condition_sync,
+			cep_op_scope_condition_sync;
 	zbx_uint64_t	update_flags = 0;
 	zbx_int64_t	used_size, update_size = 0, topology_size = 0, timers_size = 0, um_cache_dup_size = 0;
 	unsigned char	changelog_sync_mode = mode;	/* sync mode for objects using incremental sync */
@@ -7609,6 +7608,8 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 	zbx_dbsync_init_changelog(&cep_window_sync, "cep_window", changelog_sync_mode, db);
 	zbx_dbsync_init_changelog(&cep_operation_sync, "cep_operation", changelog_sync_mode, db);
 	zbx_dbsync_init_changelog(&cep_op_condition_sync, "cep_operation_condition", changelog_sync_mode, db);
+	zbx_dbsync_init_changelog(&cep_op_scope_condition_sync, "cep_operation_scope_condition", changelog_sync_mode,
+			db);
 
 	/* Action operation sync produces virtual rows with two columns - actionid, opflags. */
 	/* Because of this it cannot return the original database select and must always be  */
@@ -7906,8 +7907,11 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 	if (FAIL == zbx_dbsync_prepare_cep_operation_condition(&cep_op_condition_sync))
 		goto out;
 
+	if (FAIL == zbx_dbsync_prepare_cep_operation_scope_condition(&cep_op_scope_condition_sync))
+		goto out;
+
 	cep_config_sync(&cep_rule_sync, &cep_condition_sync, &cep_window_sync, &cep_operation_sync,
-			&cep_op_condition_sync, new_revision);
+			&cep_op_condition_sync, &cep_op_scope_condition_sync, new_revision);
 
 	START_SYNC;
 
@@ -8272,6 +8276,7 @@ clean:
 	zbx_dbsync_clear(&cep_window_sync);
 	zbx_dbsync_clear(&cep_operation_sync);
 	zbx_dbsync_clear(&cep_op_condition_sync);
+	zbx_dbsync_clear(&cep_op_scope_condition_sync);
 
 	if (ZBX_DBSYNC_INIT == mode)
 		zbx_hashset_destroy(&trend_queue);
@@ -9850,7 +9855,6 @@ static void	DCget_telemetry_query_item(zbx_dc_telemetry_query_item_t *dst_item, 
 	zbx_strscpy(dst_item->granularity_orig, src_item->itemtype.tqitem->granularity);
 	dst_item->telemetry_query = NULL;
 	dst_item->lasttimestamp = src_item->itemtype.tqitem->lasttimestamp;
-	dst_item->min_free_ts = src_item->itemtype.tqitem->min_free_ts;
 }
 
 void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num)
@@ -11810,20 +11814,50 @@ out:
 	return num;
 }
 
-void	zbx_dc_config_get_apm_db_config(zbx_apm_db_config_t *out, const zbx_apm_db_config_t *local_apm_db_config,
-		const char *config_source_ip, const char *config_ssl_ca_location)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get APM database configuration                                    *
+ *                                                                            *
+ * Parameters: out                    - [OUT] APM database configuration      *
+ *             local_apm_db_config    - [IN] local configuration, used        *
+ *                                           instead of global configuration  *
+ *                                           when enabled (optional)          *
+ *             config_source_ip       - [IN] source IP (optional)             *
+ *             config_ssl_ca_location - [IN] SSL CA location (optional)       *
+ *             revision               - [IN/OUT] revision of the last         *
+ *                                           retrieved global configuration,  *
+ *                                           updated on retrieval (optional)  *
+ *                                                                            *
+ * Return value: SUCCEED - configuration was retrieved                        *
+ *               FAIL    - global configuration has not changed since the     *
+ *                         specified revision, out is left empty              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_config_get_apm_db_config(zbx_apm_db_config_t *out, const zbx_apm_db_config_t *local_apm_db_config,
+		const char *config_source_ip, const char *config_ssl_ca_location, zbx_uint64_t *revision)
 {
 	const zbx_config_apm_global_db_t	*global_config;
 
 	if (NULL != local_apm_db_config && 0 != local_apm_db_config->status)
 	{
 		zbx_apm_db_config_copy(out, local_apm_db_config);
-		return;
+		return SUCCEED;
 	}
 
 	memset(out, 0, sizeof(*out));
 
 	RDLOCK_CACHE;
+
+	if (NULL != revision)
+	{
+		if (*revision >= config->revision.settings_table)
+		{
+			UNLOCK_CACHE;
+			return FAIL;
+		}
+
+		*revision = config->revision.settings_table;
+	}
 
 	global_config = &config->config->apm_global_db;
 
@@ -11832,7 +11866,7 @@ void	zbx_dc_config_get_apm_db_config(zbx_apm_db_config_t *out, const zbx_apm_db_
 	if (0 == out->status)
 	{
 		UNLOCK_CACHE;
-		return;
+		return SUCCEED;
 	}
 
 	out->db_type = ZBX_APM_DB_TYPE_CLICKHOUSE;
@@ -11855,6 +11889,8 @@ void	zbx_dc_config_get_apm_db_config(zbx_apm_db_config_t *out, const zbx_apm_db_
 
 	if (NULL != config_ssl_ca_location)
 		out->ssl_ca_location = zbx_strdup(NULL, config_ssl_ca_location);
+
+	return SUCCEED;
 }
 
 int	zbx_dc_config_poller_type_has_cached_data(unsigned char poller_type)
@@ -12082,8 +12118,6 @@ static void	dc_set_cached_data(ZBX_DC_ITEM *dc_item, const zbx_dc_cached_data_t 
 	{
 		if (0 != (cached_data->upd_flags & ZBX_CACHED_DATA_FLAG_UPDATE_LASTTIMESTAMP))
 			dc_item->itemtype.tqitem->lasttimestamp = cached_data->lasttimestamp;
-		if (0 != (cached_data->upd_flags & ZBX_CACHED_DATA_FLAG_UPDATE_MIN_FREE_TS))
-			dc_item->itemtype.tqitem->min_free_ts = cached_data->min_free_ts;
 	}
 }
 
@@ -17089,12 +17123,13 @@ int	zbx_dc_httptest_next(time_t now, zbx_uint64_t *httptestid, time_t *nextcheck
 
 /******************************************************************************
  *                                                                            *
- * Purpose: queue httptest to be processed according to the delay             *
+ * Purpose: queue httptest to be processed according to supplied delay and    *
+ *          store that delay as its current delay                             *
  *                                                                            *
- * Parameter: now        - [IN] the current timestamp                         *
- *            httptestid - [IN] the id of httptest to be queued               *
- *            delay      - [IN] the number of seconds between httptest        *
- *                              processing                                    *
+ * Parameters: now        - [IN] current timestamp                            *
+ *             httptestid - [IN] ID of httptest to be queued                  *
+ *             delay      - [IN] number of seconds between httptest           *
+ *                               processing                                   *
  *                                                                            *
  ******************************************************************************/
 void	zbx_dc_httptest_queue(time_t now, zbx_uint64_t httptestid, int delay)
@@ -17106,6 +17141,30 @@ void	zbx_dc_httptest_queue(time_t now, zbx_uint64_t httptestid, int delay)
 	if (NULL != (httptest = (zbx_dc_httptest_t *)zbx_hashset_search(&config->httptests, &httptestid)))
 	{
 		httptest->delay = delay;
+		httptest->nextcheck = dc_calculate_nextcheck(httptest->httptestid, httptest->delay, now);
+		dc_httptest_queue(httptest);
+	}
+
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: queue httptest that could not be processed according to its       *
+ *          current delay                                                     *
+ *                                                                            *
+ * Parameters: now        - [IN] current timestamp                            *
+ *             httptestid - [IN] ID of httptest to be queued                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_httptest_requeue(time_t now, zbx_uint64_t httptestid)
+{
+	zbx_dc_httptest_t	*httptest;
+
+	WRLOCK_CACHE;
+
+	if (NULL != (httptest = (zbx_dc_httptest_t *)zbx_hashset_search(&config->httptests, &httptestid)))
+	{
 		httptest->nextcheck = dc_calculate_nextcheck(httptest->httptestid, httptest->delay, now);
 		dc_httptest_queue(httptest);
 	}
@@ -17610,6 +17669,4 @@ char	*zbx_dc_get_apm_config(char *old_config, zbx_uint64_t *revision)
 
 	return apm_config;
 }
-
-
 
