@@ -72,7 +72,7 @@
 				}
 			}
 
-			location.href = location.href;
+			location.reload();
 		}
 	}
 </script>
