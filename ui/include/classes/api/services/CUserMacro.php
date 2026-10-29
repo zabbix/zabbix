@@ -972,8 +972,8 @@ class CUserMacro extends CApiService {
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		// Added type to query because it required to check macro is secret or not.
-		if (!$this->outputIsRequested('type', $options['output'])) {
-			$options['output'][] = 'type';
+		if (!$options['countOutput'] && !$this->outputIsRequested('type', $options['output'])) {
+			$options['output'] = $this->outputExtend($options['output'], ['type']);
 		}
 
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
@@ -1086,7 +1086,7 @@ class CUserMacro extends CApiService {
 
 	protected function unsetExtraFields(array $objects, array $fields, $output = []) {
 		foreach ($objects as &$object) {
-			if (!array_key_exists('type', $object) || $object['type'] == ZBX_MACRO_TYPE_SECRET) {
+			if ($object['type'] == ZBX_MACRO_TYPE_SECRET) {
 				unset($object['value']);
 			}
 		}
