@@ -1,6 +1,7 @@
 Changes for 6.0.50rc1
 
 New features:
+A......PS. [ZBXNEXT-10796] updated maximum supported MariaDB version to 13.0 (mprihodko)
 
 Bug fixes:
 
