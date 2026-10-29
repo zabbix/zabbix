@@ -1683,7 +1683,7 @@ A......... [ZBX-28140] fixed icon mapping order after updating mappings (dpankin
 ..F....... [ZBX-27339] fixed the last letter being cut off in short vertical labels in Data overview widget (aluchko)
 A......... [ZBX-27721] fixed Elasticsearch query construction in CTrend::getFromElasticsearch() (vskalbins)
 ..F....... [ZBX-28028] fixed page refresh after modal dialog or action submit when URL contains a fragment identifier (scernisenko)
-...G...... [ZBX-26650] fixed Zabbix agent 2 unix system run timeout (sboidenko)
+...G...... [ZBX-26650] fixed Zabbix agent 2 system run timeout on UNIX (sboidenko)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.32
