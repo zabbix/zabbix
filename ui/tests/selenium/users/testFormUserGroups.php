@@ -18,7 +18,7 @@ require_once __DIR__.'/../../include/CWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 /**
- * @backup usrgrp, proxy, proxy_group
+ * @backup usrgrp, usrgrp_proxy, usrgrp_proxy_group, proxy, proxy_group
  *
  * @dataSource LoginUsers, ScheduledReports, Proxies
  *
