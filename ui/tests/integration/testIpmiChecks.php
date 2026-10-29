@@ -16,7 +16,7 @@
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 
 /**
- * Test suite for IPMI checks, against a real ipmi_sim simulated BMC.
+ * Test suite for IPMI checks, against an ipmi_sim simulated BMC.
  *
  * The server is started once for the whole suite: every start makes the IPMI pollers open all OpenIPMI domains
  * again, which is slow.
@@ -64,7 +64,7 @@ class testIpmiChecks extends CIntegrationTest {
 	];
 
 	// "Temp" sensor number, see self::SIM_SENSOR_VALUES.
-	const SIM_SENSOR_TEMP = 1;
+	const SIM_TEMP_SENSOR_KEY = 1;
 
 	// IPMI sensor types (IPMI v2.0 table 42-3) and event/reading type codes (table 42-1) of the fixture sensors, as
 	// reported by discovery.
@@ -83,6 +83,7 @@ class testIpmiChecks extends CIntegrationTest {
 
 	const ITEM_DELAY = '1s';
 
+	// HOST_* are host names (will be created with host.create API.
 	const HOST_NORMAL = 'ipmi-normal';
 	const HOST_MACRO = 'ipmi-macro';
 	const HOST_BADPORT = 'ipmi-badport';
@@ -286,12 +287,12 @@ class testIpmiChecks extends CIntegrationTest {
 		$mcdir = $statedir.'/ipmi_sim/'.self::SIM_BMC_NAME;
 
 		shell_exec('rm -rf '.escapeshellarg($statedir));
-		if (!mkdir($mcdir, 0777, true) && !is_dir($mcdir)) {
+		if (!mkdir($mcdir, 0700, true) && !is_dir($mcdir)) {
 			throw new Exception('Cannot create ipmi_sim state directory "'.$mcdir.'"');
 		}
 
 		self::checkToolAvailable('ipmi_sim',
-				'apt install openipmi (or equivalent) - required to run the simulated BMC'
+				'apt install openipmi (or equivalent) - to run the simulated BMC the ipmi_sim program is required'
 		);
 		self::checkToolAvailable('ipmitool',
 				'apt install ipmitool (or equivalent) - required to talk to the simulated BMC'
@@ -300,7 +301,7 @@ class testIpmiChecks extends CIntegrationTest {
 		// data/ipmi_sim/test.bsdr is a pre-compiled copy of test.sdrs, checked in so this test never depends
 		// on sdrcomp being installed (see the comment at the top of test.sdrs for how to regenerate it after
 		// editing test.sdrs - sdrcomp itself is only needed for that one-off regeneration, never at test run
-		// time; some environments ship ipmi_sim/ipmitool without the rest of the openipmi package).
+		// time).
 		$sdrs = @file($datadir.'/test.bsdr');
 
 		if ($sdrs === false) {
@@ -395,7 +396,7 @@ class testIpmiChecks extends CIntegrationTest {
 	/**
 	 * @inheritdoc
 	 */
-	public function prepareData() {
+	public function prepareData(): bool {
 		self::ipmiSimStart(self::SIM_IP);
 		self::ipmiSimStart(self::SIM_RECONNECT_IP);
 		self::ipmiSimStart(self::SIM_DISCOVERY_DROP_IP);
@@ -975,18 +976,11 @@ class testIpmiChecks extends CIntegrationTest {
 	 * @depends testIpmiChecks_thresholdSensor
 	 */
 	public function testIpmiChecks_controlNotFound(): void {
-		if (CAPIHelper::getSessionId() === null) {
-			$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
-		}
-
-		$response = CAPIHelper::call('script.execute', [
+		$response = $this->call('script.execute', [
 			'scriptid' => self::$scriptids['not_found'],
 			'hostid' => self::$hostids[self::HOST_NORMAL]
-		]);
+		], true);
 
-		$this->assertArrayHasKey('error', $response, 'script.execute against a non-existent control should fail: '.
-				json_encode($response)
-		);
 		$this->assertStringContainsString('does not exist', $response['error']['data'],
 				'Unexpected error executing an IPMI command against a non-existent control: '.
 				json_encode($response['error'])
@@ -1015,16 +1009,11 @@ class testIpmiChecks extends CIntegrationTest {
 	 * @depends testIpmiChecks_thresholdSensor
 	 */
 	public function testIpmiChecks_powerControlSet(): void {
-		if (CAPIHelper::getSessionId() === null) {
-			$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
-		}
-
-		$response = CAPIHelper::call('script.execute', [
+		$response = $this->call('script.execute', [
 			'scriptid' => self::$scriptids['power_on'],
 			'hostid' => self::$hostids[self::HOST_NORMAL]
 		]);
 
-		$this->assertArrayHasKey('result', $response, 'script.execute("power on") failed: '.json_encode($response));
 		$this->assertEquals('success', $response['result']['response'],
 				'script.execute("power on") did not report success: '.json_encode($response['result'])
 		);
@@ -1037,16 +1026,11 @@ class testIpmiChecks extends CIntegrationTest {
 	 * @depends testIpmiChecks_thresholdSensor
 	 */
 	public function testIpmiChecks_powerControlSetNumeric(): void {
-		if (CAPIHelper::getSessionId() === null) {
-			$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
-		}
-
-		$response = CAPIHelper::call('script.execute', [
+		$response = $this->call('script.execute', [
 			'scriptid' => self::$scriptids['power_numeric'],
 			'hostid' => self::$hostids[self::HOST_NORMAL]
 		]);
 
-		$this->assertArrayHasKey('result', $response, 'script.execute("power 1") failed: '.json_encode($response));
 		$this->assertEquals('success', $response['result']['response'],
 				'script.execute("power 1") did not report success: '.json_encode($response['result'])
 		);
@@ -1361,10 +1345,6 @@ class testIpmiChecks extends CIntegrationTest {
 	 * @return array  raw script.execute response
 	 */
 	private function executeIpmiCommand(string $command): array {
-		if (CAPIHelper::getSessionId() === null) {
-			$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
-		}
-
 		$response = $this->call('script.create', [
 			'name' => 'Test IPMI command '.md5($command),
 			'type' => ZBX_SCRIPT_TYPE_IPMI,
@@ -1505,7 +1485,7 @@ class testIpmiChecks extends CIntegrationTest {
 
 	/**
 	 * Sensor properties reported by discovery - type, reading type, units and state names are cached when the
-	 * sensor is added, since the OpenIPMI sensor pointer is not valid outside of callbacks.
+	 * sensor is added.
 	 *
 	 * @depends testIpmiChecks_discovery
 	 */
@@ -1668,10 +1648,6 @@ class testIpmiChecks extends CIntegrationTest {
 				);
 			}
 
-			if (CAPIHelper::getSessionId() === null) {
-				$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
-			}
-
 			foreach ($hosts as $host) {
 				$item = $this->call('item.get', [
 					'output' => ['lastclock', 'state', 'error'],
@@ -1683,13 +1659,10 @@ class testIpmiChecks extends CIntegrationTest {
 				$this->assertEquals(0, $item['lastclock'], 'No value should have been collected on '.$host);
 
 				// Setting a control fails the same way - zbx_set_ipmi_control_value() with the domain down.
-				$response = CAPIHelper::call('script.execute', [
+				$response = $this->call('script.execute', [
 					'scriptid' => self::$scriptids['power_on'],
 					'hostid' => self::$hostids[$host]
-				]);
-				$this->assertArrayHasKey('error', $response, 'script.execute("power on") on '.$host.
-						' should fail: '.json_encode($response)
-				);
+				], true);
 				$this->assertStringContainsStringIgnoringCase('cannot connect to IPMI host',
 						$response['error']['data'], json_encode($response['error'])
 				);
@@ -1984,7 +1957,7 @@ class testIpmiChecks extends CIntegrationTest {
 		// control is deleted and recreated, except "Presence", whose entry must be gone with the deleted sensor -
 		// not left pointing at a sensor id OpenIPMI no longer knows (which would fail to read instead).
 		$this->dropReconnectBmc();
-		self::ipmiSimStart(self::SIM_RECONNECT_IP, [self::SIM_SENSOR_TEMP => 60], ['Presence']);
+		self::ipmiSimStart(self::SIM_RECONNECT_IP, [self::SIM_TEMP_SENSOR_KEY => 60], ['Presence']);
 
 		$this->waitForItem(self::HOST_RECONNECT.':ipmi.temp', $value_is(60), 120);
 		$this->waitForItem(self::HOST_RECONNECT.':ipmi.presence', function(array $item) {
@@ -2001,18 +1974,11 @@ class testIpmiChecks extends CIntegrationTest {
 		}, 60);
 
 		// Setting a control goes through the recreated control as well.
-		if (CAPIHelper::getSessionId() === null) {
-			$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
-		}
-
-		$response = CAPIHelper::call('script.execute', [
+		$response = $this->call('script.execute', [
 			'scriptid' => self::$scriptids['power_on'],
 			'hostid' => self::$hostids[self::HOST_RECONNECT]
 		]);
 
-		$this->assertArrayHasKey('result', $response, 'script.execute("power on") after reconnect failed: '.
-				json_encode($response)
-		);
 		$this->assertEquals('success', $response['result']['response'],
 				'script.execute("power on") after reconnect did not report success: '.json_encode($response['result'])
 		);
@@ -2029,7 +1995,7 @@ class testIpmiChecks extends CIntegrationTest {
 		// The BMC comes back with the "Presence" sensor again - OpenIPMI gives it a new sensor id, which the item and
 		// discovery must find and read like any other sensor added on reconnect.
 		$this->dropReconnectBmc();
-		self::ipmiSimStart(self::SIM_RECONNECT_IP, [self::SIM_SENSOR_TEMP => 55]);
+		self::ipmiSimStart(self::SIM_RECONNECT_IP, [self::SIM_TEMP_SENSOR_KEY => 55]);
 
 		$this->waitForItem(self::HOST_RECONNECT.':ipmi.temp', $value_is(55), 120);
 		$this->waitForItem(self::HOST_RECONNECT.':ipmi.presence', $value_is(self::IPMI_ENTITY_PRESENT), 60);
