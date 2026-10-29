@@ -596,7 +596,7 @@ FIELD		|recovery_expression|t_varchar(2048)|''	|NOT NULL	|0
 FIELD		|correlation_mode|t_integer	|'0'	|NOT NULL	|0
 FIELD		|correlation_tag|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|manual_close	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|opdata		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|opdata		|t_varchar(2048)|''	|NOT NULL	|0
 FIELD		|discover	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|event_name	|t_varchar(2048)|''	|NOT NULL	|0
 FIELD		|uuid		|t_varchar(32)	|''	|NOT NULL	|0
@@ -2297,6 +2297,14 @@ FIELD		|proxy_groupid		|t_id		|	|NOT NULL	|0	|2|proxy_group|proxy_groupid
 UNIQUE		|1			|usrgrpid,proxy_groupid
 INDEX		|2			|proxy_groupid
 
+TABLE|usrgrp_apm_filter|usrgrp_apm_filterid|0
+FIELD		|usrgrp_apm_filterid	|t_id		|	|NOT NULL	|0
+FIELD		|usrgrpid		|t_id		|	|NOT NULL	|0	|1|usrgrp|usrgrpid
+FIELD		|attribute_key		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|value			|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|signal_type		|t_integer	|'-1'	|NOT NULL	|0
+INDEX		|1			|usrgrpid
+
 TABLE|mfa|mfaid|ZBX_DATA
 FIELD		|mfaid		|t_id		|	|NOT NULL	|0
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
@@ -2460,6 +2468,9 @@ FIELD		|tag_value	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|severity	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|suppress_duration|t_varchar(32)|'0'	|NOT NULL	|0
 FIELD		|sortorder	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|scope		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|scope_evaltype	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|scope_formula	|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|cep_ruleid
 CHANGELOG	|26
 
@@ -2473,8 +2484,18 @@ FIELD		|tag_value	|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|cep_operationid
 CHANGELOG	|27
 
+TABLE|cep_operation_scope_condition|cep_operation_scope_conditionid|ZBX_DATA
+FIELD		|cep_operation_scope_conditionid|t_id	|	|NOT NULL	|0
+FIELD		|cep_operationid|t_id		|	|NOT NULL	|0			|1|cep_operation	|cep_operationid	|RESTRICT
+FIELD		|type		|t_integer	|'29'	|NOT NULL	|0
+FIELD		|operator	|t_integer	|'10'	|NOT NULL	|0
+FIELD		|tag		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|tag_value	|t_varchar(255)	|''	|NOT NULL	|0
+INDEX		|1		|cep_operationid
+CHANGELOG	|28
+
 TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|7050196	|7050196
+ROW		|1		|7050209	|7050209

@@ -1249,4 +1249,3 @@ int	zbx_dc_config_get_item_format(zbx_uint64_t itemid, unsigned char *value_type
 }
 
 #undef ZBX_CONNECTOR_STATUS_ENABLED
-

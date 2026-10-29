@@ -77,6 +77,8 @@ ZBX_PTR_VECTOR_DECL(cep_event_ptr, zbx_cep_event_t *)
 typedef struct zbx_cep_event_ptr zbx_cep_event_ptr_t;
 typedef zbx_cep_event_ptr_t * zbx_cep_event_handle_t;
 
+typedef struct zbx_cep_window zbx_cep_window_t;
+
 ZBX_VECTOR_DECL(cep_event_handle, zbx_cep_event_handle_t)
 
 typedef enum

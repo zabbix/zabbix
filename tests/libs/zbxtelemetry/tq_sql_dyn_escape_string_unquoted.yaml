@@ -1,0 +1,470 @@
+---
+test case: "asdf"
+in:
+  str: "asdf"
+
+out:
+  string_literal: "asdf"
+  name: "asdf"
+  like_pattern: "asdf"
+
+---
+test case: "'; drop table otel_traces; --"
+in:
+  str: "'; drop table otel_traces; --"
+
+out:
+  string_literal: "\\'; drop table otel_traces; --"
+  name: "\\'; drop table otel_traces; --"
+  like_pattern: "\\'; drop table otel\\\\_traces; --"
+
+---
+test case: "\"; drop table otel_traces; --"
+in:
+  str: "\"; drop table otel_traces; --"
+
+out:
+  string_literal: "\\\"; drop table otel_traces; --"
+  name: "\\\"; drop table otel_traces; --"
+  like_pattern: "\\\"; drop table otel\\\\_traces; --"
+
+---
+test case: "`; drop table otel_traces; --"
+in:
+  str: "`; drop table otel_traces; --"
+
+out:
+  string_literal: "\\`; drop table otel_traces; --"
+  name: "\\`; drop table otel_traces; --"
+  like_pattern: "\\`; drop table otel\\\\_traces; --"
+
+---
+test case: ""
+in:
+  str: ""
+
+out:
+  string_literal: ""
+  name: ""
+  like_pattern: ""
+
+---
+test case: "'\"`\\"
+in:
+  str: "'\"`\\"
+
+out:
+  string_literal: "\\'\\\"\\`\\\\"
+  name: "\\'\\\"\\`\\\\"
+  like_pattern: "\\'\\\"\\`\\\\\\\\"
+
+---
+test case: "%"
+in:
+  str: "%"
+
+out:
+  string_literal: "%"
+  name: "%"
+  like_pattern: "\\\\%"
+
+---
+test case: "_"
+in:
+  str: "_"
+
+out:
+  string_literal: "_"
+  name: "_"
+  like_pattern: "\\\\_"
+
+---
+test case: "\\%"
+in:
+  str: "\\%"
+
+out:
+  string_literal: "\\\\%"
+  name: "\\\\%"
+  like_pattern: "\\\\\\\\\\\\%"
+
+---
+test case: "\\_"
+in:
+  str: "\\_"
+
+out:
+  string_literal: "\\\\_"
+  name: "\\\\_"
+  like_pattern: "\\\\\\\\\\\\_"
+
+---
+test case: single quote
+in:
+  str: "'"
+out:
+  string_literal: "\\'"
+  name: "\\'"
+  like_pattern: "\\'"
+
+---
+test case: backslash
+in:
+  str: "\\"
+out:
+  string_literal: "\\\\"
+  name: "\\\\"
+  like_pattern: "\\\\\\\\"
+
+---
+test case: trailing backslash
+in:
+  str: "asdf\\"
+out:
+  string_literal: "asdf\\\\"
+  name: "asdf\\\\"
+  like_pattern: "asdf\\\\\\\\"
+
+---
+test case: leading backslash
+in:
+  str: "\\asdf"
+out:
+  string_literal: "\\\\asdf"
+  name: "\\\\asdf"
+  like_pattern: "\\\\\\\\asdf"
+
+---
+test case: two backslashes
+in:
+  str: "\\\\"
+out:
+  string_literal: "\\\\\\\\"
+  name: "\\\\\\\\"
+  like_pattern: "\\\\\\\\\\\\\\\\"
+
+---
+test case: literal backslash n
+in:
+  str: "\\n"
+out:
+  string_literal: "\\\\n"
+  name: "\\\\n"
+  like_pattern: "\\\\\\\\n"
+
+---
+test case: literal backslash t
+in:
+  str: "\\t"
+out:
+  string_literal: "\\\\t"
+  name: "\\\\t"
+  like_pattern: "\\\\\\\\t"
+
+---
+test case: literal backslash r
+in:
+  str: "\\r"
+out:
+  string_literal: "\\\\r"
+  name: "\\\\r"
+  like_pattern: "\\\\\\\\r"
+
+---
+test case: literal backslash zero
+in:
+  str: "\\0"
+out:
+  string_literal: "\\\\0"
+  name: "\\\\0"
+  like_pattern: "\\\\\\\\0"
+
+---
+test case: literal hex escape text
+in:
+  str: "\\x41"
+out:
+  string_literal: "\\\\x41"
+  name: "\\\\x41"
+  like_pattern: "\\\\\\\\x41"
+
+---
+test case: backslash then quote
+in:
+  str: "\\'"
+out:
+  string_literal: "\\\\\\'"
+  name: "\\\\\\'"
+  like_pattern: "\\\\\\\\\\'"
+
+---
+test case: quote then backslash
+in:
+  str: "'\\"
+out:
+  string_literal: "\\'\\\\"
+  name: "\\'\\\\"
+  like_pattern: "\\'\\\\\\\\"
+
+---
+test case: repeated quotes
+in:
+  str: "'''"
+out:
+  string_literal: "\\'\\'\\'"
+  name: "\\'\\'\\'"
+  like_pattern: "\\'\\'\\'"
+
+---
+test case: alternating escapes
+in:
+  str: "\\'\\'\\"
+out:
+  string_literal: "\\\\\\'\\\\\\'\\\\"
+  name: "\\\\\\'\\\\\\'\\\\"
+  like_pattern: "\\\\\\\\\\'\\\\\\\\\\'\\\\\\\\"
+
+---
+test case: injection with double-dash comment
+in:
+  str: "' OR 1 = 1 -- "
+out:
+  string_literal: "\\' OR 1 = 1 -- "
+  name: "\\' OR 1 = 1 -- "
+  like_pattern: "\\' OR 1 = 1 -- "
+
+---
+test case: injection with hash comment
+in:
+  str: "' OR 1 = 1 #"
+out:
+  string_literal: "\\' OR 1 = 1 #"
+  name: "\\' OR 1 = 1 #"
+  like_pattern: "\\' OR 1 = 1 #"
+
+---
+test case: injection with hash-bang comment
+in:
+  str: "' OR 1 = 1 #!"
+out:
+  string_literal: "\\' OR 1 = 1 #!"
+  name: "\\' OR 1 = 1 #!"
+  like_pattern: "\\' OR 1 = 1 #!"
+
+---
+test case: injection with slash comment
+in:
+  str: "' OR 1 = 1 //"
+out:
+  string_literal: "\\' OR 1 = 1 //"
+  name: "\\' OR 1 = 1 //"
+  like_pattern: "\\' OR 1 = 1 //"
+
+---
+test case: injection with block comment
+in:
+  str: "' OR 1 = 1 /*"
+out:
+  string_literal: "\\' OR 1 = 1 /*"
+  name: "\\' OR 1 = 1 /*"
+  like_pattern: "\\' OR 1 = 1 /*"
+
+---
+test case: injection with semicolon
+in:
+  str: "'; SELECT sleep(10); --"
+out:
+  string_literal: "\\'; SELECT sleep(10); --"
+  name: "\\'; SELECT sleep(10); --"
+  like_pattern: "\\'; SELECT sleep(10); --"
+
+---
+test case: injection with escaped quote
+in:
+  str: "\\'; DROP TABLE otel_traces; --"
+out:
+  string_literal: "\\\\\\'; DROP TABLE otel_traces; --"
+  name: "\\\\\\'; DROP TABLE otel_traces; --"
+  like_pattern: "\\\\\\\\\\'; DROP TABLE otel\\\\_traces; --"
+
+---
+test case: injection containing newline
+in:
+  str: "'\nDROP TABLE otel_traces; --"
+out:
+  string_literal: "\\'\nDROP TABLE otel_traces; --"
+  name: "\\'\nDROP TABLE otel_traces; --"
+  like_pattern: "\\'\nDROP TABLE otel\\\\_traces; --"
+
+---
+test case: union injection
+in:
+  str: "' UNION ALL SELECT version() --"
+out:
+  string_literal: "\\' UNION ALL SELECT version() --"
+  name: "\\' UNION ALL SELECT version() --"
+  like_pattern: "\\' UNION ALL SELECT version() --"
+
+---
+test case: close parenthesis injection
+in:
+  str: "'); DROP TABLE otel_traces; --"
+out:
+  string_literal: "\\'); DROP TABLE otel_traces; --"
+  name: "\\'); DROP TABLE otel_traces; --"
+  like_pattern: "\\'); DROP TABLE otel\\\\_traces; --"
+
+---
+test case: multiline block comment injection
+in:
+  str: "'; DROP TABLE otel_traces; /*\nignored\n*/"
+out:
+  string_literal: "\\'; DROP TABLE otel_traces; /*\nignored\n*/"
+  name: "\\'; DROP TABLE otel_traces; /*\nignored\n*/"
+  like_pattern: "\\'; DROP TABLE otel\\\\_traces; /*\nignored\n*/"
+
+---
+test case: Russian Unicode
+in:
+  str: "Привет"
+out:
+  string_literal: "Привет"
+  name: "Привет"
+  like_pattern: "Привет"
+
+---
+test case: Chinese Unicode
+in:
+  str: "你好"
+out:
+  string_literal: "你好"
+  name: "你好"
+  like_pattern: "你好"
+
+---
+test case: emoji
+in:
+  str: "😀"
+out:
+  string_literal: "😀"
+  name: "😀"
+  like_pattern: "😀"
+
+---
+test case: precomposed accented character
+in:
+  str: "é"
+out:
+  string_literal: "é"
+  name: "é"
+  like_pattern: "é"
+
+---
+test case: decomposed accented character
+in:
+  str: "e\u0301"
+out:
+  string_literal: "e\u0301"
+  name: "e\u0301"
+  like_pattern: "e\u0301"
+
+---
+test case: mixed Unicode
+in:
+  str: "Hello, Привет, 你好, 😀"
+out:
+  string_literal: "Hello, Привет, 你好, 😀"
+  name: "Hello, Привет, 你好, 😀"
+  like_pattern: "Hello, Привет, 你好, 😀"
+
+---
+test case: Unicode containing single quote
+in:
+  str: "Привет 'мир'"
+out:
+  string_literal: "Привет \\'мир\\'"
+  name: "Привет \\'мир\\'"
+  like_pattern: "Привет \\'мир\\'"
+
+---
+test case: Unicode containing backslash
+in:
+  str: "路径\\文件"
+out:
+  string_literal: "路径\\\\文件"
+  name: "路径\\\\文件"
+  like_pattern: "路径\\\\\\\\文件"
+
+---
+test case: non-breaking space
+in:
+  str: "hello\u00a0world"
+out:
+  string_literal: "hello\u00a0world"
+  name: "hello\u00a0world"
+  like_pattern: "hello\u00a0world"
+
+---
+test case: Unicode line separator
+in:
+  str: "hello\u2028world"
+out:
+  string_literal: "hello\u2028world"
+  name: "hello\u2028world"
+  like_pattern: "hello\u2028world"
+
+---
+test case: Unicode paragraph separator
+in:
+  str: "hello\u2029world"
+out:
+  string_literal: "hello\u2029world"
+  name: "hello\u2029world"
+  like_pattern: "hello\u2029world"
+
+---
+test case: actual tab
+in:
+  str: "hello\tworld"
+out:
+  string_literal: "hello\tworld"
+  name: "hello\tworld"
+  like_pattern: "hello\tworld"
+
+---
+test case: actual newline
+in:
+  str: "hello\nworld"
+out:
+  string_literal: "hello\nworld"
+  name: "hello\nworld"
+  like_pattern: "hello\nworld"
+
+---
+test case: actual carriage return
+in:
+  str: "hello\rworld"
+out:
+  string_literal: "hello\rworld"
+  name: "hello\rworld"
+  like_pattern: "hello\rworld"
+
+---
+test case: actual backspace
+in:
+  str: "hello\bworld"
+out:
+  string_literal: "hello\bworld"
+  name: "hello\bworld"
+  like_pattern: "hello\bworld"
+
+---
+test case: actual form feed
+in:
+  str: "hello\fworld"
+out:
+  string_literal: "hello\fworld"
+  name: "hello\fworld"
+  like_pattern: "hello\fworld"
+
+...

@@ -276,8 +276,9 @@
 
 							if (nested || show_symptoms) {
 								const symptom_icon = document.createElement('span');
-								symptom_icon.classList.add(ZBX_STYLE_ICON, 'zi-arrow-top-right',
-									nested ? 'symptoms-right' : 'symptoms-left');
+								symptom_icon.classList.add(ZBX_STYLE_ICON, ZBX_ICON_ARROW_TOP_RIGHT,
+									nested ? 'symptoms-right' : 'symptoms-left'
+								);
 								symptom_icon.setAttribute('title', <?= json_encode(_('Symptom')); ?>);
 
 								symptoms.append(symptom_icon);

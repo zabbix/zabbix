@@ -875,7 +875,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						[
 							'field' => 'Override time zone',
 							'type' => 'dropdown',
-							'value' => 'Local default: (UTC+03:00) Europe/Riga'
+							'value' => 'Local default: (UTC+02:00) Europe/Riga'
 						]
 					],
 					'hidden' => [
