@@ -81,8 +81,28 @@ else {
 		}
 		else {
 			$hostid = $data_row[0][Widget::CELL_HOSTID];
-			$table_row[] = new CCol((new CLinkAction($data['db_hosts'][$hostid]['name']))
-				->setMenuPopup(CMenuPopupHelper::getHost($hostid)));
+			$maintenance = '';
+
+			if ($data['db_hosts'][$hostid]['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+				$maintenanceid = $data['db_hosts'][$hostid]['maintenanceid'];
+
+				if (array_key_exists($maintenanceid, $data['db_maintenances'])) {
+					$maintenance = makeMaintenanceIcon(
+						$data['db_hosts'][$hostid]['maintenance_type'],
+						$data['db_maintenances'][$maintenanceid]['name'],
+						$data['db_maintenances'][$maintenanceid]['description']
+					);
+				}
+				else {
+					$maintenance = makeMaintenanceIcon($data['db_hosts'][$hostid]['maintenance_type'],
+						_('Inaccessible maintenance'), '');
+				}
+			}
+
+			$table_row[] = new CCol([
+				(new CLinkAction($data['db_hosts'][$hostid]['name']))->setMenuPopup(CMenuPopupHelper::getHost($hostid)),
+				$maintenance
+			]);
 		}
 
 		foreach ($data_row as $cell) {

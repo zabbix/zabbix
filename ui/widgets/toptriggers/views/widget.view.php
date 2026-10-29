@@ -39,6 +39,18 @@ else {
 				->addClass(ZBX_STYLE_WORDBREAK)
 				->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_COLOR_NEGATIVE : null)
 				->setMenuPopup(CMenuPopupHelper::getHost($host['hostid']));
+
+			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+				if (!array_key_exists('inaccessible_maintenance', $host)) {
+					$hosts[] = makeMaintenanceIcon($host['maintenance_type'], $host['maintenance_name'],
+						$host['maintenance_description']
+					);
+				}
+				else {
+					$hosts[] = makeMaintenanceIcon($host['maintenance_type'], _('Inaccessible maintenance'), '');
+				}
+			}
+
 			$hosts[] = ', ';
 		}
 
