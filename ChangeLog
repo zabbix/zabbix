@@ -1,8 +1,24 @@
 Changes for 7.4.17rc1
 
 New features:
+A......PS. [ZBXNEXT-10796] updated maximum supported MariaDB version to 13.0 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-27647] fixed empty space between Y-axis and graph data for graph widget (kastafjevs)
+A......... [ZBX-28140] fixed icon mapping order after updating mappings (dpankins)
+...G...... [ZBX-27925] added flag AI_NUMERICHOST to suppresses potentially lengthy network host address lookups (jburlakovs)
+..F....... [ZBX-24090] added auto logout field for guest user edit form (gklavins)
+..F....... [ZBX-27457] fixed hintbox not appearing on click in trigger overview widget (gklavins)
+..F....... [ZBX-27456] removed an extra scrollbar in the Import Compare dialog (aluchko)
+..F....... [ZBX-28042] fixed runtime error in PHP error log when opening an invalid URL leading to an access denied message (aluchko)
+..F....... [ZBX-27996] fixed type error in host wizard (gklavins)
+..F....... [ZBX-27657] fixed the 'Test' button becoming enabled after a form update when the item contains an inline validation error (aluchko)
+..F....... [ZBX-26496] fixed scrollbar appearing when hint box is shown (gklavins)
+..F....... [ZBX-28227] restored the widgets actions button tooltip (aluchko)
+..F....... [ZBX-27339] fixed the last letter being cut off in short vertical labels in Top items widget (aluchko)
+A......... [ZBX-27721] fixed Elasticsearch query construction in CTrend::getFromElasticsearch() (vskalbins)
+..F....... [ZBX-28028] fixed page refresh after modal dialog or action submit when URL contains a fragment identifier (scernisenko)
+...G...... [ZBX-26650] fixed Zabbix agent 2 unix system run timeout (sboidenko)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.16
@@ -1655,8 +1671,19 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.33rc1
 
 New features:
+A......PS. [ZBXNEXT-10796] updated maximum supported MariaDB version to 13.0 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-27647] fixed empty space between Y-axis and graph data for graph widget (kastafjevs)
+A......... [ZBX-28140] fixed icon mapping order after updating mappings (dpankins)
+..F....... [ZBX-24090] added auto logout field for guest user edit form (gklavins)
+..F....... [ZBX-27456] removed an extra scrollbar in the Import Compare dialog (aluchko)
+..F....... [ZBX-26496] fixed scrollbar appearing when hint box is shown (gklavins)
+..F....... [ZBX-28227] restored the widgets actions button tooltip (aluchko)
+..F....... [ZBX-27339] fixed the last letter being cut off in short vertical labels in Data overview widget (aluchko)
+A......... [ZBX-27721] fixed Elasticsearch query construction in CTrend::getFromElasticsearch() (vskalbins)
+..F....... [ZBX-28028] fixed page refresh after modal dialog or action submit when URL contains a fragment identifier (scernisenko)
+...G...... [ZBX-26650] fixed Zabbix agent 2 unix system run timeout (sboidenko)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.32
@@ -5926,6 +5953,7 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.50rc1
 
 New features:
+A......PS. [ZBXNEXT-10796] updated maximum supported MariaDB version to 13.0 (mprihodko)
 
 Bug fixes:
 
