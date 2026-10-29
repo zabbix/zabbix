@@ -581,12 +581,18 @@ out:
  *             r_eventid - [IN]  resolving OK event identifier                *
  *             handles   - [IN]  problem events to resolve                    *
  *             task      - [IN]  trigger event task                           *
+ *             dbpool    - [IN]  database connection pool                     *
+ *             tasks     - [OUT] new tasks to be queued                       *
  *                                                                            *
  ******************************************************************************/
 static void	cep_worker_resolve_trigger_events(zbx_db_event *db_event, zbx_uint64_t r_eventid,
-		zbx_vector_cep_event_handle_t *handles, zbx_cep_task_event_t *task)
+		zbx_vector_cep_event_handle_t *handles, zbx_cep_task_event_t *task, zbx_dbconn_pool_t *dbpool,
+		zbx_vector_mw_task_ptr_t *tasks)
 {
-	zbx_cep_t	*cep;
+	zbx_cep_t			*cep;
+	zbx_vector_cep_win_event_t	win_events;
+
+	zbx_vector_cep_win_event_create(&win_events);
 
 	db_event->eventid = r_eventid;
 
@@ -596,10 +602,20 @@ static void	cep_worker_resolve_trigger_events(zbx_db_event *db_event, zbx_uint64
 
 	cep_cache_acquire(&cep);
 	cep_resolve_trigger_events(cep, r_event, handles);
+	cep_acquire_event_windows(cep, handles, &win_events);
 	cep_cache_release(&cep);
 
 	task->event = r_event;
 	task->event_op = CEP_EVENT_CLOSE;
+
+	for (int i = 0; i < win_events.values_num; i++)
+	{
+		cep_window_process_event_closed(win_events.values[i].window, win_events.values[i].hevent, dbpool,
+				tasks);
+		zbx_cep_event_handle_release(win_events.values[i].hevent);
+		cep_window_release(win_events.values[i].window);
+	}
+	zbx_vector_cep_win_event_destroy(&win_events);
 
 	zbx_cep_get_eventids_from_handles(handles->values, handles->values_num, &task->eventids);
 
@@ -627,10 +643,13 @@ static void	cep_worker_resolve_trigger_events(zbx_db_event *db_event, zbx_uint64
  *                                                                            *
  * Purpose: create an OK event to close corresponding problem events          *
  *                                                                            *
- * Parameters: task - [IN]  trigger event task                                *
+ * Parameters: task   -  [IN]  trigger event task                             *
+ *             dbpool - [IN]  database connection pool                        *
+ *             tasks  - [OUT] new tasks to be queued                          *
  *                                                                            *
  ******************************************************************************/
-static void	cep_worker_close_trigger_event(zbx_cep_task_event_t *task)
+static void	cep_worker_close_trigger_event(zbx_cep_task_event_t *task, zbx_dbconn_pool_t *dbpool,
+		zbx_vector_mw_task_ptr_t *tasks)
 {
 	zbx_cep_t			*cep;
 	zbx_db_event			*db_event = task->db_event;
@@ -655,7 +674,7 @@ static void	cep_worker_close_trigger_event(zbx_cep_task_event_t *task)
 
 	if (0 != r_eventid)
 	{
-		cep_worker_resolve_trigger_events(db_event, r_eventid, &handles, task);
+		cep_worker_resolve_trigger_events(db_event, r_eventid, &handles, task, dbpool, tasks);
 		cep_stats_update_events_processed(1);
 	}
 	else
@@ -681,7 +700,7 @@ static void	cep_worker_process_trigger_event(zbx_cep_worker_t *worker, zbx_cep_t
 	if (TRIGGER_VALUE_PROBLEM == task->db_event->value)
 		cep_worker_open_trigger_event(worker, task, tasks);
 	else
-		cep_worker_close_trigger_event(task);
+		cep_worker_close_trigger_event(task, worker->dbpool, tasks);
 }
 
 /******************************************************************************

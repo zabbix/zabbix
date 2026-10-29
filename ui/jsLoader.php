@@ -278,7 +278,9 @@ $translate_strings = [
 		'duplicate' => _('duplicate'),
 		'selected' => _('selected'),
 		'Customize table' => _('Customize table'),
-		'Show all tags' => _('Show all tags')
+		'Show all tags' => _('Show all tags'),
+		'No columns selected' => _('No columns selected'),
+		'Add columns in the Customize table panel' => _('Add columns in the Customize table panel')
 	],
 	'class.options-popup.js' => [
 		'Column name' => _('Column name'),
