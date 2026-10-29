@@ -34,43 +34,56 @@
 #include "zbxjson.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "zbx_expression_constants.h"
 
-/**********************************************************************************
- *                                                                                *
- * Purpose: replaces occurrence of macro in input string with value given in      *
- *          macrovalue, with memory management                                    *
- *                                                                                *
- * Parameters:  in               - [IN] input string to be processed              *
- *              macro            - [IN] macro to replace                          *
- *              macrovalue       - [IN] value to replace macro with               *
- *              out              - [IN/OUT] pointer to memory holding result      *
- *              out_alloc        - [IN/OUT] size of memory holding result         *
- *                                                                                *
- * Return value:  SUCCEED - remote command was executed successfully              *
- *                FAIL    - error occurred                                        *
- *                                                                                *
- **********************************************************************************/
-static void	substitute_macro(const char *in, const char *macro, const char *macrovalue, char **out,
-		size_t *out_alloc)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: callback function to resolve the {MANUALINPUT} macro              *
+ *                                                                            *
+ * Parameters: p           - [IN] macro resolution data                       *
+ *             args        - [IN] variable argument list containing           *
+ *                                validated raw manual input string           *
+ *             replace_to  - [OUT] dynamically allocated string with          *
+ *                                 resolved macro value                       *
+ *             data        - unused                                           *
+ *             error       - unused                                           *
+ *             maxerrlen   - unused                                           *
+ *                                                                            *
+ * Return value:  SUCCEED - resolved successfully                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	macro_webhook_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to, char **data,
+		char *error, size_t maxerrlen)
 {
-	zbx_token_t	token;
-	int		pos = 0;
-	size_t		out_offset = 0, macrovalue_len;
+	const char	*manualinput = va_arg(args, const char *);
 
-	macrovalue_len = strlen(macrovalue);
-	zbx_strcpy_alloc(out, out_alloc, &out_offset, in);
-	out_offset++;
+	ZBX_UNUSED(data);
+	ZBX_UNUSED(error);
+	ZBX_UNUSED(maxerrlen);
 
-	for (; SUCCEED == zbx_token_find(*out, pos, &token, ZBX_TOKEN_SIMPLE_MACRO); pos++)
-	{
-		pos = token.loc.r;
+	if (0 == p->indexed && NULL != p->macro && NULL != manualinput && 0 == strcmp(p->macro, MVAR_MANUALINPUT))
+		*replace_to = zbx_strdup(*replace_to, manualinput);
 
-		if (0 == strncmp(*out + token.loc.l, macro, token.loc.r - token.loc.l + 1))
-		{
-			pos += zbx_replace_mem_dyn(out, out_alloc, &out_offset, token.loc.l,
-					token.loc.r - token.loc.l + 1, macrovalue, macrovalue_len);
-		}
-	}
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: substitutes {MANUALINPUT} macro in data string with real value    *
+ *                                                                            *
+ * Parameters: data        - [IN/OUT] pointer to data where the macro should  *
+ *                                    be resolved                             *
+ *             error       - [OUT] pre-allocated buffer for error message     *
+ *             maxerrlen   - [IN] size of pre-allocated error message buffer  *
+ *             manualinput - [IN] validated raw manual input, or NULL         *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully (even if macro is absent)  *
+ *                FAIL    - error occurred                                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	substitute_webhook_macros(char **data, char *error, size_t maxerrlen, const char *manualinput)
+{
+	return zbx_substitute_macros(data, error, maxerrlen, &macro_webhook_resolv, manualinput);
 }
 
 /******************************************************************************
@@ -543,13 +556,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 			goto fail;
 	}
 
-	/* substitute macros in script body and webhook parameters */
-
 	if (ZBX_SCRIPT_MANUALINPUT_YES == script.manualinput)
 	{
-		char	*expanded_cmd = NULL;
-		size_t	expanded_cmd_size;
-
 		if (NULL == manualinput)
 		{
 			zbx_strlcpy(error, "Script takes user input, but none was provided.", sizeof(error));
@@ -562,40 +570,13 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 			zbx_strlcpy(error, "Provided script user input failed validation.", sizeof(error));
 			goto fail;
 		}
-
-		substitute_macro(script.command, "{MANUALINPUT}", manualinput, &expanded_cmd, &expanded_cmd_size);
-
-		script.command = zbx_strdup(script.command, expanded_cmd);
-
-		zbx_free(expanded_cmd);
-
-		/* in the case that this is a webhook script, perform the substitution for parameter values as well */
-		if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type && 0 < webhook_params.values_num)
-		{
-			for (int n = 0; n < webhook_params.values_num; n++)
-			{
-				char	*expanded_value = NULL;
-				size_t	expanded_value_size;
-
-				/* avoid unnecessary mem (re)allocation in case the macro isn't present */
-				if (NULL == strstr(webhook_params.values[n].second, "{MANUALINPUT}"))
-					continue;
-
-				substitute_macro(webhook_params.values[n].second, "{MANUALINPUT}", manualinput,
-						&expanded_value, &expanded_value_size);
-
-				webhook_params.values[n].second = zbx_strdup(webhook_params.values[n].second,
-						expanded_value);
-
-				zbx_free(expanded_value);
-			}
-		}
 	}
 	else if (NULL != manualinput) /* script does not take additional input yet we've received a value anyway */
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "script (name:%s) "
 				"does not accept additional manual input, but request contains it anyway",
 				script.name);
+		manualinput = NULL; /* ignore input the script does not accept */
 	}
 
 	if (0 != hostid)	/* script on host */
@@ -608,15 +589,15 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	if (ZBX_SCRIPT_TYPE_WEBHOOK != script.type)
 	{
 		if (SUCCEED != zbx_substitute_simple_macros_unmasked(NULL, problem_event, recovery_event, &user->userid,
-				NULL, &host, NULL, NULL, NULL, NULL, NULL, tz, &script.command, macro_type, error,
-				sizeof(error)))
+				manualinput, &host, NULL, NULL, NULL, NULL, NULL, tz, &script.command, macro_type,
+				error, sizeof(error)))
 		{
 			goto fail;
 		}
 
-		if (SUCCEED != zbx_substitute_simple_macros(NULL, problem_event, recovery_event, &user->userid, NULL,
-				&host, NULL, NULL, NULL, NULL, NULL, tz, &script.command_orig, macro_type, error,
-				sizeof(error)))
+		if (SUCCEED != zbx_substitute_simple_macros(NULL, problem_event, recovery_event, &user->userid,
+				manualinput, &host, NULL, NULL, NULL, NULL, NULL, tz, &script.command_orig, macro_type,
+				error, sizeof(error)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			goto fail;
@@ -624,12 +605,14 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	}
 	else
 	{
+		if (SUCCEED != substitute_webhook_macros(&script.command, error, sizeof(error), manualinput))
+			goto fail;
+
 		for (int i = 0; i < webhook_params.values_num; i++)
 		{
 			if (SUCCEED != zbx_substitute_simple_macros_unmasked(NULL, problem_event, recovery_event,
-					&user->userid, NULL, &host, NULL, NULL, NULL, NULL, NULL, tz,
-					(char **)&webhook_params.values[i].second, macro_type, error,
-					sizeof(error)))
+					&user->userid, manualinput, &host, NULL, NULL, NULL, NULL, NULL, tz,
+					(char **)&webhook_params.values[i].second, macro_type, error, sizeof(error)))
 			{
 				goto fail;
 			}
@@ -638,7 +621,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		zbx_webhook_params_pack_json(&webhook_params, &webhook_params_json);
 	}
 
-	if (SUCCEED == (ret = zbx_script_prepare(&script, &host.hostid, error, sizeof(error))))
+	if (SUCCEED == (ret = zbx_script_prepare(&script, &host, error, sizeof(error))))
 	{
 		const char	*poutput = NULL, *perror = NULL;
 		int		audit_res;

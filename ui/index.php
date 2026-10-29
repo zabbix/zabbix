@@ -67,11 +67,13 @@ if (!hasRequest('form')
 	redirect('index_http.php');
 }
 
+$name = getRequest('name', ZBX_GUEST_USER);
+
 // login via form
-if (hasRequest('enter') && CWebUser::login(getRequest('name', ZBX_GUEST_USER), getRequest('password', ''))) {
+if (hasRequest('enter') && CWebUser::login($name, getRequest('password', ''))) {
 	CSessionHelper::set('sessionid', CWebUser::$data['sessionid']);
 
-	if (CWebUser::$data['autologin'] != $autologin) {
+	if (CWebUser::$data['autologin'] != $autologin && $name != ZBX_GUEST_USER) {
 		API::User()->update([
 			'userid' => CWebUser::$data['userid'],
 			'autologin' => $autologin

@@ -62,7 +62,7 @@
 				}
 
 				uncheckTableRows('maintenance');
-				location.href = location.href;
+				location.reload();
 			});
 		}
 
@@ -115,7 +115,7 @@
 						uncheckTableRows('maintenance');
 					}
 
-					location.href = location.href;
+					location.reload();
 				})
 				.catch(() => {
 					clearMessages();

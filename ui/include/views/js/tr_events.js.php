@@ -24,7 +24,7 @@
 		init() {
 			$.subscribe("acknowledge.create", function(event, response, overlay) {
 				postMessageOk(response.success.title);
-				location.href = location.href;
+				location.reload();
 			});
 
 			this._initActions();
@@ -79,7 +79,7 @@
 					postMessageDetails('success', e.detail.messages);
 				}
 
-				location.href = location.href;
+				location.reload();
 			});
 		},
 

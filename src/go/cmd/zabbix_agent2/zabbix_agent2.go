@@ -257,7 +257,7 @@ func run() error {
 		return eventLogErr(errs.Wrap(err, "failed to handle Windows service"))
 	}
 
-	err = log.Open(log.Console, log.Warning, "", 0)
+	err = log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(log.Warning))
 	if err != nil {
 		return errs.Wrap(err, "failed to open console logger")
 	}
@@ -355,12 +355,12 @@ func runAgent(isForeground bool, configPath string, systemOpt agent.PluginSystem
 		logType = log.File
 	}
 
-	err := log.Open(
-		logType,
-		agent.Options.DebugLevel,
-		agent.Options.LogFile,
-		agent.Options.LogFileSize,
-	)
+	err := log.NewWithOptions(log.NewOptions().
+		WithLogType(logType).
+		WithLevel(agent.Options.DebugLevel).
+		WithFilename(agent.Options.LogFile).
+		WithSyslogName("zabbix_agent2").
+		WithFileSize(agent.Options.LogFileSize))
 	if err != nil {
 		return errs.Wrap(err, "cannot initialize logger")
 	}
@@ -727,7 +727,7 @@ func prepareMetricPrintManager(verbose bool, pluginSysOpt agent.PluginSystemOpti
 		level = log.Trace
 	}
 
-	err := log.Open(log.Console, level, "", 0)
+	err := log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(level))
 	if err != nil {
 		return nil, zbxerr.New("failed to initialize logger").Wrap(err)
 	}

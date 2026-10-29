@@ -112,7 +112,7 @@
 				postMessageDetails('success', success.messages);
 			}
 
-			location.href = location.href;
+			location.reload();
 		}
 	};
 </script>
