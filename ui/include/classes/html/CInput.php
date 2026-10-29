@@ -122,9 +122,11 @@ class CInput extends CTag {
 
 	public function setAttribute($name, $value) {
 		if ($name === 'disabled') {
-			$this->enabled = ($value !== 'disabled');
+			$this->enabled = $value !== 'disabled';
 		}
 
-		return parent::setAttribute($name, $value);
+		parent::setAttribute($name, $value);
+
+		return $this;
 	}
 }

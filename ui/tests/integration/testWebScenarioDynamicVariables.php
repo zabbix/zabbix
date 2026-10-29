@@ -25,6 +25,9 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 class testWebScenarioDynamicVariables extends CIntegrationTest {
 
 	const HOSTNAME = 'test_web_scenario_dynamic_vars';
+	const BROKEN_COLUMN = 'agent_renamed';
+	// PostgreSQL and MySQL messages about the missing column
+	const BROKEN_COLUMN_ERROR = '(column t\\.agent does not exist|Unknown column .t\\.agent.)';
 
 	private static int $hostid = 0;
 	private static array $enabled_ids = [];
@@ -369,6 +372,83 @@ class testWebScenarioDynamicVariables extends CIntegrationTest {
 		]);
 
 		$this->assertEmpty($history['result'], 'Disabled web scenarios must not produce any LASTSTEP history');
+	}
+
+	/**
+	 * Web scenarios must be processed again after HTTP poller failed to load them from database.
+	 */
+	public function testWebScenarioDynamicVariables_RescheduleAfterFailedQuery(): void {
+		$httptestids = $this->failScenarioQuery();
+
+		$this->waitForScenariosProcessed($httptestids);
+	}
+
+	/**
+	 * Web scenarios must be processed again after a failed database query followed by disable/enable.
+	 */
+	public function testWebScenarioDynamicVariables_RescheduleAfterFailedQueryDisableEnable(): void {
+		$httptestids = $this->failScenarioQuery();
+
+		foreach ([HTTPTEST_STATUS_DISABLED, HTTPTEST_STATUS_ACTIVE] as $status) {
+			foreach ($httptestids as $httptestid) {
+				$this->call('httptest.update', ['httptestid' => $httptestid, 'status' => $status]);
+			}
+
+			$this->reloadConfigurationCache();
+		}
+
+		$this->waitForScenariosProcessed($httptestids);
+	}
+
+	/**
+	 * Make HTTP poller fail to load web scenarios by renaming httptest.agent column, which is selected only by
+	 * HTTP poller, and restore it.
+	 *
+	 * @return array  identifiers of web scenarios that failed to load
+	 */
+	private function failScenarioQuery(): array {
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of process_httptests()', true, 30);
+
+		$log_path = self::getLogPath(self::COMPONENT_SERVER);
+		clearstatcache();
+		$offset = filesize($log_path);
+
+		DBexecute('alter table httptest rename column agent to '.self::BROKEN_COLUMN);
+
+		try {
+			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, self::BROKEN_COLUMN_ERROR, true, 30, null, true);
+		}
+		finally {
+			DBexecute('alter table httptest rename column '.self::BROKEN_COLUMN.' to agent');
+		}
+
+		preg_match_all('/'.self::BROKEN_COLUMN_ERROR.'[^\[]*\[select h\.hostid[^\]]*t\.httptestid=(\d+)\]/',
+				file_get_contents($log_path, false, null, $offset), $matches);
+
+		$httptestids = array_values(array_unique($matches[2]));
+		$this->assertNotEmpty($httptestids, 'Failed web scenario query was not found in server log');
+
+		return $httptestids;
+	}
+
+	private function waitForScenariosProcessed(array $httptestids): void {
+		$log_path = self::getLogPath(self::COMPONENT_SERVER);
+		clearstatcache();
+		$offset = filesize($log_path);
+		$pending = $httptestids;
+
+		for ($i = 0; $i < 30 && $pending; $i++) {
+			sleep(1);
+			clearstatcache();
+
+			$log = file_get_contents($log_path, false, null, $offset);
+
+			$pending = array_filter($pending, fn($httptestid) =>
+				strpos($log, 'In process_httptest() httptestid:'.$httptestid.' name:') === false
+			);
+		}
+
+		$this->assertEmpty($pending, 'Web scenarios were not processed after failed query: '.implode(', ', $pending));
 	}
 
 	private function assertLASTSTEPHistoryPresent(array $scenario_names, int $expected_count, string $context): void {

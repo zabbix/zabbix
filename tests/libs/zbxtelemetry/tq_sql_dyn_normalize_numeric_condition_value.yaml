@@ -1,0 +1,84 @@
+---
+test case: ".5"
+in:
+  value: ".5"
+out:
+  value: "0.5"
+
+---
+test case: ".0"
+in:
+  value: ".0"
+out:
+  value: "0.0"
+
+---
+test case: "-.5"
+in:
+  value: "-.5"
+out:
+  value: "-0.5"
+
+---
+test case: "-.0"
+in:
+  value: "-.0"
+out:
+  value: "-0.0"
+
+---
+test case: "1."
+in:
+  value: "1."
+out:
+  value: "1.0"
+
+---
+test case: "0."
+in:
+  value: "0."
+out:
+  value: "0.0"
+
+---
+test case: "-1."
+in:
+  value: "-1."
+out:
+  value: "-1.0"
+
+---
+test case: "-0."
+in:
+  value: "-0."
+out:
+  value: "-0.0"
+
+---
+test case: ".5e2"
+in:
+  value: ".5e2"
+out:
+  value: "0.5e2"
+
+---
+test case: "1.e2"
+in:
+  value: "1.e2"
+out:
+  value: "1.0e2"
+
+---
+test case: "1.E23"
+in:
+  value: "1.E23"
+out:
+  value: "1.0E23"
+
+---
+test case: "1.e-2"
+in:
+  value: "1.e-2"
+out:
+  value: "1.0e-2"
+...

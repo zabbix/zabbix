@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Copyright (C) 2001-2026 Zabbix SIA
 **
@@ -145,5 +145,27 @@ class CApiUserGroupHelper {
 		}
 
 		return $usrgrpids;
+	}
+
+	public static function getApmFilterResourceAttributes(int $signal_type): array {
+		$resource = DBselect(
+			'SELECT DISTINCT uaf.attribute_key,uaf.value'.
+			' FROM users_groups ug'.
+			' JOIN usrgrp_apm_filter uaf ON ug.usrgrpid=uaf.usrgrpid'.
+			' WHERE ug.userid='.CApiService::$userData['userid'].
+				' AND '.dbConditionInt('uaf.signal_type', [SIGNAL_TYPE_ALL, $signal_type])
+		);
+
+		$resource_attributes = [];
+
+		while ($row = DBfetch($resource)) {
+			$resource_attributes[] = [
+				'key' => $row['attribute_key'],
+				'operator' => TAG_OPERATOR_EQUAL,
+				'value' => $row['value']
+			];
+		}
+
+		return $resource_attributes;
 	}
 }

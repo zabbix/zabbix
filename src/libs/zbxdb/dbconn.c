@@ -247,6 +247,9 @@ static int	dbconn_is_recoverable_error(zbx_dbconn_t *db, int err_no)
 	if (0 == err_no)
 		err_no = (int)mysql_errno(db->conn);
 
+	if (OFF == db->mariadb_fork && ZBX_MYSQL_ER_CLIENT_INTERACTION_TIMEOUT == err_no)
+		return SUCCEED;
+
 	switch (err_no)
 	{
 		case CR_CONN_HOST_ERROR:
@@ -263,9 +266,6 @@ static int	dbconn_is_recoverable_error(zbx_dbconn_t *db, int err_no)
 		case ER_UNKNOWN_COM_ERROR:
 		case ER_LOCK_DEADLOCK:
 		case ER_LOCK_WAIT_TIMEOUT:
-#ifdef ER_CLIENT_INTERACTION_TIMEOUT
-		case ER_CLIENT_INTERACTION_TIMEOUT:
-#endif
 #ifdef CR_SSL_CONNECTION_ERROR
 		case CR_SSL_CONNECTION_ERROR:
 #endif
@@ -286,13 +286,13 @@ static int	dbconn_is_inhibited_error(zbx_dbconn_t *db, int err_no)
 	if (0 < db->txn_level && 0 == db->txn_begin)
 		return FAIL;
 
+	if (OFF == db->mariadb_fork && ZBX_MYSQL_ER_CLIENT_INTERACTION_TIMEOUT == err_no)
+		return SUCCEED;
+
 	switch (err_no)
 	{
 		case CR_SERVER_GONE_ERROR:
 		case CR_SERVER_LOST:
-#ifdef ER_CLIENT_INTERACTION_TIMEOUT
-		case ER_CLIENT_INTERACTION_TIMEOUT:
-#endif
 			return SUCCEED;
 	}
 
@@ -545,6 +545,7 @@ static int	dbconn_open(zbx_dbconn_t *db)
 	}
 
 	zbx_dbconn_extract_version_info(db, &version_info);
+	db->mariadb_fork = version_info.mariadb_fork;
 
 	/* innodb_snapshot_isolation variable became ON by default in MariaDB 11.6.2, we need it to be OFF */
 	if (ZBX_DB_OK == ret && ON == version_info.mariadb_fork && 110602 <= version_info.current_version)

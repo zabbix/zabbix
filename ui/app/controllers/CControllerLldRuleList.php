@@ -36,7 +36,8 @@ class CControllerLldRuleList extends CController {
 													ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI,
 													ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
 													ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP,
-													ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER, ITEM_TYPE_NESTED
+													ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER, ITEM_TYPE_NESTED,
+													ITEM_TYPE_TELEMETRY_QUERY
 												]),
 			'filter_delay'					=> 'string',
 			'filter_lifetime_type'			=> 'in '.implode(',', [-1, ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER, ZBX_LLD_DELETE_IMMEDIATELY]),

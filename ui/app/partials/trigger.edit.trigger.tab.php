@@ -74,6 +74,7 @@ $trigger_form_grid
 		new CLabel(_('Operational data'), 'opdata'),
 		new CFormField((new CTextAreaFlexible('opdata', $data['opdata']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setMaxlength(DB::getFieldLength('triggers', 'opdata'))
 			->setReadonly($readonly))
 	]);
 

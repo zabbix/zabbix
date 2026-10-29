@@ -106,6 +106,7 @@ class CUrlValidatorTest extends TestCase {
 			['https://zabbix.com',										['schemes' => ['http', 'https']],							null],
 			['http://localhost',										['schemes' => ['http', 'https']],							null],
 			['javascript:alert()',										['schemes' => null],										null],
+			['javascript:1/alert(document.domain)/1',					['schemes' => ['javascript']],								null],
 			['file:/',													[],															null], // Allowed scheme with a path.
 			['//example.com/path',										[],															null], // Scheme is not present in the URL, therefore, not validated.
 			// Invalid URLs.
@@ -125,6 +126,10 @@ class CUrlValidatorTest extends TestCase {
 			['http://localhost:{$PORT}',								[],															'unacceptable URL'], // User macro not allowed.
 			['http://localhost:{MANUALINPUT}',							[],															'unacceptable URL'], // Manual input macro not allowed.
 			['javascript:alert()',										['schemes' => ['http', 'https']],							'unacceptable URL scheme'], // Invalid scheme.
+			['javascript:1/alert(document.domain)/1',					['schemes' => ['http', 'https']],							'unacceptable URL scheme'], // Invalid scheme.
+			['JaVaScRiPt:1/alert(1)/1',									['schemes' => ['http', 'https']],							'unacceptable URL scheme'], // Invalid scheme.
+			['javascript:0//%0aalert(document.domain)',					['schemes' => ['http', 'https']],							'unacceptable URL scheme'], // Invalid scheme.
+			["java\tsc\nr\ript:1/alert(document.domain)/1",				['schemes' => ['http', 'https']],							'unacceptable URL scheme'], // Invalid scheme.
 			['ftp://user@host:port',									['schemes' => ['http', 'https']],							'unacceptable URL'] // Invalid scheme.
 		];
 	}
