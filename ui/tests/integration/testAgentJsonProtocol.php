@@ -17,6 +17,26 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
+ * Client that returns the whole server response, including fields other than 'data'.
+ */
+class CAgentCommandsClient extends CZabbixClient {
+	private $raw_response = null;
+
+	protected function normalizeResponse(array &$response): bool {
+		$this->raw_response = $response;
+
+		return parent::normalizeResponse($response);
+	}
+
+	public function requestRaw(array $params) {
+		$this->raw_response = null;
+		parent::request($params);
+
+		return $this->raw_response;
+	}
+}
+
+/**
  * Test suite for history.push API methods (pushing of history)
  *
  * @required-components server
@@ -28,6 +48,9 @@ class testAgentJsonProtocol extends CIntegrationTest {
 	const HOSTNAME = 'test_agentprotocol';
 	const TRAPPER_KEY = 'trap';
 	const SCRIPT_OUTPUT_TIMEOUT = 7;
+	const RC_HOSTNAME = 'test_agentprotocol_rc';
+	const RC_OTHER_HOSTNAME = 'test_agentprotocol_rc_other';
+	const RC_UNKNOWN_HOSTNAME = 'test_agentprotocol_rc_unknown';
 
 	private static $hostid;
 	private static $sid;
@@ -393,6 +416,161 @@ class testAgentJsonProtocol extends CIntegrationTest {
 		$this->setInterfacePort($this->getConfigurationValue(self::COMPONENT_AGENT2, 'ListenPort'));
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->checkPassiveCheck();
+
+		return true;
+	}
+
+	/**
+	 * Send command result to server on behalf of active agent.
+	 *
+	 * @param CAgentCommandsClient $client
+	 * @param string               $host       host name the result is reported for
+	 * @param string               $commandid
+	 * @param string               $value      command output
+	 */
+	private static function sendActiveCommandResult(CAgentCommandsClient $client, string $host, string $commandid,
+			string $value) {
+		$client->requestRaw([
+			'request' => 'agent data',
+			'session' => md5(uniqid('', true)),
+			'host' => $host,
+			'data' => [],
+			'commands' => [
+				['id' => $commandid, 'value' => $value]
+			],
+			'version' => ZABBIX_VERSION,
+			'variant' => 2
+		]);
+	}
+
+	/**
+	 * Test that output of script executed on active agent is taken only from the host the command was sent to.
+	 *
+	 * @required-components server
+	 */
+	public function testAgentJsonProtocol_activeCommandResultFromOtherHost() {
+		$hostids = [];
+		$scriptid = null;
+		$multi_handle = null;
+		$curl = null;
+
+		try {
+			$response = $this->call('host.create', [
+				[
+					'host' => self::RC_HOSTNAME,
+					'groups' => [['groupid' => 4]], // Zabbix servers
+					'status' => HOST_STATUS_MONITORED
+				],
+				[
+					'host' => self::RC_OTHER_HOSTNAME,
+					'groups' => [['groupid' => 4]], // Zabbix servers
+					'status' => HOST_STATUS_MONITORED
+				]
+			]);
+			$this->assertArrayHasKey('hostids', $response['result']);
+			$this->assertCount(2, $response['result']['hostids']);
+			$hostids = $response['result']['hostids'];
+
+			$response = $this->call('script.create', [
+				'name' => 'Active command result test',
+				'command' => 'echo ok',
+				'execute_on' => ZBX_SCRIPT_EXECUTE_ON_AGENT,
+				'scope' => ZBX_SCRIPT_SCOPE_HOST,
+				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
+			]);
+			$this->assertArrayHasKey('scriptids', $response['result']);
+			$scriptid = $response['result']['scriptids'][0];
+
+			$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+			// Host has no agent interface, so the command is queued for the active agent and script.execute waits
+			// until the agent reports the result. The request is not awaited here so that the agent can be emulated.
+			$curl = curl_init(PHPUNIT_URL.'api_jsonrpc.php');
+			curl_setopt_array($curl, [
+				CURLOPT_POST => true,
+				CURLOPT_POSTFIELDS => json_encode([
+					'jsonrpc' => '2.0',
+					'method' => 'script.execute',
+					'params' => [
+						'scriptid' => $scriptid,
+						'hostid' => $hostids[0]
+					],
+					'id' => 1
+				]),
+				CURLOPT_RETURNTRANSFER => true,
+				CURLOPT_HTTPHEADER => [
+					'Content-Type: application/json-rpc',
+					'Authorization: Bearer '.CAPIHelper::getSessionId()
+				]
+			]);
+
+			$multi_handle = curl_multi_init();
+			curl_multi_add_handle($multi_handle, $curl);
+
+			$pump = function(float $seconds) use ($multi_handle): int {
+				$end = microtime(true) + $seconds;
+
+				do {
+					curl_multi_exec($multi_handle, $running);
+					curl_multi_select($multi_handle, 0.1);
+				} while ($running && microtime(true) < $end);
+
+				return $running;
+			};
+
+			$client = new CAgentCommandsClient('localhost', $this->getConfigurationValue(self::COMPONENT_SERVER,
+				'ListenPort'), 10, 10, ZBX_SOCKET_BYTES_LIMIT, tls_config: ['ACTIVE' => false]
+			);
+
+			$commandid = null;
+
+			for ($i = 0; $i < 30; $i++) {
+				$response = $client->requestRaw([
+					'request' => 'active checks',
+					'host' => self::RC_HOSTNAME
+				]);
+
+				if (is_array($response) && array_key_exists('commands', $response)) {
+					$commandid = (string) $response['commands'][0]['id'];
+					break;
+				}
+
+				$this->assertNotEquals(0, $pump(1), 'script.execute finished before the command was sent to agent');
+			}
+
+			$this->assertNotNull($commandid, 'Remote command was not sent to active agent');
+
+			// Results reported on behalf of other hosts must be ignored.
+			foreach ([self::RC_UNKNOWN_HOSTNAME, self::RC_OTHER_HOSTNAME] as $host) {
+				self::sendActiveCommandResult($client, $host, $commandid, 'forged by '.$host);
+			}
+
+			// Give server time to pick up an accepted result, it checks command state every second.
+			$pump(3);
+
+			self::sendActiveCommandResult($client, self::RC_HOSTNAME, $commandid, 'ok');
+
+			$this->assertEquals(0, $pump(30), 'script.execute did not finish');
+
+			$response = json_decode(curl_multi_getcontent($curl), true);
+			$this->assertIsArray($response);
+			$this->assertArrayHasKey('result', $response, json_encode($response));
+			$this->assertEquals('success', $response['result']['response']);
+			$this->assertEquals('ok', $response['result']['value']);
+		} finally {
+			if ($multi_handle !== null) {
+				curl_multi_remove_handle($multi_handle, $curl);
+				curl_multi_close($multi_handle);
+			}
+
+			if ($scriptid !== null) {
+				$this->call('script.delete', [$scriptid]);
+			}
+
+			if ($hostids !== []) {
+				$this->call('host.delete', $hostids);
+			}
+		}
 
 		return true;
 	}

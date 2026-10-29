@@ -23,6 +23,7 @@
 <script>
 	const view = new class {
 		#severity_classes = [
+			'status-amp-severity-unspecified',
 			'status-amp-severity-trace',
 			'status-amp-severity-debug',
 			'status-amp-severity-info',
@@ -162,6 +163,7 @@
 						.setWidth('auto'),
 					new CDataTableColumn('severity_number', <?= json_encode(_('Severity number')) ?>)
 						.setFields(['severity_number'])
+						.setRenderer('text_field')
 						.setSortable(true)
 						.setWidth('auto'),
 					new CDataTableColumn('traceid', <?= json_encode(_('Trace ID')) ?>)
@@ -207,7 +209,7 @@
 						.setWidth('auto')
 						.setVisible(false),
 					new CDataTableColumn('log_attributes', <?= json_encode(_('Log attributes')); ?>)
-						.setFields(['attributes'])
+						.setFields(['log_attributes'])
 						.setVisible(false)
 						.setRenderer('attributes')
 						.setColumnOptions({
@@ -316,9 +318,9 @@
 						return;
 					}
 
-					const severity_class = severity_number >= 1 && severity_number <= 24
-						? this.#severity_classes[Math.floor((severity_number - 1) / 4)]
-						: this.#severity_classes[0];
+					const severity_class = severity_number < 1 && severity_number > 24
+						? this.#severity_classes[0]
+						: this.#severity_classes[Math.floor((severity_number - 1) / 4) + 1];
 
 					const severity_span = document.createElement('span');
 					severity_span.classList.add(severity_class);
@@ -395,6 +397,7 @@
 					const row_hash = this.#hashRowData(row_data);
 
 					row.dataset.rowHash = row_hash;
+					row.setAttribute('tabindex', '0');
 
 					const row_data_o = Object.create(null);
 
@@ -440,22 +443,12 @@
 							row.classList.add(CDataTable.ZBX_STYLE_ROW_SELECTED);
 						}
 
-						row.addEventListener('click', e => {
-							/** @type {HTMLElement} */
-							const target = e.target;
-							const selection = window.getSelection();
-
-							if (target.tagName === 'A') {
-								return;
-							}
-
-							if (target.hasAttribute('data-hintbox') || (selection && selection.toString().length > 0)) {
+						const selectRow = target => {
+							if (target.hasAttribute('data-hintbox')) {
 								return;
 							}
 
 							if (this.#selected_row_hash === row_hash) {
-								this.#side_drawer.close();
-
 								return;
 							}
 
@@ -467,6 +460,37 @@
 							this.#selected_row_hash = row_hash;
 
 							this.#openSideDrawer(this.#rows_data.get(this.#selected_row_hash));
+						};
+
+						row.addEventListener('keydown', e => {
+							if (e.key !== 'Enter') {
+								return;
+							}
+
+							const target = e.target;
+
+							if (target.tagName === 'A') {
+								return;
+							}
+
+							e.preventDefault();
+							selectRow(target);
+						});
+
+						row.addEventListener('click', e => {
+							const selection = window.getSelection();
+
+							if (selection && selection.toString().length > 0) {
+								return;
+							}
+
+							const target = e.target;
+
+							if (target.tagName === 'A') {
+								return;
+							}
+
+							selectRow(target);
 						});
 					}
 				})
@@ -493,6 +517,9 @@
 				groups: this.#createDetailGroups(e.detail.response)
 			});
 
+			Focuser.recoverFocus(this.#side_drawer.getElement());
+			Focuser.containFocus(this.#side_drawer.getElement());
+
 			this.#details_panel.get().addEventListener('close', () => {
 				this.#side_drawer.close();
 			});
@@ -508,8 +535,10 @@
 
 			const datatable_element = this.#datatable.getElement();
 
-			datatable_element.querySelector(`.${CDataTable.ZBX_STYLE_ROW_SELECTED}`)
-				?.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
+			const row_selected = datatable_element.querySelector(`.${CDataTable.ZBX_STYLE_ROW_SELECTED}`);
+			row_selected?.classList.remove(CDataTable.ZBX_STYLE_ROW_SELECTED);
+
+			row_selected?.focus();
 
 			this.#scheduleRefresh();
 		}

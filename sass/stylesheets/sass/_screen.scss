@@ -2006,6 +2006,10 @@ main {
 		margin: 10px;
 		color: $font-alt-color;
 	}
+
+	.ha-nodes {
+		margin-top: 10px
+	}
 }
 
 .uppercase {
@@ -2508,10 +2512,6 @@ svg {
 	.item-test-result {
 		display: inline-flex;
 	}
-}
-
-#proxy-form .form-field-apm-attributes {
-	width: 100%;
 }
 
 #token_form {

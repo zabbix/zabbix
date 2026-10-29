@@ -35,9 +35,6 @@ void	tq_aggr_column_clean(zbx_tq_aggr_column_t *aggr_column);
 void	tq_condition_init(zbx_tq_condition_t *condition);
 void	tq_condition_clean(zbx_tq_condition_t *condition);
 
-const zbx_tq_column_info_t	*tq_get_column_info(zbx_tq_signal_type_t signal_type,
-		zbx_tq_metric_point_type_t metric_point_type, const char *column);
-
 char	*tq_get_result_field_name_dyn(const zbx_tq_column_t *col);
 int	tq_condition_ptr_compare_by_column_and_key(const void *a, const void *b);
 void	tq_get_conditions_and_or_sorted(zbx_tq_query_t *query, zbx_vector_tq_condition_ptr_t *conditions_sorted);

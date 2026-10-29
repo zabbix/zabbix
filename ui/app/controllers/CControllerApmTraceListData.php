@@ -19,7 +19,7 @@ class CControllerApmTraceListData extends CControllerDataTable {
 	protected array $allowed_data_fields = ['traceid', 'spanid', 'service_name', 'span_count', 'error_count',
 		'span_name', 'span_kind', 'scope_name', 'scope_version', 'status_code', 'status_message', 'timestamp',
 		'timestamp_formatted', 'timestamp_ns_formatted', 'trace_state', 'span_attributes', 'resource_attributes',
-		'duration', 'duration_time_units', 'duration_percentage'];
+		'duration', 'duration_time_units', 'duration_percentage', 'has_root_span'];
 
 	protected array $filter = [];
 
@@ -39,12 +39,14 @@ class CControllerApmTraceListData extends CControllerDataTable {
 		$validator = new CFormValidator(self::getFilterValidationRules());
 
 		if ($validator->validate($this->filter) !== CFormValidator::SUCCESS) {
+			$validator->addErrorsToGlobal();
+
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
-						'messages' => _('Invalid request')
+						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
-				])])
+				], JSON_THROW_ON_ERROR)])
 			);
 
 			return false;
@@ -63,28 +65,29 @@ class CControllerApmTraceListData extends CControllerDataTable {
 			'min_duration' => ['string', 'use' => [CTimeUnitValidator::class, ['min' => null, 'max' => null]]],
 			'max_duration' => ['string', 'use' => [CTimeUnitValidator::class, ['min' => null, 'max' => null]]],
 			'statuses' => ['array', 'field' => ['integer', 'in' => [APM_TRACE_STATUS_UNSET, APM_TRACE_STATUS_OK,
-				APM_TRACE_STATUS_ERROR]]],
+				APM_TRACE_STATUS_ERROR
+			]]],
 			'resource_attributes_evaltype' => ['integer', 'required',
-				'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]
+				'in' => [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]
 			],
 			'resource_attributes' => ['array',
 				'field' => ['object', 'fields' => [
 					'key' => ['string'],
-					'operator' => ['integer', 'required', 'in' => [CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_EQUAL,
-						CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_EXISTS, CONDITION_OPERATOR_NOT_EQUAL,
-						CONDITION_OPERATOR_NOT_LIKE]],
+					'operator' => ['integer', 'required', 'in' => [TAG_OPERATOR_EXISTS, TAG_OPERATOR_EQUAL,
+						TAG_OPERATOR_LIKE, TAG_OPERATOR_NOT_EXISTS, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_NOT_LIKE
+					]],
 					'value' => ['string']
 				]]
 			],
 			'span_attributes_evaltype' => ['integer', 'required',
-				'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]
+				'in' => [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]
 			],
 			'span_attributes' => ['array',
 				'field' => ['object', 'fields' => [
 					'key' => ['string'],
-					'operator' => ['integer', 'required', 'in' => [CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_EQUAL,
-						CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_EXISTS, CONDITION_OPERATOR_NOT_EQUAL,
-						CONDITION_OPERATOR_NOT_LIKE]],
+					'operator' => ['integer', 'required', 'in' => [TAG_OPERATOR_EXISTS, TAG_OPERATOR_EQUAL,
+						TAG_OPERATOR_LIKE, TAG_OPERATOR_NOT_EXISTS, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_NOT_LIKE
+					]],
 					'value' => ['string']
 				]]
 			],
@@ -129,10 +132,10 @@ class CControllerApmTraceListData extends CControllerDataTable {
 			: [];
 
 		$resource_attributes = array_key_exists('resource_attributes', $this->filter)
-			&& $this->filter['resource_attributes']
-				? array_filter($this->filter['resource_attributes'],
-					static fn (array $attribute) => $attribute['key'] !== '')
-				: null;
+				&& $this->filter['resource_attributes']
+			? array_filter($this->filter['resource_attributes'],
+				static fn (array $attribute) => $attribute['key'] !== '')
+			: null;
 
 		$span_attributes = array_key_exists('span_attributes', $this->filter) && $this->filter['span_attributes']
 			? array_filter($this->filter['span_attributes'], static fn (array $attribute) => $attribute['key'] !== '')
@@ -155,9 +158,9 @@ class CControllerApmTraceListData extends CControllerDataTable {
 			$filter['status_code'] = CApmTraceHelper::getStatusCodes($statuses);
 		}
 
-		$data_fields = $this->getDataFields(['traceid', 'duration', 'timestamp']);
+		$data_fields = $this->getDataFields(['traceid', 'duration', 'timestamp', 'has_root_span']);
 
-		$limit = (int)CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
+		$limit = (int) CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$traces = API::ApmTrace()->get([
 			'output' => ['traceid'],
 			'time_from' => $timeline['from_ts'],
@@ -175,6 +178,10 @@ class CControllerApmTraceListData extends CControllerDataTable {
 			'limit' => $limit
 		]);
 
+		if ($traces === false) {
+			throw new Exception();
+		}
+
 		if ($traces) {
 			$select_fields = array_diff($data_fields, ['duration_time_units', 'duration_percentage']);
 
@@ -183,13 +190,17 @@ class CControllerApmTraceListData extends CControllerDataTable {
 			}
 
 			$traces = API::ApmTrace()->get([
-				'output'    => $select_fields,
+				'output' => $select_fields,
 				'time_from' => $timeline['from_ts'],
 				'time_till' => $timeline['to_ts'],
-				'traceids'  => array_column($traces, 'traceid'),
+				'traceids' => array_column($traces, 'traceid'),
 				'sortfield' => $sort_field,
 				'sortorder' => $sort_order
 			]);
+
+			if ($traces === false) {
+				throw new Exception();
+			}
 		}
 
 		$rows = [];
@@ -200,7 +211,7 @@ class CControllerApmTraceListData extends CControllerDataTable {
 			$trace_max_duration = max(array_column($traces, 'duration'));
 
 			foreach ($traces as &$trace) {
-				if (!array_key_exists('service_name', $trace) || !$trace['service_name']) {
+				if (array_key_exists('has_root_span', $trace) && $trace['has_root_span'] == 0) {
 					$trace['service_name'] = '['._('No root span found').']';
 				}
 
@@ -269,7 +280,8 @@ class CControllerApmTraceListData extends CControllerDataTable {
 	protected function isDataSourceConfigured(): bool {
 		try {
 			ApmDb::getInstance()->getConfig();
-		} catch (DBException) {
+		}
+		catch (DBException) {
 			return false;
 		}
 
