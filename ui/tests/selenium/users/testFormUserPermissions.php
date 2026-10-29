@@ -20,7 +20,7 @@ require_once __DIR__.'/../behaviors/CTableBehavior.php';
 require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 /**
- * @backup role, users, usrgrp, module, proxy, proxy_group
+ * @backup role, users, usrgrp, module
  *
  * @onBefore prepareUserData, prepareProxyData
  *
@@ -572,7 +572,10 @@ class testFormUserPermissions extends CWebTest {
 
 		$form->selectTab('Permissions');
 		$this->assertEquals('Proxy allowed', $form->getField('Proxies')->getText());
-		$this->assertEquals('Proxy group not denied', $form->getField('Proxy groups')->getText());
+
+		$proxy_groups = $form->getField('Proxy groups')->query('tag:span')->all()->asText();
+		$this->assertContains('Proxy group not denied', $proxy_groups);
+		$this->assertNotContains('Proxy group denied', $proxy_groups);
 	}
 
 	/**
