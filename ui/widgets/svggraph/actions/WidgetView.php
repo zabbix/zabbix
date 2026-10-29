@@ -19,8 +19,7 @@ namespace Widgets\SvgGraph\Actions;
 use CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CNumberParser,
-	CParser,
-	CRangeTimeParser;
+	CParser;
 
 use Widgets\SvgGraph\Includes\{
 	CSvgGraphHelper,
