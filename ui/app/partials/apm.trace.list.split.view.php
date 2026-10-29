@@ -22,6 +22,7 @@
 $trace_view = (new CDiv())
 	->setId('trace_view')
 	->addClass('trace-view')
+	->addClass($data['trace']['has_root_span'] ? null : 'missing-span')
 	->addItem(
 		(new CDiv())
 			->addClass('trace-view-header')
@@ -54,7 +55,17 @@ $trace_view = (new CDiv())
 					->addClass('trace-view-close-button')
 					->addClass('js-close-button')
 			])
-	)
+	);
+
+if ($data['trace']['has_root_span'] == 0) {
+	$trace_view->addItem(
+		(new CDiv())
+			->addClass('trace-view-alert')
+			->addItem(makeMessageBox(ZBX_STYLE_MSG_WARNING, [], _('Trace has missing span'), false))
+	);
+}
+
+$trace_view
 	->addItem(
 		(new CTag('z-timeline-range-slider', true))
 			->addClass('trace-timeline')

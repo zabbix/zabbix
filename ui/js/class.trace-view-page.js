@@ -257,6 +257,7 @@ class TraceViewPage {
 					id: span.id,
 					parent_id: span.parent_id,
 					label: label,
+					missing: span.missing,
 					subtitle: span.operation || '',
 					meta: span.count ?? '',
 					span
@@ -323,7 +324,7 @@ class TraceViewPage {
 
 			const label = document.createElement('span');
 			label.classList.add('trace-span-label');
-			label.textContent = this.#formatTime(value, this.#getTimeUnit(value));
+			label.textContent = span.missing ? '' : this.#formatTime(value, this.#getTimeUnit(value));
 
 			bar_start = this.#getClampedStartRatio(span) * 100;
 			bar_width = this.#getClampedWidthRatio(span) * 100;
@@ -331,9 +332,13 @@ class TraceViewPage {
 			const bar = document.createElement('div');
 			bar.classList.add('trace-span-bar');
 			bar.style.setProperty('--trace-span-start', `${bar_start}%`);
-			bar.style.setProperty('--trace-span-width', `${bar_width}%`);
+			bar.style.setProperty('--trace-span-width', bar_width === 100 ? `calc(${bar_width}% - 2px)` : `${bar_width}%`);
 			bar.style.setProperty('--trace-span-color', span_color);
 			bar.appendChild(label);
+
+			if (span.missing) {
+				bar.classList.add('missing');
+			}
 
 			row_element.appendChild(bar);
 		}
@@ -345,6 +350,10 @@ class TraceViewPage {
 			marker.classList.add('trace-event-marker');
 			marker.style.setProperty('--trace-event-position', `${marker_position}%`);
 			marker.style.setProperty('--trace-marker-border-color', span_color);
+
+			if (span.missing) {
+				marker.classList.add('missing');
+			}
 
 			if (bar_width === 0 || bar_start > marker_position || marker_position > bar_start + bar_width) {
 				marker.style.setProperty('--trace-marker-bg-color', span_color);

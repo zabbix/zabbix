@@ -56,7 +56,7 @@ class CControllerApmTraceListSplitView extends CController {
 
 		try {
 			$traces = API::ApmTrace()->get([
-				'output' => ['traceid', 'error_count', 'timestamp', 'duration'],
+				'output' => ['traceid', 'error_count', 'timestamp', 'duration', 'service_name', 'has_root_span'],
 				'time_from' => $time_from,
 				'time_till' => $time_to,
 				'traceids' => [$traceid]
@@ -144,10 +144,36 @@ class CControllerApmTraceListSplitView extends CController {
 				])
 				: '0'._x('ns', 'nanosecond short');
 
+			if ($span['parent_spanid'] && !in_array($span['parent_spanid'], $spanids)) {
+				$parent_span_index = count($spans);
+
+				$trace_view_spans[$parent_span_index] = [
+					'index' => $parent_span_index,
+					'id' => $span['parent_spanid'],
+					'missing' => true,
+					'parent_id' => null,
+					'name' => _('Missing span'),
+					'operation' => _('Span ID').' '.$span['parent_spanid'],
+					'service_name' => '',
+					'scope_name' => '',
+					'duration' => 0,
+					'timestamp' => 0,
+					'start' => 0,
+					'end' => $end,
+					'count' => $span_counts[$span['parent_spanid']] ?? null,
+					'events' => [],
+					'resource_attributes' => [],
+					'span_attributes' => [],
+					'status_code' => '',
+					'status_message' => ''
+				];
+			}
+
 			$trace_view_spans[$i] = [
 				'index' => $i,
 				'id' => $span['spanid'],
-				'parent_id' => in_array($span['parent_spanid'], $spanids) ? $span['parent_spanid'] : null,
+				'missing' => false,
+				'parent_id' => $span['parent_spanid'],
 				'name' => $span['service_name'],
 				'operation' => $span['span_name'],
 				'service_name' => $span['service_name'],
@@ -173,7 +199,7 @@ class CControllerApmTraceListSplitView extends CController {
 				'end' => $end,
 				'selected_start' => 0,
 				'selected_end' => $end,
-				'spans' => $trace_view_spans
+				'spans' => array_values($trace_view_spans)
 			]
 		], JSON_THROW_ON_ERROR);
 
