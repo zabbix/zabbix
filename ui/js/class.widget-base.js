@@ -1753,6 +1753,8 @@ class CWidgetBase {
 		this._button_actions.type = 'button';
 		this._button_actions.setAttribute('aria-expanded', 'false');
 		this._button_actions.setAttribute('aria-haspopup', 'true');
+		this._button_actions.setAttribute("data-hintbox", '1');
+		this._button_actions.setAttribute("data-hintbox-contents", t('Actions'));
 		this._button_actions.setAttribute('aria-label', t('Open widget actions'))
 		this._button_actions.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_MORE, 'js-widget-action');
 
