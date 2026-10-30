@@ -1259,6 +1259,7 @@ int	cep_rule_get_execute_ops(const zbx_cep_rule_t *rule, int execute_when, zbx_c
 				{
 					continue;
 				}
+				break;
 			default:
 				break;
 		}
