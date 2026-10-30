@@ -6081,9 +6081,9 @@ section {
     background: var(--trace-span-color);
     transform: translateY(-50%); }
     .trace-view .trace-span-bar.missing {
-      --missing-span-bg-color: #fff;
-      --missing-span-border-color: #768D99;
-      --missing-span-stripe-color: #ebebeb;
+      --missing-span-bg-color: #2b2b2b;
+      --missing-span-border-color: #808080;
+      --missing-span-stripe-color: #383838;
       background-color: var(--missing-span-bg-color);
       background-image: repeating-linear-gradient(45deg, var(--missing-span-stripe-color), var(--missing-span-stripe-color) 9px, transparent 0px, transparent 18px);
       border: 1px dashed var(--missing-span-border-color); }

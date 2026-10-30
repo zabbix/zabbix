@@ -5989,8 +5989,8 @@ section {
     background: var(--trace-span-color);
     transform: translateY(-50%); }
     .trace-view .trace-span-bar.missing {
-      --missing-span-bg-color: #fff;
-      --missing-span-border-color: #768D99;
+      --missing-span-bg-color: #ffffff;
+      --missing-span-border-color: #000000;
       --missing-span-stripe-color: #ebebeb;
       background-color: var(--missing-span-bg-color);
       background-image: repeating-linear-gradient(45deg, var(--missing-span-stripe-color), var(--missing-span-stripe-color) 9px, transparent 0px, transparent 18px);
