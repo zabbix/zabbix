@@ -59,7 +59,6 @@
 					});
 
 					overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
-						console.log('aa');
 						chkbxRange.clearSelectedOnFilterChange();
 
 						this.reload({success: e.detail});
