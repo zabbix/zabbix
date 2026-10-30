@@ -1249,6 +1249,20 @@ int	cep_rule_get_execute_ops(const zbx_cep_rule_t *rule, int execute_when, zbx_c
 		if (op->execute_when != execute_when)
 			continue;
 
+		switch (op->type)
+		{
+			case ZBX_CEP_OP_COPY_FIRST:
+			case ZBX_CEP_OP_COPY_LAST:
+				if (NULL != ctx && NULL != cep_event_context_get_event(ctx))
+				{
+					
+					if (ZBX_EVENT_COPIED == ctx->event->flags)
+						continue;
+				}
+			default:
+				break;
+		}
+
 		if (NULL == ctx || SUCCEED == cep_op_filter_match_event(&op->execute_filter, ctx))
 			zbx_vector_const_cep_operation_ptr_append(ops, op);
 	}
