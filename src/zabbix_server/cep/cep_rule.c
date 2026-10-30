@@ -1245,6 +1245,7 @@ int	cep_rule_get_execute_ops(const zbx_cep_rule_t *rule, int execute_when, zbx_c
 	for (int i = 0; i < rule->operations.values_num; i++)
 	{
 		const zbx_cep_operation_t	*op = &rule->operations.values[i];
+		zbx_cep_event_t			*event;
 
 		if (op->execute_when != execute_when)
 			continue;
@@ -1253,10 +1254,10 @@ int	cep_rule_get_execute_ops(const zbx_cep_rule_t *rule, int execute_when, zbx_c
 		{
 			case ZBX_CEP_OP_COPY_FIRST:
 			case ZBX_CEP_OP_COPY_LAST:
-				if (NULL != ctx && NULL != cep_event_context_get_event(ctx))
+				if (NULL != ctx && NULL != (event = cep_event_context_get_event(ctx)) &&
+						ZBX_EVENT_COPIED == event->flags)
 				{
-					if (ZBX_EVENT_COPIED == ctx->event->flags)
-						continue;
+					continue;
 				}
 			default:
 				break;
