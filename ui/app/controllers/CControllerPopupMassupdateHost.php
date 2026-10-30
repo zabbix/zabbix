@@ -498,8 +498,6 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				$backurl = new CUrl($this->getInput('backurl'));
 
 				if ($result) {
-					$backurl->setArgument('uncheck', 1);
-
 					CMessageHelper::setSuccessTitle($upd_status
 						? _n('Host enabled', 'Hosts enabled', $hosts_count)
 						: _n('Host disabled', 'Hosts disabled', $hosts_count)
@@ -553,7 +551,6 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				'location_url' => (new CUrl('zabbix.php'))
 					->setArgument('action', 'host.list')
 					->setArgument('page', CPagerHelper::loadPage('host.list'))
-					->setArgument('uncheck', 1)
 					->getUrl(),
 				'monitored_by' => CWebUser::checkAccess(CRoleHelper::ACTIONS_SELECT_SERVER_FOR_MONITORING)
 					? ZBX_MONITORED_BY_SERVER
