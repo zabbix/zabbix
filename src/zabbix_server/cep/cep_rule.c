@@ -1255,7 +1255,6 @@ int	cep_rule_get_execute_ops(const zbx_cep_rule_t *rule, int execute_when, zbx_c
 			case ZBX_CEP_OP_COPY_LAST:
 				if (NULL != ctx && NULL != cep_event_context_get_event(ctx))
 				{
-					
 					if (ZBX_EVENT_COPIED == ctx->event->flags)
 						continue;
 				}
