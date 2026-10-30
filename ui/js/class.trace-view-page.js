@@ -218,7 +218,7 @@ class TraceViewPage {
 			line.setAttribute('x2', String(this.#clamp(x2, 0, width)));
 			line.setAttribute('y1', String(y));
 			line.setAttribute('y2', String(y));
-			line.setAttribute('stroke', span.color || this.#getColor(index));
+			line.setAttribute('stroke', span.color || this.#getColor(span.index || 0));
 			line.setAttribute('stroke-width', '2');
 			line.setAttribute('stroke-linecap', 'round');
 

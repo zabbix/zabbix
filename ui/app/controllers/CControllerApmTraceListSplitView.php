@@ -117,9 +117,10 @@ class CControllerApmTraceListSplitView extends CController {
 		$start_timestamp = min($trace['timestamp'], min(array_column($spans, 'timestamp', 'timestamp')));
 		$end = $trace['duration'];
 
+		$span_index = 0;
 		$spanids = array_column($spans, 'spanid');
 
-		foreach ($spans as $i => $span) {
+		foreach ($spans as $span) {
 			$span_start = $span['timestamp'] - $start_timestamp;
 			$span_end = $span_start + $span['duration'];
 			$end = max($span_end, $end);
@@ -145,10 +146,8 @@ class CControllerApmTraceListSplitView extends CController {
 				: '0'._x('ns', 'nanosecond short');
 
 			if ($span['parent_spanid'] && !in_array($span['parent_spanid'], $spanids)) {
-				$parent_span_index = count($spans);
-
-				$trace_view_spans[$parent_span_index] = [
-					'index' => $parent_span_index,
+				$trace_view_spans[$span_index] = [
+					'index' => $span_index,
 					'id' => $span['parent_spanid'],
 					'missing' => true,
 					'parent_id' => null,
@@ -167,10 +166,12 @@ class CControllerApmTraceListSplitView extends CController {
 					'status_code' => '',
 					'status_message' => ''
 				];
+
+				$span_index++;
 			}
 
-			$trace_view_spans[$i] = [
-				'index' => $i,
+			$trace_view_spans[$span_index] = [
+				'index' => $span_index,
 				'id' => $span['spanid'],
 				'missing' => false,
 				'parent_id' => $span['parent_spanid'],
@@ -189,6 +190,8 @@ class CControllerApmTraceListSplitView extends CController {
 				'status_code' => $span['status_code'],
 				'status_message' => $span['status_message']
 			];
+
+			$span_index++;
 		}
 
 		$output = json_encode([
