@@ -1198,7 +1198,7 @@ class CUserMacro extends CApiService {
 
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if ($options['output'] != API_OUTPUT_COUNT && $options['globalmacro'] === null) {
+		if (!$options['countOutput'] && $options['globalmacro'] === null) {
 			if ($options['selectHostGroups'] !== null || $options['selectTemplateGroups'] !== null
 					|| $options['selectHosts'] !== null || $options['selectTemplates'] !== null) {
 				$sqlParts = $this->addQuerySelect($this->fieldId('hostid'), $sqlParts);
