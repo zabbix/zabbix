@@ -203,7 +203,7 @@ class TraceViewPage {
 	#renderOverview() {
 		const width = this.#overview.parentElement.offsetWidth;
 		const height = 56;
-		const rows = Array.from(this.#spans.values());
+		const rows = Array.from(this.#spans.values()).filter(span => !span.missing);
 		const elements = [];
 
 		this.#overview.setAttribute('viewBox', `0 0 ${width} ${height}`);
