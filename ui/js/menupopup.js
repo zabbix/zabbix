@@ -1627,7 +1627,7 @@ function getMenuPopupScriptItems(tree, trigger_elm, csrf_token) {
 					Script.execute(data.params.scriptid, data.params.confirmation, trigger_elm, data.params.hostid,
 						data.params.eventid, csrf_token, data.params.manualinput, data.params.manualinput_prompt,
 						data.params.manualinput_validator_type, data.params.manualinput_validator,
-						data.params.manualinput_default_value
+						data.params.manualinput_default_value, data.name
 					);
 					cancelEvent(e);
 				};
