@@ -20,10 +20,10 @@ class CControllerTriggerMassupdate extends CController {
 
 	private array $triggers = [];
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'ids' => 'required|array_id',
-			'prototype' => 'in 1',
+			'prototype' => 'required|in 0,1',
 			'update' => 'in 1',
 			'visible' => 'array',
 			'dependencies' => 'array_id',
@@ -50,13 +50,9 @@ class CControllerTriggerMassupdate extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
-		$has_access = match ($this->getInput('context')) {
-			'host' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
-			'template' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-		};
-
-		if (!$has_access) {
+	protected function checkPermissions(): bool {
+		$ids = array_keys(array_flip($this->getInput('ids')));
+		if (!$ids) {
 			return false;
 		}
 
@@ -78,7 +74,8 @@ class CControllerTriggerMassupdate extends CController {
 
 		$options = [
 			'output' => ['triggerid', 'templateid'],
-			'triggerids' => $this->getInput('ids'),
+			'triggerids' => $ids,
+			'selectHosts' => ['status'],
 			'editable' => true,
 			'preservekeys' => true
 		];
@@ -93,10 +90,24 @@ class CControllerTriggerMassupdate extends CController {
 
 		$this->triggers = $parent_lld ? API::TriggerPrototype()->get($options) : API::Trigger()->get($options);
 
-		return (bool) $this->triggers;
+		if (count($this->triggers) != count($ids)) {
+			return false;
+		}
+
+		$has_template_access = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+
+		foreach ($this->triggers as $trigger) {
+			foreach ($trigger['hosts'] as $host) {
+				if ($host['status'] == HOST_STATUS_TEMPLATE && !$has_template_access) {
+					return false;
+				}
+			}
+		}
+
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		if ($this->hasInput('update')) {
 			$visible = $this->getInput('visible', []);
 			$tags = $this->getInput('tags', []);
