@@ -72,6 +72,7 @@ require_once dirname(__FILE__).'/testLLDHistorySyncAtScale.php';
 require_once dirname(__FILE__).'/testTelnetChecks.php';
 require_once dirname(__FILE__).'/testHousekeepingConfSync.php';
 require_once dirname(__FILE__).'/testScheduledReports.php';
+require_once dirname(__FILE__).'/testInternalJavaItem.php';
 require_once dirname(__FILE__).'/testReportTest.php';
 
 use PHPUnit\Framework\TestSuite;
@@ -136,6 +137,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testNestedLLD');
 		$suite->addTestSuite('testCalculatedExpression');
 		$suite->addTestSuite('testDiagInfo');
+		$suite->addTestSuite('testInternalJavaItem');
 		$suite->addTestSuite('testReportTest');
 		$suite->addTestSuite('testLLDHistorySyncAtScale');
 		/* $suite->addTestSuite('testLLDHistorySyncAtScaleSingleSyncer'); */
