@@ -41,21 +41,6 @@ class testFormUserGroups extends CWebTest {
 	 * Create test data for "Multi-factor authentication" field in user group form.
 	 */
 	public function prepareMfaHostgroupData() {
-		$proxyid = CDBHelper::getValue(
-			'SELECT proxyid'.
-			' FROM proxy'.
-			' WHERE name='.zbx_dbstr('active_proxy1')
-		);
-
-		$proxy_groupid = CDBHelper::getValue(
-			'SELECT proxy_groupid'.
-			' FROM proxy_group'.
-			' WHERE name='.zbx_dbstr('Online proxy group')
-		);
-
-		$this->assertNotEmpty($proxyid, 'Proxy "active_proxy1" was not found.');
-		$this->assertNotEmpty($proxy_groupid, 'Proxy group "Online proxy group" was not found.');
-
 		$mfaids = CDataHelper::call('mfa.create', [
 			[
 				'type' => MFA_TYPE_TOTP,
@@ -73,6 +58,9 @@ class testFormUserGroups extends CWebTest {
 		])['mfaids'];
 
 		CDataHelper::call('authentication.update', ['mfa_status' => MFA_ENABLED]);
+
+		$proxyid = CDataHelper::get('Proxies.proxyids.active_proxy1');
+		$proxy_groupid = CDataHelper::get('Proxies.proxy_groupids.Online proxy group');
 
 		CDataHelper::call('usergroup.create', [
 			[
