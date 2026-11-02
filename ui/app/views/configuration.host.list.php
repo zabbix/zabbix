@@ -205,7 +205,7 @@ foreach ($data['hosts'] as $host) {
 	$interface = null;
 
 	if ($host['interfaces']) {
-		foreach (CItem::INTERFACE_TYPES_BY_PRIORITY as $interface_type) {
+		foreach (CItemGeneral::INTERFACE_TYPES_BY_PRIORITY as $interface_type) {
 			$host_interfaces = array_filter($host['interfaces'], function(array $host_interface) use ($interface_type) {
 				return ($host_interface['type'] == $interface_type);
 			});
@@ -258,7 +258,7 @@ foreach ($data['hosts'] as $host) {
 		->setArgument('visible[status]', 1)
 		->setArgument('update', 1)
 		->setArgument('backurl',
-			(new CUrl('zabbix.php', false))
+			(new CUrl('zabbix.php'))
 				->setArgument('action', 'host.list')
 				->setArgument('page', CPagerHelper::loadPage('host.list', null))
 				->getUrl()
@@ -491,7 +491,7 @@ $status_toggle_url =  (new CUrl('zabbix.php'))
 	->setArgument('visible[status]', 1)
 	->setArgument('update', 1)
 	->setArgument('backurl',
-		(new CUrl('zabbix.php', false))
+		(new CUrl('zabbix.php'))
 			->setArgument('action', 'host.list')
 			->setArgument('page', CPagerHelper::loadPage('host.list', null))
 			->getUrl()

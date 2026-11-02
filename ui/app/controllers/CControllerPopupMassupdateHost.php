@@ -99,9 +99,9 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 	}
 
 	protected function doAction(): void {
+		$hostids = $this->getInput('hostids');
+
 		if ($this->hasInput('update')) {
-			$output = [];
-			$hostids = $this->getInput('hostids');
 			$visible = $this->getInput('visible', []);
 			$macros = array_filter(cleanInheritedMacros($this->getInput('macros', [])),
 				function (array $macro): bool {
@@ -480,7 +480,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
 				],
-				'hostids' => $this->getInput('hostids'),
+				'hostids' => $hostids,
 				'inventories' => zbx_toHash(getHostInventories(), 'db_field'),
 				'location_url' => (new CUrl('zabbix.php'))
 					->setArgument('action', 'host.list')
