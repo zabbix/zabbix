@@ -42,7 +42,8 @@ class ZVertical extends HTMLElement {
 			position: 'absolute',
 			bottom: 0,
 			left: 0,
-			transform: 'rotate(270deg)'
+			transform: 'rotate(270deg)',
+			willChange: 'transform'
 		});
 
 		const slot = document.createElement('slot');
@@ -88,7 +89,7 @@ class ZVertical extends HTMLElement {
 		this.style.width = `${this.#inner_container.scrollHeight}px`;
 		this.style.height = `${this.#inner_container.scrollWidth}px`;
 
-		const anchor_position = Math.min(this.#inner_container.scrollHeight, this.#inner_container.scrollWidth) / 2;
+		const anchor_position = this.#inner_container.scrollHeight / 2;
 
 		this.#inner_container.style.transformOrigin = `${anchor_position}px ${anchor_position}px`;
 	}

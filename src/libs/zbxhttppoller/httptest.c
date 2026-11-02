@@ -608,8 +608,8 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 			httptest->httptest.httptestid);
 
 	buffer = zbx_strdup(buffer, httptest->httptest.delay);
-	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-				&buffer, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL, NULL, NULL, NULL, &buffer,
+				ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 	/* Avoid the potential usage of uninitialized values when: */
 	/* 1) compile without libCURL support */
@@ -678,8 +678,8 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 				&db_httpstep.required, ZBX_MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
 
 		db_httpstep.status_codes = zbx_strdup(NULL, row[7]);
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL, NULL, NULL,
-				NULL, &db_httpstep.status_codes, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL, NULL, NULL, NULL,
+				&db_httpstep.status_codes, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 		db_httpstep.post_type = atoi(row[8]);
 
@@ -700,8 +700,8 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 		}
 
 		buffer = zbx_strdup(buffer, row[4]);
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL, NULL, NULL,
-				NULL, &buffer, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL, NULL, NULL, NULL,
+				&buffer, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 		if (SUCCEED != zbx_is_time_suffix(buffer, &db_httpstep.timeout, ZBX_LENGTH_UNLIMITED))
 		{
@@ -1072,28 +1072,28 @@ int	process_httptests(int now, const char *config_source_ip, const char *config_
 			}
 
 			httptest.httptest.agent = zbx_strdup(NULL, row[5]);
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL, NULL, NULL, NULL,
-					NULL, NULL, &httptest.httptest.agent, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL, NULL, NULL,
+					NULL, &httptest.httptest.agent, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 			if (HTTPTEST_AUTH_NONE != (httptest.httptest.authentication = atoi(row[6])))
 			{
 				httptest.httptest.http_user = zbx_strdup(NULL, row[7]);
-				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL,
-						NULL, NULL, NULL, NULL, NULL, &httptest.httptest.http_user,
+				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL,
+						NULL, NULL, NULL, NULL, &httptest.httptest.http_user,
 						ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 				httptest.httptest.http_password = zbx_strdup(NULL, row[8]);
-				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL,
-						NULL, NULL, NULL, NULL, NULL, &httptest.httptest.http_password,
+				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL,
+						NULL, NULL, NULL, NULL, &httptest.httptest.http_password,
 						ZBX_MACRO_TYPE_COMMON, NULL, 0);
 			}
 
 			if ('\0' != *row[9])
 			{
 				httptest.httptest.http_proxy = zbx_strdup(NULL, row[9]);
-				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL, NULL,
-						NULL, NULL, NULL, NULL, &httptest.httptest.http_proxy,
-						ZBX_MACRO_TYPE_COMMON, NULL, 0);
+				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL,
+						NULL, NULL, NULL, &httptest.httptest.http_proxy, ZBX_MACRO_TYPE_COMMON,
+						NULL, 0);
 			}
 			else
 				httptest.httptest.http_proxy = NULL;
@@ -1109,9 +1109,9 @@ int	process_httptests(int now, const char *config_source_ip, const char *config_
 					NULL, &httptest.httptest.ssl_key_file, ZBX_MACRO_TYPE_HTTPTEST_FIELD, NULL, 0);
 
 			httptest.httptest.ssl_key_password = zbx_strdup(NULL, row[13]);
-			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL, NULL,
-					NULL, NULL, NULL, NULL, &httptest.httptest.ssl_key_password,
-					ZBX_MACRO_TYPE_COMMON, NULL, 0);
+			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL,
+					NULL, NULL, NULL, &httptest.httptest.ssl_key_password, ZBX_MACRO_TYPE_COMMON,
+					NULL, 0);
 
 			httptest.httptest.verify_peer = atoi(row[14]);
 			httptest.httptest.verify_host = atoi(row[15]);

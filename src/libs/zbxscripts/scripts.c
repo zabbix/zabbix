@@ -454,8 +454,8 @@ static int	passive_command_send_and_result_fetch(const zbx_dc_host_t *host, cons
 	}
 
 	port = zbx_strdup(port, item.interface.port_orig);
-	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-			&port, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL, NULL, NULL, NULL, &port,
+			ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 	if (SUCCEED != (ret = zbx_is_ushort(port, &item.interface.port)))
 	{
@@ -748,7 +748,7 @@ void	zbx_webhook_params_pack_json(const zbx_vector_ptr_pair_t *params, char **pa
  * Purpose: prepares user script                                                   *
  *                                                                                 *
  * Parameters: script        - [IN] script to prepare                              *
- *             hostid        - [IN] host the script will be executed on            *
+ *             host          - [IN] host the script will be executed on            *
  *             error         - [OUT] error message buffer                          *
  *             max_error_len - [IN] size of error message output buffer            *
  *                                                                                 *
@@ -761,7 +761,7 @@ void	zbx_webhook_params_pack_json(const zbx_vector_ptr_pair_t *params, char **pa
  *           function.                                                             *
  *                                                                                 *
  ***********************************************************************************/
-int	zbx_script_prepare(zbx_script_t *script, const zbx_uint64_t *hostid, char *error, size_t max_error_len)
+int	zbx_script_prepare(zbx_script_t *script, const zbx_dc_host_t *host, char *error, size_t max_error_len)
 {
 	int			ret = FAIL;
 	zbx_dc_um_handle_t	*um_handle;
@@ -773,13 +773,13 @@ int	zbx_script_prepare(zbx_script_t *script, const zbx_uint64_t *hostid, char *e
 	switch (script->type)
 	{
 		case ZBX_SCRIPT_TYPE_SSH:
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL, NULL, NULL,
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL, NULL, NULL,
 					NULL, &script->publickey, ZBX_MACRO_TYPE_COMMON, NULL, 0);
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL, NULL, NULL,
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL, NULL, NULL,
 					NULL, &script->privatekey, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 			ZBX_FALLTHROUGH;
 		case ZBX_SCRIPT_TYPE_TELNET:
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL, NULL, NULL,
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL, NULL, NULL,
 					NULL, &script->port, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 			if ('\0' != *script->port && SUCCEED != (ret = zbx_is_ushort(script->port, NULL)))
@@ -788,9 +788,9 @@ int	zbx_script_prepare(zbx_script_t *script, const zbx_uint64_t *hostid, char *e
 				goto out;
 			}
 
-			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL,
+			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL,
 					NULL, NULL, NULL, &script->username, ZBX_MACRO_TYPE_COMMON, NULL, 0);
-			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL,
+			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL,
 					NULL, NULL, NULL, &script->password, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 			break;
 		case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:

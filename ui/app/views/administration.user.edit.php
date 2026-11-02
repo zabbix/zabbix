@@ -286,14 +286,17 @@ $user_form_list
 	->addRow(new CLabel(_('Theme'), $theme_select->getFocusableElementId()), $theme_select);
 
 // Append auto-login & auto-logout to form list.
-if ($data['action'] === 'userprofile.edit' || $data['db_user']['username'] !== ZBX_GUEST_USER) {
+if (in_array($data['action'], ['userprofile.edit', 'user.edit'])) {
 	$autologout = ($data['autologout'] !== '0') ? $data['autologout'] : DB::getDefault('users', 'autologout');
 
-	$user_form_list->addRow(_('Auto-login'),
-		(new CCheckBox('autologin'))
-			->setUncheckedValue('0')
-			->setChecked($data['autologin'])
-	);
+	if ($data['action'] === 'userprofile.edit' || $data['db_user']['username'] !== ZBX_GUEST_USER) {
+		$user_form_list->addRow(_('Auto-login'),
+			(new CCheckBox('autologin'))
+				->setUncheckedValue('0')
+				->setChecked($data['autologin'])
+		);
+	}
+
 	$user_form_list->addRow(_('Auto-logout'), [
 		(new CCheckBox(null))
 			->setId('autologout_visible')

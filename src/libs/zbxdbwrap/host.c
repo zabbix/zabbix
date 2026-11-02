@@ -6098,6 +6098,7 @@ zbx_uint64_t	zbx_db_add_interface(zbx_uint64_t hostid, unsigned char type, unsig
 	unsigned short		db_port;
 	const char		*db_ip, *db_dns;
 	zbx_dc_um_handle_t	*um_handle;
+	zbx_dc_host_t		dc_host;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -6151,8 +6152,9 @@ zbx_uint64_t	zbx_db_add_interface(zbx_uint64_t hostid, unsigned char type, unsig
 		}
 
 		tmp = strdup(row[4]);
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL,
-					NULL, NULL, &tmp, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+		dc_host.hostid = hostid;
+		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &dc_host, NULL, NULL, NULL, NULL, NULL, NULL,
+					&tmp, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 		if (FAIL == zbx_is_ushort(tmp, &db_port) || db_port != port)
 		{
