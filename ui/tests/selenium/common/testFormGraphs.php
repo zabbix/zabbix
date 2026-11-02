@@ -1026,7 +1026,7 @@ class testFormGraphs extends CWebTest {
 		foreach ($data['yaxis_items'] as $y => $yaxis_item) {
 			if ($this->prototype) {
 				$form->query('xpath:.//button[@id="yaxis_'.$y.'_prototype"]')->waitUntilClickable()->one()->click();
-				$dialog = COverlayDialogElement::find()->one();
+				$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 				$this->assertFalse($dialog->query('link', $yaxis_item)->exists());
 				$dialog->close();
 			}
@@ -1040,7 +1040,7 @@ class testFormGraphs extends CWebTest {
 		}
 
 		$items_container->query('button', 'Add'.$this->getGraphSuffix())->waitUntilClickable()->one()->click();
-		$dialog = COverlayDialogElement::find()->one();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 
 		// Assert that text items are not present in dialog.
 		foreach ($data['items'] as $item) {

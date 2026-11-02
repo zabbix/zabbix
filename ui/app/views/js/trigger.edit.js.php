@@ -893,7 +893,7 @@ window.trigger_edit_popup = new class {
 		}
 
 		if (curl == null) {
-			location.href = location.href;
+			location.reload();
 		}
 		else {
 			location.href = curl.getUrl();

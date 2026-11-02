@@ -75,17 +75,15 @@ function escapeHtml(string) {
  * Validates and processes the numeric value in an HTML input element. Leaves negative numbers without leading zeroes.
  *
  * @param {HTMLInputElement} input           The HTML input element containing the numeric value.
- * @param {bool}             allow_empty     If true, the field can be empty; otherwise, empty fields are replaced
- *                                           with "0".
  * @param {bool}             allow_negative  If true, negative numbers are allowed; otherwise, negative numbers
  *                                           are converted to positive.
  * @param {number}           min_length      Pad number with zeroes to maintain min length.
  */
-function normalizeNumericBox(input, {allow_empty, allow_negative, min_length}) {
+function normalizeNumericBox(input, {allow_negative, min_length}) {
 	let num = parseInt(input.value, 10);
 
 	if (isNaN(num)) {
-		input.value = (input.value === '' && allow_empty) ? '' : '0'.repeat(Math.max(min_length, 1));
+		input.value = '0'.repeat(Math.max(min_length, 1));
 	}
 	else {
 		if (num < 0 && !allow_negative) {

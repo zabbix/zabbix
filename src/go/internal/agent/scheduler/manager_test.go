@@ -25,6 +25,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"golang.zabbix.com/agent2/internal/agent"
 	"golang.zabbix.com/agent2/internal/agent/alias"
+	"golang.zabbix.com/agent2/internal/agent/keyaccess"
 	"golang.zabbix.com/agent2/internal/agent/resultcache"
 	"golang.zabbix.com/agent2/pkg/itemutil"
 	"golang.zabbix.com/sdk/conf"
@@ -680,6 +681,143 @@ func checkExporterTasks(t *testing.T, m *Manager, clientID uint64, items []*clie
 	}
 }
 
+func newSystemRunTestManager(t *testing.T) *Manager {
+	t.Helper()
+
+	err := log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	plugin.ClearRegistry()
+	t.Cleanup(plugin.ClearRegistry)
+
+	err = plugin.RegisterMetrics(&mockExporterPlugin{}, "SystemRunTest", "system.run", "Run a test command.")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	allowRecords := conf.Node{
+		Nodes: []any{
+			&conf.Value{Value: []byte("system.run[/usr/bin/uptime]"), Line: 1},
+		},
+	}
+
+	err = keyaccess.LoadRules(&allowRecords, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Cleanup(func() {
+		cleanupErr := keyaccess.LoadRules(nil, nil)
+		if cleanupErr != nil {
+			t.Error(cleanupErr)
+		}
+	})
+
+	manager, err := NewManager(&agent.Options, make(agent.PluginSystemOptions))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return manager
+}
+
+//nolint:paralleltest // The plugin registry and key access rules are global.
+func TestUpdateRequestAccessRules(t *testing.T) {
+	tests := []struct {
+		name       string
+		key        string
+		clientID   uint64
+		wantError  string
+		wantQueued int
+	}{
+		{
+			name:       "allowedCommand",
+			key:        "system.run[/usr/bin/uptime]",
+			clientID:   agent.PassiveChecksClientID,
+			wantQueued: 1,
+		},
+		{
+			name:      "deniedCommand",
+			key:       "system.run[echo denied]",
+			clientID:  agent.PassiveChecksClientID,
+			wantError: "Unsupported item key.",
+		},
+		{
+			name:      "injectedCommand",
+			key:       "system.run[/usr/bin/uptime; cat /etc/passwd; /usr/bin/uptime]",
+			clientID:  agent.PassiveChecksClientID,
+			wantError: "Unsupported item key.",
+		},
+		{
+			name:      "deniedActiveCheck",
+			key:       "system.run[echo denied]",
+			clientID:  agent.MaxBuiltinClientID + 1,
+			wantError: "Unsupported item key.",
+		},
+		{
+			name:      "deniedTestCheck",
+			key:       "system.run[echo denied]",
+			clientID:  agent.TestrunClientID,
+			wantError: "Unsupported item key.",
+		},
+		{
+			name:       "localCheckBypassesRules",
+			key:        "system.run[echo denied]",
+			clientID:   agent.LocalChecksClientID,
+			wantQueued: 1,
+		},
+		{
+			name:      "unknownMetric",
+			key:       "unknown.metric",
+			clientID:  agent.PassiveChecksClientID,
+			wantError: "Unsupported item key.",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			manager := newSystemRunTestManager(t)
+
+			var cache resultCacheMock
+
+			update := updateRequest{
+				clientID: tt.clientID,
+				sink:     &cache,
+				requests: []*Request{
+					{
+						Itemid:  1,
+						Key:     tt.key,
+						Timeout: "3s",
+					},
+				},
+				now: time.Now(),
+			}
+			manager.processUpdateRequestRun(&update)
+
+			if tt.wantError == "" {
+				if len(cache.results) != 0 {
+					t.Fatalf("Allowed request returned unexpected results: %v", cache.results)
+				}
+			} else {
+				if len(cache.results) != 1 {
+					t.Fatalf("Expected one error result, got %d", len(cache.results))
+				}
+
+				err := cache.results[0].Error
+				if err == nil || err.Error() != tt.wantError {
+					t.Errorf("Request error = %v, want %q", err, tt.wantError)
+				}
+			}
+
+			if got := len(manager.pluginQueue); got != tt.wantQueued {
+				t.Errorf("Queued plugins = %d, want %d", got, tt.wantQueued)
+			}
+		})
+	}
+}
+
 func newManager() (*Manager, error) {
 	plugin.ClearRegistry()
 	plugins := make([]mockExporterPlugin, 3)
@@ -694,7 +832,7 @@ func newManager() (*Manager, error) {
 
 //nolint:paralleltest
 func TestTaskCreate(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	manager, err := newManager()
 	if err != nil {
@@ -744,7 +882,7 @@ func TestTaskCreate(t *testing.T) {
 }
 
 func TestTaskUpdate(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	manager, err := newManager()
 	if err != nil {
@@ -812,7 +950,7 @@ func TestTaskUpdate(t *testing.T) {
 }
 
 func TestTaskUpdateInvalidInterval(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	manager, err := newManager()
 	if err != nil {
@@ -866,7 +1004,7 @@ func TestTaskUpdateInvalidInterval(t *testing.T) {
 }
 
 func TestTaskDelete(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	manager, err := newManager()
 	if err != nil {
@@ -932,7 +1070,7 @@ func TestTaskDelete(t *testing.T) {
 }
 
 func TestSchedule(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
@@ -984,7 +1122,7 @@ func TestSchedule(t *testing.T) {
 }
 
 func TestScheduleCapacity(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
@@ -1039,7 +1177,7 @@ func TestScheduleCapacity(t *testing.T) {
 }
 
 func TestScheduleUpdate(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
@@ -1108,7 +1246,7 @@ func TestScheduleUpdate(t *testing.T) {
 }
 
 func TestCollectorSchedule(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
@@ -1155,7 +1293,7 @@ func TestCollectorSchedule(t *testing.T) {
 }
 
 func TestCollectorScheduleUpdate(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
@@ -1230,7 +1368,7 @@ func TestCollectorScheduleUpdate(t *testing.T) {
 }
 
 func TestRunner(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
@@ -1353,7 +1491,7 @@ func checkWatchRequests(t *testing.T, p plugin.Accessor, requests []*Request) {
 }
 
 func TestWatcher(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
@@ -1449,7 +1587,7 @@ func TestWatcher(t *testing.T) {
 }
 
 func TestCollectorExporterSchedule(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
@@ -1502,7 +1640,7 @@ func TestCollectorExporterSchedule(t *testing.T) {
 }
 
 func TestRunnerWatcher(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
@@ -1599,7 +1737,7 @@ func TestRunnerWatcher(t *testing.T) {
 }
 
 func TestMultiCollectorExporterSchedule(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
@@ -1663,7 +1801,7 @@ func TestMultiCollectorExporterSchedule(t *testing.T) {
 }
 
 func TestMultiRunnerWatcher(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
@@ -1741,7 +1879,7 @@ func TestMultiRunnerWatcher(t *testing.T) {
 }
 
 func TestPassiveRunner(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	manager := mockManager{sink: make(chan Performer, 10)}
 	plugin.ClearRegistry()
@@ -1820,7 +1958,7 @@ type configuratorOption struct {
 }
 
 func TestConfigurator(t *testing.T) {
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	var opt1, opt2, opt3 configuratorOption
 	_ = conf.UnmarshalStrict([]byte("Delay=5"), &opt1)

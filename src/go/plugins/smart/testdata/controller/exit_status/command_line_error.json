@@ -1,0 +1,14 @@
+{
+  "json_format_version": [1, 0],
+  "smartctl": {
+    "version": [7, 4],
+    "argv": ["smartctl", "--invalid-option", "-j"],
+    "messages": [
+      {
+        "string": "=======> INVALID ARGUMENT TO - OPTION: --invalid-option <=======",
+        "severity": "error"
+      }
+    ],
+    "exit_status": 1
+  }
+}

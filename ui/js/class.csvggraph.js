@@ -618,14 +618,15 @@
 					}
 
 					if (show_hint && data.hintMaxRows > rows_added) {
-						jQuery('<li>')
-							.append(
-								jQuery('<span>')
-									.css('background-color', point.g.getAttribute('data-color'))
-									.addClass('svg-graph-hintbox-item-color')
-							)
-							.append(`${point.g.getAttribute('data-metric')}: ${point.v}`)
-							.appendTo(html);
+						const color_span = document.createElement('span');
+						color_span.style.backgroundColor = point.g.getAttribute('data-color');
+						color_span.classList.add('svg-graph-hintbox-item-color');
+
+						const li = document.createElement('li');
+						li.append(color_span, `${point.g.getAttribute('data-metric')}: ${point.v}`)
+
+						html.append(li);
+
 						rows_added++;
 					}
 				}
@@ -814,15 +815,14 @@
 				}
 
 				triggers.slice(0, data.hintMaxRows).forEach((val, i) => {
-					hint_body.append(
-						jQuery('<li>')
-							.append(
-								jQuery('<span>')
-									.css('background-color', val.color)
-									.addClass('svg-graph-hintbox-trigger-color')
-							)
-							.append(`${val.trigger} [${val.constant}]`)
-					)
+					const color_span = document.createElement('span');
+					color_span.style.backgroundColor = val.color;
+					color_span.classList.add('svg-graph-hintbox-trigger-color');
+
+					const li = document.createElement('li');
+					li.append(color_span, `${val.trigger} [${val.constant}]`);
+
+					hint_body.append(li);
 
 					val.elem.classList.toggle('svg-graph-simple-trigger-hover', true)
 				});
@@ -841,12 +841,12 @@
 
 		if (html !== null) {
 			if (hbox === null) {
-				hbox = hintBox.createBox(e, graph[0], html[0], '', false, false, '.wrapper', false);
+				hbox = hintBox.createBox(e, graph[0], html[0], '', false, false, '.wrapper', false, hbox_footer);
 
 				graph
 					.off('mouseup', makeHintboxStatic)
 					.on('mouseup', {graph: graph}, makeHintboxStatic);
-				graph.data('hintbox', html);
+				graph.data('hintbox', hbox);
 				graph.data('hintbox_footer', hbox_footer);
 			}
 			else {

@@ -342,8 +342,8 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request, const zbx_even
 			if (HOST_STATUS_MONITORED != dc_items[i].host.status)
 				continue;
 
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &dc_items[i].host.hostid, NULL, NULL, NULL,
-					NULL, NULL, NULL, NULL, &dc_items[i].delay, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &dc_items[i].host, NULL, NULL, NULL,
+					NULL, NULL, NULL, &dc_items[i].delay, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 			if (SUCCEED != zbx_interval_preproc(dc_items[i].delay, &delay, NULL, NULL))
 				continue;
@@ -623,8 +623,8 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, zbx_json_parse_t *jp,
 			if (HOST_STATUS_MONITORED != dc_items[i].host.status)
 				continue;
 
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &dc_items[i].host.hostid, NULL, NULL, NULL,
-					NULL, NULL, NULL, NULL, &dc_items[i].delay, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &dc_items[i].host, NULL, NULL, NULL,
+					NULL, NULL, NULL, &dc_items[i].delay, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 			if (ZBX_COMPONENT_VERSION(4, 4, 0) > version &&
 					SUCCEED != zbx_interval_preproc(dc_items[i].delay, &delay, NULL, NULL))
@@ -667,9 +667,8 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, zbx_json_parse_t *jp,
 
 			timeout = zbx_strdup(NULL, dc_items[i].timeout_orig);
 
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &dc_items[i].host.hostid, NULL, NULL,
-						NULL, NULL, NULL, NULL, NULL, &timeout, ZBX_MACRO_TYPE_COMMON, NULL,
-						0);
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &dc_items[i].host, NULL, NULL, NULL,
+						NULL, NULL, NULL, &timeout, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_TIMEOUT, timeout, ZBX_JSON_TYPE_STRING);
 
