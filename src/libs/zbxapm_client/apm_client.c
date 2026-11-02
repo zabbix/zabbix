@@ -54,7 +54,7 @@ int	zbx_apm_get_stats(zbx_apm_stats_t *stats, char **error)
 
 	if (FAIL == zbx_ipc_socket_read(&socket, &response))
 	{
-		*error = zbx_strdup(NULL, "read stats response from APM service");
+		*error = zbx_strdup(NULL, "cannot read stats response from APM service");
 		goto out;
 	}
 

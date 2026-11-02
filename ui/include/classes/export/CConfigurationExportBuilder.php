@@ -768,6 +768,10 @@ class CConfigurationExportBuilder {
 				'ssl_key_password' => $discoveryRule['ssl_key_password'],
 				'verify_peer' => $discoveryRule['verify_peer'],
 				'verify_host' => $discoveryRule['verify_host'],
+				'time_shift' => $discoveryRule['time_shift'],
+				'lookback_limit' => $discoveryRule['lookback_limit'],
+				'granularity' => $discoveryRule['granularity'],
+				'query' => $discoveryRule['query'],
 				'lld_macro_paths' => self::formatLldMacroPaths($discoveryRule['lld_macro_paths']),
 				'preprocessing' => self::formatPreprocessingSteps($discoveryRule['preprocessing']),
 				'overrides' => self::formatLldOverrides($discoveryRule['overrides'])

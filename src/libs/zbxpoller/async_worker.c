@@ -54,8 +54,8 @@ static zbx_poller_item_t	*dc_config_async_get_poller_items(zbx_uint64_t processi
 		if (ZBX_POLLER_TYPE_TELEMETRY_QUERY == poller_type)
 		{
 			poller_item->apm_db_config = zbx_malloc(NULL, sizeof(zbx_apm_db_config_t));
-			zbx_dc_config_get_apm_db_config(poller_item->apm_db_config, config_apm_db_config,
-					config_source_ip, config_ssl_ca_location);
+			(void)zbx_dc_config_get_apm_db_config(poller_item->apm_db_config, config_apm_db_config,
+					config_source_ip, config_ssl_ca_location, NULL);
 		}
 
 		switch (poller_type)

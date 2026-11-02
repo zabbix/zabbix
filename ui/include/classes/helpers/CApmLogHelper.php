@@ -18,6 +18,7 @@ class CApmLogHelper {
 
 	public static function getName(int $type): string {
 		return match ($type) {
+			APM_LOG_SEVERITY_UNSPECIFIED => _('Unspecified'),
 			APM_LOG_SEVERITY_TRACE => _('Trace'),
 			APM_LOG_SEVERITY_DEBUG => _('Debug'),
 			APM_LOG_SEVERITY_INFO => _('Info'),
@@ -28,7 +29,8 @@ class CApmLogHelper {
 		};
 	}
 
-	public static function getSeverities(int $min = APM_LOG_SEVERITY_TRACE, int $max = APM_LOG_SEVERITY_FATAL): array {
+	public static function getSeverities(int $min = APM_LOG_SEVERITY_UNSPECIFIED,
+			int $max = APM_LOG_SEVERITY_FATAL): array {
 		$types = [];
 
 		foreach (range($min, $max) as $type) {
