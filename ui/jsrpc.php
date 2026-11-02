@@ -896,6 +896,13 @@ switch ($data['method']) {
 			}
 			elseif ($scripts) {
 				$result = $scripts[$data['hostid']][0];
+
+				if ($result['type'] == ZBX_SCRIPT_TYPE_URL &&
+						!CHtmlUrlValidator::validate($result['url'], ['allow_user_macro' => false])) {
+					$result = [
+						'error' => [_s('Provided URL "%1$s" is invalid.', $result['url'])]
+					];
+				}
 			}
 		}
 		break;
@@ -919,6 +926,13 @@ switch ($data['method']) {
 			}
 			elseif ($scripts) {
 				$result = $scripts[$data['eventid']][0];
+
+				if ($result['type'] == ZBX_SCRIPT_TYPE_URL &&
+						!CHtmlUrlValidator::validate($result['url'], ['allow_user_macro' => false])) {
+					$result = [
+						'error' => [_s('Provided URL "%1$s" is invalid.', $result['url'])]
+					];
+				}
 			}
 		}
 		break;
