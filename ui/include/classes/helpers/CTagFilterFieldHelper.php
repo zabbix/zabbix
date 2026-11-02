@@ -16,22 +16,26 @@
 
 class CTagFilterFieldHelper {
 
+	public const FILTER_TYPE_TAG = 0;
+	public const FILTER_TYPE_APM_ATTRIBUTE = 1;
+
 	/**
 	 * @param array  $data
 	 * @param int    $data['evaltype']                (optional)
 	 * @param array  $data['tags']                    (optional)
-	 * @param string $data['tags'][]['tag']
+	 * @param string $data['tags'][]['tag']           if filter_type set to FILTER_TYPE_TAG
+	 * @param string $data['tags'][]['key']           if filter_type set to FILTER_TYPE_APM_ATTRIBUTE
 	 * @param int    $data['tags'][]['operator']
 	 * @param string $data['tags'][]['value']
 	 * @param array  $options
 	 * @param string $options['tag_field_name']       (optional)
 	 * @param string $options['evaltype_field_name']  (optional)
+	 * @param string $options['filter_type']          (optional)
 	 *
 	 * @return CTable
 	 */
 	public static function getTagFilterField(array $data = [], array $options = []): CTable {
 		$options += [
-			'tag_field_name' => 'filter_tags',
 			'evaltype_field_name' => 'filter_evaltype'
 		];
 
@@ -47,7 +51,7 @@ class CTagFilterFieldHelper {
 				(new CRadioButtonList($options['evaltype_field_name'], (int) $data['evaltype']))
 					->addValue(_('And/Or'), TAG_EVAL_TYPE_AND_OR)
 					->addValue(_('Or'), TAG_EVAL_TYPE_OR)
-					->setModern(true)
+					->setModern()
 					->setId($options['evaltype_field_name'])
 			))->setColSpan(4)
 		);
@@ -69,16 +73,22 @@ class CTagFilterFieldHelper {
 	}
 
 	/**
-	 * Make empty tag filter field row template.
+	 * Make tag filter field row template.
 	 *
-	 * @param array  $options
-	 * @param string $options['tag_field_name']  (optional)
+	 * @param array      $options
+	 * @param string     $options['tag_field_name']  (optional)
+	 * @param int        $options['filter_type']     (optional)
+	 * @param string|int $index
+	 * @param string     $data['tags'][]['tag']      if filter_type set to FILTER_TYPE_TAG
+	 * @param string     $data['tags'][]['key']      if filter_type set to FILTER_TYPE_APM_ATTRIBUTE
+	 * @param int        $data['tags'][]['operator']
+	 * @param string     $data['tags'][]['value']
 	 *
 	 * @return CRow
 	 */
 	public static function getTemplate(array $options = []): CRow {
 		$options += [
-			'tag_field_name' => 'filter_tags'
+			'filter_type' => self::FILTER_TYPE_TAG
 		];
 
 		return self::getFilterRow($options, ['tag' => '', 'operator' => TAG_OPERATOR_LIKE, 'value' => '']);
@@ -87,11 +97,27 @@ class CTagFilterFieldHelper {
 	private static function getFilterRow(array $options, array $tag, ?int $i = null): CRow {
 		$index = $i === null ? '#{rowNum}' : $i;
 
+		$options += [
+			'tag_field_name' => 'filter_tags',
+			'filter_type' => self::FILTER_TYPE_TAG
+		];
+
+		$name_placeholder = _('tag');
+		$name_key = 'tag';
+
+		if ($options['filter_type'] == self::FILTER_TYPE_APM_ATTRIBUTE) {
+			$name_placeholder = _('key');
+			$name_key = 'key';
+		}
+
 		$items = [
-			(new CTextBox($options['tag_field_name'].'['.$index.'][tag]', $tag['tag']))
-				->setAttribute('placeholder', _('tag'))
+			(new CTextBox($options['tag_field_name'].'['.$index.']['.$name_key.']',
+				array_key_exists($name_key, $tag) ? $tag[$name_key] : ''
+			))
+				->setAttribute('placeholder', $name_placeholder)
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 			(new CSelect($options['tag_field_name'].'['.$index.'][operator]'))
+				->setId($options['tag_field_name'].'_'.$index.'_operator')
 				->addOptions(CSelect::createOptionsFromArray([
 					TAG_OPERATOR_EXISTS => _('Exists'),
 					TAG_OPERATOR_EQUAL => _('Equals'),
@@ -103,7 +129,9 @@ class CTagFilterFieldHelper {
 				->setValue((int) $tag['operator'])
 				->setFocusableElementId($options['tag_field_name'].'-'.$index.'-operator-select')
 				->setId($options['tag_field_name'].'_'.$index.'_operator'),
-			(new CTextBox($options['tag_field_name'].'['.$index.'][value]', $tag['value']))
+			(new CTextBox($options['tag_field_name'].'['.$index.'][value]',
+				array_key_exists('value', $tag) ? $tag['value'] : ''
+			))
 				->setAttribute('placeholder', _('value'))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 				->setId($options['tag_field_name'].'_'.$index.'_value'),

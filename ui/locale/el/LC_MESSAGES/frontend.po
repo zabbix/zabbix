@@ -141,6 +141,14 @@ msgid_plural "%1$s actions"
 msgstr[0] "Ενέργεια %1$s"
 msgstr[1] "Ενέργειες %1$s"
 
+#: include/actions.inc.php:1960
+#, c-format
+msgctxt "screen reader"
+msgid "%1$s action have been taken"
+msgid_plural "%1$s actions have been taken"
+msgstr[0] ""
+msgstr[1] ""
+
 #: jsLoader.php:321
 #, c-format
 msgid "%1$s characters"
@@ -395,6 +403,11 @@ msgstr "(συνδέθηκε από τον εντοπισμό διακομιστ�
 msgid "(no proxy)"
 msgstr "(χωρίς διαμεσολαβητή)"
 
+#: include/classes/helpers/CProxyHelper.php:225
+#, c-format
+msgid "+ %1$d more"
+msgstr ""
+
 #: include/classes/setup/CSetupWizard.php:541
 msgid "0 - use default port"
 msgstr "0 - χρήση προεπιλεγμένης θύρας"
@@ -407,6 +420,10 @@ msgstr "0 ή 1"
 #: app/views/administration.queue.overview.proxy.php:50
 msgid "1 minute"
 msgstr "1 λεπτό"
+
+#: app/views/ceprule.edit.php:192
+msgid "1) \"Event occurred\""
+msgstr ""
 
 #: app/views/host.wizard.edit.php:861
 msgid "1. Install Java Gateway on the same machine running Zabbix server by following the instructions in"
@@ -422,6 +439,10 @@ msgstr "10 δευτερόλεπτα"
 msgid "12-hour"
 msgstr "12ωρο"
 
+#: app/views/ceprule.edit.php:193
+msgid "2) \"Event added to window\""
+msgstr ""
+
 #: app/views/host.wizard.edit.php:867
 msgid "2. Configure your Java application to support remote JMX monitoring. For example:"
 msgstr ""
@@ -434,6 +455,10 @@ msgstr "24ωρο"
 #: app/views/popup.sla.edit.php:101 include/classes/helpers/CSlaHelper.php:254
 msgid "24x7"
 msgstr "24x7"
+
+#: app/views/ceprule.edit.php:194
+msgid "3) \"Event evicted\""
+msgstr ""
 
 #: app/views/administration.queue.overview.php:49
 #: app/views/administration.queue.overview.proxy.php:49
@@ -577,6 +602,34 @@ msgstr ""
 #: include/classes/helpers/CMenuHelper.php:467
 #: include/classes/helpers/CRoleHelper.php:495 include/html.inc.php:848
 msgid "API tokens"
+msgstr ""
+
+#: app/views/administration.apm.db.edit.php:25
+#: app/views/administration.apm.db.edit.php:124 app/views/proxy.edit.php:458
+#: include/classes/helpers/CMenuHelper.php:96
+#: include/classes/helpers/CMenuHelper.php:367
+#: include/classes/helpers/CRoleHelper.php:386
+msgid "APM"
+msgstr ""
+
+#: include/classes/db/ApmDb.php:130
+msgid "APM DB is not configured."
+msgstr ""
+
+#: app/controllers/CControllerApmDbEdit.php:39
+msgid "APM data source"
+msgstr ""
+
+#: app/controllers/CControllerApmDbUpdate.php:82
+msgid "APM data source updated."
+msgstr ""
+
+#: app/views/usergroup.edit.php:418
+msgid "APM filter"
+msgstr ""
+
+#: include/classes/data/CItemData.php:2838
+msgid "APM statistics for <type>. Returns JSON."
 msgstr ""
 
 #: widgets/gauge/includes/WidgetForm.php:265
@@ -835,6 +888,11 @@ msgstr "Ενεργό"
 msgid "Active checks"
 msgstr "Ενεργοί έλεγχοι"
 
+#: app/controllers/CControllerPopupGeneric.php:553
+#: app/views/popup.media.edit.php:116
+msgid "Active devices"
+msgstr ""
+
 #: app/views/maintenance.edit.php:144 app/views/maintenance.list.php:96
 msgid "Active since"
 msgstr "Ενεργό από"
@@ -842,6 +900,11 @@ msgstr "Ενεργό από"
 #: app/views/maintenance.edit.php:154 app/views/maintenance.list.php:97
 msgid "Active till"
 msgstr "Ενεργό έως"
+
+#: app/controllers/CControllerMaintenanceEdit.php:216
+#, c-format
+msgid "Ad-hoc: %1$s"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:204
 #: app/partials/action.operations.php:134
@@ -1042,6 +1105,15 @@ msgstr "Προσθήκη θυγατρικής υπηρεσίας"
 msgid "Add child services"
 msgstr "Προσθήκη θυγατρικών υπηρεσιών"
 
+#: jsLoader.php:283
+msgid "Add columns in the Customize table panel"
+msgstr ""
+
+#: app/views/user.device.init.view.php:93 app/views/user.device.list.php:31
+#: app/views/userprofile.device.list.php:31
+msgid "Add device"
+msgstr ""
+
 #: app/partials/configuration.valuemap.php:57
 msgid "Add from host"
 msgstr "Προσθήκη από διακομιστή"
@@ -1049,6 +1121,10 @@ msgstr "Προσθήκη από διακομιστή"
 #: app/partials/configuration.valuemap.php:54
 msgid "Add from template"
 msgstr "Προσθήκη από πρότυπο"
+
+#: app/controllers/CControllerFavoriteDelete.php:65 include/html.inc.php:178
+msgid "Add graph to Favorite graphs widget"
+msgstr ""
 
 #: include/actions.inc.php:629 include/actions.inc.php:860
 msgid "Add host"
@@ -1071,6 +1147,10 @@ msgstr ""
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
 msgid "Add item"
+msgstr ""
+
+#: app/controllers/CControllerFavoriteDelete.php:64 include/html.inc.php:177
+msgid "Add map to Favorite maps widget"
 msgstr ""
 
 #: app/partials/massupdate.macros.tab.php:96
@@ -1159,6 +1239,10 @@ msgstr ""
 #: app/controllers/CControllerPopupImportCompare.php:167
 msgid "Added"
 msgstr "Προστέθηκε"
+
+#: app/views/user.device.list.php:123 app/views/userprofile.device.list.php:45
+msgid "Added on"
+msgstr ""
 
 #: jsLoader.php:333
 #, c-format
@@ -1316,6 +1400,16 @@ msgstr ""
 msgid "Aggregate functions"
 msgstr "Συγκεντρωτικές συναρτήσεις"
 
+#: app/views/popup.telemetry.aggregatedcolumn.edit.php:75
+msgid "Aggregated column"
+msgstr ""
+
+#: app/partials/item.edit.item.tab.php:736
+#: app/partials/lldrule.edit.lldrule.tab.php:700
+#: app/partials/lldrule.edit.prototype.tab.php:700
+msgid "Aggregated columns"
+msgstr ""
+
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:283
 msgid "Aggregates each item in the data set."
 msgstr "Συγκεντρώνει κάθε στοιχείο στο σύνολο δεδομένων."
@@ -1341,6 +1435,12 @@ msgstr ""
 msgid "Aggregation interval"
 msgstr "Διάστημα συγκέντρωσης"
 
+#: app/views/js/apm.metric.list.js.php:200
+#: app/views/js/apm.metric.list.js.php:750
+#: app/views/js/apm.metric.list.js.php:780
+msgid "Aggregation temporality"
+msgstr ""
+
 #: include/actions.inc.php:2048
 msgid "Alert message"
 msgstr "Μήνυμα συναγερμού"
@@ -1357,6 +1457,16 @@ msgstr "Αλγόριθμος"
 #: include/hosts.inc.php:114
 msgid "Alias"
 msgstr "Ψευδώνυμο"
+
+#: app/controllers/CControllerItemCreate.php:447
+#: app/controllers/CControllerItemPrototypeCreate.php:447
+#: app/controllers/CControllerItemPrototypeUpdate.php:435
+#: app/controllers/CControllerItemUpdate.php:447
+#: app/controllers/CControllerLldRuleUpdateGeneral.php:606
+#: app/controllers/CControllerPopupItemTestEdit.php:162
+#: app/controllers/CControllerPopupTelemetryAggregatedColumnEdit.php:77
+msgid "Alias is not unique."
+msgstr ""
 
 #: include/views/monitoring.sysmap.constructor.php:75
 msgid "Align map elements"
@@ -1406,6 +1516,15 @@ msgstr ""
 #: app/views/monitoring.dashboard.view.php:189
 msgid "All dashboards"
 msgstr "Όλοι οι πίνακες ελέγχου"
+
+#: app/partials/ceprule.modal.operation.php:335
+#: include/classes/helpers/CCepRuleHelper.php:483
+msgid "All events"
+msgstr ""
+
+#: app/partials/ceprule.modal.operation.php:326
+msgid "All events - applies the operation to every event in the window. You can filter which events to include."
+msgstr ""
 
 #: app/views/monitoring.charts.view.php:82
 msgid "All graphs"
@@ -1637,9 +1756,18 @@ msgstr ""
 msgid "Apache, AWS, MySQL, etc."
 msgstr ""
 
+#: include/classes/setup/CSetupWizard.php:745
+#: include/classes/setup/CSetupWizard.php:1081
+msgid "AppRole"
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:225
 msgid "Application error."
 msgstr "Σφάλμα εφαρμογής."
+
+#: app/partials/ceprule.modal.operation.php:321 app/views/ceprule.edit.php:238
+msgid "Applies to"
+msgstr ""
 
 #: app/partials/timeselector.filter.php:104
 #: app/views/dashboard.page.properties.edit.php:64
@@ -1800,6 +1928,21 @@ msgstr "Τουλάχιστον μία ενέργεια είναι υποχρεω
 msgid "At least one active user must exist with role \"%1$s\"."
 msgstr "Πρέπει να υπάρχει τουλάχιστον ένας ενεργός χρήστης με ρόλο \"%1$s\"."
 
+#: app/controllers/CControllerItemCreate.php:445
+#: app/controllers/CControllerItemCreate.php:446
+#: app/controllers/CControllerItemPrototypeCreate.php:445
+#: app/controllers/CControllerItemPrototypeCreate.php:446
+#: app/controllers/CControllerItemPrototypeUpdate.php:433
+#: app/controllers/CControllerItemPrototypeUpdate.php:434
+#: app/controllers/CControllerItemUpdate.php:445
+#: app/controllers/CControllerItemUpdate.php:446
+#: app/controllers/CControllerLldRuleUpdateGeneral.php:604
+#: app/controllers/CControllerLldRuleUpdateGeneral.php:605
+#: app/controllers/CControllerPopupItemTestEdit.php:160
+#: app/controllers/CControllerPopupItemTestEdit.php:161
+msgid "At least one aggregated column must be specified."
+msgstr ""
+
 #: app/controllers/CControllerMaintenanceTimePeriodCheck.php:40
 msgid "At least one day must be selected."
 msgstr ""
@@ -1830,6 +1973,14 @@ msgstr ""
 msgid "At least one host group or host must be selected."
 msgstr "Πρέπει να επιλεγεί τουλάχιστον μία ομάδα διακομιστών ή διακομιστής."
 
+#: app/controllers/CControllerMaintenanceCreate.php:87
+#: app/controllers/CControllerMaintenanceUpdate.php:88
+#: app/views/maintenance.edit.php:301
+#: include/classes/api/services/CMaintenance.php:688
+#: include/classes/api/services/CMaintenance.php:706
+msgid "At least one host group, host or trigger must be selected."
+msgstr ""
+
 #: app/controllers/CControllerGraphPrototypeCreate.php:116
 #: app/controllers/CControllerGraphPrototypeUpdate.php:118
 msgid "At least one item must be a prototype"
@@ -1856,6 +2007,11 @@ msgstr "Θα πρέπει να υποστηρίζεται τουλάχιστον
 #: app/views/correlation.edit.php:264
 msgid "At least one operation must be selected."
 msgstr "Πρέπει να επιλεγεί τουλάχιστον μία λειτουργία."
+
+#: app/controllers/CControllerCepRuleCreate.php:184
+#: app/controllers/CControllerCepRuleUpdate.php:185
+msgid "At least one operation must execute when pattern matched."
+msgstr ""
 
 #: app/views/popup.action.edit.php:179 app/views/popup.action.edit.php:252
 msgid "At least one operation must exist."
@@ -1921,6 +2077,29 @@ msgstr "Προσπάθειες"
 #: app/views/popup.mediatypemapping.edit.php:59
 msgid "Attribute"
 msgstr "Χαρακτηριστικό"
+
+#: app/views/popup.telemetry.condition.edit.php:54
+msgid "Attribute key"
+msgstr ""
+
+#: app/controllers/CControllerProxyCreate.php:131
+#: app/controllers/CControllerProxyUpdate.php:130
+msgid "Attribute key and category are not unique."
+msgstr ""
+
+#: app/controllers/CControllerUsergroupCreate.php:96
+#: app/controllers/CControllerUsergroupUpdate.php:97
+msgid "Attribute key, value and category are not unique."
+msgstr ""
+
+#: app/views/popup.telemetry.condition.edit.php:67
+msgid "Attribute value"
+msgstr ""
+
+#: app/views/apm.metric.list.php:83 app/views/js/apm.metric.list.js.php:210
+#: app/views/js/apm.metric.list.js.php:851
+msgid "Attributes"
+msgstr ""
 
 #: app/views/administration.geomaps.edit.php:86
 msgid "Attribution text"
@@ -2001,6 +2180,10 @@ msgstr "Σύνθημα ταυτοποίησης"
 #: app/views/popup.itemtestedit.view.php:204
 msgid "Authentication protocol"
 msgstr "Πρωτόκολλο ταυτοποίησης"
+
+#: include/classes/vaults/CVaultHashiCorp.php:79
+msgid "Authentication role ID and secret ID must be empty if authentication token is provided."
+msgstr ""
 
 #: app/controllers/CControllerAuthenticationUpdate.php:302
 msgid "Authentication settings updated"
@@ -2205,6 +2388,11 @@ msgstr "Βασικό χρώμα"
 msgid "Basic"
 msgstr "Βασική"
 
+#: app/views/js/apm.log.list.js.php:594 app/views/js/apm.metric.list.js.php:803
+#: app/views/js/apm.trace.list.js.php:583
+msgid "Basic information"
+msgstr ""
+
 #: app/views/connector.edit.php:132
 msgid "Bearer"
 msgstr "Φορέας"
@@ -2358,6 +2546,14 @@ msgstr "Τελευταίοι Ν"
 msgid "Brackets to specify IPv6 addresses"
 msgstr ""
 
+#: app/views/mediatype.edit.php:464
+msgid "Bridge Adapter connection details can be found in Zabbix configuration file."
+msgstr ""
+
+#: app/views/mediatype.edit.php:463
+msgid "Bridge adapter connection"
+msgstr ""
+
 #: jsLoader.php:266
 msgid "Bring forward"
 msgstr ""
@@ -2375,6 +2571,11 @@ msgstr ""
 msgid "Bulgarian (bg_BG)"
 msgstr "Βουλγαρικά (bg_BG)"
 
+#: app/controllers/CControllerProxyEdit.php:156
+#, c-format
+msgid "By adding the proxy to a proxy group, it will be removed from proxy allow/deny lists of the following user groups: %1$s."
+msgstr ""
+
 #: report2.php:191
 msgid "By host"
 msgstr "Ανά διακομιστή"
@@ -2387,6 +2588,15 @@ msgstr "Από μένα"
 #: report2.php:192
 msgid "By trigger template"
 msgstr "Με πρότυπο εναύσματος"
+
+#: include/classes/api/services/CCepRule.php:957
+#, c-format
+msgid "CEP rule \"%1$s\" already exists."
+msgstr ""
+
+#: app/controllers/CControllerPopup.php:43
+msgid "CEP rule edit"
+msgstr ""
 
 #: app/views/administration.proxy.list.php:161
 #: app/views/administration.proxy.list.php:177
@@ -2540,10 +2750,32 @@ msgstr "Αδύνατη η προσθήκη μη αριθμητικού αντι�
 msgid "Cannot add action"
 msgstr "Αδύνατη η προσθήκη ενέργειας"
 
+#: app/controllers/CControllerCepRuleCreate.php:207
+#: app/controllers/CControllerCepRuleCreate.php:234
+msgid "Cannot add complex event processing rule"
+msgstr ""
+
 #: jsLoader.php:133
 #, c-format
 msgid "Cannot add dashboard page: maximum number of %1$d dashboard pages has been added."
 msgstr "Δεν είναι δυνατή η προσθήκη σελίδας πίνακα ελέγχου: έχει προστεθεί ο μέγιστος αριθμός %1$d σελίδων πίνακα ελέγχου."
+
+#: app/controllers/CControllerUserDeviceInit.php:39
+#: app/controllers/CControllerUserDeviceInit.php:88
+msgid "Cannot add device"
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:679
+msgid "Cannot add device because the device limit has been reached. Please remove redundant devices, or contact your system administrator."
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:677
+msgid "Cannot add device. Please contact your system administrator."
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:678
+msgid "Cannot add device. Please try again later. If error persists, please contact your system administrator."
+msgstr ""
 
 #: host_discovery_prototypes.php:518
 msgid "Cannot add discovery prototype"
@@ -3018,6 +3250,12 @@ msgid_plural "Cannot delete event correlations"
 msgstr[0] "Αδύνατη η διαγραφή συσχέτισης συμβάντων"
 msgstr[1] "Αδύνατη η διαγραφή συσχετίσεων συμβάντων"
 
+#: app/controllers/CControllerCepRuleDelete.php:70
+msgid "Cannot delete event processing rule"
+msgid_plural "Cannot delete event processing rules"
+msgstr[0] ""
+msgstr[1] ""
+
 #: graphs.php:281 graphs.php:338
 #, fuzzy
 msgid "Cannot delete graph"
@@ -3044,6 +3282,13 @@ msgstr[1] "Αδύνατη η διαγραφή ξενιστή"
 msgid "Cannot delete host \"%1$s\": %2$s."
 msgstr ""
 
+#: include/classes/api/services/CHost.php:1352
+#, c-format
+msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host group, host or trigger."
+msgid_plural "Cannot delete hosts %1$s because maintenance \"%2$s\" must contain at least one host group, host or trigger."
+msgstr[0] ""
+msgstr[1] ""
+
 #: include/classes/api/services/CHost.php:1461
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
@@ -3061,6 +3306,13 @@ msgstr[1] "Αδύνατη η διαγραφή των ομάδων διακομι
 #, c-format
 msgid "Cannot delete host group \"%1$s\": %2$s."
 msgstr ""
+
+#: include/classes/api/services/CHostGroup.php:796
+#, c-format
+msgid "Cannot delete host group %1$s because maintenance \"%2$s\" must contain at least one host group, host or trigger."
+msgid_plural "Cannot delete host groups %1$s because maintenance \"%2$s\" must contain at least one host group, host or trigger."
+msgstr[0] ""
+msgstr[1] ""
 
 #: include/classes/api/services/CHostGroup.php:858
 #, c-format
@@ -3254,6 +3506,13 @@ msgstr[1] "Αδύνατη η διαγραφή εναύσματος"
 msgid "Cannot delete trigger \"%1$s\": %2$s."
 msgstr ""
 
+#: include/classes/api/managers/CTriggerManager.php:128
+#, c-format
+msgid "Cannot delete trigger %1$s because maintenance \"%2$s\" must contain at least one host group, host or trigger."
+msgid_plural "Cannot delete triggers %1$s because maintenance \"%2$s\" must contain at least one host group, host or trigger."
+msgstr[0] ""
+msgstr[1] ""
+
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
 #, fuzzy
 msgid "Cannot delete trigger prototype"
@@ -3348,6 +3607,12 @@ msgid_plural "Cannot disable event correlations"
 msgstr[0] ""
 msgstr[1] ""
 
+#: app/controllers/CControllerCepRuleDisable.php:86
+msgid "Cannot disable event processing rule"
+msgid_plural "Cannot disable event processing rules"
+msgstr[0] ""
+msgstr[1] ""
+
 #: app/controllers/CControllerHostGroupDisable.php:91
 #: app/controllers/CControllerPopupMassupdateHost.php:498
 #: app/controllers/CControllerProxyHostDisable.php:93
@@ -3426,6 +3691,11 @@ msgid_plural "Cannot enable connectors"
 msgstr[0] "Αδύνατη η ενεργοποίηση του συνδέσμου"
 msgstr[1] "Αδύνατη η ενεργοποίηση των συνδέσμων"
 
+#: include/classes/api/services/CRole.php:851
+#, c-format
+msgid "Cannot enable device action \"%2$s\" for user role \"%1$s\" because device access is disabled."
+msgstr ""
+
 #: host_discovery_prototypes.php:585
 msgid "Cannot enable discovery prototype"
 msgid_plural "Cannot enable discovery prototypes"
@@ -3441,6 +3711,12 @@ msgstr[1] "Αδύνατη η ενεργοποίηση κανόνων εντοπ�
 #: app/controllers/CControllerCorrelationEnable.php:76
 msgid "Cannot enable event correlation"
 msgid_plural "Cannot enable event correlations"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/controllers/CControllerCepRuleEnable.php:86
+msgid "Cannot enable event processing rule"
+msgid_plural "Cannot enable event processing rules"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -4274,6 +4550,10 @@ msgstr ""
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
 msgstr "Αδύνατη η ανάγνωση απάντησης, ελέγξτε σύνδεση με Zabbix εξυπηρετητή \"%1$s\"."
 
+#: app/controllers/CControllerUserDeviceDelete.php:120
+msgid "Cannot remove device"
+msgstr ""
+
 #: app/controllers/CControllerPopupMassupdateHost.php:363
 #, c-format
 msgid "Cannot remove the tag with name \"%1$s\" and value \"%2$s\", defined in a host prototype, from host \"%3$s\"."
@@ -4288,6 +4568,10 @@ msgid "Cannot reset TOTP secret"
 msgid_plural "Cannot reset TOTP secrets"
 msgstr[0] ""
 msgstr[1] ""
+
+#: app/controllers/CControllerCepRuleResetTimeWindows.php:62
+msgid "Cannot reset rule time windows"
+msgstr ""
 
 #: include/classes/api/services/CDRule.php:273
 #: include/classes/api/services/CDRule.php:433
@@ -4394,6 +4678,10 @@ msgstr ""
 msgid "Cannot switch host for interface."
 msgstr "Αδύνατη η εναλλαγή ξενιστή για διεπαφή."
 
+#: app/controllers/CControllerApmDbTest.php:36
+msgid "Cannot test configuration"
+msgstr ""
+
 #: app/controllers/CControllerMediatypeTestEdit.php:75
 #: app/controllers/CControllerMediatypeTestSend.php:84
 msgid "Cannot test disabled media type."
@@ -4404,6 +4692,15 @@ msgid "Cannot unblock user"
 msgid_plural "Cannot unblock users"
 msgstr[0] ""
 msgstr[1] ""
+
+#: include/classes/server/CZabbixServer.php:687
+#: include/classes/server/CZabbixServer.php:696
+msgid "Cannot unlink device. Please contact your system administrator."
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:688
+msgid "Cannot unlink device. Please try again later. If error persists, please contact your system administrator."
+msgstr ""
 
 #: include/classes/api/services/CHost.php:1143
 msgid "Cannot unlink template"
@@ -4523,6 +4820,11 @@ msgstr "Αδύνατη η ενημέρωση ενέργειας"
 msgid "Cannot update authentication"
 msgstr ""
 
+#: app/controllers/CControllerCepRuleUpdate.php:208
+#: app/controllers/CControllerCepRuleUpdate.php:236
+msgid "Cannot update complex event processing rule"
+msgstr ""
+
 #: app/controllers/CControllerAuditSettingsUpdate.php:45
 #: app/controllers/CControllerAuditSettingsUpdate.php:82
 #: app/controllers/CControllerAutoregUpdate.php:41
@@ -4546,6 +4848,10 @@ msgstr "Αδύνατη η ενημέρωση διαμόρφωσης"
 #: app/controllers/CControllerConnectorUpdate.php:157
 msgid "Cannot update connector"
 msgstr "Αδύνατη η ενημέρωση του συνδέσμου"
+
+#: app/controllers/CControllerDiscoveryCheckCheck.php:227
+msgid "Cannot update discovery check"
+msgstr ""
 
 #: host_discovery_prototypes.php:526 host_discovery_prototypes.php:550
 msgid "Cannot update discovery prototype"
@@ -4619,6 +4925,46 @@ msgstr "Αδύνατη η ενημέρωση αντιστοίχισης εικο
 #: app/controllers/CControllerImageUpdate.php:156
 msgid "Cannot update image"
 msgstr "Αδύνατη η ενημέρωση εικόνας"
+
+#: include/classes/api/services/CItemGeneral.php:934
+#, c-format
+msgid "Cannot update inherited discovery rule prototype with key \"%1$s\" on host \"%2$s\" because granularity cannot be greater than lookback limit."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:933
+#, c-format
+msgid "Cannot update inherited discovery rule prototype with key \"%1$s\" on template \"%2$s\" because granularity cannot be greater than lookback limit."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:944
+#, c-format
+msgid "Cannot update inherited discovery rule with key \"%1$s\" on host \"%2$s\" because granularity cannot be greater than lookback limit."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:943
+#, c-format
+msgid "Cannot update inherited discovery rule with key \"%1$s\" on template \"%2$s\" because granularity cannot be greater than lookback limit."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:929
+#, c-format
+msgid "Cannot update inherited item prototype with key \"%1$s\" on host \"%2$s\" because granularity cannot be greater than lookback limit."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:928
+#, c-format
+msgid "Cannot update inherited item prototype with key \"%1$s\" on template \"%2$s\" because granularity cannot be greater than lookback limit."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:939
+#, c-format
+msgid "Cannot update inherited item with key \"%1$s\" on host \"%2$s\" because granularity cannot be greater than lookback limit."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:938
+#, c-format
+msgid "Cannot update inherited item with key \"%1$s\" on template \"%2$s\" because granularity cannot be greater than lookback limit."
+msgstr ""
 
 #: include/classes/api/services/CHostInterface.php:373
 #, c-format
@@ -4803,6 +5149,10 @@ msgstr ""
 msgid "Cannot use both %1$s and %2$s at the same time."
 msgstr ""
 
+#: app/partials/ceprule.window.php:62
+msgid "Capacity"
+msgstr ""
+
 #: app/views/administration.regex.edit.php:55
 msgid "Case sensitive"
 msgstr "Διάκριση πεζών-κεφαλαίων"
@@ -4825,9 +5175,24 @@ msgstr ""
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr ""
 
+#: app/partials/apm.attributes.php:35 app/partials/item.edit.item.tab.php:653
+#: app/partials/lldrule.edit.lldrule.tab.php:617
+#: app/partials/lldrule.edit.prototype.tab.php:617 include/forms.inc.php:712
+msgid "Category"
+msgstr ""
+
 #: include/actions.inc.php:1991 include/classes/screens/CScreenProblem.php:1178
 #: include/events.inc.php:182
 msgid "Cause"
+msgstr ""
+
+#: app/partials/ceprule.window.php:41
+msgid "Cause and symptom grouping - first event from the fixed time window will be treated as cause, others - as symptoms."
+msgstr ""
+
+#: app/partials/ceprule.window.php:50
+#: include/classes/helpers/CCepRuleHelper.php:539
+msgid "Cause and symptoms grouping"
 msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:35
@@ -4896,6 +5261,10 @@ msgstr ""
 #: widgets/item/includes/WidgetForm.php:255
 #: widgets/item/views/widget.edit.php:200
 msgid "Change indicator"
+msgstr ""
+
+#: include/classes/html/CMacroValue.php:239
+msgid "Change macro value type"
 msgstr ""
 
 #: app/views/administration.mediatype.edit.php:157
@@ -5200,6 +5569,14 @@ msgstr ""
 msgid "Clone"
 msgstr "Κλώνος"
 
+#: include/classes/helpers/CCepRuleHelper.php:466
+msgid "Clone first"
+msgstr ""
+
+#: include/classes/helpers/CCepRuleHelper.php:467
+msgid "Clone last"
+msgstr ""
+
 #: app/views/configuration.host.edit.php:61
 #: app/views/js/popup.host.edit.js.php:44 host_prototypes.php:203
 msgid "Cloned host parameter values have been modified."
@@ -5223,14 +5600,26 @@ msgstr ""
 msgid "Close"
 msgstr "Κλείσιμο"
 
+#: include/classes/helpers/CCepRuleHelper.php:475
+msgid "Close (window)"
+msgstr ""
+
 #: app/partials/trigger.edit.trigger.tab.php:151
 #: app/partials/trigger.edit.trigger.tab.php:229
 msgid "Close expression constructor"
 msgstr "Κλείσιμο κατασκευής έκφρασης"
 
+#: jsLoader.php:520
+msgid "Close modal window"
+msgstr ""
+
 #: app/views/correlation.edit.php:254
 #: include/classes/helpers/CCorrelationHelper.php:71
 msgid "Close new event"
+msgstr ""
+
+#: include/func.inc.php:1617 jsLoader.php:394
+msgid "Close notification"
 msgstr ""
 
 #: app/views/correlation.edit.php:247
@@ -5261,6 +5650,12 @@ msgstr ""
 #: include/classes/html/CSectionCollapsible.php:45 jsLoader.php:299
 #: jsLoader.php:304 widgets/problems/Widget.php:35
 msgid "Collapse"
+msgstr ""
+
+#: include/classes/html/CSectionCollapsible.php:54
+#: include/classes/html/CSectionCollapsible.php:60 jsLoader.php:532
+#: jsLoader.php:570
+msgid "Collapse section"
 msgstr ""
 
 #: app/partials/layout.htmlpage.aside.php:40
@@ -5311,8 +5706,21 @@ msgstr ""
 msgid "Colors"
 msgstr ""
 
+#: app/views/popup.telemetry.aggregatedcolumn.edit.php:54
+msgid "Column"
+msgstr ""
+
 #: widgets/topitems/views/column.edit.php:293
 msgid "Column aggregation function"
+msgstr ""
+
+#: app/controllers/CControllerItemCreate.php:434
+#: app/controllers/CControllerItemPrototypeCreate.php:434
+#: app/controllers/CControllerItemPrototypeUpdate.php:422
+#: app/controllers/CControllerItemUpdate.php:434
+#: app/controllers/CControllerLldRuleUpdateGeneral.php:593
+#: app/controllers/CControllerPopupItemTestEdit.php:149
+msgid "Column and key name combination is not unique."
 msgstr ""
 
 #: jsLoader.php:304
@@ -5380,6 +5788,32 @@ msgstr ""
 msgid "Complete authentication to get tokens."
 msgstr ""
 
+#: app/controllers/CControllerCepRuleEdit.php:90 app/views/ceprule.edit.php:284
+#: app/views/ceprule.list.php:65 app/views/ceprule.list.php:165
+msgid "Complex event processing"
+msgstr ""
+
+#: app/controllers/CControllerAuditLogList.php:219
+msgid "Complex event processing rule"
+msgstr ""
+
+#: app/controllers/CControllerCepRuleCreate.php:222
+msgid "Complex event processing rule added"
+msgstr ""
+
+#: app/controllers/CControllerCepRuleUpdate.php:224
+msgid "Complex event processing rule updated"
+msgstr ""
+
+#: include/events.inc.php:146
+msgid "Complex event processing rule."
+msgstr ""
+
+#: include/actions.inc.php:2277 include/html.inc.php:1158
+#, c-format
+msgid "Complex event processing: %1$s"
+msgstr ""
+
 #: include/classes/core/CComponentRegistry.php:53
 #, c-format
 msgid "Component %1$s already registered."
@@ -5411,6 +5845,11 @@ msgstr ""
 msgid "Condition"
 msgstr "Συνθήκη"
 
+#: app/views/js/ceprule.edit.js.php:512
+#: app/views/js/ceprule.operation.edit.js.php:598
+msgid "Condition details"
+msgstr ""
+
 #: app/controllers/CControllerServiceCreate.php:45
 #: app/controllers/CControllerServiceUpdate.php:46
 msgid "Condition, limit and status combination is not unique."
@@ -5432,6 +5871,10 @@ msgstr "Διαμόρφωση"
 #: include/classes/data/CItemData.php:2764
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "Διαμόρφωση στατιστικών cache. Cache - buffer (λειτουργίες: pfree, συνολική, χρήση, ελεύθερη)"
+
+#: include/classes/db/ApmDb.php:45
+msgid "Configuration cannot be retrieved if a local database is defined for APM."
+msgstr ""
 
 #: app/views/host.wizard.edit.php:1024
 msgid "Configuration complete"
@@ -5471,6 +5914,10 @@ msgstr ""
 #: app/controllers/CControllerDiscoveryList.php:143 host_discovery.php:27
 msgid "Configuration of discovery rules"
 msgstr "Διαμόρφωση κανόνων εντοπισμού"
+
+#: app/controllers/CControllerCepRuleList.php:102
+msgid "Configuration of event processing rules"
+msgstr ""
 
 #: graphs.php:27
 msgid "Configuration of graph prototypes"
@@ -5643,6 +6090,10 @@ msgstr ""
 msgid "Configure host"
 msgstr ""
 
+#: app/views/mediatype.edit.php:468
+msgid "Configured"
+msgstr ""
+
 #: app/controllers/CControllerOauthAuthorize.php:166
 #: app/views/mediatype.edit.php:155
 #, c-format
@@ -5684,6 +6135,11 @@ msgstr ""
 #: app/views/administration.mediatype.edit.php:91
 #: app/views/mediatype.edit.php:105
 msgid "Connection security"
+msgstr ""
+
+#: app/views/js/administration.apm.db.edit.js.php:337
+#, c-format
+msgid "Connection timeout of %1$s seconds exceeded when connecting to APM data source."
 msgstr ""
 
 #: include/classes/server/CZabbixServer.php:521
@@ -5815,6 +6271,14 @@ msgstr "Επαφή"
 msgid "Contains"
 msgstr ""
 
+#: include/classes/helpers/CRegexHelper.php:22
+msgid "Contains any substring from list"
+msgstr ""
+
+#: include/classes/helpers/CRegexHelper.php:21
+msgid "Contains string"
+msgstr ""
+
 #: app/views/action.list.php:75 app/views/administration.iconmap.list.php:36
 #: app/views/administration.image.list.php:69
 #: app/views/administration.proxy.list.php:241
@@ -5943,6 +6407,10 @@ msgstr ""
 msgid "Correlation edit"
 msgstr ""
 
+#: app/controllers/CControllerApmDbTest.php:78
+msgid "Could not connect to APM data source."
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:52
 #: app/controllers/CControllerPopupTriggerExpr.php:693
 #: app/controllers/CControllerPopupTriggerExpr.php:734
@@ -6025,6 +6493,10 @@ msgstr ""
 #: app/views/administration.image.list.php:60
 msgid "Create background"
 msgstr "Δημιουργία παρασκηνίου"
+
+#: app/views/ceprule.list.php:29
+msgid "Create complex event processing"
+msgstr ""
 
 #: app/views/connector.list.php:140
 msgid "Create connector"
@@ -6201,6 +6673,14 @@ msgstr "Δημιουργία διαμεσολαβητή"
 msgid "Create proxy group"
 msgstr ""
 
+#: app/views/administration.proxy.list.php:273
+msgid "Create proxy in Cloud"
+msgstr ""
+
+#: app/views/administration.regex.list.php:35
+msgid "Create regular expression"
+msgstr ""
+
 #: app/views/reports.scheduledreport.list.php:37
 msgid "Create report"
 msgstr ""
@@ -6303,6 +6783,10 @@ msgstr ""
 msgid "Critical"
 msgstr "Κρίσιμο"
 
+#: app/views/js/apm.metric.list.js.php:79
+msgid "Cumulative"
+msgstr ""
+
 #: app/views/administration.proxy.list.php:66
 msgid "Current"
 msgstr ""
@@ -6313,6 +6797,15 @@ msgstr ""
 
 #: app/views/js/administration.authentication.edit.js.php:425
 msgid "Current SP private key will be deleted."
+msgstr ""
+
+#: app/partials/ceprule.modal.operation.php:333
+#: include/classes/helpers/CCepRuleHelper.php:481
+msgid "Current event"
+msgstr ""
+
+#: app/partials/ceprule.modal.operation.php:324
+msgid "Current event - applies the operation to the current event."
 msgstr ""
 
 #: app/views/popup.operation.edit.php:256
@@ -6408,6 +6901,14 @@ msgstr "Προσαρμοσμένο μέγεθος"
 msgid "Custom templates are not supported."
 msgstr ""
 
+#: app/views/js/configuration.host.list.js.php:299
+#: app/views/js/monitoring.host.view.js.php:181
+#: app/views/js/monitoring.latest.view.js.php:229
+#: app/views/js/monitoring.problem.view.js.php:150
+#: app/views/js/template.list.js.php:158 jsLoader.php:316
+msgid "Custom text"
+msgstr ""
+
 #: jsLoader.php:270
 msgid "Customize table"
 msgstr ""
@@ -6477,6 +6978,10 @@ msgstr ""
 msgid "Dark (classic)"
 msgstr ""
 
+#: include/classes/core/ZBase.php:392
+msgid "Dark blue"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:227
 #: app/controllers/CControllerDashboardPrint.php:71
 #: app/controllers/CControllerDashboardView.php:93
@@ -6497,6 +7002,10 @@ msgstr ""
 #: include/classes/api/services/CDashboardGeneral.php:94
 #, c-format
 msgid "Dashboard \"%1$s\" is used in report \"%2$s\"."
+msgstr ""
+
+#: app/views/monitoring.dashboard.view.php:101
+msgid "Dashboard actions"
 msgstr ""
 
 #: app/controllers/CControllerDashboardUpdate.php:218
@@ -6582,11 +7091,21 @@ msgstr ""
 msgid "Data collection"
 msgstr ""
 
+#: app/views/proxy.edit.php:250
+msgid "Data collection enabled"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:2241
 #: include/classes/graphdraw/CPieGraphDraw.php:793
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
 msgstr "Δεδομένα από %1$s. Παραγόμενα σε %2$s δευτ."
+
+#: app/partials/item.edit.item.tab.php:938
+#: app/partials/lldrule.edit.lldrule.tab.php:922
+#: app/partials/lldrule.edit.prototype.tab.php:924
+msgid "Data gaps are possible."
+msgstr ""
 
 #: app/views/host.wizard.edit.php:168
 msgid "Data is collected by Zabbix agent, a lightweight software `component installed on your monitoring target."
@@ -6629,6 +7148,11 @@ msgstr ""
 msgid "Data set label"
 msgstr ""
 
+#: include/classes/helpers/CMenuHelper.php:365
+#: include/classes/helpers/CRoleHelper.php:561
+msgid "Data source"
+msgstr ""
+
 #: app/views/administration.audit.settings.edit.php:52
 #: app/views/administration.housekeeping.edit.php:102
 #: app/views/administration.housekeeping.edit.php:115
@@ -6637,8 +7161,22 @@ msgstr ""
 msgid "Data storage period"
 msgstr ""
 
+#: include/classes/helpers/CSystemInfoHelper.php:310
+msgid "Data stores"
+msgstr ""
+
 #: app/views/connector.edit.php:54 app/views/connector.list.php:74
 msgid "Data type"
+msgstr ""
+
+#: app/partials/item.edit.item.tab.php:953
+#: app/partials/lldrule.edit.lldrule.tab.php:937
+#: app/partials/lldrule.edit.prototype.tab.php:939
+msgid "Data will likely overlap."
+msgstr ""
+
+#: app/views/administration.apm.db.edit.php:91
+msgid "Database"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:660
@@ -6828,6 +7366,14 @@ msgstr ""
 msgid "Decrease by"
 msgstr ""
 
+#: include/classes/helpers/CCepRuleHelper.php:463
+msgid "Decrease severity"
+msgstr ""
+
+#: include/classes/helpers/CCepRuleHelper.php:472
+msgid "Decrease value"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:707
 #: app/controllers/CControllerPopupTriggerExpr.php:1226
 #: app/partials/action.operations.php:73
@@ -6863,6 +7409,10 @@ msgstr ""
 msgid "Default access to new actions"
 msgstr ""
 
+#: app/views/administration.userrole.edit.php:429
+msgid "Default access to new device actions"
+msgstr ""
+
 #: app/views/administration.userrole.edit.php:285
 msgid "Default access to new modules"
 msgstr ""
@@ -6870,6 +7420,10 @@ msgstr ""
 #: app/views/administration.authentication.edit.php:42
 msgid "Default authentication"
 msgstr "Προκαθορισμένη ταυτοποίηση"
+
+#: include/classes/html/CTabFilter.php:169
+msgid "Default filter tab"
+msgstr ""
 
 #: app/views/administration.miscconfig.edit.php:58
 msgid "Default host inventory mode"
@@ -6892,6 +7446,11 @@ msgstr ""
 msgid "Default login form"
 msgstr ""
 
+#: app/views/administration.user.edit.php:306
+#: app/views/userprofile.edit.php:260
+msgid "Default maintenance period"
+msgstr ""
+
 #: app/views/popup.operation.edit.php:171
 msgid "Default media type"
 msgstr ""
@@ -6902,6 +7461,10 @@ msgstr "Διάρκεια βήματος προεπιλεγμένης λειτο�
 
 #: app/views/dashboard.properties.edit.php:78
 msgid "Default page display period"
+msgstr ""
+
+#: app/views/dashboard.properties.edit.php:75
+msgid "Default slideshow interval"
 msgstr ""
 
 #: app/views/administration.gui.edit.php:85
@@ -7009,6 +7572,10 @@ msgstr "Διαγραφή και καθαρισμός σχεδιότυπου; (Π
 msgid "Delete column"
 msgstr ""
 
+#: app/views/js/ceprule.edit.js.php:237
+msgid "Delete complex event processing rule?"
+msgstr ""
+
 #: app/views/popup.action.edit.php:292
 msgid "Delete current action?"
 msgstr "Διαγραφή τρέχουσας ενέργειας;"
@@ -7111,6 +7678,14 @@ msgstr ""
 #: app/views/js/action.list.js.php:112
 msgid "Delete selected actions?"
 msgstr "Διαγραφή επιλεγμένων ενεργειών;"
+
+#: app/views/js/ceprule.list.js.php:105
+msgid "Delete selected complex event processing rule?"
+msgstr ""
+
+#: app/views/js/ceprule.list.js.php:104
+msgid "Delete selected complex event processing rules?"
+msgstr ""
 
 #: app/views/connector.edit.php:318 app/views/js/connector.list.js.php:118
 msgid "Delete selected connector?"
@@ -7423,6 +7998,10 @@ msgstr ""
 msgid "Delimiter"
 msgstr "Οριοθέτης"
 
+#: app/views/js/apm.metric.list.js.php:78
+msgid "Delta"
+msgstr ""
+
 #: app/views/administration.user.edit.php:693
 msgid "Denied methods"
 msgstr ""
@@ -7448,6 +8027,10 @@ msgstr "Εξαρτημένο"
 
 #: include/items.inc.php:102
 msgid "Dependent item"
+msgstr ""
+
+#: include/triggers.inc.php:2018 widgets/trigover/includes/ViewHelper.php:94
+msgid "Dependent trigger"
 msgstr ""
 
 #: app/views/popup.generic.php:364 app/views/trigger.list.php:266
@@ -7565,13 +8148,54 @@ msgstr ""
 msgid "Device"
 msgstr "Συσκευή"
 
+#: app/views/user.device.list.php:120 app/views/userprofile.device.list.php:44
+msgid "Device ID"
+msgstr ""
+
+#: include/classes/api/services/CRole.php:830
+#, c-format
+msgid "Device action \"%2$s\" is not available for user role \"%1$s\"."
+msgstr ""
+
+#: app/views/administration.userrole.edit.php:422
+msgid "Device actions"
+msgstr ""
+
+#: app/controllers/CControllerUserDeviceStatus.php:68
+msgid "Device added"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1367
 msgid "Device interrupts. Returns integer"
+msgstr ""
+
+#: app/views/administration.timeouts.edit.php:208
+msgid "Device link"
+msgstr ""
+
+#: app/views/js/user.device.list.js.php:63
+msgid "Device not found. Remove device from the database?"
+msgstr ""
+
+#: app/controllers/CControllerUserDeviceDelete.php:114
+msgid "Device removed"
 msgstr ""
 
 #: app/views/configuration.discovery.edit.php:122
 msgid "Device uniqueness criteria"
 msgstr "Κριτήρια μοναδικότητας συσκευής"
+
+#: app/controllers/CControllerUserDeviceList.php:232
+#: app/controllers/CControllerUserProfileDeviceList.php:127
+#: app/views/administration.user.edit.php:650
+#: app/views/administration.user.list.php:135
+#: app/views/administration.userrole.edit.php:393
+#: app/views/user.device.list.php:26 app/views/userprofile.device.list.php:26
+#: include/classes/helpers/CMenuHelper.php:348
+#: include/classes/helpers/CMenuHelper.php:519
+#: include/classes/helpers/CRoleHelper.php:549
+msgid "Devices"
+msgstr ""
 
 #: app/views/connector.edit.php:131 include/httptest.inc.php:31
 msgid "Digest"
@@ -7671,6 +8295,14 @@ msgstr ""
 #: app/views/js/action.list.js.php:97
 msgid "Disable selected actions?"
 msgstr "Απενεργοποίηση επιλεγμένων ενεργειών;"
+
+#: app/views/js/ceprule.list.js.php:147
+msgid "Disable selected complex event processing rule?"
+msgstr ""
+
+#: app/views/js/ceprule.list.js.php:146
+msgid "Disable selected complex event processing rules?"
+msgstr ""
 
 #: app/views/js/connector.list.js.php:103
 msgid "Disable selected connector?"
@@ -7823,10 +8455,18 @@ msgstr "Απενεργοποιημένο"
 msgid "Disabled automatically by an LLD rule."
 msgstr ""
 
+#: app/views/administration.userrole.edit.php:157
+msgid "Disabled: Users can set personal URL (after login), Redirect URL after login is used as fallback."
+msgstr ""
+
 #: app/views/administration.trigdisplay.edit.php:146
 #: widgets/geomap/Widget.php:44
 msgid "Disaster"
 msgstr "Καταστροφή"
+
+#: include/classes/helpers/CCepRuleHelper.php:460
+msgid "Discard"
+msgstr ""
 
 #: include/items.inc.php:1630
 msgid "Discard unchanged"
@@ -7978,6 +8618,10 @@ msgid "Discovery prototype disabled"
 msgid_plural "Discovery prototypes disabled"
 msgstr[0] ""
 msgstr[1] ""
+
+#: app/controllers/CControllerPopup.php:56
+msgid "Discovery prototype edit"
+msgstr ""
 
 #: host_discovery_prototypes.php:578
 msgid "Discovery prototype enabled"
@@ -8192,6 +8836,10 @@ msgstr "Θέλετε να αντικαταστήσετε την υπο συνθ�
 msgid "Does not contain"
 msgstr ""
 
+#: include/classes/helpers/CRegexHelper.php:23
+msgid "Does not contain string"
+msgstr ""
+
 #: app/partials/monitoring.host.filter.php:54
 #: app/partials/monitoring.host.filter.php:205
 #: app/partials/monitoring.latest.filter.php:117
@@ -8383,6 +9031,10 @@ msgstr "Επεξεργασία"
 msgid "Edit dashboard"
 msgstr ""
 
+#: jsLoader.php:708
+msgid "Edit filter properties"
+msgstr ""
+
 #: app/views/monitoring.map.view.php:58
 msgid "Edit map"
 msgstr ""
@@ -8398,6 +9050,10 @@ msgstr ""
 #: app/controllers/CControllerDashboardWidgetEdit.php:68
 #: include/classes/html/widgets/CWidgetFormView.php:169
 msgid "Edit widget"
+msgstr ""
+
+#: jsLoader.php:348
+msgid "Edit widget settings"
 msgstr ""
 
 #: jsLoader.php:185
@@ -8560,6 +9216,10 @@ msgstr ""
 msgid "Enable debug mode in selected groups?"
 msgstr "Ενεργοποίηση εκσφαλμάτωσης σε επιλεγμένες ομάδες;"
 
+#: app/views/administration.apm.db.edit.php:31
+msgid "Enable global data source"
+msgstr ""
+
 #: include/actions.inc.php:664 include/actions.inc.php:862
 msgid "Enable host"
 msgstr "Ενεργοποίηση ξενιστή"
@@ -8623,6 +9283,14 @@ msgstr ""
 #: app/views/js/action.list.js.php:82
 msgid "Enable selected actions?"
 msgstr "Ενεργοποίηση επιλεγμένων ενεργειών;"
+
+#: app/views/js/ceprule.list.js.php:126
+msgid "Enable selected complex event processing rule?"
+msgstr ""
+
+#: app/views/js/ceprule.list.js.php:125
+msgid "Enable selected complex event processing rules?"
+msgstr ""
 
 #: app/views/js/connector.list.js.php:88
 msgid "Enable selected connector?"
@@ -8784,6 +9452,10 @@ msgstr ""
 msgid "Enabled"
 msgstr "Ενεργοποιημένο"
 
+#: app/views/administration.userrole.edit.php:156
+msgid "Enabled: Users are restricted to Redirect URL after login."
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:393
 msgid "Encrypt"
 msgstr ""
@@ -8812,6 +9484,10 @@ msgstr ""
 msgid "End of line sequence"
 msgstr ""
 
+#: app/views/administration.userrole.edit.php:154
+msgid "Enforce redirect after login"
+msgstr ""
+
 #: include/locales.inc.php:33
 msgid "English (en_GB)"
 msgstr ""
@@ -8826,6 +9502,10 @@ msgstr ""
 
 #: app/views/host.wizard.edit.php:470
 msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
+msgstr ""
+
+#: include/html.inc.php:201
+msgid "Enter full screen mode"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:612
@@ -8919,6 +9599,11 @@ msgstr ""
 msgid "Error: %1$s"
 msgstr "Σφάλμα: %1$s"
 
+#: app/partials/apm.trace.list.split.view.php:48
+#, c-format
+msgid "Errors: %1s"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1120
 msgid "Evaluation period"
 msgstr ""
@@ -8935,6 +9620,18 @@ msgstr "Αναγνωριστικό συμβάντος"
 #, fuzzy
 msgid "Event acknowledged"
 msgstr "Αναγνωρισμένο συμβάν"
+
+#: include/classes/helpers/CCepRuleHelper.php:444
+msgid "Event added to window"
+msgstr ""
+
+#: app/views/js/apm.trace.list.js.php:662
+msgid "Event attributes"
+msgstr ""
+
+#: include/classes/helpers/CCepRuleHelper.php:446
+msgid "Event closed"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:226
 #: app/views/correlation.edit.php:339 app/views/correlation.list.php:30
@@ -8983,9 +9680,17 @@ msgstr ""
 msgid "Event correlation updated"
 msgstr ""
 
+#: app/partials/ceprule.window.php:112
+msgid "Event count tag"
+msgstr ""
+
 #: tr_events.php:29 tr_events.php:172 tr_events.php:191
 msgid "Event details"
 msgstr "Λεπτομέρειες συμβάντος"
+
+#: include/classes/helpers/CCepRuleHelper.php:445
+msgid "Event evicted"
+msgstr ""
 
 #: include/triggers.inc.php:610
 msgid "Event generation"
@@ -8995,8 +9700,17 @@ msgstr "Παραγωγή συμβάντος"
 msgid "Event is acknowledged"
 msgstr ""
 
+#: include/classes/helpers/CCepRuleHelper.php:349
+#: include/classes/helpers/CCepRuleHelper.php:376
+msgid "Event is cloned"
+msgstr ""
+
 #: app/views/js/popup.operation.edit.js.php:516 include/actions.inc.php:368
 msgid "Event is not acknowledged"
+msgstr ""
+
+#: include/classes/helpers/CCepRuleHelper.php:377
+msgid "Event is not cloned"
 msgstr ""
 
 #: tr_events.php:182
@@ -9018,6 +9732,38 @@ msgstr ""
 #: app/views/popup.condition.edit.php:672
 msgid "Event name matches Trigger name (with macros expanded) unless a custom Event name is specified in Trigger settings."
 msgstr ""
+
+#: app/controllers/CControllerMaintenanceCreate.php:90
+#: app/controllers/CControllerMaintenanceUpdate.php:91
+msgid "Event name operator and value combination is not unique."
+msgstr ""
+
+#: include/classes/helpers/CCepRuleHelper.php:443
+msgid "Event occurred"
+msgstr ""
+
+#: app/views/ceprule.list.php:25 include/classes/helpers/CMenuHelper.php:222
+#: include/classes/helpers/CRoleHelper.php:505
+msgid "Event processing"
+msgstr ""
+
+#: app/controllers/CControllerCepRuleDelete.php:60
+msgid "Event processing rule deleted"
+msgid_plural "Event processing rules deleted"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/controllers/CControllerCepRuleDisable.php:76
+msgid "Event processing rule disabled"
+msgid_plural "Event processing rules disabled"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/controllers/CControllerCepRuleEnable.php:76
+msgid "Event processing rule enabled"
+msgid_plural "Event processing rules enabled"
+msgstr[0] ""
+msgstr[1] ""
 
 #: include/classes/helpers/CCorrelationHelper.php:55
 msgid "Event tag pair"
@@ -9132,6 +9878,22 @@ msgstr "Εκτέλεση σε"
 msgid "Execute scripts"
 msgstr ""
 
+#: app/partials/ceprule.modal.operation.php:163 app/views/ceprule.edit.php:120
+#: include/classes/helpers/CCepRuleHelper.php:524
+msgid "Execute when"
+msgstr ""
+
+#: app/views/ceprule.edit.php:214
+#, c-format
+msgid "Execute when %1$s: There is no \"%2$s\" operation defined."
+msgstr ""
+
+#: app/controllers/CControllerCepRuleEdit.php:212
+#: app/controllers/CControllerCepRuleGeneral.php:134
+#, c-format
+msgid "Execute when type not allowed for window type \"%1$s\"."
+msgstr ""
+
 #: app/views/reports.actionlog.list.csv.php:66
 #: app/views/reports.actionlog.list.php:148 include/actions.inc.php:2073
 msgid "Executed"
@@ -9148,6 +9910,11 @@ msgstr "Εκτελέσιμη δέσμη ενεργειών"
 msgid "Execution confirmation"
 msgstr "Επιβεβαίωση εκτέλεσης"
 
+#: app/views/js/apm.metric.list.js.php:658
+#, c-format
+msgid "Exemplar  %1$s"
+msgstr ""
+
 #: app/partials/monitoring.host.filter.php:50
 #: app/partials/monitoring.host.filter.php:201
 #: app/partials/monitoring.latest.filter.php:113
@@ -9159,6 +9926,10 @@ msgstr "Επιβεβαίωση εκτέλεσης"
 #: include/classes/helpers/CTagFilterFieldHelper.php:122
 #: include/classes/html/widgets/fields/CWidgetFieldTagsView.php:93
 msgid "Exists"
+msgstr ""
+
+#: include/classes/html/CHtmlPage.php:131 include/html.inc.php:192
+msgid "Exit full screen mode"
 msgstr ""
 
 #: app/views/js/monitoring.problem.view.js.php:230
@@ -9174,6 +9945,12 @@ msgstr ""
 msgid "Expand macros"
 msgstr ""
 
+#: include/classes/html/CSectionCollapsible.php:54
+#: include/classes/html/CSectionCollapsible.php:63 jsLoader.php:531
+#: jsLoader.php:569
+msgid "Expand section"
+msgstr ""
+
 #: app/partials/layout.htmlpage.aside.php:43
 msgid "Expand sidebar"
 msgstr ""
@@ -9181,6 +9958,12 @@ msgstr ""
 #: include/views/monitoring.sysmap.edit.php:156
 msgid "Expand single problem"
 msgstr "Ανάπτυξη απλού προβλήματος"
+
+#: app/controllers/CControllerLldRuleUpdateGeneral.php:376
+#: app/controllers/CControllerLldRuleUpdateGeneral.php:403
+#: app/controllers/CControllerLldRuleUpdateGeneral.php:443
+msgid "Expected LLD macro format is \"{#MACRO}\"."
+msgstr ""
 
 #: app/controllers/CControllerHostCreate.php:195
 #: app/controllers/CControllerHostUpdate.php:200
@@ -9218,6 +10001,14 @@ msgstr ""
 #: app/views/popup.generic.php:623 include/graphs.inc.php:27
 msgid "Exploded"
 msgstr "Αναπτυγμένο"
+
+#: app/partials/item.edit.item.tab.php:674
+#: app/partials/lldrule.edit.lldrule.tab.php:638
+#: app/partials/lldrule.edit.prototype.tab.php:638
+#: app/views/js/apm.metric.list.js.php:837
+#: include/classes/helpers/CApmMetricHelper.php:24
+msgid "Exponential histogram"
+msgstr ""
 
 #: include/classes/html/CButtonExport.php:32
 msgid "Export"
@@ -9338,6 +10129,11 @@ msgstr ""
 msgid "Failed to paste widget."
 msgstr ""
 
+#: include/classes/server/CZabbixServer.php:663
+#, c-format
+msgid "Failed to process \"%1$s\" request. Please contact your system administrator."
+msgstr ""
+
 #: app/controllers/CControllerAuthenticationUpdate.php:274
 msgid "Failed to select default LDAP server."
 msgstr ""
@@ -9378,6 +10174,10 @@ msgstr ""
 #: include/items.inc.php:37
 msgid "Failure Audit"
 msgstr "Αποτυχία επιθεώρησης"
+
+#: include/classes/helpers/CApmLogHelper.php:27
+msgid "Fatal"
+msgstr ""
 
 #: app/views/system.warning.php:27 app/views/system.warning.php:52
 msgid "Fatal error, please report to the Zabbix team"
@@ -9670,6 +10470,11 @@ msgctxt "page navigation"
 msgid "First"
 msgstr "Πρώτο"
 
+#: include/classes/helpers/CCepRuleHelper.php:346
+#: include/classes/helpers/CCepRuleHelper.php:364
+msgid "First event in time window"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:268
 #: app/controllers/CControllerPopupTriggerExpr.php:297
 msgid "Fit"
@@ -9684,8 +10489,20 @@ msgstr "Προσαρμογή στο χάρτη"
 msgid "Fixed"
 msgstr "Σταθερό"
 
+#: app/partials/item.edit.item.tab.php:946
+#: app/partials/lldrule.edit.lldrule.tab.php:930
+#: app/partials/lldrule.edit.prototype.tab.php:932
+msgid "Fixed duration of each aggregated bucket within the processing window."
+msgstr ""
+
 #: include/classes/helpers/CServiceHelper.php:152
 msgid "Fixed status"
+msgstr ""
+
+#: app/views/js/apm.log.list.js.php:181 app/views/js/apm.log.list.js.php:609
+#: app/views/js/apm.metric.list.js.php:195
+#: app/views/js/apm.metric.list.js.php:735
+msgid "Flags"
 msgstr ""
 
 #: app/views/js/popup.massupdate.tmpl.js.php:81
@@ -9843,6 +10660,10 @@ msgstr ""
 msgid "Generated in %1$s sec"
 msgstr ""
 
+#: app/views/user.device.init.view.php:66
+msgid "Generating secure QR code..."
+msgstr ""
+
 #: app/controllers/CControllerGeomapsEdit.php:75
 #: app/views/administration.geomaps.edit.php:119
 #: app/views/administration.geomaps.edit.php:126
@@ -9897,6 +10718,10 @@ msgstr ""
 msgid "Global"
 msgstr ""
 
+#: app/views/js/correlation.edit.js.php:27
+msgid "Global event correlation is deprecated and may be removed in next releases."
+msgstr ""
+
 #: include/classes/api/services/CIconMap.php:366
 #, c-format
 msgid "Global regular expression \"%1$s\" does not exist."
@@ -9946,6 +10771,10 @@ msgstr ""
 msgid "Go to last page, %1$s"
 msgstr ""
 
+#: include/classes/html/CTabFilter.php:387
+msgid "Go to next filter tab"
+msgstr ""
+
 #: include/classes/helpers/CPagerHelper.php:227
 #, c-format
 msgid "Go to next page, %1$s"
@@ -9961,6 +10790,10 @@ msgstr ""
 msgid "Go to page %1$s, current page"
 msgstr ""
 
+#: include/classes/html/CTabFilter.php:400
+msgid "Go to previous filter tab"
+msgstr ""
+
 #: include/classes/helpers/CPagerHelper.php:199
 #, c-format
 msgid "Go to previous page, %1$s"
@@ -9973,6 +10806,13 @@ msgstr "Google Chrome"
 #: include/graphs.inc.php:65
 msgid "Gradient line"
 msgstr "Χρωμοβαθμισμένη γραμμή"
+
+#: app/partials/item.edit.item.tab.php:945
+#: app/partials/lldrule.edit.lldrule.tab.php:929
+#: app/partials/lldrule.edit.prototype.tab.php:931
+#: app/views/item.massupdate.php:307
+msgid "Granularity"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:229
 #: app/partials/monitoring.latest.view.html.php:219
@@ -10265,6 +11105,10 @@ msgstr "Ομαδοποίηση με"
 msgid "Groups"
 msgstr "Ομάδες"
 
+#: app/partials/ceprule.window.php:103
+msgid "Groups tags by value and applies the first available tag match."
+msgstr ""
+
 #: include/classes/helpers/CMenuHelper.php:454
 msgid "Guest user"
 msgstr ""
@@ -10445,6 +11289,14 @@ msgstr ""
 
 #: widgets/itemhistory/views/column.edit.php:132
 msgid "Highlights"
+msgstr ""
+
+#: app/partials/item.edit.item.tab.php:673
+#: app/partials/lldrule.edit.lldrule.tab.php:637
+#: app/partials/lldrule.edit.prototype.tab.php:637
+#: app/views/js/apm.metric.list.js.php:831
+#: include/classes/helpers/CApmMetricHelper.php:23
+msgid "Histogram"
 msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:232
@@ -11461,6 +12313,10 @@ msgstr "Επιτυχής εισαγωγή"
 msgid "Impossible to filter by inventory field \"%1$s\", which does not exist."
 msgstr ""
 
+#: include/classes/helpers/CCepRuleHelper.php:384
+msgid "In"
+msgstr ""
+
 #: app/views/js/administration.user.edit.js.php:61
 #: app/views/js/administration.userprofile.edit.js.php:69
 msgid "In case of successful password change user will be logged out of all active sessions. Continue?"
@@ -11493,9 +12349,17 @@ msgstr ""
 msgid "Inaccessible action"
 msgstr ""
 
+#: include/actions.inc.php:2276 include/classes/screens/CScreenProblem.php:436
+msgid "Inaccessible complex event processing rule"
+msgstr ""
+
 #: app/controllers/CControllerPopupScheduledReportEdit.php:123
 #: app/controllers/CControllerScheduledReportEdit.php:303
 msgid "Inaccessible dashboard"
+msgstr ""
+
+#: app/partials/js/user.edit.media.tab.js.php:143
+msgid "Inaccessible device"
 msgstr ""
 
 #: app/partials/configuration.host.edit.html.php:64
@@ -11548,6 +12412,17 @@ msgstr ""
 msgid "Inaccessible media type"
 msgstr ""
 
+#: app/controllers/CControllerHostListData.php:345
+#: app/controllers/CControllerPopupItemTestEdit.php:640
+#: include/classes/helpers/CProxyHelper.php:48
+msgid "Inaccessible proxy"
+msgstr ""
+
+#: app/controllers/CControllerHostListData.php:346
+#: include/classes/helpers/CProxyHelper.php:83
+msgid "Inaccessible proxy group"
+msgstr ""
+
 #: include/classes/widgets/fields/CWidgetFieldMultiSelectService.php:31
 msgid "Inaccessible service"
 msgstr ""
@@ -11586,6 +12461,10 @@ msgstr ""
 
 #: app/controllers/CControllerScheduledReportEdit.php:231
 msgid "Inaccessible user group"
+msgstr ""
+
+#: include/classes/helpers/CItemGeneralHelper.php:305
+msgid "Inaccessible value mapping"
 msgstr ""
 
 #: jsLoader.php:153
@@ -11681,6 +12560,14 @@ msgstr "Λανθασμένη %1$s τιμή σήμανσης για χάρτη \"
 #, c-format
 msgid "Incorrect API \"%1$s\"."
 msgstr "Λανθασμένο API \"%1$s\"."
+
+#: include/classes/db/ApmDbClickHouse.php:280
+#: include/classes/db/ApmDbClickHouse.php:293
+#: include/classes/db/ApmDbClickHouse.php:307
+#: include/classes/db/ApmDbClickHouse.php:326
+#, c-format
+msgid "Incorrect ClickHouse query parameter %1$s for type %2$s."
+msgstr ""
 
 #: app/controllers/CControllerHostCreate.php:65
 #: app/controllers/CControllerHostUpdate.php:69
@@ -11980,6 +12867,13 @@ msgstr ""
 msgid "Incorrect regular expression \"%1$s\": \"%2$s\""
 msgstr "Ανακριβής κανονική έκφραση \"%1$s\": \"%2$s\""
 
+#: app/controllers/CControllerRegExCreate.php:43
+#: app/controllers/CControllerRegExTest.php:70
+#: app/controllers/CControllerRegExUpdate.php:44
+#, c-format
+msgid "Incorrect regular expression: \"%2$s\""
+msgstr ""
+
 #: include/classes/server/CZabbixServer.php:533
 #: include/classes/server/CZabbixServer.php:575
 #: include/classes/server/CZabbixServer.php:582
@@ -11998,6 +12892,33 @@ msgstr ""
 #, c-format
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "Λανθασμένη κατάσταση ξενιστή \"%1$s\"."
+
+#: include/classes/core/CConfigFile.php:282
+#: include/classes/core/CConfigFile.php:292
+#, c-format
+msgid "Incorrect telemetry Certificate authority (CA) configuration %1$s: %2$s."
+msgstr ""
+
+#: include/classes/core/CConfigFile.php:270
+#: include/classes/core/CConfigFile.php:793
+#: include/classes/core/CConfigFile.php:799
+#: include/classes/core/CConfigFile.php:805
+#: include/classes/core/CConfigFile.php:813
+#: include/classes/core/CConfigFile.php:825
+#: include/classes/core/CConfigFile.php:834
+#: include/classes/core/CConfigFile.php:841
+#: include/classes/core/CConfigFile.php:848
+#: include/classes/core/CConfigFile.php:854
+#: include/classes/core/CConfigFile.php:866
+#: include/classes/core/CConfigFile.php:875
+#: include/classes/core/CConfigFile.php:883
+#: include/classes/core/CConfigFile.php:889
+#: include/classes/core/CConfigFile.php:895
+#: include/classes/core/CConfigFile.php:904
+#: include/classes/core/CConfigFile.php:913
+#, c-format
+msgid "Incorrect telemetry provider configuration %1$s: %2$s."
+msgstr ""
 
 #: include/classes/api/services/CHttpTest.php:882
 msgid "Incorrect templated web scenario step count."
@@ -12347,6 +13268,14 @@ msgstr ""
 msgid "Increase by"
 msgstr ""
 
+#: include/classes/helpers/CCepRuleHelper.php:462
+msgid "Increase severity"
+msgstr ""
+
+#: include/classes/helpers/CCepRuleHelper.php:471
+msgid "Increase value"
+msgstr ""
+
 #: app/views/popup.acknowledge.edit.php:91 include/actions.inc.php:1583
 #: include/actions.inc.php:2008 include/html.inc.php:971
 msgid "Indefinitely"
@@ -12504,6 +13433,10 @@ msgstr ""
 
 #: include/classes/html/widgets/fields/CWidgetFieldLatLngView.php:45
 msgid "Initial view is ignored if the default view is set."
+msgstr ""
+
+#: app/views/proxy.edit.php:245
+msgid "Input"
 msgstr ""
 
 #: app/views/administration.script.edit.php:339
@@ -12832,6 +13765,11 @@ msgstr ""
 msgid "Invalid method parameters."
 msgstr "Άκυρες παράμετροι μεθόδου."
 
+#: app/controllers/CControllerCepRuleEdit.php:221
+#: app/controllers/CControllerCepRuleGeneral.php:143
+msgid "Invalid operation."
+msgstr ""
+
 #: app/controllers/CControllerDashboardUpdate.php:259
 #: app/controllers/CControllerDashboardUpdate.php:268
 #: app/controllers/CControllerDashboardUpdate.php:280
@@ -13114,6 +14052,11 @@ msgstr ""
 msgid "Invalid range."
 msgstr ""
 
+#: index_http.php:72 index_mfa.php:127 index.php:103 index.php:121
+#: index_sso.php:331
+msgid "Invalid redirect URL."
+msgstr ""
+
 #: app/controllers/CControllerDataTable.php:59
 #: app/controllers/CControllerDataTable.php:138
 msgid "Invalid request"
@@ -13194,6 +14137,13 @@ msgstr ""
 msgid "Invalid user group mapping configuration."
 msgstr ""
 
+#: app/controllers/CControllerCepRuleEdit.php:379
+#: app/controllers/CControllerCepRuleEdit.php:386
+#: app/controllers/CControllerCepRuleGeneral.php:218
+#: app/controllers/CControllerCepRuleGeneral.php:223
+msgid "Invalid value."
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:3323
 #, c-format
 msgid "Invalid zoomparameter \"%1$s\": %2$s."
@@ -13236,6 +14186,18 @@ msgstr ""
 
 #: include/classes/helpers/CRoleHelper.php:560
 msgid "Invoke \"Execute now\" on read-only hosts"
+msgstr ""
+
+#: include/classes/helpers/CCepRuleHelper.php:391
+msgid "Is less than or equal"
+msgstr ""
+
+#: app/views/js/apm.metric.list.js.php:754
+msgid "Is monotonic"
+msgstr ""
+
+#: include/classes/helpers/CCepRuleHelper.php:390
+msgid "Is more than or equal"
 msgstr ""
 
 #: app/views/administration.user.list.php:134
@@ -13647,6 +14609,15 @@ msgstr ""
 msgid "Key"
 msgstr "Κλειδί"
 
+#: app/partials/item.edit.item.tab.php:710
+#: app/partials/item.edit.item.tab.php:713
+#: app/partials/lldrule.edit.lldrule.tab.php:674
+#: app/partials/lldrule.edit.lldrule.tab.php:677
+#: app/partials/lldrule.edit.prototype.tab.php:674
+#: app/partials/lldrule.edit.prototype.tab.php:677
+msgid "Key name"
+msgstr ""
+
 #: app/views/administration.script.edit.php:172
 #: include/views/js/common.item.edit.js.php:56
 msgid "Key passphrase"
@@ -13816,11 +14787,20 @@ msgstr ""
 msgid "Last accessed at"
 msgstr ""
 
+#: app/views/user.device.list.php:124 app/views/userprofile.device.list.php:46
+msgid "Last active"
+msgstr ""
+
 #: app/partials/monitoring.latest.view.html.php:76
 #: app/partials/monitoring.latest.view.html.php:89
 #: include/classes/screens/CScreenHttpTest.php:112
 msgid "Last check"
 msgstr "Τελευταίος έλεγχος"
+
+#: include/classes/helpers/CCepRuleHelper.php:347
+#: include/classes/helpers/CCepRuleHelper.php:368
+msgid "Last event in time window"
+msgstr ""
 
 #: jsLoader.php:377
 msgid "Last hour graph"
@@ -13964,6 +14944,16 @@ msgstr ""
 msgid "Limit for search and filter results"
 msgstr "Όριο στοιχείων Αναζήτησης/Φίλτρου"
 
+#: app/partials/item.edit.item.tab.php:930
+#: app/partials/lldrule.edit.lldrule.tab.php:914
+#: app/partials/lldrule.edit.prototype.tab.php:916
+msgid "Limit processing window historical lookup when previous item updates are missing or too old."
+msgstr ""
+
+#: app/partials/ceprule.window.php:71
+msgid "Limited"
+msgstr ""
+
 #: include/graphs.inc.php:55 include/views/js/monitoring.sysmaps.js.php:364
 #: include/views/js/monitoring.sysmaps.js.php:413
 #: include/views/js/monitoring.sysmaps.js.php:801
@@ -14105,6 +15095,10 @@ msgstr ""
 msgid "List of mounted filesystems, their types, disk space and inode statistics. Returns JSON"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1903
+msgid "List of mounted filesystems, their types, disk space and inode statistics. Returns JSON. Mode: full(default), short; mountpoint: exact match."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1266
 msgid "List of network interfaces with detailed information. Returns JSON"
 msgstr ""
@@ -14119,6 +15113,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1241
 msgid "List of object instances of Windows performance counters. Returns JSON"
+msgstr ""
+
+#: include/classes/html/CTabFilter.php:382
+msgid "List of open filter tabs"
 msgstr ""
 
 #: app/views/popup.dashboard.share.edit.php:126
@@ -14194,8 +15192,17 @@ msgstr "Γεωγραφικό μήκος τοποθεσίας"
 msgid "Log"
 msgstr "Καταγραφή"
 
+#: app/views/apm.log.list.php:97 app/views/js/apm.log.list.js.php:211
+#: app/views/js/apm.log.list.js.php:651
+msgid "Log attributes"
+msgstr ""
+
 #: app/views/administration.audit.settings.edit.php:50
 msgid "Log changes by low-level discovery, network discovery and autoregistration"
+msgstr ""
+
+#: app/views/js/apm.log.list.js.php:516
+msgid "Log details"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1063
@@ -14263,6 +15270,24 @@ msgstr ""
 
 #: app/views/administration.authentication.edit.php:384
 msgid "Logout responses"
+msgstr ""
+
+#: app/controllers/CControllerApmLogList.php:162
+#: app/partials/item.edit.item.tab.php:662
+#: app/partials/lldrule.edit.lldrule.tab.php:626
+#: app/partials/lldrule.edit.prototype.tab.php:626
+#: app/views/apm.log.list.php:150 app/views/js/apm.metric.list.js.php:641
+#: app/views/proxy.edit.php:299 app/views/usergroup.edit.php:397
+#: include/classes/helpers/CMenuHelper.php:89
+#: include/classes/helpers/CRoleHelper.php:442
+msgid "Logs"
+msgstr ""
+
+#: app/partials/item.edit.item.tab.php:928
+#: app/partials/lldrule.edit.lldrule.tab.php:912
+#: app/partials/lldrule.edit.prototype.tab.php:914
+#: app/views/item.massupdate.php:302
+msgid "Lookback limit"
 msgstr ""
 
 #: include/discovery.inc.php:113
@@ -14461,8 +15486,16 @@ msgstr ""
 msgid "Manage SLA"
 msgstr ""
 
+#: include/classes/helpers/CRoleHelper.php:633
+msgid "Manage own devices"
+msgstr ""
+
 #: include/classes/helpers/CRoleHelper.php:554
 msgid "Manage scheduled reports"
+msgstr ""
+
+#: include/classes/helpers/CRoleHelper.php:634
+msgid "Manage user devices"
 msgstr ""
 
 #: app/partials/configuration.host.edit.html.php:344
@@ -14737,6 +15770,10 @@ msgstr "Μέγιστο πλήθος στοιχείων πρός εμφάνιση
 msgid "Max history display period"
 msgstr ""
 
+#: app/views/proxy.edit.php:260
+msgid "Max messages per second"
+msgstr ""
+
 #: app/views/administration.gui.edit.php:99
 msgid "Max number of columns and rows in overview tables"
 msgstr ""
@@ -14767,8 +15804,17 @@ msgstr ""
 msgid "Max repetition count is applicable to discovery and walk only."
 msgstr ""
 
+#: app/partials/configuration.host.interface.row.php:57
+#: app/views/host.wizard.edit.php:752
+msgid "Max repetition count is applicable to walk only."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:96
 msgid "Max zoom level"
+msgstr ""
+
+#: app/views/apm.trace.list.php:90
+msgid "Max. duration"
 msgstr ""
 
 #: app/views/configuration.discovery.edit.php:84
@@ -14785,6 +15831,11 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1026
 msgid "Maximum number of processes supported by OS. Returns integer"
+msgstr ""
+
+#: app/partials/configuration.host.interface.row.php:75
+#: app/views/host.wizard.edit.php:765
+msgid "Maximum number of retries after a timeout for walk[]/get[] items. For walk[], retries are shared across the entire walk. 0 disables retries."
 msgstr ""
 
 #: widgets/piechart/views/widget.edit.js.php:680
@@ -15080,6 +16131,26 @@ msgstr "Μέθοδος δεν βρέθηκε."
 msgid "Methods"
 msgstr ""
 
+#: app/views/js/apm.metric.list.js.php:205
+#: app/views/js/apm.metric.list.js.php:727
+msgid "Metric description"
+msgstr ""
+
+#: app/views/js/apm.metric.list.js.php:847
+msgid "Metric information"
+msgstr ""
+
+#: app/views/apm.metric.list.php:48 app/views/js/apm.metric.list.js.php:150
+#: app/views/js/apm.metric.list.js.php:806
+msgid "Metric name"
+msgstr ""
+
+#: app/partials/item.edit.item.tab.php:668
+#: app/partials/lldrule.edit.lldrule.tab.php:632
+#: app/partials/lldrule.edit.prototype.tab.php:632
+msgid "Metric points"
+msgstr ""
+
 #: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
 msgid "Metrics"
 msgstr ""
@@ -15103,6 +16174,10 @@ msgstr "Ενδιάμεσο"
 #: widgets/svggraph/includes/WidgetForm.php:319
 #: widgets/tophosts/views/column.edit.php:219
 msgid "Min"
+msgstr ""
+
+#: app/views/apm.trace.list.php:83
+msgid "Min. duration"
 msgstr ""
 
 #: app/views/popup.proxygroup.edit.php:59
@@ -15375,6 +16450,14 @@ msgstr ""
 msgid "Most critical of child services"
 msgstr ""
 
+#: include/classes/html/CFilter.php:256 include/classes/html/CTabFilter.php:332
+msgid "Move time range backward"
+msgstr ""
+
+#: include/classes/html/CFilter.php:261 include/classes/html/CTabFilter.php:339
+msgid "Move time range forward"
+msgstr ""
+
 #: include/httptest.inc.php:402
 msgid "Mozilla Firefox"
 msgstr "Mozilla Firefox"
@@ -15403,6 +16486,10 @@ msgstr ""
 #: include/triggers.inc.php:611
 msgid "Multiple PROBLEM events"
 msgstr "Πολλαπλά ΠΡΟΒΛΗΜΑΤΙΚΑ συμβάντα"
+
+#: app/partials/ceprule.modal.operation.php:235
+msgid "Multiple: Clones any problem."
+msgstr ""
 
 #: app/partials/administration.system.info.php:235
 #, c-format
@@ -15702,6 +16789,10 @@ msgstr ""
 msgid "Nested"
 msgstr ""
 
+#: include/classes/db/ApmDbClickHouse.php:261
+msgid "Nested arrays are not supported in ClickHouse query parameters."
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:77
 msgid "Network discovery data storage period"
 msgstr ""
@@ -15743,6 +16834,11 @@ msgstr ""
 msgid "Never"
 msgstr "Ποτέ"
 
+#: app/controllers/CControllerUserDeviceList.php:225
+#: app/views/user.device.list.php:104
+msgid "New"
+msgstr ""
+
 #: app/views/popup.token.edit.php:159
 msgid "New API token"
 msgstr ""
@@ -15772,8 +16868,17 @@ msgstr ""
 msgid "New additional rule"
 msgstr ""
 
+#: app/views/popup.telemetry.aggregatedcolumn.edit.php:75
+msgid "New aggregated column"
+msgstr ""
+
 #: widgets/tophosts/views/column.edit.php:300
 msgid "New column"
+msgstr ""
+
+#: app/controllers/CControllerCepRuleEdit.php:89 app/views/ceprule.edit.php:283
+#: app/views/js/ceprule.edit.js.php:397
+msgid "New complex event processing"
 msgstr ""
 
 #: app/controllers/CControllerActionConditionCheck.php:107
@@ -15790,6 +16895,10 @@ msgstr "Νέος σύνδεσμος"
 #: app/controllers/CControllerDashboardView.php:174
 #: app/controllers/CControllerTemplateDashboardEdit.php:79
 msgid "New dashboard"
+msgstr ""
+
+#: app/views/lldrule.prototype.edit.php:168
+msgid "New discovery prototype"
 msgstr ""
 
 #: app/views/configuration.discovery.edit.php:244
@@ -16031,6 +17140,10 @@ msgstr ""
 msgid "No color"
 msgstr ""
 
+#: jsLoader.php:282
+msgid "No columns selected"
+msgstr ""
+
 #: jsLoader.php:194
 msgid "No compatible widgets."
 msgstr ""
@@ -16053,6 +17166,12 @@ msgstr ""
 
 #: include/classes/html/CTableInfo.php:35
 msgid "No data found."
+msgstr ""
+
+#: app/controllers/CControllerApmLogListData.php:97
+#: app/controllers/CControllerApmMetricListData.php:116
+#: app/controllers/CControllerApmTraceListData.php:103
+msgid "No data source"
 msgstr ""
 
 #: widgets/dataover/actions/WidgetView.php:40
@@ -16243,6 +17362,10 @@ msgstr ""
 msgid "No permissions to import discovery rules."
 msgstr ""
 
+#: include/classes/api/services/CConfiguration.php:347
+msgid "No permissions to import global regexes."
+msgstr ""
+
 #: include/classes/api/services/CConfiguration.php:313
 msgid "No permissions to import graphs."
 msgstr ""
@@ -16297,6 +17420,16 @@ msgstr ""
 
 #: include/classes/api/services/CConfiguration.php:317
 msgid "No permissions to import web scenarios."
+msgstr ""
+
+#: include/classes/api/services/CDevice.php:232
+#: include/classes/api/services/CDevice.php:516
+msgid "No permissions to manage own devices."
+msgstr ""
+
+#: include/classes/api/services/CDevice.php:239
+#: include/classes/api/services/CDevice.php:520
+msgid "No permissions to manage user devices."
 msgstr ""
 
 #: app/controllers/CControllerChartsView.php:133
@@ -16524,8 +17657,17 @@ msgstr "Χωρίς διαμεσολαβητή"
 msgid "No recipients specified for action operation message."
 msgstr ""
 
+#: app/views/js/apm.metric.list.js.php:712
+msgid "No recorded value"
+msgstr ""
+
 #: include/classes/core/CWidget.php:197 jsLoader.php:174
 msgid "No refresh"
+msgstr ""
+
+#: app/controllers/CControllerApmTraceListData.php:215
+#: app/controllers/CControllerApmTraceListData.php:219
+msgid "No root span found"
 msgstr ""
 
 #: include/classes/api/services/CUser.php:3489
@@ -16596,6 +17738,10 @@ msgstr ""
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:255
 msgid "None"
 msgstr "Ουδέν"
+
+#: app/partials/ceprule.window.php:38
+msgid "None - there will be no time window specific processing."
+msgstr ""
 
 #: app/controllers/CControllerLatest.php:541
 #: app/partials/configuration.filter.items.php:183
@@ -16674,12 +17820,28 @@ msgstr ""
 msgid "Not classified"
 msgstr "Αταξινόμητο"
 
+#: app/views/mediatype.edit.php:468
+msgid "Not configured"
+msgstr ""
+
 #: app/controllers/CControllerMediatypeEnable.php:88
 msgid "Not enabled"
 msgstr ""
 
+#: include/classes/helpers/CCepRuleHelper.php:365
+msgid "Not first event in time window"
+msgstr ""
+
+#: include/classes/helpers/CCepRuleHelper.php:385
+msgid "Not in"
+msgstr ""
+
 #: include/forms.inc.php:308
 msgid "Not inherited items"
+msgstr ""
+
+#: include/classes/helpers/CCepRuleHelper.php:369
+msgid "Not last event in time window"
 msgstr ""
 
 #: app/views/host.wizard.edit.php:175
@@ -16708,6 +17870,10 @@ msgstr ""
 
 #: app/views/host.wizard.edit.php:518 app/views/host.wizard.edit.php:541
 msgid "Note that during agent installation, you will need to configure both the PSK identity and PSK. Make sure they match the PSK identity and PSK set in step 1."
+msgstr ""
+
+#: app/views/ceprule.edit.php:196
+msgid "Note: \"Event closed\", \"Window closed\" and \"Pattern matched\" operate independently and are not affected by this execution order."
 msgstr ""
 
 #: app/views/host.wizard.edit.php:578
@@ -17123,6 +18289,10 @@ msgstr ""
 msgid "Only disabled group can be set for deprovisioned users."
 msgstr ""
 
+#: include/classes/api/services/CTriggerGeneral.php:2083
+msgid "Only hosts referenced in problem or recovery expressions can be used in event name."
+msgstr ""
+
 #: app/partials/administration.system.info.php:66
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Απαριθμώνται μόνο συλλέκτες εκχωρημένοι σε ενεργούς ξενιστές"
@@ -17166,6 +18336,11 @@ msgstr "Απαριθμώνται μόνο εναύσματα εκχωρημέν�
 msgid "Open URL"
 msgstr ""
 
+#: app/views/popup.generic.php:455 include/classes/html/CHtmlPage.php:221
+#: jsLoader.php:521
+msgid "Open Zabbix documentation in a new tab"
+msgstr ""
+
 #: app/views/administration.script.edit.php:228
 msgid "Open in a new window"
 msgstr ""
@@ -17177,6 +18352,10 @@ msgstr ""
 
 #: app/views/mediatype.test.edit.php:101 app/views/popup.scriptexec.php:41
 msgid "Open log"
+msgstr ""
+
+#: jsLoader.php:349
+msgid "Open widget actions"
 msgstr ""
 
 #: include/classes/validators/CSslCertificateValidator.php:28
@@ -17224,6 +18403,10 @@ msgstr "Η λειτουργία δεν εκτελείται λόγω μη εξο
 msgid "Operation details"
 msgstr "Λεπτομέρειες λειτουργίας"
 
+#: app/views/ceprule.edit.php:191
+msgid "Operation execution order:"
+msgstr ""
+
 #: app/controllers/CControllerActionOperationCheck.php:163
 msgid "Operation has no group to operate."
 msgstr "Η λειτουργία δεν έχει ομάδα να λειτουργήσει."
@@ -17231,6 +18414,10 @@ msgstr "Η λειτουργία δεν έχει ομάδα να λειτουργ
 #: app/controllers/CControllerActionOperationCheck.php:172
 msgid "Operation has no template to operate."
 msgstr "Η λειτουργία δεν έχει σχεδιότυπο να λειτουργήσει."
+
+#: app/views/apm.trace.list.php:69 app/views/js/apm.trace.list.js.php:166
+msgid "Operation name"
+msgstr ""
 
 #: app/partials/trigger.edit.trigger.tab.php:64 app/views/trigger.list.php:222
 #: app/views/trigger.prototype.list.php:65 include/blocks.inc.php:582
@@ -17249,6 +18436,10 @@ msgstr ""
 #: app/views/popup.action.edit.php:258 app/views/popup.lldoverride.php:195
 msgid "Operations"
 msgstr "Λειτουργίες"
+
+#: app/partials/ceprule.modal.operation.php:201
+msgid "Operations are applied to all events in the window by default, except \"Event occurred\"."
+msgstr ""
 
 #: app/views/correlation.condition.edit.php:66
 #: app/views/correlation.condition.edit.php:101
@@ -17396,6 +18587,15 @@ msgstr ""
 msgid "Other configuration parameters"
 msgstr "Άλλες παράμετροι διαμόρφωσης"
 
+#: app/partials/ceprule.modal.operation.php:334
+#: include/classes/helpers/CCepRuleHelper.php:482
+msgid "Other events"
+msgstr ""
+
+#: app/partials/ceprule.modal.operation.php:325
+msgid "Other events - applies the operation to all events in the window except the current one. You can filter which events to include."
+msgstr ""
+
 #: app/views/administration.miscconfig.edit.php:151
 msgid "Other parameters"
 msgstr "Άλλες παράμετροι"
@@ -17452,6 +18652,10 @@ msgstr "Περίοδος επικάλυψης τάσεων συλλέκτη"
 
 #: app/views/popup.tabfilter.edit.php:40
 msgid "Override time period selector"
+msgstr ""
+
+#: widgets/clock/includes/WidgetForm.php:122
+msgid "Override time zone"
 msgstr ""
 
 #: app/controllers/CControllerPopupLldOverride.php:90
@@ -17515,6 +18719,10 @@ msgstr "PHP bcmath"
 #: include/classes/setup/CFrontendSetup.php:295
 msgid "PHP bcmath extension missing (PHP configuration parameter --enable-bcmath)."
 msgstr "Απουσία επέκτασης PHP bcmath (παράμετρος ρύθμισης PHP --enable-bcmath)."
+
+#: include/classes/db/ApmDbClickHouse.php:26
+msgid "PHP cURL extension is not available. "
+msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:575
 msgid "PHP ctype"
@@ -17820,8 +19028,16 @@ msgstr "Γονικοί συλλέκτες"
 msgid "Parent services"
 msgstr ""
 
+#: app/views/js/apm.trace.list.js.php:586
+msgid "Parent span ID"
+msgstr ""
+
 #: app/partials/configuration.tags.tab.php:46
 msgid "Parent templates"
+msgstr ""
+
+#: include/triggers.inc.php:2018 widgets/trigover/includes/ViewHelper.php:94
+msgid "Parent trigger"
 msgstr ""
 
 #: app/partials/trigger.edit.trigger.tab.php:32
@@ -17928,6 +19144,19 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:938
 msgid "Pattern"
+msgstr ""
+
+#: app/partials/ceprule.window.php:51
+#: include/classes/helpers/CCepRuleHelper.php:540
+msgid "Pattern match"
+msgstr ""
+
+#: app/partials/ceprule.window.php:42
+msgid "Pattern match - executes JavaScript to identify event patterns in sliding time window."
+msgstr ""
+
+#: include/classes/helpers/CCepRuleHelper.php:448
+msgid "Pattern matched"
 msgstr ""
 
 #: widgets/topitems/includes/CWidgetFieldColumnsListView.php:58
@@ -18400,6 +19629,10 @@ msgstr ""
 msgid "Problem display"
 msgstr "Πρόβλημα εμφάνισης"
 
+#: app/partials/ceprule.modal.operation.php:233
+msgid "Problem event generation mode impacts cloning:"
+msgstr ""
+
 #: app/views/js/trigger.edit.js.php:268 include/triggers.inc.php:603
 msgid "Problem expression"
 msgstr ""
@@ -18409,13 +19642,31 @@ msgstr ""
 msgid "Problem hosts"
 msgstr ""
 
+#: include/classes/helpers/CCepRuleHelper.php:357
+msgid "Problem is not opened"
+msgstr ""
+
 #: app/views/js/popup.action.edit.js.php:289 include/actions.inc.php:365
 msgid "Problem is not suppressed"
+msgstr ""
+
+#: include/classes/helpers/CCepRuleHelper.php:361
+msgid "Problem is not symptom"
+msgstr ""
+
+#: include/classes/helpers/CCepRuleHelper.php:344
+#: include/classes/helpers/CCepRuleHelper.php:356
+msgid "Problem is opened"
 msgstr ""
 
 #: app/views/js/popup.action.edit.js.php:288 include/actions.inc.php:45
 #: include/actions.inc.php:364
 msgid "Problem is suppressed"
+msgstr ""
+
+#: include/classes/helpers/CCepRuleHelper.php:345
+#: include/classes/helpers/CCepRuleHelper.php:360
+msgid "Problem is symptom"
 msgstr ""
 
 #: jsLoader.php:282
@@ -18430,6 +19681,21 @@ msgstr ""
 
 #: include/actions.inc.php:1981
 msgid "Problem resolved"
+msgstr ""
+
+#: include/actions.inc.php:1849
+msgctxt "screen reader"
+msgid "Problem severity changed"
+msgstr ""
+
+#: include/actions.inc.php:1839
+msgctxt "screen reader"
+msgid "Problem severity decreased"
+msgstr ""
+
+#: include/actions.inc.php:1844
+msgctxt "screen reader"
+msgid "Problem severity increased"
 msgstr ""
 
 #: app/views/usergroup.edit.php:273
@@ -18470,6 +19736,10 @@ msgstr "Προβλήματα"
 
 #: widgets/problemsbysv/Widget.php:32
 msgid "Problems by severity"
+msgstr ""
+
+#: app/views/proxy.edit.php:284
+msgid "Process"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1257
@@ -18522,6 +19792,16 @@ msgstr ""
 #: app/views/hintbox.eventlist.php:44 widgets/url/actions/WidgetView.php:68
 #, c-format
 msgid "Provided URL \"%1$s\" is invalid."
+msgstr ""
+
+#: include/classes/vaults/CVaultHashiCorp.php:69
+#, c-format
+msgid "Provided authentication role ID \"%1$s\" is empty."
+msgstr ""
+
+#: include/classes/vaults/CVaultHashiCorp.php:73
+#, c-format
+msgid "Provided authentication secret ID \"%1$s\" is empty."
 msgstr ""
 
 #: include/classes/vaults/CVaultHashiCorp.php:64
@@ -18588,6 +19868,13 @@ msgstr "Διαμεσολαβητής"
 msgid "Proxy \"%1$s\" already exists."
 msgstr ""
 
+#: app/controllers/CControllerUsergroupUpdateGeneral.php:105
+#, c-format
+msgid "Proxy \"%1$s\" cannot be added to the proxy list because it is already managed by proxy group."
+msgid_plural "Proxies \"%1$s\" cannot be added to the proxy list because they are already managed by proxy group."
+msgstr[0] ""
+msgstr[1] ""
+
 #: include/classes/import/importers/CHostImporter.php:333
 #, c-format
 msgid "Proxy \"%1$s\" for host \"%2$s\" does not exist."
@@ -18602,6 +19889,10 @@ msgstr ""
 #, c-format
 msgid "Proxy \"%1$s\" is used by discovery rule \"%2$s\"."
 msgstr "Διαμεσολαβητής \"%1$s\" σε χρήση από κανόνα εντοπισμού \"%2$s\"."
+
+#: app/views/usergroup.edit.php:414
+msgid "Proxy access list"
+msgstr ""
 
 #: app/controllers/CControllerProxyCreate.php:227
 msgid "Proxy added"
@@ -18639,6 +19930,11 @@ msgstr ""
 #: include/classes/import/importers/CHostImporter.php:348
 #, c-format
 msgid "Proxy group \"%1$s\" for host \"%2$s\" does not exist."
+msgstr ""
+
+#: include/classes/api/services/CProxyGroup.php:423
+#, c-format
+msgid "Proxy group \"%1$s\" is used by action \"%2$s\"."
 msgstr ""
 
 #: include/classes/api/services/CProxyGroup.php:437
@@ -18721,6 +20017,15 @@ msgstr "Αρχείο δημόσιου κλειδιού"
 
 #: app/controllers/CControllerAuditLogList.php:210
 msgid "Push"
+msgstr ""
+
+#: app/views/js/user.device.init.view.js.php:122
+msgid "QR code has expired."
+msgstr ""
+
+#: app/views/js/user.device.init.view.js.php:125
+#, c-format
+msgid "QR code will expire in %1$s."
 msgstr ""
 
 #: include/views/js/item.preprocessing.js.php:208
@@ -18949,6 +20254,11 @@ msgstr ""
 #: include/views/js/monitoring.sysmaps.js.php:362
 #: include/views/js/monitoring.sysmaps.js.php:525
 msgid "Rectangle"
+msgstr ""
+
+#: app/views/administration.user.edit.php:471
+#: app/views/administration.userrole.edit.php:171
+msgid "Redirect URL after login"
 msgstr ""
 
 #: app/views/oauth.edit.php:44
@@ -19224,6 +20534,10 @@ msgstr ""
 msgid "Remove all"
 msgstr ""
 
+#: app/views/js/user.device.list.js.php:61
+msgid "Remove device?"
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:176
 msgid "Remove domain name"
 msgstr ""
@@ -19240,12 +20554,24 @@ msgstr "Αφαίρεση από ομάδα ξενιστών"
 msgid "Remove from host groups"
 msgstr "Αφαίρεση από ομάδες ξενιστών"
 
+#: app/controllers/CControllerFavoriteCreate.php:54 include/html.inc.php:169
+msgid "Remove graph from the Favorite graphs widget"
+msgstr ""
+
 #: include/actions.inc.php:633 include/actions.inc.php:861
 msgid "Remove host"
 msgstr "Αφαίρεση ξενιστή"
 
 #: include/actions.inc.php:656 include/actions.inc.php:872
 msgid "Remove host tags"
+msgstr ""
+
+#: app/controllers/CControllerFavoriteCreate.php:53 include/html.inc.php:168
+msgid "Remove map from the Favorite maps widget"
+msgstr ""
+
+#: app/views/user.device.list.php:164 app/views/userprofile.device.list.php:75
+msgid "Remove selected device?"
 msgstr ""
 
 #: widgets/favgraphs/views/widget.view.php:43
@@ -19459,6 +20785,10 @@ msgstr "Επαναφορά προκαθορισμένων"
 msgid "Reset layout"
 msgstr ""
 
+#: app/views/ceprule.edit.php:47
+msgid "Reset time windows"
+msgstr ""
+
 #: widgets/geomap/Widget.php:37
 msgid "Reset to initial view"
 msgstr ""
@@ -19475,6 +20805,17 @@ msgstr "Επιλυμένο"
 #: include/events.inc.php:163 include/events.inc.php:166
 #: include/events.inc.php:171
 msgid "Resolved by"
+msgstr ""
+
+#: app/controllers/CControllerProblemViewData.php:196
+#: widgets/problems/includes/WidgetProblems.php:274
+#, c-format
+msgid "Resolved by complex event processing rule \"%1$s\"."
+msgstr ""
+
+#: app/controllers/CControllerProblemViewData.php:199
+#: widgets/problems/includes/WidgetProblems.php:277
+msgid "Resolved by complex event processing rule."
 msgstr ""
 
 #: include/classes/screens/CScreenProblem.php:1398
@@ -19506,6 +20847,24 @@ msgstr "Πόρος"
 
 #: app/views/reports.auditlog.list.php:92
 msgid "Resource ID"
+msgstr ""
+
+#: app/views/apm.log.list.php:112 app/views/apm.metric.list.php:98
+#: app/views/apm.trace.list.php:99 app/views/js/apm.log.list.js.php:219
+#: app/views/js/apm.log.list.js.php:657 app/views/js/apm.metric.list.js.php:218
+#: app/views/js/apm.metric.list.js.php:857
+#: app/views/js/apm.trace.list.js.php:214
+#: app/views/js/apm.trace.list.js.php:639 app/views/proxy.edit.php:288
+#: app/views/usergroup.edit.php:385
+msgid "Resource attributes"
+msgstr ""
+
+#: app/views/js/apm.log.list.js.php:629
+msgid "Resource schema URL"
+msgstr ""
+
+#: app/views/js/apm.metric.list.js.php:723
+msgid "Resource schema url"
 msgstr ""
 
 #: app/views/mediatype.test.edit.php:93 app/views/popup.scriptexec.php:48
@@ -19572,6 +20931,11 @@ msgstr "Τύπος αποτελέσματος"
 
 #: app/views/js/popup.itemtestedit.view.js.php:339
 msgid "Result with value map applied"
+msgstr ""
+
+#: app/partials/configuration.host.interface.row.php:74
+#: app/views/host.wizard.edit.php:764 app/views/popup.itemtestedit.view.php:210
+msgid "Retries"
 msgstr ""
 
 #: app/views/webscenario.step.edit.php:247
@@ -19713,6 +21077,10 @@ msgstr "Γραμμές"
 #: app/views/administration.user.edit.php:314
 msgid "Rows per page"
 msgstr "Γραμμές ανά σελίδα"
+
+#: app/controllers/CControllerCepRuleResetTimeWindows.php:54
+msgid "Rule time windows are reset"
+msgstr ""
 
 #: app/views/popup.import.php:165
 msgid "Rules"
@@ -20102,6 +21470,10 @@ msgstr ""
 msgid "Safari"
 msgstr "Safari"
 
+#: app/views/js/apm.log.list.js.php:675
+msgid "Sampled"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:60
 msgid "Sans-Serif"
 msgstr ""
@@ -20147,6 +21519,10 @@ msgstr ""
 
 #: include/views/mfa.login.php:60
 msgid "Scan this QR code"
+msgstr ""
+
+#: app/views/user.device.init.view.php:72
+msgid "Scan this QR code to add your device and setup your notifications."
 msgstr ""
 
 #: widgets/scatterplot/Widget.php:24
@@ -20243,6 +21619,30 @@ msgstr ""
 #: app/views/popup.acknowledge.edit.php:53
 msgctxt "selected problems"
 msgid "Scope"
+msgstr ""
+
+#: app/views/apm.log.list.php:127 app/views/apm.metric.list.php:113
+#: app/views/js/apm.log.list.js.php:227 app/views/js/apm.log.list.js.php:663
+#: app/views/js/apm.metric.list.js.php:226
+#: app/views/js/apm.metric.list.js.php:863
+msgid "Scope attributes"
+msgstr ""
+
+#: app/views/apm.log.list.php:76 app/views/apm.metric.list.php:74
+#: app/views/apm.trace.list.php:76 app/views/js/apm.log.list.js.php:193
+#: app/views/js/apm.log.list.js.php:637 app/views/js/apm.metric.list.js.php:170
+#: app/views/js/apm.trace.list.js.php:177
+#: app/views/js/apm.trace.list.js.php:602
+msgid "Scope name"
+msgstr ""
+
+#: app/views/js/apm.log.list.js.php:633
+msgid "Scope schema URL"
+msgstr ""
+
+#: app/views/js/apm.log.list.js.php:199 app/views/js/apm.log.list.js.php:641
+#: app/views/js/apm.trace.list.js.php:183
+msgid "Scope version"
 msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:252
@@ -20346,6 +21746,10 @@ msgstr "Το σχέδιο αναζήτησης είναι άδειο"
 msgid "Search string"
 msgstr ""
 
+#: include/classes/data/CTriggerConditionFunctionData.php:2781
+msgid "Search value"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:114
 #: app/controllers/CControllerPopupTriggerExpr.php:1135
 msgid "Season"
@@ -20432,12 +21836,20 @@ msgstr ""
 msgid "Select"
 msgstr "Επιλέξτε"
 
+#: include/classes/helpers/CRoleHelper.php:624
+msgid "Select \"Server\" for monitoring and discovery"
+msgstr ""
+
 #: app/views/slareport.list.php:104
 msgid "Select SLA to display SLA report."
 msgstr ""
 
 #: app/views/host.wizard.edit.php:137 app/views/js/host.wizard.edit.js.php:1116
 msgid "Select a template"
+msgstr ""
+
+#: include/classes/html/CDateSelector.php:199
+msgid "Select date"
 msgstr ""
 
 #: app/views/popup.massupdate.item.php:458 app/views/popup.triggerexpr.php:95
@@ -20466,6 +21878,10 @@ msgstr "Επιλεγμένο"
 
 #: app/views/popup.acknowledge.edit.php:63
 msgid "Selected and all other problems of related triggers"
+msgstr ""
+
+#: app/views/popup.media.edit.php:117
+msgid "Selected devices"
 msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:654
@@ -20757,6 +22173,14 @@ msgstr ""
 msgid "Session terminated, re-login, please."
 msgstr "Τερματισμός συνεδρίας. Επανασυνδεθείτε."
 
+#: include/classes/helpers/CCepRuleHelper.php:469
+msgid "Set"
+msgstr ""
+
+#: include/classes/helpers/CCepRuleHelper.php:626
+msgid "Set as symptom"
+msgstr ""
+
 #: app/views/popup.tabfilter.edit.php:40
 msgid "Set custom time period"
 msgstr ""
@@ -20775,8 +22199,16 @@ msgstr ""
 msgid "Set host inventory mode"
 msgstr ""
 
+#: include/classes/helpers/CCepRuleHelper.php:458
+msgid "Set name"
+msgstr ""
+
 #: include/classes/html/CInputSecret.php:80 jsLoader.php:423
 msgid "Set new value"
+msgstr ""
+
+#: include/classes/helpers/CCepRuleHelper.php:461
+msgid "Set severity"
 msgstr ""
 
 #: app/views/popup.service.statusrule.edit.php:39
@@ -20797,6 +22229,10 @@ msgstr ""
 
 #: app/views/host.wizard.edit.php:477
 msgid "Set up Zabbix agent on your monitoring target by executing the following script [bash under root]:"
+msgstr ""
+
+#: include/classes/helpers/CCepRuleHelper.php:470
+msgid "Set value"
 msgstr ""
 
 #: app/views/js/popup.itemtestedit.view.js.php:383 include/forms.inc.php:1599
@@ -20878,6 +22314,14 @@ msgctxt "screen reader"
 msgid "Severity increased"
 msgstr ""
 
+#: app/views/js/apm.log.list.js.php:164 app/views/js/apm.log.list.js.php:617
+msgid "Severity number"
+msgstr ""
+
+#: app/views/js/apm.log.list.js.php:159 app/views/js/apm.log.list.js.php:613
+msgid "Severity text"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:360
 #: include/views/js/monitoring.sysmaps.js.php:523
 #: include/views/monitoring.sysmap.constructor.php:37
@@ -20897,6 +22341,12 @@ msgstr ""
 #: include/classes/api/services/CMap.php:1261
 #, c-format
 msgid "Sharing option \"%1$s\" is missing a value for map \"%2$s\"."
+msgstr ""
+
+#: app/partials/item.edit.item.tab.php:918
+#: app/partials/lldrule.edit.lldrule.tab.php:902
+#: app/partials/lldrule.edit.prototype.tab.php:904
+msgid "Shift the processing window back by a fixed amount."
 msgstr ""
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:135
@@ -20944,6 +22394,15 @@ msgstr "Εμφάνιση"
 #: widgets/piechart/includes/WidgetForm.php:205
 #: widgets/svggraph/includes/WidgetForm.php:355
 msgid "Show aggregation function"
+msgstr ""
+
+#: app/views/js/apm.log.list.js.php:389 app/views/js/apm.metric.list.js.php:374
+#: app/views/js/apm.trace.list.js.php:340
+msgid "Show all attributes"
+msgstr ""
+
+#: include/classes/helpers/CTagHelper.php:133 jsLoader.php:281
+msgid "Show all tags"
 msgstr ""
 
 #: widgets/gauge/includes/WidgetForm.php:302
@@ -21009,6 +22468,10 @@ msgstr "Εμφάνιση γραμμών"
 
 #: include/views/monitoring.sysmap.edit.php:274
 msgid "Show link labels"
+msgstr ""
+
+#: include/classes/html/CHtmlPage.php:190
+msgid "Show main menu"
 msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:267
@@ -21177,6 +22640,24 @@ msgstr ""
 msgid "Simple"
 msgstr "Απλό"
 
+#: app/partials/ceprule.window.php:48
+#: include/classes/helpers/CCepRuleHelper.php:537
+msgid "Simple (multiple)"
+msgstr ""
+
+#: app/partials/ceprule.window.php:39
+msgid "Simple (multiple) - sets up sliding time window based event operations."
+msgstr ""
+
+#: app/partials/ceprule.window.php:49
+#: include/classes/helpers/CCepRuleHelper.php:538
+msgid "Simple (once)"
+msgstr ""
+
+#: app/partials/ceprule.window.php:40
+msgid "Simple (once) - same as 'Simple (multiple)', except that an event cannot be processed by another window of this type."
+msgstr ""
+
 #: app/views/js/host.wizard.edit.js.php:97
 msgid "Simple Network Management Protocol (SNMP) interface"
 msgstr ""
@@ -21216,6 +22697,10 @@ msgstr ""
 
 #: widgets/itemhistory/views/column.edit.php:140
 msgid "Single line - result will be displayed in a single line and truncated to specified length."
+msgstr ""
+
+#: app/partials/ceprule.modal.operation.php:236
+msgid "Single: Clones closed problems only."
 msgstr ""
 
 #: include/hosts.inc.php:364
@@ -21282,6 +22767,14 @@ msgstr "Μέγεθος ληφθείσης απόκρισης από εξυπηρ
 
 #: app/views/host.wizard.edit.php:355
 msgid "Skip OS selection if you already have Zabbix agent installed."
+msgstr ""
+
+#: app/views/layout.htmlpage.php:63 include/page_header.php:217
+msgid "Skip to main content"
+msgstr ""
+
+#: app/views/dashboard.page.properties.edit.php:50
+msgid "Slideshow interval"
 msgstr ""
 
 #: include/locales.inc.php:61
@@ -21360,6 +22853,10 @@ msgstr ""
 msgid "Sort entries by"
 msgstr "Ταξινόμηση καταχωρίσεων με"
 
+#: app/views/ceprule.edit.php:261 app/views/ceprule.list.php:91
+msgid "Sort order"
+msgstr ""
+
 #: app/views/popup.service.edit.php:105
 msgid "Sort order (0->999)"
 msgstr "Σειρά ταξινόμησης (0->999)"
@@ -21377,6 +22874,31 @@ msgstr "Προέλευση"
 
 #: widgets/piechart/includes/WidgetForm.php:132
 msgid "Space between sectors"
+msgstr ""
+
+#: app/views/apm.log.list.php:62 app/views/apm.trace.list.php:55
+#: app/views/js/apm.log.list.js.php:175 app/views/js/apm.log.list.js.php:605
+#: app/views/js/apm.metric.list.js.php:690
+#: app/views/js/apm.trace.list.js.php:149
+#: app/views/js/apm.trace.list.js.php:590
+msgid "Span ID"
+msgstr ""
+
+#: app/views/apm.trace.list.php:114 app/views/js/apm.trace.list.js.php:207
+#: app/views/js/apm.trace.list.js.php:649
+msgid "Span attributes"
+msgstr ""
+
+#: app/views/js/apm.trace.list.js.php:557
+msgid "Span details"
+msgstr ""
+
+#: app/views/js/apm.trace.list.js.php:171
+msgid "Span kind"
+msgstr ""
+
+#: app/partials/apm.trace.list.split.view.php:87
+msgid "Span tree"
 msgstr ""
 
 #: include/locales.inc.php:62
@@ -21620,6 +23142,11 @@ msgstr ""
 msgid "Status calculation rule and additional rules are only applicable if child services exist."
 msgstr ""
 
+#: app/views/js/apm.trace.list.js.php:189
+#: app/views/js/apm.trace.list.js.php:618
+msgid "Status code"
+msgstr ""
+
 #: include/views/configuration.httpconf.edit.php:229
 msgid "Status codes"
 msgstr "Κωδικοί κατάστασης"
@@ -21630,6 +23157,11 @@ msgstr ""
 
 #: include/classes/helpers/CMapHelper.php:287
 msgid "Status maintenance"
+msgstr ""
+
+#: app/views/js/apm.trace.list.js.php:195
+#: app/views/js/apm.trace.list.js.php:625
+msgid "Status message"
 msgstr ""
 
 #: app/controllers/CControllerDiscoveryView.php:90
@@ -21688,6 +23220,10 @@ msgstr "Βήματα"
 #: app/views/administration.user.edit.php:801
 msgid "Stop"
 msgstr "Σταματώ"
+
+#: app/views/ceprule.edit.php:254 app/views/ceprule.list.php:90
+msgid "Stop after this rule"
+msgstr ""
 
 #: app/views/popup.lldoverride.php:55
 #: include/views/configuration.host.discovery.edit.php:973
@@ -21796,8 +23332,24 @@ msgstr "Επιτυχής επιθεώρηση"
 msgid "Success message"
 msgstr ""
 
+#: app/controllers/CControllerApmDbTest.php:74
+msgid "Successfully connected to APM data source."
+msgstr ""
+
+#: app/partials/item.edit.item.tab.php:671
+#: app/partials/lldrule.edit.lldrule.tab.php:635
+#: app/partials/lldrule.edit.prototype.tab.php:635
+#: app/views/js/apm.metric.list.js.php:776
+#: include/classes/helpers/CApmMetricHelper.php:22
+msgid "Sum"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1141
 msgid "Sum of incoming and outgoing traffic statistics on network interface. Returns integer"
+msgstr ""
+
+#: app/views/js/apm.metric.list.js.php:181
+msgid "Sum/Value"
 msgstr ""
 
 #: include/func.inc.php:212
@@ -21835,9 +23387,28 @@ msgstr ""
 msgid "Suppress"
 msgstr ""
 
+#: jsLoader.php:640
+msgid "Suppress by event name"
+msgstr ""
+
+#: jsLoader.php:641
+msgid "Suppress by tags"
+msgstr ""
+
+#: jsLoader.php:638
+msgid "Suppress host"
+msgstr ""
+
 #: include/classes/helpers/CRoleHelper.php:546
 msgid "Suppress problems"
 msgstr ""
+
+#: app/views/acknowledge.edit.php:177 app/views/acknowledge.edit.php:182
+#: jsLoader.php:639
+msgid "Suppress trigger"
+msgid_plural "Suppress triggers"
+msgstr[0] ""
+msgstr[1] ""
 
 #: include/actions.inc.php:1571
 msgid "Suppress until"
@@ -21845,6 +23416,10 @@ msgstr ""
 
 #: include/actions.inc.php:1580 include/classes/screens/CScreenProblem.php:1250
 msgid "Suppressed"
+msgstr ""
+
+#: include/html.inc.php:1154
+msgid "Suppressed by complex event processing"
 msgstr ""
 
 #: include/actions.inc.php:2241 include/html.inc.php:1134
@@ -22165,6 +23740,11 @@ msgstr "Κατάλογος στόχων"
 msgid "Target type"
 msgstr "Τύπος στόχου"
 
+#: app/views/administration.timeouts.edit.php:134 app/views/proxy.edit.php:443
+#: include/items.inc.php:101
+msgid "Telemetry query"
+msgstr ""
+
 #: app/views/administration.script.edit.php:105
 #: app/views/administration.script.list.php:181 include/discovery.inc.php:61
 msgid "Telnet"
@@ -22408,6 +23988,10 @@ msgstr "Δοκιμή επιβεβαίωσης"
 msgid "Test data"
 msgstr "Δοκιμή δεδομένων"
 
+#: app/views/administration.regex.edit.php:94
+msgid "Test expression"
+msgstr ""
+
 #: app/views/administration.regex.edit.php:129
 msgid "Test expressions"
 msgstr "Δοκιμή εκφράσεων"
@@ -22430,6 +24014,10 @@ msgstr ""
 
 #: app/controllers/CControllerPopupScheduledReportTest.php:78
 msgid "Test report generating"
+msgstr ""
+
+#: app/views/administration.regex.edit.php:43
+msgid "Test result"
 msgstr ""
 
 #: app/views/administration.regex.edit.php:124
@@ -22463,6 +24051,10 @@ msgstr ""
 #: widgets/tophosts/views/column.edit.php:73
 msgid "Text"
 msgstr "Κείμενο"
+
+#: jsLoader.php:317
+msgid "Text, macros, or combined"
+msgstr ""
 
 #: widgets/tophosts/views/column.edit.php:77
 msgid "Text, supports {INVENTORY.*}, {HOST.*} macros"
@@ -22549,6 +24141,10 @@ msgstr ""
 msgid "The following placeholders are supported:"
 msgstr ""
 
+#: app/views/administration.apm.db.edit.php:32
+msgid "The global data source will be used by the Frontend, Server, and Proxies, unless explicitly overridden in the respective configuration files."
+msgstr ""
+
 #: include/html.inc.php:724
 #, c-format
 msgid "The graph is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
@@ -22626,12 +24222,21 @@ msgstr ""
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr ""
 
+#: app/views/administration.apm.db.edit.php:83
+msgid "The previous password was cleared due to a URL change. Please enter the new password."
+msgstr ""
+
 #: app/views/popup.ldap.edit.php:101
 msgid "The previous password was cleared due to a host change. Please enter the new password."
 msgstr ""
 
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
+msgstr ""
+
+#: include/classes/scim/API.php:55
+#, c-format
+msgid "The requested endpoint \"%1$s\" is not supported."
 msgstr ""
 
 #: include/classes/core/CJsonRpc.php:211
@@ -22660,6 +24265,12 @@ msgstr ""
 #: app/views/host.wizard.edit.php:573
 #, c-format
 msgid "The template you selected (%1$s) requires the %2$s to be added to the host (%3$s)."
+msgstr ""
+
+#: app/partials/item.edit.item.tab.php:996
+#: app/partials/lldrule.edit.lldrule.tab.php:974
+#: app/partials/lldrule.edit.prototype.tab.php:976
+msgid "The timeout value is unavailable because it is configured on a proxy that you do not have permission to."
 msgstr ""
 
 #: app/views/popup.token.view.php:62
@@ -22710,6 +24321,18 @@ msgid "This check cannot be removed, as it is used as a condition in %1$s discov
 msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
 msgstr[0] ""
 msgstr[1] ""
+
+#: include/classes/helpers/CTelemetryHelper.php:165
+#: include/classes/helpers/CTelemetryHelper.php:173
+msgid "This column is not available for the selected category."
+msgstr ""
+
+#: include/classes/helpers/CTelemetryHelper.php:183
+#: include/classes/helpers/CTelemetryHelper.php:194
+#: include/classes/helpers/CTelemetryHelper.php:205
+#: include/classes/helpers/CTelemetryHelper.php:216
+msgid "This column is not available for the selected metric points."
+msgstr ""
 
 #: app/views/host.wizard.edit.php:384
 msgid "This configuration will overwrite all existing encryption settings on the host."
@@ -23016,6 +24639,18 @@ msgstr "Χρονική μετατόπιση"
 msgid "Time type"
 msgstr "Τύπος χρόνου"
 
+#: app/partials/ceprule.window.php:36
+msgid "Time window"
+msgstr ""
+
+#: app/partials/ceprule.window.php:64
+msgid "Time window may be limited to contain specific event count. When this limit is reached, new events will be evicted due to capacity restriction."
+msgstr ""
+
+#: app/views/ceprule.list.php:88
+msgid "Time window processing"
+msgstr ""
+
 #: app/views/administration.user.edit.php:287 app/views/popup.sla.edit.php:84
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:82
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:130
@@ -23094,6 +24729,10 @@ msgstr "Σε"
 msgid "To complete the setup, configure the following variables (host macros)."
 msgstr ""
 
+#: app/views/proxy.edit.php:251
+msgid "To enable OpenTelemetry data collection set up Proxy configuration file first."
+msgstr ""
+
 #: jsLoader.php:398
 msgid "To set a host interface select a single item type for all items"
 msgstr "Για να ορίσετε διεπαφή ξενιστή επιλέξτε απλό τύπο στοιχείου για όλα τα στοιχεία"
@@ -23106,12 +24745,21 @@ msgstr "Σήμερα"
 msgid "Today so far"
 msgstr ""
 
+#: include/classes/setup/CSetupWizard.php:744
+#: include/classes/setup/CSetupWizard.php:1081
+msgid "Token"
+msgstr ""
+
 #: app/controllers/CControllerPopup.php:60
 msgid "Token edit"
 msgstr ""
 
 #: app/views/oauth.edit.php:188
 msgid "Token endpoint"
+msgstr ""
+
+#: app/views/user.device.list.php:143
+msgid "Token expired"
 msgstr ""
 
 #: app/views/oauth.edit.php:201
@@ -23201,6 +24849,32 @@ msgstr ""
 
 #: app/controllers/CControllerMediatypeTestSend.php:192
 msgid "Trace"
+msgstr ""
+
+#: app/partials/apm.trace.list.split.view.php:32 app/views/apm.log.list.php:55
+#: app/views/apm.trace.list.php:48 app/views/js/apm.log.list.js.php:169
+#: app/views/js/apm.log.list.js.php:601 app/views/js/apm.metric.list.js.php:678
+#: app/views/js/apm.trace.list.js.php:143
+msgid "Trace ID"
+msgstr ""
+
+#: app/controllers/CControllerApmTraceListSplitView.php:72
+msgid "Trace not found."
+msgstr ""
+
+#: app/views/js/apm.trace.list.js.php:155
+msgid "Trace state"
+msgstr ""
+
+#: app/controllers/CControllerApmTraceList.php:164
+#: app/partials/item.edit.item.tab.php:660
+#: app/partials/lldrule.edit.lldrule.tab.php:624
+#: app/partials/lldrule.edit.prototype.tab.php:624
+#: app/views/apm.trace.list.php:148 app/views/js/apm.metric.list.js.php:640
+#: app/views/proxy.edit.php:297 app/views/usergroup.edit.php:395
+#: include/classes/helpers/CMenuHelper.php:81
+#: include/classes/helpers/CRoleHelper.php:440
+msgid "Traces"
 msgstr ""
 
 #: include/page_footer.php:40
@@ -23779,6 +25453,10 @@ msgstr "Παράμετρος URL δεν μπορεί να είναι πίνακ�
 msgid "URL parameter name is empty."
 msgstr "Κενό όνομα παραμέτρου URL."
 
+#: include/classes/validators/CUrlValidator.php:148
+msgid "URL scheme is required"
+msgstr ""
+
 #: include/classes/api/services/CMap.php:955
 #: include/classes/api/services/CMap.php:1430
 #, c-format
@@ -23820,6 +25498,10 @@ msgstr ""
 msgid "Unable to create the configuration file."
 msgstr ""
 
+#: include/classes/db/ApmDbClickHouse.php:373
+msgid "Unable to decode data received from ClickHouse."
+msgstr ""
+
 #: include/classes/db/MysqlDbBackend.php:35
 #: include/classes/db/OracleDbBackend.php:36
 #: include/classes/db/PostgresqlDbBackend.php:61
@@ -23836,6 +25518,12 @@ msgstr ""
 msgid "Unable to load authentication API parameters."
 msgstr ""
 
+#: include/classes/db/ApmDbClickHouse.php:93
+#: include/classes/db/ApmDbClickHouse.php:127
+#, c-format
+msgid "Unable to load data from ClickHouse: %1$s."
+msgstr ""
+
 #: include/classes/core/ZBase.php:469
 #: include/classes/vaults/CVaultCyberArk.php:106
 #: include/classes/vaults/CVaultHashiCorp.php:93
@@ -23848,6 +25536,11 @@ msgstr ""
 
 #: include/classes/helpers/CSettingsHelper.php:124
 msgid "Unable to load settings API parameters."
+msgstr ""
+
+#: include/classes/vaults/CVaultHashiCorp.php:125
+#: include/classes/vaults/CVaultHashiCorp.php:133
+msgid "Unable to load token from Vault."
 msgstr ""
 
 #: include/classes/core/CConfigFile.php:233
@@ -23905,6 +25598,11 @@ msgstr ""
 #: widgets/problemsbysv/includes/WidgetForm.php:116
 msgid "Unacknowledged only"
 msgstr "Μόνο μη αναγνωρισμένα"
+
+#: app/controllers/CControllerUserDeviceList.php:227
+#: app/views/user.device.list.php:106
+msgid "Unassigned"
+msgstr ""
 
 #: app/partials/administration.ha.nodes.php:56
 msgid "Unavailable"
@@ -24033,6 +25731,11 @@ msgstr ""
 msgid "Unexpected server error."
 msgstr ""
 
+#: app/views/js/apm.metric.list.js.php:160
+#: app/views/js/apm.metric.list.js.php:814
+msgid "Unit"
+msgstr ""
+
 #: app/views/popup.massupdate.item.php:157
 #: include/views/configuration.item.edit.php:763
 #: include/views/configuration.item.prototype.edit.php:730
@@ -24153,6 +25856,20 @@ msgstr "Αναίρεση σίγασης"
 msgid "Unmute for %1$s"
 msgstr ""
 
+#: include/classes/helpers/CApmTraceHelper.php:21
+msgid "Unset"
+msgstr ""
+
+#: widgets/svggraph/includes/WidgetForm.php:339
+#: widgets/svggraph/includes/WidgetForm.php:375
+msgid "Unsigned"
+msgstr ""
+
+#: app/views/js/apm.metric.list.js.php:77
+#: include/classes/helpers/CApmLogHelper.php:21
+msgid "Unspecified"
+msgstr ""
+
 #: app/partials/administration.system.info.php:161
 #, c-format
 msgid "Unsupported %1$s database server version. Must be at least %2$s."
@@ -24161,6 +25878,11 @@ msgstr ""
 #: app/partials/administration.system.info.php:174
 #, c-format
 msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
+msgstr ""
+
+#: include/classes/db/ApmDbClickHouse.php:247
+#, c-format
+msgid "Unsupported ClickHouse query parameter type: %1$s."
 msgstr ""
 
 #: app/partials/administration.system.info.php:206
@@ -24241,6 +25963,11 @@ msgstr "Ανοικτά"
 #: app/partials/administration.system.info.php:59
 #: app/partials/administration.system.info.php:64
 msgid "Up to date"
+msgstr ""
+
+#: app/views/maintenance.list.php:66 app/views/maintenance.list.php:104
+msgctxt "maintenance status"
+msgid "Upcoming"
 msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:205
@@ -24626,6 +26353,10 @@ msgstr ""
 msgid "User group membership attribute"
 msgstr ""
 
+#: app/views/administration.user.edit.php:428
+msgid "User group permissions"
+msgstr ""
+
 #: include/classes/api/services/CMap.php:784
 #: include/classes/api/services/CMap.php:1252
 #, c-format
@@ -24673,6 +26404,10 @@ msgstr "Ο χρήστης δεν επιτρέπεται να διαγράψει 
 msgid "User is not allowed to delete oneself."
 msgstr ""
 
+#: include/classes/api/services/CDevice.php:254
+msgid "User is not allowed to use linked devices."
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:462
 #: app/views/popup.ldap.edit.php:222
 msgid "User last name attribute"
@@ -24715,6 +26450,11 @@ msgstr "Συνθηματικό χρήστη"
 #: app/views/administration.user.edit.php:40 include/html.inc.php:847
 msgid "User profile"
 msgstr "Προφιλ χρήστη"
+
+#: app/views/administration.user.edit.php:468
+#: app/views/administration.userrole.edit.php:148
+msgid "User profile settings"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:263
 #: app/views/administration.authentication.edit.php:488
@@ -25472,9 +27212,28 @@ msgstr ""
 msgid "Vault API endpoint"
 msgstr ""
 
+#: include/classes/vaults/CVaultHashiCorp.php:117
+msgid "Vault AppRole login connection failed"
+msgstr ""
+
+#: include/classes/setup/CSetupWizard.php:762
+#: include/classes/setup/CSetupWizard.php:1093
+msgid "Vault authentication role ID"
+msgstr ""
+
+#: include/classes/setup/CSetupWizard.php:773
+#: include/classes/setup/CSetupWizard.php:1097
+msgid "Vault authentication secret ID"
+msgstr ""
+
 #: include/classes/setup/CSetupWizard.php:598
 #: include/classes/setup/CSetupWizard.php:799
 msgid "Vault authentication token"
+msgstr ""
+
+#: include/classes/setup/CSetupWizard.php:742
+#: include/classes/setup/CSetupWizard.php:1080
+msgid "Vault authentication type"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:616
@@ -25486,6 +27245,10 @@ msgstr ""
 #: include/classes/vaults/CVaultCyberArk.php:98
 #: include/classes/vaults/CVaultHashiCorp.php:85 include/config.inc.php:53
 msgid "Vault connection failed."
+msgstr ""
+
+#: include/classes/db/ApmDb.php:94
+msgid "Vault is not configured."
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:609
@@ -25536,6 +27299,14 @@ msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:655
 msgid "Verify database certificate"
+msgstr ""
+
+#: app/views/administration.apm.db.edit.php:111
+msgid "Verify hostname"
+msgstr ""
+
+#: app/views/administration.apm.db.edit.php:99
+msgid "Verify server certificate"
 msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:881
@@ -25854,6 +27625,14 @@ msgstr ""
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:213
 msgid "Width"
 msgstr "Πλάτος"
+
+#: app/partials/ceprule.modal.operation.php:42
+msgid "Window"
+msgstr ""
+
+#: include/classes/helpers/CCepRuleHelper.php:447
+msgid "Window closed"
+msgstr ""
 
 #: app/views/host.wizard.edit.php:435
 msgid "Windows"
@@ -26222,6 +28001,10 @@ msgstr ""
 msgid "You cannot switch templates for current selection."
 msgstr ""
 
+#: app/controllers/CControllerHostWizardGet.php:83
+msgid "You do not have permission to add a host monitored by Zabbix server."
+msgstr ""
+
 #: include/classes/api/services/CAuditLog.php:73
 #: include/classes/api/services/CHaNode.php:45
 #: include/classes/api/services/CHost.php:896
@@ -26276,6 +28059,10 @@ msgstr ""
 
 #: app/views/connector.edit.php:49
 msgid "Zabbix Streaming Protocol v1.0"
+msgstr ""
+
+#: include/classes/helpers/CMenuHelper.php:470
+msgid "Zabbix Subscriptions"
 msgstr ""
 
 #: include/classes/helpers/CMenuHelper.php:427
@@ -26351,6 +28138,11 @@ msgstr ""
 
 #: app/views/administration.script.edit.php:115
 msgid "Zabbix server (proxy)"
+msgstr ""
+
+#: app/partials/administration.system.info.php:32
+#: include/classes/helpers/CSystemInfoHelper.php:225
+msgid "Zabbix server ID"
 msgstr ""
 
 #: app/views/administration.miscconfig.edit.php:112
@@ -26429,6 +28221,10 @@ msgstr ""
 msgid "a PEM-encoded private key is expected"
 msgstr ""
 
+#: include/classes/validators/CUuidV7Validator.php:49
+msgid "a UUIDv7 is expected"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:1381
 msgid "a boolean is expected"
 msgstr ""
@@ -26481,6 +28277,10 @@ msgstr ""
 msgid "a hexadecimal color code (6 symbols) is expected"
 msgstr ""
 
+#: include/classes/validators/CUuidV7Validator.php:39
+msgid "a hyphenated UUID is expected"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2090
 msgid "a low-level discovery macro is expected"
 msgstr ""
@@ -26510,6 +28310,13 @@ msgstr ""
 msgid "a port number is expected"
 msgstr ""
 
+#: include/classes/validators/CFrontendActionValidator.php:35
+#: include/classes/validators/CFrontendActionValidator.php:42
+#: include/classes/validators/CFrontendActionValidator.php:51
+#: include/classes/validators/CFrontendActionValidator.php:59
+msgid "a relative URL to the frontend is expected"
+msgstr ""
+
 #: app/controllers/CControllerPopupItemTestSend.php:193
 #: app/controllers/CControllerPopupItemTestSend.php:207
 msgid "a relative time is expected"
@@ -26517,6 +28324,14 @@ msgstr ""
 
 #: app/views/administration.authentication.edit.php:122
 msgid "a special character"
+msgstr ""
+
+#: include/classes/core/CConfigFile.php:283
+#: include/classes/core/CConfigFile.php:293
+#: include/classes/core/CConfigFile.php:800
+#: include/classes/core/CConfigFile.php:835
+#: include/classes/core/CConfigFile.php:876
+msgid "a string is expected"
 msgstr ""
 
 #: app/views/administration.miscconfig.edit.php:133
@@ -26563,8 +28378,16 @@ msgstr ""
 msgid "a timestamp is too large"
 msgstr ""
 
+#: include/classes/validators/CPushNotificationRecipientValidator.php:37
+msgid "a wildcard pattern '*' or a UUIDv7 is expected"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:333
 msgid "abs() - Absolute value"
+msgstr ""
+
+#: include/classes/api/services/CUserGroup.php:694
+msgid "access to this proxy is managed by its proxy group"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:339
@@ -26788,6 +28611,10 @@ msgstr ""
 #: app/controllers/CControllerScheduledReportCreate.php:83
 #: app/controllers/CControllerScheduledReportUpdate.php:87
 msgid "at least one day of the week must be selected"
+msgstr ""
+
+#: include/classes/api/services/CCepRule.php:908
+msgid "at least one operation must execute when pattern matched"
 msgstr ""
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:63
@@ -27056,6 +28883,11 @@ msgstr ""
 msgid "cannot be greater than or equal to the value of parameter \"%1$s\""
 msgstr ""
 
+#: include/classes/api/item_types/CItemTypeTelemetryQuery.php:245
+#, c-format
+msgid "cannot be greater than the value of parameter \"%1$s\""
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:3487
 #, c-format
 msgid "cannot be less than or equal to the value of parameter \"%1$s\""
@@ -27189,6 +29021,10 @@ msgstr ""
 msgid "contains"
 msgstr ""
 
+#: include/classes/data/CTriggerConditionFunctionData.php:177
+msgid "contains() - Returns 1 if search value is found in value, 0 otherwise"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:538
 msgid "cos() - The cosine of a value, where the value is an angle expressed in radians"
 msgstr ""
@@ -27226,6 +29062,10 @@ msgstr "d.M"
 
 #: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:100
 msgid "data is missing"
+msgstr ""
+
+#: include/classes/core/CConfigFile.php:855
+msgid "database vault should be configured if vault path is provided"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:573
@@ -27345,6 +29185,12 @@ msgstr ""
 msgid "duplicate"
 msgstr ""
 
+#: app/views/js/ceprule.edit.js.php:770
+#: include/classes/helpers/CCepRuleHelper.php:504
+#, c-format
+msgid "duration %1$s"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:598
 msgid "e() - Returns Euler's number"
 msgstr ""
@@ -27380,6 +29226,10 @@ msgstr ""
 msgid "error-matching"
 msgstr ""
 
+#: app/partials/ceprule.modal.condition.php:84
+msgid "event name"
+msgstr ""
+
 #: app/views/popup.lldoverride.php:104
 #: include/views/configuration.host.discovery.edit.php:820
 #: include/views/js/configuration.host.discovery.edit.js.php:50
@@ -27405,6 +29255,11 @@ msgstr "κενή έκφραση"
 
 #: include/classes/helpers/CElasticsearchHelper.php:185
 msgid "failed to parse JSON"
+msgstr ""
+
+#: include/classes/api/services/CDevice.php:329
+#: include/classes/api/services/CDevice.php:335
+msgid "failed to parse key material"
 msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:3251
@@ -27514,10 +29369,19 @@ msgstr ""
 msgid "host"
 msgstr "ξενιστής"
 
+#: include/classes/validators/CEventNameValidator.php:108
+#, c-format
+msgid "host \"%1$s\" is not allowed in event name"
+msgstr ""
+
 #: include/classes/api/services/CMap.php:849
 #: include/classes/api/services/CMap.php:1317
 msgid "host group"
 msgstr "ομάδα ξενιστή"
+
+#: app/partials/ceprule.modal.condition.php:98
+msgid "host group name"
+msgstr ""
 
 #: include/classes/api/services/CHostGroup.php:797
 msgid "host group with the same UUID already exists"
@@ -27662,6 +29526,10 @@ msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:4263
 msgid "invalid Prometheus pattern"
+msgstr ""
+
+#: include/classes/validators/CFrontendActionValidator.php:65
+msgid "invalid action in the frontend URL"
 msgstr ""
 
 #: include/classes/parsers/CIPRangeParser.php:135
@@ -27833,6 +29701,11 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:688
 msgid "jsonpath() - Returns JSONPath result"
+msgstr ""
+
+#: include/classes/helpers/CTagFilterFieldHelper.php:100
+#: include/forms.inc.php:697
+msgid "key"
 msgstr ""
 
 #: include/classes/parsers/CItemKey.php:54
@@ -28014,6 +29887,10 @@ msgstr ""
 msgid "memberOf is a preferable way to configure groups because it is faster. Use groupOfNames if your LDAP server does not support memberOf or group filtering is required."
 msgstr ""
 
+#: include/classes/data/CTriggerConditionFunctionData.php:213
+msgid "mid() - Alias for substring()"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:813
 msgid "mid() - Returns a substring beginning at the character position specified by start for N characters"
 msgstr ""
@@ -28161,6 +30038,11 @@ msgctxt "new element in multiselect"
 msgid "new"
 msgstr "νέο"
 
+#: app/partials/ceprule.modal.operation.php:288
+#: app/partials/ceprule.modal.operation.php:289
+msgid "new name"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:1515
 #: include/classes/graphdraw/CPieGraphDraw.php:347
 #: include/classes/html/svg/CSvgGraphLegend.php:116
@@ -28257,6 +30139,14 @@ msgstr ""
 msgid "now() - Number of seconds since the Epoch"
 msgstr ""
 
+#: app/controllers/CControllerApmTraceListData.php:241
+#: app/controllers/CControllerApmTraceListSplitView.php:131
+#: app/controllers/CControllerApmTraceListSplitView.php:145
+#: include/func.inc.php:546
+msgctxt "nanosecond short"
+msgid "ns"
+msgstr ""
+
 #: include/forms.inc.php:1311 include/views/js/item.preprocessing.js.php:293
 msgid "number"
 msgstr ""
@@ -28316,6 +30206,11 @@ msgstr "απο"
 msgid "off"
 msgstr "εκτός"
 
+#: app/partials/ceprule.modal.operation.php:283
+#: app/partials/ceprule.modal.operation.php:284
+msgid "old name"
+msgstr ""
+
 #: app/views/administration.user.edit.php:381
 #: include/classes/setup/CFrontendSetup.php:292
 #: include/classes/setup/CFrontendSetup.php:309
@@ -28351,6 +30246,10 @@ msgstr ""
 msgid "only one time unit is allowed"
 msgstr ""
 
+#: include/classes/api/services/CCepRule.php:925
+msgid "operations must be grouped by \"execute_when\" in ascending order"
+msgstr ""
+
 #: include/views/general.login.php:41
 msgid "or"
 msgstr ""
@@ -28374,6 +30273,10 @@ msgstr ""
 #: include/classes/html/widgets/fields/CWidgetFieldHostPatternSelectView.php:32
 #: include/classes/html/widgets/fields/CWidgetFieldPatternSelectView.php:36
 msgid "patterns"
+msgstr ""
+
+#: include/classes/helpers/CTelemetryHelper.php:238
+msgid "percentile"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:878
@@ -28522,6 +30425,10 @@ msgctxt "second short"
 msgid "s"
 msgstr "δ"
 
+#: app/views/js/apm.metric.list.js.php:880
+msgid "schema url"
+msgstr ""
+
 #: app/views/administration.mediatype.edit.php:236
 #: app/views/administration.script.edit.php:242
 #: app/views/mediatype.edit.php:293 include/forms.inc.php:1362
@@ -28573,8 +30480,31 @@ msgstr "σύντομη περιγραφή"
 msgid "should be empty"
 msgstr ""
 
+#: include/classes/core/CConfigFile.php:914
+msgid "should be empty string if the url scheme is not \"https\""
+msgstr ""
+
+#: include/classes/core/CConfigFile.php:884
+#, c-format
+msgid "should be enabled if \"%1$s\" is enabled"
+msgstr ""
+
+#: include/classes/core/CConfigFile.php:890
+#: include/classes/core/CConfigFile.php:896
+#, c-format
+msgid "should be enabled if \"%1$s\" is provided"
+msgstr ""
+
 #: app/controllers/CControllerPopupItemTestSend.php:217
 msgid "should be less than current time"
+msgstr ""
+
+#: include/classes/validators/CRelativeTimeValidator.php:72
+msgid "should be less than or equal to current time"
+msgstr ""
+
+#: include/classes/core/CConfigFile.php:905
+msgid "should be set to false if the url scheme is not \"https\""
 msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:137
@@ -28622,6 +30552,10 @@ msgstr ""
 msgid "subject or body text"
 msgstr ""
 
+#: include/classes/data/CTriggerConditionFunctionData.php:238
+msgid "substring() - Returns a substring beginning at the character position specified by start for N characters"
+msgstr ""
+
 #: include/graphs.inc.php:84 widgets/piechart/actions/WidgetView.php:666
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:397
 #: widgets/tophosts/views/column.edit.php:156
@@ -28663,6 +30597,10 @@ msgstr ""
 
 #: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
 msgid "tag cannot be empty"
+msgstr ""
+
+#: app/partials/ceprule.window.php:26
+msgid "tag names"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1055
@@ -28859,6 +30797,11 @@ msgstr "Πληκτρολογήστε για αναζήτηση"
 msgid "unacceptable URL"
 msgstr ""
 
+#: include/classes/validators/CUrlValidator.php:156
+#: include/classes/validators/CUrlValidator.php:163
+msgid "unacceptable URL scheme"
+msgstr ""
+
 #: include/classes/import/validators/CXmlValidatorGeneral.php:296
 #, c-format
 msgid "unexpected constant \"%1$s\""
@@ -28946,6 +30889,10 @@ msgstr ""
 msgid "uppercase identifier expected"
 msgstr ""
 
+#: include/classes/core/CConfigFile.php:849
+msgid "username and password must be empty if vault path is provided"
+msgstr ""
+
 #: app/partials/configuration.tags.tab.php:79
 #: app/partials/monitoring.host.filter.php:61
 #: app/partials/monitoring.host.filter.php:212
@@ -29018,6 +30965,11 @@ msgstr ""
 #: include/classes/validators/CApiInputValidator.php:2352
 #, c-format
 msgid "value %1$s already exists"
+msgstr ""
+
+#: include/classes/api/item_types/CItemTypeTelemetryQuery.php:307
+#, c-format
+msgid "value cannot have more than %1$s fractional digits"
 msgstr ""
 
 #: include/classes/parsers/CEscapedStringParser.php:72
@@ -29183,6 +31135,11 @@ msgstr ""
 msgid "value must be within the range of %1$s"
 msgstr ""
 
+#: include/classes/api/item_types/CItemTypeTelemetryQuery.php:316
+#, c-format
+msgid "value must not be %1$s"
+msgstr ""
+
 #: app/views/js/correlation.edit.js.php:235
 #: include/classes/helpers/CCorrelationHelper.php:141
 msgid "value of new event tag"
@@ -29200,9 +31157,17 @@ msgstr ""
 msgid "varsamp() - Sample variance"
 msgstr ""
 
+#: app/views/js/apm.metric.list.js.php:876
+msgid "version"
+msgstr ""
+
 #: include/actions.inc.php:552 include/actions.inc.php:568
 msgid "via"
 msgstr "μέσω"
+
+#: app/partials/ceprule.modal.condition.php:91
+msgid "visible name"
+msgstr ""
 
 #: include/func.inc.php:633
 msgctxt "week short"
@@ -29282,7 +31247,29 @@ msgctxt "year short"
 msgid "y"
 msgstr "ε"
 
+#: include/classes/api/services/CHost.php:2186
+msgid "you do not have permission to current proxy"
+msgstr ""
+
+#: include/classes/api/services/CHost.php:2197
+msgid "you do not have permission to current proxy group"
+msgstr ""
+
+#: include/classes/api/services/CDRule.php:682
+#: include/classes/api/services/CHost.php:2120
+msgid "you do not have permission to select Server for monitoring and discovery"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:1439
+msgid "you do not have permission to update the parameter while redirect url is enforced by role rule"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:3324
 #, c-format
 msgid "zoom level must be between \"%1$s\" and \"%2$s\""
+msgstr ""
+
+#: include/func.inc.php:545
+msgctxt "microsecond short"
+msgid "μs"
 msgstr ""

@@ -103,10 +103,10 @@ const view = new class {
 		this.#change_password_btn?.addEventListener('click', e => {
 			this.#password_changed = true;
 
-			this.#password_input?.focus();
-
 			this.#updateDisplayState([this.#password_input], true);
 			this.#updateDisabledState([this.#password_input], false);
+
+			this.#password_input?.focus();
 
 			e.target.hidden = true;
 		});
@@ -333,8 +333,9 @@ const view = new class {
 		})
 		.catch(error => {
 			if (error?.name === 'TimeoutError') {
-				const $msg_box = makeMessageBox('bad',
-					[<?= json_encode(_('Could not connect to APM data source.')) ?>]);
+				const $msg_box = makeMessageBox('bad', [],
+					<?= json_encode(_s('Connection timeout of %1$s seconds exceeded when connecting to APM data source.', 5)) ?>
+				);
 
 				addMessage($msg_box[0]);
 

@@ -82,45 +82,45 @@ $filter = (new CFilter())
 			->addItem([
 				(new CLabel(_('Attributes'), 'filter_attributes')),
 				new CFormField(
-					CApmAttrFilterFieldHelper::getFilterField([
-						'evaltype' => $data['filter']['attributes_evaltype'],
-						'attributes' => $data['filter']['attributes'] ?: [
-							['key' => '', 'value' => '', 'operator' => CONDITION_OPERATOR_LIKE]
+					CTagFilterFieldHelper::getTagFilterField([
+						'evaltype' => $data['filter']['metric_attributes_evaltype'],
+						'tags' => $data['filter']['metric_attributes'] ?: [
+							['key' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]
 						]
-					],
-					[
-						'evaltype_field_name' => 'filter_attributes_evaltype',
-						'attribute_field_name' => 'filter_attributes'
-					])
+					], [
+						'evaltype_field_name' => 'filter_metric_attributes_evaltype',
+						'tag_field_name' => 'filter_metric_attributes',
+						'filter_type' => CTagFilterFieldHelper::FILTER_TYPE_APM_ATTRIBUTE
+					])->setId('filter-metric-attributes')
 				)
 			])
 			->addItem([
 				(new CLabel(_('Resource attributes'), 'filter_resource_attributes')),
 				new CFormField(
-					CApmAttrFilterFieldHelper::getFilterField([
+					CTagFilterFieldHelper::getTagFilterField([
 						'evaltype' => $data['filter']['resource_attributes_evaltype'],
-						'attributes' => $data['filter']['resource_attributes'] ?: [
-							['key' => '', 'value' => '', 'operator' => CONDITION_OPERATOR_LIKE]
+						'tags' => $data['filter']['resource_attributes'] ?: [
+							['key' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]
 						]
-					],
-					[
-						'evaltype_field_name' => 'filter_resource_evaltype',
-						'attribute_field_name' => 'filter_resource_attributes'
+					], [
+						'evaltype_field_name' => 'filter_resource_attributes_evaltype',
+						'tag_field_name' => 'filter_resource_attributes',
+						'filter_type' => CTagFilterFieldHelper::FILTER_TYPE_APM_ATTRIBUTE
 					])->setId('filter-resource-attributes')
 				)
 			])
 			->addItem([
 				(new CLabel(_('Scope attributes'), 'filter_scope_attributes')),
 				new CFormField(
-					CApmAttrFilterFieldHelper::getFilterField([
+					CTagFilterFieldHelper::getTagFilterField([
 						'evaltype' => $data['filter']['scope_attributes_evaltype'],
-						'attributes' => $data['filter']['scope_attributes'] ?: [
-							['key' => '', 'value' => '', 'operator' => CONDITION_OPERATOR_LIKE]
+						'tags' => $data['filter']['scope_attributes'] ?: [
+							['key' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]
 						]
-					],
-					[
-						'evaltype_field_name' => 'filter_scope_evaltype',
-						'attribute_field_name' => 'filter_scope_attributes'
+					], [
+						'evaltype_field_name' => 'filter_scope_attributes_evaltype',
+						'tag_field_name' => 'filter_scope_attributes',
+						'filter_type' => CTagFilterFieldHelper::FILTER_TYPE_APM_ATTRIBUTE
 					])->setId('filter-scope-attributes')
 				)
 			])
@@ -156,44 +156,16 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 
 $html_page->show();
 
-(new CTemplateTag('filter-attributes-row-tmpl'))
-	->addItem(
-		CApmAttrFilterFieldHelper::getFilterFieldRow('#{rowNum}', [
-			'key' => '#{key}',
-			'value' => '#{value}',
-			'operator' => CONDITION_OPERATOR_LIKE
-		],
-		[
-			'attribute_field_name' => 'filter_attributes'
-		])
-	)
-	->show();
-
-(new CTemplateTag('filter-resource-attributes-row-tmpl'))
-	->addItem(
-		CApmAttrFilterFieldHelper::getFilterFieldRow('#{rowNum}', [
-			'key' => '#{key}',
-			'value' => '#{value}',
-			'operator' => CONDITION_OPERATOR_LIKE
-		],
-		[
-			'attribute_field_name' => 'filter_resource_attributes'
-		])
-	)
-	->show();
-
-(new CTemplateTag('filter-scope-attributes-row-tmpl'))
-	->addItem(
-		CApmAttrFilterFieldHelper::getFilterFieldRow('#{rowNum}', [
-			'key' => '#{key}',
-			'value' => '#{value}',
-			'operator' => CONDITION_OPERATOR_LIKE
-		],
-		[
-			'attribute_field_name' => 'filter_scope_attributes'
-		])
-	)
-	->show();
+foreach (['metric', 'resource', 'scope'] as $key) {
+	(new CTemplateTag('filter-'.$key.'-attributes-row-tmpl'))
+		->addItem(
+			CTagFilterFieldHelper::getTemplate([
+				'tag_field_name' => 'filter_'.$key.'_attributes',
+				'filter_type' => CTagFilterFieldHelper::FILTER_TYPE_APM_ATTRIBUTE
+			])
+		)
+		->show();
+}
 
 (new CScriptTag('
 	view.init('.json_encode([

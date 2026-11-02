@@ -20,12 +20,7 @@
 class CHostInterface extends CApiService {
 
 	public const ACCESS_RULES = [
-		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
-		'create' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'massadd' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'massremove' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
 	];
 
 	protected $tableName = 'interface';
@@ -538,26 +533,6 @@ class CHostInterface extends CApiService {
 	}
 
 	/**
-	 * Update interfaces.
-	 *
-	 * @param array $interfaces   multidimensional array with Interfaces data
-	 *
-	 * @return array
-	 */
-	public function update(array $interfaces) {
-		$interfaces = zbx_toArray($interfaces);
-
-		$this->checkInput($interfaces, __FUNCTION__);
-		$this->checkMainInterfacesOnUpdate($interfaces);
-
-		$this->updateInterfaces($interfaces);
-
-		$this->updateInterfaceDetails($interfaces);
-
-		return ['interfaceids' => array_column($interfaces, 'interfaceid')];
-	}
-
-	/**
 	 * Delete interfaces.
 	 * Interface cannot be deleted if it's main interface and exists other interface of same type on same host.
 	 * Interface cannot be deleted if it is used in items.
@@ -908,38 +883,6 @@ class CHostInterface extends CApiService {
 		$interfaces = array_merge($dbInterfaces, $interfaces);
 
 		$this->checkMainInterfaces($interfaces);
-	}
-
-	/**
-	 * Prepares data to validate main interface for every interface type. Executes main interface validation.
-	 *
-	 * @param array $interfaces                     Array of interfaces to validate.
-	 * @param int   $interfaces[]['hostid']         Updated interface's hostid.
-	 * @param int   $interfaces[]['interfaceid']    Updated interface's interfaceid.
-	 *
-	 * @throws APIException
-	 */
-	private function checkMainInterfacesOnUpdate(array $interfaces) {
-		$hostids = array_keys(array_flip(zbx_objectValues($interfaces, 'hostid')));
-
-		$dbInterfaces = API::HostInterface()->get([
-			'hostids' => $hostids,
-			'output' => ['hostid', 'main', 'type'],
-			'preservekeys' => true,
-			'nopermissions' => true
-		]);
-
-		// update interfaces from DB with data that will be updated.
-		foreach ($interfaces as $interface) {
-			if (isset($dbInterfaces[$interface['interfaceid']])) {
-				$dbInterfaces[$interface['interfaceid']] = array_merge(
-					$dbInterfaces[$interface['interfaceid']],
-					$interface
-				);
-			}
-		}
-
-		$this->checkMainInterfaces($dbInterfaces);
 	}
 
 	private function checkMainInterfacesOnDelete(array $interfaceIds) {
