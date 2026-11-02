@@ -1113,23 +1113,18 @@ function openMassupdatePopup(action, parameters = {}, {
 }) {
 	const form = trigger_element.closest('form');
 
-	switch (action) {
-		case 'popup.massupdate.host':
-			parameters.hostids = Object.keys(chkbxRange.getSelectedIds());
-			break;
-
-		default:
-			parameters.ids = Object.keys(chkbxRange.getSelectedIds());
+	if (action === 'popup.massupdate.host') {
+		parameters.hostids = chkbxRange.getSelectedIds();
+	}
+	else {
+		parameters.ids = chkbxRange.getSelectedIds();
 	}
 
 	switch (action) {
 		case 'item.massupdate':
-			parameters.context = form.querySelector('#form_context').value;
-			parameters.prototype = 0;
-			break;
-
 		case 'trigger.massupdate':
 			parameters.context = form.querySelector('#form_context').value;
+			parameters.prototype = 0;
 			break;
 
 		case 'item.prototype.massupdate':
