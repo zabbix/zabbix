@@ -83,7 +83,7 @@ class testIpmiChecks extends CIntegrationTest {
 
 	const ITEM_DELAY = '1s';
 
-	// HOST_* are host names (will be created with host.create API.
+	// HOST_* are host names (will be created with host.create API).
 	const HOST_NORMAL = 'ipmi-normal';
 	const HOST_MACRO = 'ipmi-macro';
 	const HOST_BADPORT = 'ipmi-badport';
