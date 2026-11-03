@@ -361,13 +361,6 @@ class CMenuHelper {
 		}
 
 		$submenu_administration = [
-			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_DATA_SOURCE)
-				? (new CMenuItem(_('Data source')))
-					->setSubMenu(new CMenu([
-						(new CMenuItem(_('APM')))
-							->setAction('apm.db.edit')
-					]))
-				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)
 				? (new CMenuItem(_('General')))
 					->setId('main-menu-general')
@@ -399,6 +392,10 @@ class CMenuHelper {
 						(new CMenuItem(_('Connectors')))
 							->setAction('connector.list')
 							->setAliases(['connector.edit']),
+						CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_DATA_SOURCE)
+							? (new CMenuItem(_('APM')))
+								->setAction('apm.db.edit')
+							: null,
 						(new CMenuItem(_('Other')))
 							->setAction('miscconfig.edit')
 					])))
