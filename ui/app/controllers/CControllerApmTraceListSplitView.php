@@ -117,6 +117,7 @@ class CControllerApmTraceListSplitView extends CController {
 		$start_timestamp = min($trace['timestamp'], min(array_column($spans, 'timestamp', 'timestamp')));
 		$end = $trace['duration'];
 
+		$trace_missing_span = false;
 		$span_index = 0;
 		$spanids = array_column($spans, 'spanid');
 
@@ -167,6 +168,7 @@ class CControllerApmTraceListSplitView extends CController {
 					'status_message' => ''
 				];
 
+				$trace_missing_span = true;
 				$span_index++;
 			}
 
@@ -194,8 +196,13 @@ class CControllerApmTraceListSplitView extends CController {
 			$span_index++;
 		}
 
+		$trace_view = (new CPartial('apm.trace.list.split.view', [
+			'trace' => $trace,
+			'trace_missing_span' => $trace_missing_span
+		]))->getOutput();
+
 		$output = json_encode([
-			'trace_view' => (new CPartial('apm.trace.list.split.view', ['trace' => $trace]))->getOutput(),
+			'trace_view' => $trace_view,
 			'trace_view_data' => [
 				'id' => $traceid,
 				'start' => 0,

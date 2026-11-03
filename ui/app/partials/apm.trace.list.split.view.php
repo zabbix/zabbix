@@ -57,7 +57,7 @@ $trace_view = (new CDiv())
 			])
 	);
 
-if ($data['trace']['has_root_span'] == 0) {
+if ($data['trace']['has_root_span'] == 0 || $data['trace_missing_span']) {
 	$trace_view->addItem(
 		(new CDiv())
 			->addClass('trace-view-alert')
