@@ -938,7 +938,17 @@ switch ($data['method']) {
 				];
 			}
 			elseif ($scripts) {
-				$result = $scripts[$data['hostid']][0];
+				$script = $scripts[$data['hostid']][0];
+				$url_validator = new CUrlValidator(['schemes' => CSettingsHelper::getAllowedUriSchemes()]);
+
+				if ($script['type'] == ZBX_SCRIPT_TYPE_URL && !$url_validator->validate($script['url'])) {
+					$result = [
+						'error' => [_s('Provided URL "%1$s" is invalid.', $script['url'])]
+					];
+				}
+				else {
+					$result = $script;
+				}
 			}
 		}
 		break;
@@ -961,7 +971,17 @@ switch ($data['method']) {
 				];
 			}
 			elseif ($scripts) {
-				$result = $scripts[$data['eventid']][0];
+				$script = $scripts[$data['eventid']][0];
+				$url_validator = new CUrlValidator(['schemes' => CSettingsHelper::getAllowedUriSchemes()]);
+
+				if ($script['type'] == ZBX_SCRIPT_TYPE_URL && !$url_validator->validate($script['url'])) {
+					$result = [
+						'error' => [_s('Provided URL "%1$s" is invalid.', $script['url'])]
+					];
+				}
+				else {
+					$result = $script;
+				}
 			}
 		}
 		break;
