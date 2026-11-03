@@ -22,7 +22,7 @@
 $trace_view = (new CDiv())
 	->setId('trace_view')
 	->addClass('trace-view')
-	->addClass($data['trace']['has_root_span'] ? null : 'missing-span')
+	->addClass($data['trace']['has_root_span'] == 0 || $data['trace_missing_span'] ? 'missing-span' : null)
 	->addItem(
 		(new CDiv())
 			->addClass('trace-view-header')
