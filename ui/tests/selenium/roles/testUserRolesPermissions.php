@@ -787,7 +787,7 @@ class testUserRolesPermissions extends CWebTest {
 			$monitored_by = $host_dialog->asForm()->getField('Monitored by')->asSegmentedRadio();
 
 			// Check default selected option ('Server' when allowed, 'Proxy' when 'Server' is disabled).
-			$this->assertEquals($action_status ? 'Server' : 'Proxy', $monitored_by->getText());
+			$this->assertEquals($action_status ? 'Server' : 'Proxy', $monitored_by->getSelected());
 
 			foreach (['monitored_by_0', 'monitored_by_1', 'monitored_by_2'] as $id) {
 				$enabled = ($id === 'monitored_by_0') ? $action_status : true;
@@ -803,7 +803,7 @@ class testUserRolesPermissions extends CWebTest {
 			$discovery_by = $discovery_dialog->asForm()->getField('Discovery by')->asSegmentedRadio();
 
 			// Check default selected option ('Server' when allowed, 'Proxy' when 'Server' is disabled).
-			$this->assertEquals($action_status ? 'Server' : 'Proxy', $discovery_by->getText());
+			$this->assertEquals($action_status ? 'Server' : 'Proxy', $discovery_by->getSelected());
 
 			$this->assertTrue($discovery_dialog->query('id:discovery_by_0')->one()->isEnabled($action_status));
 			$this->assertTrue($discovery_dialog->query('id:discovery_by_1')->one()->isEnabled());
