@@ -259,11 +259,7 @@ class CApiService {
 	 * @return bool
 	 */
 	protected function outputIsRequested($field, $output) {
-		if ($output === API_OUTPUT_EXTEND || (is_array($output) && in_array($field, $output, true))) {
-			return true;
-		}
-
-		return false;
+		return $output === API_OUTPUT_EXTEND || (is_array($output) && in_array($field, $output, true));
 	}
 
 	/**

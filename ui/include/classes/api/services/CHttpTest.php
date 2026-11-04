@@ -225,13 +225,13 @@ class CHttpTest extends CApiService {
 			$result = $this->addRelatedObjects($options, $result);
 
 			// expandName
-			$nameRequested = (is_array($options['output']) && in_array('name', $options['output'], true))
-				|| $options['output'] === API_OUTPUT_EXTEND;
+			$nameRequested = (is_array($options['output']) && in_array('name', $options['output']))
+				|| $options['output'] == API_OUTPUT_EXTEND;
 			$expandName = $options['expandName'] !== null && $nameRequested;
 
 			// expandStepName
-			$stepNameRequested = $options['selectSteps'] === API_OUTPUT_EXTEND
-				|| (is_array($options['selectSteps']) && in_array('name', $options['selectSteps'], true));
+			$stepNameRequested = $options['selectSteps'] == API_OUTPUT_EXTEND
+				|| (is_array($options['selectSteps']) && in_array('name', $options['selectSteps']));
 			$expandStepName = $options['expandStepName'] !== null && $stepNameRequested;
 
 			if ($expandName || $expandStepName) {
