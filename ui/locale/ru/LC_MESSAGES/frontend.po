@@ -568,47 +568,47 @@ msgstr "API методы"
 
 #: app/controllers/CControllerAuditLogList.php:222
 msgid "API token"
-msgstr "API токен"
+msgstr "Токен API"
 
 #: include/classes/api/services/CToken.php:287
 #, c-format
 msgid "API token \"%1$s\" already exists for userid \"%2$s\"."
-msgstr "API токен \"%1$s\" уже существует у userid \"%2$s\"."
+msgstr "Токен API \"%1$s\" уже существует у пользователя с ID \"%2$s\"."
 
 #: app/controllers/CControllerTokenCreate.php:116
 #: app/controllers/CControllerTokenCreate.php:129
 msgid "API token added"
-msgstr "API токен добавлен"
+msgstr "Токен API добавлен"
 
 #: app/controllers/CControllerTokenDelete.php:64
 msgid "API token deleted"
 msgid_plural "API tokens deleted"
-msgstr[0] "API токен удален"
-msgstr[1] "API токены удалены"
-msgstr[2] "API токены удалены"
+msgstr[0] "Токен API удалён"
+msgstr[1] "Токены API удалены"
+msgstr[2] "Токены API удалены"
 
 #: app/controllers/CControllerTokenDisable.php:63
 msgid "API token disabled"
 msgid_plural "API tokens disabled"
-msgstr[0] "API токен деактивирован"
-msgstr[1] "API токены деактивированы"
-msgstr[2] "API токены деактивированы"
+msgstr[0] "Токен API отключён"
+msgstr[1] "Токены API отключены"
+msgstr[2] "Токены API отключены"
 
 #: app/controllers/CControllerTokenEnable.php:63
 msgid "API token enabled"
 msgid_plural "API tokens enabled"
-msgstr[0] "API токен активирован"
-msgstr[1] "API токены активированы"
-msgstr[2] "API токены активированы"
+msgstr[0] "Токен API включён"
+msgstr[1] "Токены API включены"
+msgstr[2] "Токены API включены"
 
 #: include/classes/api/services/CUser.php:1807
 msgid "API token expired."
-msgstr "Срок действия API токена истёк."
+msgstr "Срок действия токена API истёк."
 
 #: app/controllers/CControllerTokenUpdate.php:107
 #: app/controllers/CControllerTokenUpdate.php:135
 msgid "API token updated"
-msgstr "API токен обновлен"
+msgstr "Токен API обновлён"
 
 #: app/controllers/CControllerPopupTokenEdit.php:116
 #: app/controllers/CControllerPopupTokenView.php:75
@@ -620,7 +620,7 @@ msgstr "API токен обновлен"
 #: include/classes/helpers/CMenuHelper.php:467
 #: include/classes/helpers/CRoleHelper.php:495 include/html.inc.php:848
 msgid "API tokens"
-msgstr "API токены"
+msgstr "Токены API"
 
 #: app/views/administration.apm.db.edit.php:25
 #: app/views/administration.apm.db.edit.php:124 app/views/proxy.edit.php:458
@@ -2753,7 +2753,7 @@ msgstr "Завершить Мастер Узлов сети?"
 #: app/controllers/CControllerTokenCreate.php:65
 #: app/controllers/CControllerTokenCreate.php:135
 msgid "Cannot add API token"
-msgstr "Не удалось добавить API токен"
+msgstr "Не удалось добавить токен API"
 
 #: include/classes/api/services/CGraphGeneral.php:620
 #: include/classes/api/services/CGraphGeneral.php:642
@@ -3123,7 +3123,7 @@ msgstr "Невозможно скопировать триггер \"%1$s\", т�
 #: app/controllers/CControllerSlaCreate.php:69
 #: app/controllers/CControllerSlaCreate.php:127
 msgid "Cannot create SLA"
-msgstr "Не удалось создать SLA"
+msgstr "Не удалось создать соглашение SLA"
 
 #: include/classes/api/services/CHostPrototype.php:1291
 #, c-format
@@ -3194,9 +3194,9 @@ msgstr "Не удалось создать шаг веб-сценария"
 #: app/controllers/CControllerTokenDelete.php:72
 msgid "Cannot delete API token"
 msgid_plural "Cannot delete API tokens"
-msgstr[0] "Не удалось удалить API токен"
-msgstr[1] "Не удалось удалить API токены"
-msgstr[2] "Не удалось удалить API токены"
+msgstr[0] "Не удалось удалить токен API"
+msgstr[1] "Не удалось удалить токены API"
+msgstr[2] "Не удалось удалить токены API"
 
 #: include/classes/api/services/CMfa.php:459
 #, c-format
@@ -3206,9 +3206,9 @@ msgstr "Не удалось удалить MFA метод \"%1$s\", так ка�
 #: app/controllers/CControllerSlaDelete.php:72
 msgid "Cannot delete SLA"
 msgid_plural "Cannot delete SLAs"
-msgstr[0] "Не удалось удалить SLA"
-msgstr[1] "Не удалось удалить SLA"
-msgstr[2] "Не удалось удалить SLA"
+msgstr[0] "Не удалось удалить соглашение SLA"
+msgstr[1] "Не удалось удалить соглашения SLA"
+msgstr[2] "Не удалось удалить соглашения SLA"
 
 #: include/classes/api/services/CUser.php:1287
 #, c-format
@@ -3622,16 +3622,16 @@ msgstr[2] "Не удалось удалить веб-сценарии"
 #: app/controllers/CControllerTokenDisable.php:66
 msgid "Cannot disable API token"
 msgid_plural "Cannot disable API tokens"
-msgstr[0] "Не удалось деактивировать API токен"
-msgstr[1] "Не удалось деактивировать API токены"
-msgstr[2] "Не удалось деактивировать API токены"
+msgstr[0] "Не удалось отключить токен API"
+msgstr[1] "Не удалось отключить токены API"
+msgstr[2] "Не удалось отключить токены API"
 
 #: app/controllers/CControllerSlaDisable.php:81
 msgid "Cannot disable SLA"
 msgid_plural "Cannot disable SLAs"
-msgstr[0] "Не удалось деактивировать SLA"
-msgstr[1] "Не удалось деактивировать SLA"
-msgstr[2] "Не удалось деактивировать SLA"
+msgstr[0] "Не удалось отключить соглашение SLA"
+msgstr[1] "Не удалось отключить соглашения SLA"
+msgstr[2] "Не удалось отключить соглашения SLA"
 
 #: app/controllers/CControllerActionDisable.php:92
 msgid "Cannot disable action"
@@ -3739,16 +3739,16 @@ msgstr "Невозможно отобразить более одного эле
 #: app/controllers/CControllerTokenEnable.php:66
 msgid "Cannot enable API token"
 msgid_plural "Cannot enable API tokens"
-msgstr[0] "Не удалось активировать API токен"
-msgstr[1] "Не удалось активировать API токены"
-msgstr[2] "Не удалось активировать API токены"
+msgstr[0] "Не удалось включить токен API"
+msgstr[1] "Не удалось включить токены API"
+msgstr[2] "Не удалось включить токены API"
 
 #: app/controllers/CControllerSlaEnable.php:81
 msgid "Cannot enable SLA"
 msgid_plural "Cannot enable SLAs"
-msgstr[0] "Не удалось активировать SLA"
-msgstr[1] "Не удалось активировать SLA"
-msgstr[2] "Не удалось активировать SLA"
+msgstr[0] "Не удалось включить соглашение SLA"
+msgstr[1] "Не удалось включить соглашения SLA"
+msgstr[2] "Не удалось включить соглашения SLA"
 
 #: app/controllers/CControllerActionEnable.php:92
 msgid "Cannot enable action"
@@ -3877,7 +3877,7 @@ msgstr "Не удалось найти \"parent_discovery_rule\" с ключом
 #: include/classes/import/importers/CTemplateDashboardImporter.php:217
 #, c-format
 msgid "Cannot find SLA \"%1$s\" used in dashboard \"%2$s\"."
-msgstr "Не удалось найти SLA \"%1$s\", используемый на панели \"%2$s\"."
+msgstr "Не удалось найти соглашение SLA \"%1$s\", используемое на панели \"%2$s\"."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:241
 #, c-format
@@ -4873,12 +4873,12 @@ msgstr "Не удалось обновить \"%2$s\" у обнаруженно�
 #: app/controllers/CControllerTokenUpdate.php:66
 #: app/controllers/CControllerTokenUpdate.php:142
 msgid "Cannot update API token"
-msgstr "Не удалось обновить API токен"
+msgstr "Не удалось обновить токен API"
 
 #: app/controllers/CControllerSlaUpdate.php:70
 #: app/controllers/CControllerSlaUpdate.php:138
 msgid "Cannot update SLA"
-msgstr "Не удалось обновить SLA"
+msgstr "Не удалось обновить соглашение SLA"
 
 #: include/classes/api/services/CGraphGeneral.php:68
 msgid "Cannot update a discovered graph."
@@ -5864,7 +5864,7 @@ msgstr "Связь между агентом Zabbix и сервером/прок
 
 #: app/views/host.wizard.edit.php:414
 msgid "Communication between Zabbix agent and server/proxy is secured with the pre-shared key (PSK) encryption method."
-msgstr "Соединение между Zabbix агентом и сервером/прокси защищено с помощью метода шифрования PSK."
+msgstr "Связь между агентом Zabbix и сервером/прокси защищена шифрованием с общим секретным ключом (PSK)."
 
 #: include/items.inc.php:946
 msgctxt "SNMP Community"
@@ -6568,11 +6568,11 @@ msgstr "Создать"
 #: app/views/administration.token.list.php:109
 #: app/views/administration.user.token.list.php:76
 msgid "Create API token"
-msgstr "Создать API токен"
+msgstr "Создать токен API"
 
 #: app/views/sla.list.php:191
 msgid "Create SLA"
-msgstr "Создать SLA"
+msgstr "Создать соглашение SLA"
 
 #: app/views/action.list.php:73
 msgid "Create action"
@@ -7770,15 +7770,15 @@ msgstr "Удалить скрипт?"
 
 #: app/views/popup.token.edit.php:138
 msgid "Delete selected API token?"
-msgstr "Удалить выбранный API токен?"
+msgstr "Удалить выбранный токен API?"
 
 #: app/views/js/sla.list.js.php:134 app/views/popup.sla.edit.php:261
 msgid "Delete selected SLA?"
-msgstr "Удалить выбранный SLA?"
+msgstr "Удалить выбранное соглашение SLA?"
 
 #: app/views/js/sla.list.js.php:133
 msgid "Delete selected SLAs?"
-msgstr "Удалить выбранные SLA?"
+msgstr "Удалить выбранные соглашения SLA?"
 
 #: app/views/js/action.list.js.php:113
 msgid "Delete selected action?"
@@ -8382,20 +8382,20 @@ msgstr "Деактивация потерянных ресурсов"
 #: app/views/administration.token.list.php:211
 #: app/views/administration.user.token.list.php:164
 msgid "Disable selected API token?"
-msgstr "Деактивировать выбранный API токен?"
+msgstr "Отключить выбранный токен API?"
 
 #: app/views/administration.token.list.php:212
 #: app/views/administration.user.token.list.php:165
 msgid "Disable selected API tokens?"
-msgstr "Деактивировать выбранные API токены?"
+msgstr "Отключить выбранные токены API?"
 
 #: app/views/js/sla.list.js.php:119
 msgid "Disable selected SLA?"
-msgstr "Деактивировать выбранный SLA?"
+msgstr "Отключить выбранное соглашение SLA?"
 
 #: app/views/js/sla.list.js.php:118
 msgid "Disable selected SLAs?"
-msgstr "Деактивировать выбранные SLA?"
+msgstr "Отключить выбранные соглашения SLA?"
 
 #: app/views/js/action.list.js.php:98
 msgid "Disable selected action?"
@@ -9375,20 +9375,20 @@ msgstr "Включение удаленного мониторинга JMX"
 #: app/views/administration.token.list.php:205
 #: app/views/administration.user.token.list.php:158
 msgid "Enable selected API token?"
-msgstr "Активировать выбранный API токен?"
+msgstr "Включить выбранный токен API?"
 
 #: app/views/administration.token.list.php:206
 #: app/views/administration.user.token.list.php:159
 msgid "Enable selected API tokens?"
-msgstr "Активировать выбранные API токены?"
+msgstr "Включить выбранные токены API?"
 
 #: app/views/js/sla.list.js.php:104
 msgid "Enable selected SLA?"
-msgstr "Активировать выбранный SLA?"
+msgstr "Включить выбранное соглашение SLA?"
 
 #: app/views/js/sla.list.js.php:103
 msgid "Enable selected SLAs?"
-msgstr "Активировать выбранные SLA?"
+msgstr "Включить выбранные соглашения SLA?"
 
 #: app/views/js/action.list.js.php:83
 msgid "Enable selected action?"
@@ -12254,7 +12254,7 @@ msgstr "Сертификат IdP"
 
 #: app/views/administration.authentication.edit.php:291
 msgid "IdP entity ID"
-msgstr "ID объекта IdP"
+msgstr "Идентификатор сущности IdP"
 
 #: include/classes/core/CModuleManager.php:318
 #, c-format
@@ -12283,20 +12283,20 @@ msgstr "Если активирована HTTP аутентификация, в�
 #, c-format
 msgid "If at least %2$s child service has %1$s status or above"
 msgid_plural "If at least %2$s child services have %1$s status or above"
-msgstr[0] "Если по крайней мере %2$s дочерняя услуга в %1$s состоянии или выше"
-msgstr[1] "Если по крайней мере %2$s дочерние услуги в %1$s состоянии или выше"
-msgstr[2] "Если по крайней мере %2$s дочерних услуг в %1$s состоянии или выше"
+msgstr[0] "Если число дочерних услуг со статусом «%1$s» или выше не меньше %2$s"
+msgstr[1] "Если число дочерних услуг со статусом «%1$s» или выше не меньше %2$s"
+msgstr[2] "Если число дочерних услуг со статусом «%1$s» или выше не меньше %2$s"
 
 #: include/classes/helpers/CServiceHelper.php:35
 #, c-format
 msgid "If at least %2$s child services have %1$s status or above"
-msgstr "Если по крайней мере %2$s дочерних услуг в %1$s состоянии или выше"
+msgstr "Если число дочерних услуг со статусом «%1$s» или выше не меньше %2$s"
 
 #: include/classes/helpers/CServiceHelper.php:40
 #: include/classes/helpers/CServiceHelper.php:89
 #, c-format
 msgid "If at least %2$s of child services have %1$s status or above"
-msgstr "Если по крайней мере %2$s дочерних услуг в %1$s состоянии или выше"
+msgstr "Если доля дочерних услуг со статусом «%1$s» или выше не меньше %2$s"
 
 #: app/views/popup.lldoverride.php:52
 msgid "If filter matches"
@@ -12306,20 +12306,20 @@ msgstr "При соответствии фильтру"
 #, c-format
 msgid "If less than %2$s child service has %1$s status or below"
 msgid_plural "If less than %2$s child services have %1$s status or below"
-msgstr[0] "Если число дочерних услуг в состоянии %1$s или ниже меньше %2$s"
-msgstr[1] "Если число дочерних услуг в состоянии %1$s или ниже меньше %2$s"
-msgstr[2] "Если число дочерних услуг в состоянии %1$s или ниже меньше %2$s"
+msgstr[0] "Если число дочерних услуг со статусом «%1$s» или ниже меньше %2$s"
+msgstr[1] "Если число дочерних услуг со статусом «%1$s» или ниже меньше %2$s"
+msgstr[2] "Если число дочерних услуг со статусом «%1$s» или ниже меньше %2$s"
 
 #: include/classes/helpers/CServiceHelper.php:45
 #, c-format
 msgid "If less than %2$s child services have %1$s status or below"
-msgstr "Если меньше чем %2$s дочерних услуг в %1$s состоянии или ниже"
+msgstr "Если число дочерних услуг со статусом «%1$s» или ниже меньше %2$s"
 
 #: include/classes/helpers/CServiceHelper.php:50
 #: include/classes/helpers/CServiceHelper.php:101
 #, c-format
 msgid "If less than %2$s of child services have %1$s status or below"
-msgstr "Если меньше чем %2$s дочерних услуг в %1$s состоянии или ниже"
+msgstr "Если доля дочерних услуг со статусом «%1$s» или ниже меньше %2$s"
 
 #: include/classes/setup/CSetupWizard.php:614
 msgid "If no port is specified, the \"Database port\" value is used."
@@ -12335,7 +12335,7 @@ msgstr "Если группы пользователей не указаны, в
 #: include/classes/helpers/CServiceHelper.php:110
 #, c-format
 msgid "If weight of child services with %1$s status or above is at least %2$s"
-msgstr "Если вес дочерних услуг с %1$s состоянием или выше по крайней мере %2$s"
+msgstr "Если суммарный вес дочерних услуг со статусом «%1$s» или выше не меньше %2$s"
 
 #: include/classes/helpers/CServiceHelper.php:65
 #: include/classes/helpers/CServiceHelper.php:70
@@ -12343,7 +12343,7 @@ msgstr "Если вес дочерних услуг с %1$s состоянием
 #: include/classes/helpers/CServiceHelper.php:118
 #, c-format
 msgid "If weight of child services with %1$s status or below is less than %2$s"
-msgstr "Если вес дочерних услуг с %1$s состоянием или ниже меньше чем %2$s"
+msgstr "Если суммарный вес дочерних услуг со статусом «%1$s» или ниже меньше %2$s"
 
 #: app/views/host.wizard.edit.php:380
 msgid "If you do not know your PSK or would like to change it, click the button below. Note that changing the PSK may impact existing configurations."
@@ -12470,7 +12470,7 @@ msgstr "В файле конфигурации Zabbix сервера (zabbix_ser
 
 #: include/classes/widgets/fields/CWidgetFieldMultiSelectSla.php:31
 msgid "Inaccessible SLA"
-msgstr "Недоступный SLA"
+msgstr "Недоступное соглашение SLA"
 
 #: include/classes/widgets/fields/CWidgetFieldMultiSelectAction.php:32
 msgid "Inaccessible action"
@@ -15446,7 +15446,7 @@ msgstr "Пн"
 #: include/func.inc.php:566 jsLoader.php:209
 msgctxt "month short"
 msgid "M"
-msgstr "мес"
+msgstr "мес."
 
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:93
 msgid "MAC address A"
@@ -15617,11 +15617,11 @@ msgstr "Убедитесь, что скопировали токен аутен�
 
 #: include/classes/helpers/CRoleHelper.php:549
 msgid "Manage API tokens"
-msgstr "Управление API токенами"
+msgstr "Управление токенами API"
 
 #: include/classes/helpers/CRoleHelper.php:555
 msgid "Manage SLA"
-msgstr "Управление SLA"
+msgstr "Управление соглашениями SLA"
 
 #: include/classes/helpers/CRoleHelper.php:633
 msgid "Manage own devices"
@@ -16986,7 +16986,7 @@ msgstr "Новый"
 
 #: app/views/popup.token.edit.php:159
 msgid "New API token"
-msgstr "Новый API токен"
+msgstr "Новый токен API"
 
 #: app/views/popup.ldap.edit.php:315
 msgid "New LDAP server"
@@ -17002,7 +17002,7 @@ msgstr "Новый OAuth"
 
 #: app/views/popup.sla.edit.php:241 app/views/popup.sla.edit.php:270
 msgid "New SLA"
-msgstr "Новый SLA"
+msgstr "Новое соглашение SLA"
 
 #: app/views/js/popup.action.edit.js.php:413
 #: app/views/popup.action.edit.php:313
@@ -19575,7 +19575,7 @@ msgstr "Предварительный обзор инсталляции"
 
 #: app/views/host.wizard.edit.php:405
 msgid "Pre-shared key"
-msgstr "Предварительно согласованный ключ (PSK)"
+msgstr "Общий секретный ключ (PSK)"
 
 #: app/views/host.wizard.edit.php:394
 msgid "Pre-shared key identity"
@@ -20465,7 +20465,7 @@ msgstr "Сгенерировать заново"
 
 #: app/views/popup.token.edit.php:130
 msgid "Regenerate selected API token? Previously generated token will become invalid."
-msgstr "Сгенерировать заново выбранный API токен? Ранее сгенерированный токен станет недействительным."
+msgstr "Сгенерировать заново выбранный токен API? Ранее сгенерированный токен станет недействительным."
 
 #: include/forms.inc.php:364
 msgid "Regular"
@@ -21111,7 +21111,7 @@ msgstr "Возвращает JSON массив с MBean объектами и и
 
 #: include/classes/data/CItemData.php:949
 msgid "Return first column of the first row of the SQL query result."
-msgstr "Возвращает первый столбец первой строки результата SQL запроса."
+msgstr "Возвращает первый столбец первой строки результата SQL-запроса."
 
 #: include/classes/data/CItemData.php:1011
 msgid "Return value of an attribute of MBean object."
@@ -21307,61 +21307,61 @@ msgstr "SLA"
 #: include/classes/api/services/CSla.php:543
 #, c-format
 msgid "SLA \"%1$s\" SLO must have no more than 4 fractional digits."
-msgstr "SLA \"%1$s\" SLO должно содержать не более 4 цифр дробной части."
+msgstr "Значение SLO в соглашении SLA \"%1$s\" должно содержать не более 4 цифр дробной части."
 
 #: include/classes/api/services/CSla.php:527
 #, c-format
 msgid "SLA \"%1$s\" already exists."
-msgstr "SLA \"%1$s\" уже существует."
+msgstr "Соглашение SLA \"%1$s\" уже существует."
 
 #: app/controllers/CControllerSlaCreate.php:119
 msgid "SLA created"
-msgstr "SLA создан"
+msgstr "Соглашение SLA создано"
 
 #: app/controllers/CControllerSlaDelete.php:64
 msgid "SLA deleted"
 msgid_plural "SLAs deleted"
-msgstr[0] "SLA удален"
-msgstr[1] "SLA удалены"
-msgstr[2] "SLA удалены"
+msgstr[0] "Соглашение SLA удалено"
+msgstr[1] "Соглашения SLA удалены"
+msgstr[2] "Соглашения SLA удалены"
 
 #: app/controllers/CControllerSlaDisable.php:73
 msgid "SLA disabled"
 msgid_plural "SLAs disabled"
-msgstr[0] "SLA деактивирован"
-msgstr[1] "SLA деактивированы"
-msgstr[2] "SLA деактивированы"
+msgstr[0] "Соглашение SLA отключено"
+msgstr[1] "Соглашения SLA отключены"
+msgstr[2] "Соглашения SLA отключены"
 
 #: app/controllers/CControllerPopup.php:58
 msgid "SLA edit"
-msgstr "Редактировать SLA "
+msgstr "Редактирование соглашения SLA"
 
 #: app/controllers/CControllerSlaEnable.php:73
 msgid "SLA enabled"
 msgid_plural "SLAs enabled"
-msgstr[0] "SLA активирован"
-msgstr[1] "SLA активированы"
-msgstr[2] "SLA активированы"
+msgstr[0] "Соглашение SLA включено"
+msgstr[1] "Соглашения SLA включены"
+msgstr[2] "Соглашения SLA включены"
 
 #: widgets/slareport/views/widget.view.php:35
 msgid "SLA is disabled."
-msgstr "SLA деактивирован."
+msgstr "Соглашение SLA отключено."
 
 #: app/controllers/CControllerSlaReportList.php:230 app/views/sla.list.php:93
 #: app/views/sla.list.php:121 app/views/slareport.list.php:92
 #: include/classes/helpers/CMenuHelper.php:93
 #: include/classes/helpers/CRoleHelper.php:400 widgets/slareport/Widget.php:29
 msgid "SLA report"
-msgstr "Отчет SLA"
+msgstr "Отчёт по SLA"
 
 #: app/controllers/CControllerSlaUpdate.php:130
 msgid "SLA updated"
-msgstr "SLA обновлен"
+msgstr "Соглашение SLA обновлено"
 
 #: include/classes/api/services/CDashboardGeneral.php:636
 #, c-format
 msgid "SLA with ID \"%1$s\" is not available."
-msgstr "SLA с ID \"%1$s\" недоступен."
+msgstr "Соглашение SLA с ID \"%1$s\" недоступно."
 
 #: include/classes/html/widgets/fields/CWidgetFieldMultiSelectSlaView.php:35
 msgid "SLAs"
@@ -21517,7 +21517,7 @@ msgstr "Сертификат SP"
 
 #: app/views/administration.authentication.edit.php:334
 msgid "SP entity ID"
-msgstr "ID объекта SP"
+msgstr "Идентификатор сущности SP"
 
 #: app/views/administration.authentication.edit.php:345
 msgid "SP name ID format"
@@ -21530,24 +21530,24 @@ msgstr "Приватный ключ SP"
 #: include/classes/debug/CProfiler.php:158
 #, c-format
 msgid "SQL count: %1$s (selects: %2$s | executes: %3$s)"
-msgstr "SQL запросов: %1$s (selects: %2$s | executes: %3$s)"
+msgstr "SQL-запросов: %1$s (selects: %2$s | executes: %3$s)"
 
 #: include/items.inc.php:1493
 #: include/views/configuration.host.discovery.edit.php:638
 #: include/views/configuration.item.edit.php:739
 #: include/views/configuration.item.prototype.edit.php:708
 msgid "SQL query"
-msgstr "SQL запрос"
+msgstr "SQL-запрос"
 
 #: include/classes/db/DB.php:873
 #, c-format
 msgid "SQL statement execution has failed \"%1$s\""
-msgstr "Ошибка при выполнении SQL запроса \"%1$s\""
+msgstr "Ошибка при выполнении SQL-запроса \"%1$s\""
 
 #: include/classes/db/DB.php:648 include/classes/db/DB.php:707
 #, c-format
 msgid "SQL statement execution has failed \"%1$s\"."
-msgstr "Ошибка при выполнении SQL запроса \"%1$s\"."
+msgstr "Ошибка при выполнении SQL-запроса \"%1$s\"."
 
 #: app/views/administration.script.edit.php:104
 #: app/views/administration.script.list.php:177 include/discovery.inc.php:47
@@ -21996,7 +21996,7 @@ msgstr "Выберите «Сервер» для мониторинга и об�
 
 #: app/views/slareport.list.php:104
 msgid "Select SLA to display SLA report."
-msgstr "Выберите SLA для отображения отчета по SLA."
+msgstr "Выберите соглашение SLA для отображения отчёта по SLA."
 
 #: app/views/host.wizard.edit.php:137 app/views/js/host.wizard.edit.js.php:1116
 msgid "Select a template"
@@ -23147,12 +23147,12 @@ msgstr "Время начала"
 #: include/classes/api/services/CSla.php:566
 #, c-format
 msgid "Start time must be less than end time for SLA \"%1$s\"."
-msgstr "Время начала должно быть меньше времени окончания для SLA \"%1$s\"."
+msgstr "Время начала должно быть меньше времени окончания для соглашения SLA \"%1$s\"."
 
 #: include/classes/api/services/CSla.php:593
 #, c-format
 msgid "Start time must be less than end time for excluded downtime \"%2$s\" of SLA \"%1$s\"."
-msgstr "Время начала должно быть меньше времени завершения для исключения времени простоя \"%2$s\" SLA \"%1$s\"."
+msgstr "Время начала должно быть меньше времени окончания для исключённого периода простоя \"%2$s\" соглашения SLA \"%1$s\"."
 
 #: app/views/host.wizard.edit.php:310
 msgid "Start typing or click Select to choose an existing host, or enter a new host name."
@@ -24946,7 +24946,7 @@ msgstr "По верхнему краю"
 #: include/classes/helpers/CMenuHelper.php:144
 #: include/classes/helpers/CRoleHelper.php:424
 msgid "Top 100 triggers"
-msgstr "Топ 100 триггеров"
+msgstr "Рейтинг 100 триггеров"
 
 #: widgets/tophosts/includes/WidgetForm.php:145
 msgid "Top N"
@@ -24954,15 +24954,15 @@ msgstr "Первые N"
 
 #: widgets/tophosts/Widget.php:34
 msgid "Top hosts"
-msgstr "Топ узлов сети"
+msgstr "Рейтинг узлов сети"
 
 #: widgets/topitems/Widget.php:32
 msgid "Top items"
-msgstr "Топ элементов данных"
+msgstr "Рейтинг элементов данных"
 
 #: widgets/toptriggers/Widget.php:29
 msgid "Top triggers"
-msgstr "Топ триггеров"
+msgstr "Рейтинг триггеров"
 
 #: app/views/administration.queue.overview.proxy.php:98
 #: widgets/hostavail/views/widget.view.php:44
@@ -25044,11 +25044,11 @@ msgstr "Транзакция не была закрыта. Откат..."
 
 #: include/classes/data/CItemData.php:935
 msgid "Transform SQL query result into a JSON array for low-level discovery."
-msgstr "Преобразование результата SQL запроса в JSON массив для низкоуровневого обнаружения."
+msgstr "Преобразование результата SQL-запроса в JSON-массив для низкоуровневого обнаружения."
 
 #: include/classes/data/CItemData.php:942
 msgid "Transform SQL query result into a JSON array."
-msgstr "Преобразование результата SQL запроса в JSON массив."
+msgstr "Преобразование результата SQL-запроса в JSON-массив."
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:323
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:177
@@ -31350,7 +31350,7 @@ msgstr "отображаемое имя"
 #: include/func.inc.php:633
 msgctxt "week short"
 msgid "w"
-msgstr "нед"
+msgstr "нед."
 
 #: include/classes/api/services/CHttpTest.php:440
 msgid "web scenario with the same UUID already exists"
