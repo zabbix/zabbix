@@ -18,9 +18,6 @@ require_once dirname(__FILE__).'/../../include/triggers.inc.php';
 
 class CControllerPopupTestTriggerExpr extends CController {
 	private $defined_error_phrases = [];
-	private $expression = '';
-	private $macros_data = [];
-	private $allowed_testing = true;
 	private $supported_token_types = [
 		CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION,
 		CExpressionParserResult::TOKEN_TYPE_MACRO,
@@ -85,15 +82,15 @@ class CControllerPopupTestTriggerExpr extends CController {
 	}
 
 	protected function doAction() {
-		$this->expression = $this->getInput('expression', '');
+		$expression = $this->getInput('expression', '');
 		$test_data = array_column($this->getInput('test_data', []), 'value', 'key');
 		$test_data_rows = [];
+		$macros_data = [];
+		$allowed_testing = true;
 
 		$expression_parser = new CExpressionParser(['usermacros' => true, 'lldmacros' => true]);
 
-		if ($expression_parser->parse($this->expression) == CParser::PARSE_SUCCESS) {
-			$this->macros_data = [];
-
+		if ($expression_parser->parse($expression) == CParser::PARSE_SUCCESS) {
 			foreach ($expression_parser->getResult()->getTokensOfTypes($this->supported_token_types) as $token) {
 				if ($token['type'] == CExpressionParserResult::TOKEN_TYPE_STRING) {
 					$matched_macros = CMacrosResolverGeneral::extractMacros(
@@ -116,20 +113,20 @@ class CControllerPopupTestTriggerExpr extends CController {
 				}
 
 				foreach ($macros as $macro) {
-					if (array_key_exists($macro, $this->macros_data)) {
+					if (array_key_exists($macro, $macros_data)) {
 						continue;
 					}
 
 					$key = md5($macro);
-					$this->macros_data[$macro] = array_key_exists($key, $test_data) ? $test_data[$key] : '';
+					$macros_data[$macro] = array_key_exists($key, $test_data) ? $test_data[$key] : '';
 					$info = get_item_function_info($macro);
 
 					if (!is_array($info) && array_key_exists($info, $this->defined_error_phrases)) {
-						$this->allowed_testing = false;
+						$allowed_testing = false;
 						$test_data_rows[] = [
 							'macro' => $macro,
 							'key' => $key,
-							'value' => $this->macros_data[$macro],
+							'value' => $macros_data[$macro],
 							'error' => $this->defined_error_phrases[$info]
 						];
 					}
@@ -137,7 +134,7 @@ class CControllerPopupTestTriggerExpr extends CController {
 						$test_data_rows[] = [
 							'macro' => $macro,
 							'key' => $key,
-							'value' => $this->macros_data[$macro],
+							'value' => $macros_data[$macro],
 							'value_type' => $info['value_type'],
 							'values' => $info['values'],
 							'error' => null
@@ -147,39 +144,39 @@ class CControllerPopupTestTriggerExpr extends CController {
 			}
 		}
 
-		list($outline, $expression_html_tree) = analyzeExpression($this->expression, TRIGGER_EXPRESSION);
+		list($outline, $expression_html_tree) = analyzeExpression($expression, TRIGGER_EXPRESSION);
 
 		$message_title = null;
 		$results = [];
 
-		if ($this->allowed_testing && $this->hasInput('test_expression')) {
+		if ($allowed_testing && $this->hasInput('test_expression')) {
 			$mapping = [];
 			$expressions = [];
-
-			$expression_parser = new CExpressionParser(['usermacros' => true, 'lldmacros' => true]);
 
 			foreach ($expression_html_tree as $e) {
 				$original_expression = $e['expression']['value'];
 
 				if ($expression_parser->parse($original_expression) == CParser::PARSE_SUCCESS) {
 					$tokens = $expression_parser->getResult()->getTokensOfTypes($this->supported_token_types);
-					$expression = $original_expression;
+					$substituted_expression = $original_expression;
 
 					for ($token = end($tokens); $token; $token = prev($tokens)) {
 						if ($token['type'] == CExpressionParserResult::TOKEN_TYPE_STRING) {
-							$value = strtr(CExpressionParser::unquoteString($token['match']), $this->macros_data);
+							$value = strtr(CExpressionParser::unquoteString($token['match']), $macros_data);
 							$value = CExpressionParser::quoteString($value, false, true);
 						}
 						else {
-							$value = strtr($token['match'], $this->macros_data);
+							$value = strtr($token['match'], $macros_data);
 							$value = CExpressionParser::quoteString($value, false);
 						}
 
-						$expression = substr_replace($expression, $value, $token['pos'], $token['length']);
+						$substituted_expression = substr_replace($substituted_expression, $value, $token['pos'],
+							$token['length']
+						);
 					}
 
-					$mapping[$expression][] = $original_expression;
-					$expressions[] = $expression;
+					$mapping[$substituted_expression][] = $original_expression;
+					$expressions[] = $substituted_expression;
 				}
 			}
 
@@ -198,10 +195,10 @@ class CControllerPopupTestTriggerExpr extends CController {
 				$message_title = _('Cannot evaluate expression');
 			}
 			else {
-				foreach ($response as $expression) {
-					foreach ($mapping[$expression['expression']] as $original_expression) {
-						unset($expression['expression']);
-						$results[$original_expression] = $expression;
+				foreach ($response as $result) {
+					foreach ($mapping[$result['expression']] as $original_expression) {
+						unset($result['expression']);
+						$results[$original_expression] = $result;
 					}
 				}
 			}
@@ -209,8 +206,8 @@ class CControllerPopupTestTriggerExpr extends CController {
 
 		$this->setResponse(new CControllerResponseData([
 			'title' => _('Test'),
-			'expression' => $this->expression,
-			'allowed_testing' => $this->allowed_testing,
+			'expression' => $expression,
+			'allowed_testing' => $allowed_testing,
 			'test_data_rows' => $test_data_rows,
 			'eHTMLTree' => $expression_html_tree,
 			'results' => $results,
