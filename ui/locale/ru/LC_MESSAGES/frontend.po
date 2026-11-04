@@ -6217,7 +6217,7 @@ msgstr "Подключаться через"
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:256
 msgctxt "missing data function"
 msgid "Connected"
-msgstr "Подключено"
+msgstr "Соединять точки"
 
 #: app/views/administration.timeouts.edit.php:148
 msgid "Connection"
@@ -15164,7 +15164,7 @@ msgstr "Присоединенные шаблоны"
 
 #: app/views/template.list.php:149
 msgid "Linked to templates"
-msgstr "Связи с шаблонами"
+msgstr "Присоединён к шаблонам"
 
 #: include/views/js/monitoring.sysmaps.js.php:755
 #: include/views/js/monitoring.sysmaps.js.php:766
@@ -16662,7 +16662,7 @@ msgstr "Отключить звук"
 #: jsLoader.php:286
 #, c-format
 msgid "Mute for %1$s"
-msgstr "Отключить звук на %1$s"
+msgstr "Отключить звук для пользователя %1$s"
 
 #: app/views/monitoring.dashboard.list.php:95
 msgid "My"
@@ -18108,7 +18108,7 @@ msgstr "Количество элементов данных в очереди, 
 #: include/classes/data/CItemData.php:2615
 #: include/classes/data/CItemData.php:2778
 msgid "Number of items in the queue which are delayed in Zabbix server or proxy by \"from\" till \"to\" seconds, inclusive."
-msgstr "Количество элементов данных в очереди, которые задерживаются на Zabbix сервере или прокси \"from\" и \"to\" секунд, включительно."
+msgstr "Количество элементов данных в очереди на сервере или прокси Zabbix, задержанных на время от \"from\" до \"to\" секунд включительно."
 
 #: include/classes/data/CItemData.php:2687
 msgid "Number of monitored hosts"
@@ -22941,12 +22941,12 @@ msgstr "Мал."
 
 #: jsLoader.php:288
 msgid "Snooze"
-msgstr "Отложить"
+msgstr "Отключить звук текущих уведомлений"
 
 #: jsLoader.php:291
 #, c-format
 msgid "Snooze for %1$s"
-msgstr "Отложить на %1$s"
+msgstr "Отключить звук текущих уведомлений для пользователя %1$s"
 
 #: include/hosts.inc.php:174
 msgid "Software"
