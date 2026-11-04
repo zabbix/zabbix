@@ -146,9 +146,9 @@ msgstr[2] "%1$s действий"
 msgctxt "screen reader"
 msgid "%1$s action have been taken"
 msgid_plural "%1$s actions have been taken"
-msgstr[0] "Выполнено действие %1$s"
-msgstr[1] "Выполнено действия %1$s"
-msgstr[2] "Выполнено действий %1$s"
+msgstr[0] "Выполнено %1$s действие"
+msgstr[1] "Выполнено %1$s действия"
+msgstr[2] "Выполнено %1$s действий"
 
 #: jsLoader.php:321
 #, c-format
@@ -293,7 +293,7 @@ msgstr[2] "%1$s секунд"
 msgid "%1$s unacknowledged problem"
 msgid_plural "%1$s unacknowledged problems"
 msgstr[0] "%1$s неподтвержденная проблема"
-msgstr[1] "%1$s неподтвержденных проблем"
+msgstr[1] "%1$s неподтвержденные проблемы"
 msgstr[2] "%1$s неподтвержденных проблем"
 
 #: widgets/problemhosts/views/widget.view.php:117
@@ -358,7 +358,7 @@ msgstr "%1$s-й процентиль: %2$s"
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgstr[0] "Зафиксирована %4$s неуспешная попытка входа в систему. Последняя неуспешная попытка с %1$s в %2$s %3$s."
-msgstr[1] "Зафиксировано %4$s неуспешные попытки входа в систему. Последняя неуспешная попытка с %1$s в %2$s %3$s."
+msgstr[1] "Зафиксированы %4$s неуспешные попытки входа в систему. Последняя неуспешная попытка с %1$s в %2$s %3$s."
 msgstr[2] "Зафиксировано %4$s неуспешных попыток входа в систему. Последняя неуспешная попытка с %1$s в %2$s %3$s."
 
 #: include/classes/screens/CScreenDiscovery.php:223
@@ -585,25 +585,25 @@ msgid "API token deleted"
 msgid_plural "API tokens deleted"
 msgstr[0] "API токен удален"
 msgstr[1] "API токены удалены"
-msgstr[2] "API токенов удалено"
+msgstr[2] "API токены удалены"
 
 #: app/controllers/CControllerTokenDisable.php:63
 msgid "API token disabled"
 msgid_plural "API tokens disabled"
 msgstr[0] "API токен деактивирован"
-msgstr[1] "API токена деактивированы"
-msgstr[2] "API токенов деактивировано"
+msgstr[1] "API токены деактивированы"
+msgstr[2] "API токены деактивированы"
 
 #: app/controllers/CControllerTokenEnable.php:63
 msgid "API token enabled"
 msgid_plural "API tokens enabled"
 msgstr[0] "API токен активирован"
-msgstr[1] "API токена активированы"
-msgstr[2] "API токенов активировано"
+msgstr[1] "API токены активированы"
+msgstr[2] "API токены активированы"
 
 #: include/classes/api/services/CUser.php:1807
 msgid "API token expired."
-msgstr "Срок API токена истёк."
+msgstr "Срок действия API токена истёк."
 
 #: app/controllers/CControllerTokenUpdate.php:107
 #: app/controllers/CControllerTokenUpdate.php:135
@@ -830,7 +830,7 @@ msgstr[2] "Действия удалены"
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] "Действие деактивировано"
-msgstr[1] "Действий деактивировано"
+msgstr[1] "Действия деактивированы"
 msgstr[2] "Действия деактивированы"
 
 #: app/controllers/CControllerPopup.php:42
@@ -841,7 +841,7 @@ msgstr "Изменение действия"
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] "Действие активировано"
-msgstr[1] "Действий активировано"
+msgstr[1] "Действия активированы"
 msgstr[2] "Действия активированы"
 
 #: app/controllers/CControllerActionLogList.php:198
@@ -1618,7 +1618,7 @@ msgstr "Разрешенные методы"
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:326
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:450
 msgid "Also used as legend label for aggregated data sets."
-msgstr "Также используется подписью к легенде для агрегированых наборов данных."
+msgstr "Также используется как подпись в легенде для агрегированных наборов данных."
 
 #: include/classes/setup/CSetupWizard.php:1034
 msgid "Alternatively, you can install it manually:"
@@ -3259,7 +3259,7 @@ msgstr "Не удалось удалить проверку обнаружени
 #: host_discovery_prototypes.php:313 host_discovery_prototypes.php:605
 msgid "Cannot delete discovery prototype"
 msgid_plural "Cannot delete discovery prototypes"
-msgstr[0] "Не удалось удалить прототипы правил обнаружения"
+msgstr[0] "Не удалось удалить прототип правил обнаружения"
 msgstr[1] "Не удалось удалить прототипы правил обнаружения"
 msgstr[2] "Не удалось удалить прототипы правил обнаружения"
 
@@ -3286,7 +3286,7 @@ msgstr[2] "Не удалось удалить корреляции событи�
 #: app/controllers/CControllerCepRuleDelete.php:70
 msgid "Cannot delete event processing rule"
 msgid_plural "Cannot delete event processing rules"
-msgstr[0] "Не удалось удалить правила обработки событий"
+msgstr[0] "Не удалось удалить правило обработки событий"
 msgstr[1] "Не удалось удалить правила обработки событий"
 msgstr[2] "Не удалось удалить правила обработки событий"
 
@@ -3308,8 +3308,8 @@ msgstr[2] "Не удалось удалить прототипы графико�
 msgid "Cannot delete host"
 msgid_plural "Cannot delete hosts"
 msgstr[0] "Не удалось удалить узел сети"
-msgstr[1] "Не удалось удалить узелы сети"
-msgstr[2] "Не удалось удалить узелы сети"
+msgstr[1] "Не удалось удалить узлы сети"
+msgstr[2] "Не удалось удалить узлы сети"
 
 #: include/classes/api/services/CHost.php:1631
 #, c-format
@@ -3320,7 +3320,7 @@ msgstr "Не удалось удалить узел сети \"%1$s\": %2$s."
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host group, host or trigger."
 msgid_plural "Cannot delete hosts %1$s because maintenance \"%2$s\" must contain at least one host group, host or trigger."
-msgstr[0] "Не удалось удалить узлы сети %1$s, так как обслуживание \"%2$s\" должно содержать хотя бы одну группу узлов сети, узел сети или триггер."
+msgstr[0] "Не удалось удалить узел сети %1$s, так как обслуживание \"%2$s\" должно содержать хотя бы одну группу узлов сети, узел сети или триггер."
 msgstr[1] "Не удалось удалить узлы сети %1$s, так как обслуживание \"%2$s\" должно содержать хотя бы одну группу узлов сети, узел сети или триггер."
 msgstr[2] "Не удалось удалить узлы сети %1$s, так как обслуживание \"%2$s\" должно содержать хотя бы одну группу узлов сети, узел сети или триггер."
 
@@ -3337,7 +3337,7 @@ msgid "Cannot delete host group"
 msgid_plural "Cannot delete host groups"
 msgstr[0] "Не удалось удалить группу узлов сети"
 msgstr[1] "Не удалось удалить группы узлов сети"
-msgstr[2] "Не удалось удалить групп узлов сети"
+msgstr[2] "Не удалось удалить группы узлов сети"
 
 #: include/classes/api/services/CHostGroup.php:767
 #, c-format
@@ -3348,7 +3348,7 @@ msgstr "Не удалось удалить группу узлов сети \"%1
 #, c-format
 msgid "Cannot delete host group %1$s because maintenance \"%2$s\" must contain at least one host group, host or trigger."
 msgid_plural "Cannot delete host groups %1$s because maintenance \"%2$s\" must contain at least one host group, host or trigger."
-msgstr[0] "Не удалось удалить группы узлов сети %1$s, так как обслуживание \"%2$s\" должно содержать хотя бы одну группу узлов сети, узел сети или триггер."
+msgstr[0] "Не удалось удалить группу узлов сети %1$s, так как обслуживание \"%2$s\" должно содержать хотя бы одну группу узлов сети, узел сети или триггер."
 msgstr[1] "Не удалось удалить группы узлов сети %1$s, так как обслуживание \"%2$s\" должно содержать хотя бы одну группу узлов сети, узел сети или триггер."
 msgstr[2] "Не удалось удалить группы узлов сети %1$s, так как обслуживание \"%2$s\" должно содержать хотя бы одну группу узлов сети, узел сети или триггер."
 
@@ -3369,8 +3369,8 @@ msgstr "Не удалось удалить группы узлов сети"
 msgid "Cannot delete host prototype"
 msgid_plural "Cannot delete host prototypes"
 msgstr[0] "Не удалось удалить прототип узлов сети"
-msgstr[1] "Не удалось удалить прототипа узлов сети"
-msgstr[2] "Не удалось удалить прототипов узлов сети"
+msgstr[1] "Не удалось удалить прототипы узлов сети"
+msgstr[2] "Не удалось удалить прототипы узлов сети"
 
 #: host_prototypes.php:139
 msgid "Cannot delete host prototypes"
@@ -3418,8 +3418,8 @@ msgstr[2] "Не удалось удалить периоды обслужива�
 msgid "Cannot delete media type"
 msgid_plural "Cannot delete media types"
 msgstr[0] "Не удалось удалить способ оповещения"
-msgstr[1] "Не удалось удалить способ оповещения"
-msgstr[2] "Не удалось удалить способ оповещения"
+msgstr[1] "Не удалось удалить способы оповещения"
+msgstr[2] "Не удалось удалить способы оповещения"
 
 #: app/controllers/CControllerModuleScan.php:120
 #, c-format
@@ -3494,7 +3494,7 @@ msgid "Cannot delete service"
 msgid_plural "Cannot delete services"
 msgstr[0] "Не удалось удалить услугу"
 msgstr[1] "Не удалось удалить услуги"
-msgstr[2] "Не удалось удалить услуг"
+msgstr[2] "Не удалось удалить услуги"
 
 #: include/classes/api/services/CService.php:455
 #: include/classes/api/services/CService.php:470
@@ -3537,7 +3537,7 @@ msgstr "Невозможно удалить триггер \"%1$s:%2$s\" уна�
 #: include/classes/api/services/CTriggerPrototype.php:510
 #, c-format
 msgid "Cannot delete templated trigger prototype \"%1$s:%2$s\"."
-msgstr "Не удалось удалить прототип графиков \"%1$s:%2$s\" унаследованный из шаблона."
+msgstr "Не удалось удалить прототип триггеров \"%1$s:%2$s\", унаследованный из шаблона."
 
 #: include/classes/api/services/CHttpTest.php:677
 #, c-format
@@ -3560,7 +3560,7 @@ msgstr "Не удалось удалить триггер \"%1$s\": %2$s."
 #, c-format
 msgid "Cannot delete trigger %1$s because maintenance \"%2$s\" must contain at least one host group, host or trigger."
 msgid_plural "Cannot delete triggers %1$s because maintenance \"%2$s\" must contain at least one host group, host or trigger."
-msgstr[0] "Не удалось удалить триггеры %1$s, так как обслуживание \"%2$s\" должно содержать хотя бы одну группу узлов сети, узел сети или триггер."
+msgstr[0] "Не удалось удалить триггер %1$s, так как обслуживание \"%2$s\" должно содержать хотя бы одну группу узлов сети, узел сети или триггер."
 msgstr[1] "Не удалось удалить триггеры %1$s, так как обслуживание \"%2$s\" должно содержать хотя бы одну группу узлов сети, узел сети или триггер."
 msgstr[2] "Не удалось удалить триггеры %1$s, так как обслуживание \"%2$s\" должно содержать хотя бы одну группу узлов сети, узел сети или триггер."
 
@@ -3610,7 +3610,7 @@ msgid "Cannot delete user role"
 msgid_plural "Cannot delete user roles"
 msgstr[0] "Не удалось удалить роль пользователя"
 msgstr[1] "Не удалось удалить роли пользователей"
-msgstr[2] "Не удалось удалить ролей пользователей"
+msgstr[2] "Не удалось удалить роли пользователей"
 
 #: httpconf.php:178 httpconf.php:418
 msgid "Cannot delete web scenario"
@@ -3650,7 +3650,7 @@ msgstr[2] "Не удалось деактивировать коннекторы
 #: host_discovery_prototypes.php:586
 msgid "Cannot disable discovery prototype"
 msgid_plural "Cannot disable discovery prototypes"
-msgstr[0] "Не удалось деактивировать прототипы правил обнаружения"
+msgstr[0] "Не удалось деактивировать прототип правил обнаружения"
 msgstr[1] "Не удалось деактивировать прототипы правил обнаружения"
 msgstr[2] "Не удалось деактивировать прототипы правил обнаружения"
 
@@ -3671,7 +3671,7 @@ msgstr[2] "Не удалось деактивировать корреляции
 #: app/controllers/CControllerCepRuleDisable.php:86
 msgid "Cannot disable event processing rule"
 msgid_plural "Cannot disable event processing rules"
-msgstr[0] "Не удалось отключить правила обработки событий"
+msgstr[0] "Не удалось отключить правило обработки событий"
 msgstr[1] "Не удалось отключить правила обработки событий"
 msgstr[2] "Не удалось отключить правила обработки событий"
 
@@ -3793,7 +3793,7 @@ msgstr[2] "Не удалось активировать корреляции с�
 #: app/controllers/CControllerCepRuleEnable.php:86
 msgid "Cannot enable event processing rule"
 msgid_plural "Cannot enable event processing rules"
-msgstr[0] "Невозможно включить правила обработки событий"
+msgstr[0] "Невозможно включить правило обработки событий"
 msgstr[1] "Невозможно включить правила обработки событий"
 msgstr[2] "Невозможно включить правила обработки событий"
 
@@ -4740,12 +4740,12 @@ msgstr "Не удалось задать зависимость для прот�
 #: include/classes/api/services/CItemGeneral.php:2461
 #, c-format
 msgid "Cannot set dependency for item with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
-msgstr "Не удалось задать зависимость для прототипа элементов данных с ключом \"%1$s\" от основного элемента данных с ключом \"%2$s\" с узла сети \"%3$s\": %4$s."
+msgstr "Не удалось задать зависимость для элемента данных с ключом \"%1$s\" от основного элемента данных с ключом \"%2$s\" на узле сети \"%3$s\": %4$s."
 
 #: include/classes/api/services/CItemGeneral.php:2460
 #, c-format
 msgid "Cannot set dependency for item with key \"%1$s\" on the master item with key \"%2$s\" on the template \"%3$s\": %4$s."
-msgstr "Не удалось задать зависимость для прототипа элементов данных с ключом \"%1$s\" от основного элемента данных с ключом \"%2$s\" с шаблона \"%3$s\": %4$s."
+msgstr "Не удалось задать зависимость для элемента данных с ключом \"%1$s\" от основного элемента данных с ключом \"%2$s\" в шаблоне \"%3$s\": %4$s."
 
 #: include/classes/api/services/CHost.php:1085
 #: include/classes/api/services/CHost.php:2161
@@ -4764,7 +4764,7 @@ msgstr "Поддержка аудио оповещений отсутствуе�
 
 #: include/classes/api/services/CHostInterface.php:305
 msgid "Cannot switch host for interface."
-msgstr "Не удалось переключить узел сети на интерфейс."
+msgstr "Не удалось изменить узел сети для интерфейса."
 
 #: app/controllers/CControllerApmDbTest.php:36
 msgid "Cannot test configuration"
@@ -4848,12 +4848,12 @@ msgstr "Не удалось обновить \"%1$s\" для прототипа 
 #: include/classes/api/services/CTriggerGeneral.php:1136
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger \"%2$s\"."
-msgstr "Не удалось обновить \"%1$s\" для шаблонного графика \"%2$s\"."
+msgstr "Не удалось обновить \"%1$s\" для шаблонного триггера \"%2$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:1147
 #, c-format
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
-msgstr "Не удалось обновить \"%1$s\" для шаблонного прототипа графика \"%2$s\"."
+msgstr "Не удалось обновить \"%1$s\" для шаблонного прототипа триггера \"%2$s\"."
 
 #: include/classes/api/helpers/CApiSettingsHelper.php:94
 #, c-format
@@ -4863,7 +4863,7 @@ msgstr "Невозможно обновить параметр \"%1$s\", так 
 #: include/classes/api/services/CHost.php:2344
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
-msgstr "Не удалось обновить \"%1$s\" у обнаруженного узла сети \"%2$s\"."
+msgstr "Не удалось обновить \"%2$s\" у обнаруженного узла сети \"%1$s\"."
 
 #: include/classes/api/services/CTriggerGeneral.php:1142
 #, c-format
@@ -5451,7 +5451,7 @@ msgstr "Проверка на ошибки с использованием ре�
 
 #: include/items.inc.php:1626
 msgid "Check for not supported value"
-msgstr "Проверка на неподдерживамое значение"
+msgstr "Проверка на неподдерживаемое значение"
 
 #: include/classes/setup/CSetupWizard.php:56
 #: include/classes/setup/CSetupWizard.php:510
@@ -6217,7 +6217,7 @@ msgstr "Подключаться через"
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:256
 msgctxt "missing data function"
 msgid "Connected"
-msgstr "Соединение"
+msgstr "Подключено"
 
 #: app/views/administration.timeouts.edit.php:148
 msgid "Connection"
@@ -7418,7 +7418,7 @@ msgstr "День"
 
 #: include/func.inc.php:2565
 msgid "Day before yesterday"
-msgstr "За день до вчера"
+msgstr "Позавчера"
 
 #: app/views/maintenance.timeperiod.edit.php:138
 #: app/views/maintenance.timeperiod.edit.php:168
@@ -7520,7 +7520,7 @@ msgstr "Доступ по умолчанию к новым действиям"
 
 #: app/views/administration.userrole.edit.php:429
 msgid "Default access to new device actions"
-msgstr "Доступ по умолчанию к действиям новых устройств"
+msgstr "Доступ по умолчанию к новым действиям устройств"
 
 #: app/views/administration.userrole.edit.php:285
 msgid "Default access to new modules"
@@ -8719,14 +8719,14 @@ msgstr "Прототип обнаружения создан"
 #: host_discovery_prototypes.php:313 host_discovery_prototypes.php:604
 msgid "Discovery prototype deleted"
 msgid_plural "Discovery prototypes deleted"
-msgstr[0] "Прототипы обнаружения удалены"
+msgstr[0] "Прототип обнаружения удалён"
 msgstr[1] "Прототипы обнаружения удалены"
 msgstr[2] "Прототипы обнаружения удалены"
 
 #: host_discovery_prototypes.php:579
 msgid "Discovery prototype disabled"
 msgid_plural "Discovery prototypes disabled"
-msgstr[0] "Прототипы обнаружения деактивированы"
+msgstr[0] "Прототип обнаружения деактивирован"
 msgstr[1] "Прототипы обнаружения деактивированы"
 msgstr[2] "Прототипы обнаружения деактивированы"
 
@@ -8737,7 +8737,7 @@ msgstr "Редактирование прототипа обнаружения"
 #: host_discovery_prototypes.php:578
 msgid "Discovery prototype enabled"
 msgid_plural "Discovery prototypes enabled"
-msgstr[0] "Прототипы обнаружения активированы"
+msgstr[0] "Прототип обнаружения активирован"
 msgstr[1] "Прототипы обнаружения активированы"
 msgstr[2] "Прототипы обнаружения активированы"
 
@@ -9866,22 +9866,22 @@ msgstr "Обработка событий"
 #: app/controllers/CControllerCepRuleDelete.php:60
 msgid "Event processing rule deleted"
 msgid_plural "Event processing rules deleted"
-msgstr[0] "Правила обработки событий удалены"
-msgstr[1] "Правило обработки событий удалено"
+msgstr[0] "Правило обработки событий удалено"
+msgstr[1] "Правила обработки событий удалены"
 msgstr[2] "Правила обработки событий удалены"
 
 #: app/controllers/CControllerCepRuleDisable.php:76
 msgid "Event processing rule disabled"
 msgid_plural "Event processing rules disabled"
-msgstr[0] "Правила обработки событий отключены"
-msgstr[1] "Правило обработки событий отключено"
+msgstr[0] "Правило обработки событий отключено"
+msgstr[1] "Правила обработки событий отключены"
 msgstr[2] "Правила обработки событий отключены"
 
 #: app/controllers/CControllerCepRuleEnable.php:76
 msgid "Event processing rule enabled"
 msgid_plural "Event processing rules enabled"
-msgstr[0] "Правила обработки событий включены"
-msgstr[1] "Правило обработки событий включено"
+msgstr[0] "Правило обработки событий включено"
+msgstr[1] "Правила обработки событий включены"
 msgstr[2] "Правила обработки событий включены"
 
 #: include/classes/helpers/CCorrelationHelper.php:55
@@ -9896,8 +9896,8 @@ msgstr "Тип события"
 msgid "Event updated"
 msgid_plural "Events updated"
 msgstr[0] "Событие обновлено"
-msgstr[1] "События обновлено"
-msgstr[2] "Событий обновлено"
+msgstr[1] "События обновлены"
+msgstr[2] "События обновлены"
 
 #: app/views/connector.edit.php:58 app/views/connector.list.php:100
 msgid "Events"
@@ -10073,7 +10073,7 @@ msgstr "Развернуть раздел"
 
 #: app/partials/layout.htmlpage.aside.php:43
 msgid "Expand sidebar"
-msgstr "Расширить боковую панель"
+msgstr "Развернуть боковую панель"
 
 #: include/views/monitoring.sysmap.edit.php:156
 msgid "Expand single problem"
@@ -10090,7 +10090,7 @@ msgstr "Ожидаемый формат LLD-макроса: \"{#MACRO}\"."
 #: app/controllers/CControllerTemplateCreate.php:69
 #: app/controllers/CControllerTemplateUpdate.php:71
 msgid "Expected user macro format is \"{$MACRO}\"."
-msgstr "Ожидаемый формат пользовательского макроса: \"{$МАКРОС}\"."
+msgstr "Ожидаемый формат пользовательского макроса: \"{$MACRO}\"."
 
 #: app/partials/scheduledreport.table.html.php:93
 #: app/views/reports.scheduledreport.list.php:65
@@ -10105,7 +10105,7 @@ msgstr "Завершено"
 #: app/partials/scheduledreport.table.html.php:96
 #, c-format
 msgid "Expired on %1$s."
-msgstr "Истекает в %1$s."
+msgstr "Срок действия истёк %1$s."
 
 #: app/views/administration.token.list.php:135
 #: app/views/administration.user.token.list.php:97
@@ -10353,7 +10353,7 @@ msgstr "В поле \"%1$s\" пропущено значение у карты �
 #: include/validate.inc.php:250
 #, c-format
 msgid "Field \"%1$s\" is not correct: %2$s"
-msgstr "Поле \"%1$s\" не корректно: %2$s"
+msgstr "Поле \"%1$s\" некорректно: %2$s"
 
 #: include/validate.inc.php:186 include/validate.inc.php:191
 #: include/validate.inc.php:222
@@ -10650,7 +10650,7 @@ msgstr "Шрифт"
 
 #: include/views/js/monitoring.sysmaps.js.php:552
 msgid "Font color"
-msgstr "Цвет фона"
+msgstr "Цвет шрифта"
 
 #: include/views/js/monitoring.sysmaps.js.php:379
 #: include/views/js/monitoring.sysmaps.js.php:546
@@ -11479,7 +11479,7 @@ msgstr "Функции истории"
 
 #: app/views/administration.housekeeping.edit.php:218
 msgid "History, trends and audit log compression"
-msgstr "История, тренды и сжатие журнала аудита"
+msgstr "Сжатие истории, динамики изменений и журнала аудита"
 
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
@@ -11700,7 +11700,7 @@ msgstr "Группа узлов сети добавлена"
 msgid "Host group deleted"
 msgid_plural "Host groups deleted"
 msgstr[0] "Группа узлов сети удалена"
-msgstr[1] "Групп узлов сети удалено"
+msgstr[1] "Группы узлов сети удалены"
 msgstr[2] "Группы узлов сети удалены"
 
 #: app/controllers/CControllerPopup.php:47
@@ -11848,7 +11848,7 @@ msgstr "Сети узла сети"
 #: widgets/topitems/includes/WidgetForm.php:128
 #: widgets/topitems/views/widget.edit.php:63
 msgid "Host ordering"
-msgstr "Расположение хоста"
+msgstr "Порядок узлов сети"
 
 #: widgets/hostnavigator/includes/WidgetForm.php:65
 msgid "Host patterns"
@@ -11887,8 +11887,8 @@ msgstr "Макросы прототипов узлов сети"
 msgid "Host prototype updated"
 msgid_plural "Host prototypes updated"
 msgstr[0] "Прототип узлов сети обновлен"
-msgstr[1] "Прототипы узлов сети обновлен"
-msgstr[2] "Прототипы узлов сети обновлен"
+msgstr[1] "Прототипы узлов сети обновлены"
+msgstr[2] "Прототипы узлов сети обновлены"
 
 #: include/classes/api/services/CHostPrototype.php:1137
 #, c-format
@@ -12078,7 +12078,7 @@ msgstr "Очистка истории"
 #: include/views/configuration.item.edit.php:1084
 #: include/views/configuration.item.prototype.edit.php:952
 msgid "However, if \"Check for not supported value\" steps are configured, they are always placed and executed first (with \"any error\" being the last of them)."
-msgstr "Однако, если добавлены шаги \"Проверка на неподдерживамое значение\", эти шаги всегда располагаются и выполняются первыми (при этом \"любая ошибка\" располагается последним из этих шагов)."
+msgstr "Однако, если добавлены шаги \"Проверка на неподдерживаемое значение\", эти шаги всегда располагаются и выполняются первыми (при этом \"любая ошибка\" располагается последним из этих шагов)."
 
 #: include/locales.inc.php:47
 msgid "Hungarian (hu_HU)"
@@ -12284,7 +12284,7 @@ msgstr "Если активирована HTTP аутентификация, в�
 msgid "If at least %2$s child service has %1$s status or above"
 msgid_plural "If at least %2$s child services have %1$s status or above"
 msgstr[0] "Если по крайней мере %2$s дочерняя услуга в %1$s состоянии или выше"
-msgstr[1] "Если по крайней мере %2$s дочерних услуг в %1$s состоянии или выше"
+msgstr[1] "Если по крайней мере %2$s дочерние услуги в %1$s состоянии или выше"
 msgstr[2] "Если по крайней мере %2$s дочерних услуг в %1$s состоянии или выше"
 
 #: include/classes/helpers/CServiceHelper.php:35
@@ -12306,9 +12306,9 @@ msgstr "При соответствии фильтру"
 #, c-format
 msgid "If less than %2$s child service has %1$s status or below"
 msgid_plural "If less than %2$s child services have %1$s status or below"
-msgstr[0] "Если меньше чем %2$s дочерняя услуга в %1$s состоянии или ниже"
-msgstr[1] "Если меньше чем %2$s дочерних услуг в %1$s состоянии или ниже"
-msgstr[2] "Если меньше чем %2$s дочерних услуг в %1$s состоянии или ниже"
+msgstr[0] "Если число дочерних услуг в состоянии %1$s или ниже меньше %2$s"
+msgstr[1] "Если число дочерних услуг в состоянии %1$s или ниже меньше %2$s"
+msgstr[2] "Если число дочерних услуг в состоянии %1$s или ниже меньше %2$s"
 
 #: include/classes/helpers/CServiceHelper.php:45
 #, c-format
@@ -13146,7 +13146,7 @@ msgstr "Некорректное значение \"%1$s\" для поля це�
 #: include/classes/db/DB.php:408
 #, c-format
 msgid "Incorrect value \"%1$s\" for unsigned int field \"%2$s\"."
-msgstr "Некорректное значение \"%1$s\" для поля целого положительного числа \"%2$s\"."
+msgstr "Некорректное значение \"%1$s\" для поля целого числа без знака \"%2$s\"."
 
 #: app/controllers/CControllerPopupMassupdateHost.php:78
 #: include/classes/validators/CNewValidator.php:125
@@ -14451,7 +14451,7 @@ msgstr "Элемент данных не выбран"
 #: widgets/topitems/includes/WidgetForm.php:157
 #: widgets/topitems/views/widget.edit.php:81
 msgid "Item ordering"
-msgstr "Расположение элемента"
+msgstr "Порядок элементов данных"
 
 #: widgets/piechart/views/widget.edit.js.php:203
 #: widgets/svggraph/views/widget.edit.js.php:281
@@ -14912,7 +14912,7 @@ msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
 msgstr[0] "Последний %1$d год"
 msgstr[1] "Последние %1$d года"
-msgstr[2] "Последний %1$d лет"
+msgstr[2] "Последние %1$d лет"
 
 #: app/partials/administration.ha.nodes.php:28
 msgid "Last access"
@@ -15164,7 +15164,7 @@ msgstr "Присоединенные шаблоны"
 
 #: app/views/template.list.php:149
 msgid "Linked to templates"
-msgstr "Соединения с шаблонам"
+msgstr "Связи с шаблонами"
 
 #: include/views/js/monitoring.sysmaps.js.php:755
 #: include/views/js/monitoring.sysmaps.js.php:766
@@ -15249,7 +15249,7 @@ msgstr "Список объектов экземпляров счётчиков 
 
 #: include/classes/data/CItemData.php:1241
 msgid "List of object instances of Windows performance counters. Returns JSON"
-msgstr "Список объектов экзепляров счётчиков производительности Windows. Возвращает JSON"
+msgstr "Список экземпляров объектов счётчиков производительности Windows. Возвращает JSON"
 
 #: include/classes/html/CTabFilter.php:382
 msgid "List of open filter tabs"
@@ -15564,7 +15564,7 @@ msgstr "Обслуживание \"%1$s\" уже существует."
 
 #: app/controllers/CControllerPopup.php:50
 msgid "Maintenance edit"
-msgstr "Редактирование типа \"maintanance\""
+msgstr "Редактирование обслуживания"
 
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:238
@@ -15579,8 +15579,8 @@ msgstr "Период обслуживания создан"
 msgid "Maintenance period deleted"
 msgid_plural "Maintenance periods deleted"
 msgstr[0] "Период обслуживания удален"
-msgstr[1] "Периода обслуживания удалено"
-msgstr[2] "Периодов обслуживания удалено"
+msgstr[1] "Периоды обслуживания удалены"
+msgstr[2] "Периоды обслуживания удалены"
 
 #: app/views/maintenance.timeperiod.edit.php:197
 msgid "Maintenance period length"
@@ -16071,8 +16071,8 @@ msgstr "Тип медиа и атрибут не уникальны."
 msgid "Media type deleted"
 msgid_plural "Media types deleted"
 msgstr[0] "Способ оповещения удален"
-msgstr[1] "Способ оповещения удален"
-msgstr[2] "Способ оповещения удален"
+msgstr[1] "Способы оповещения удалены"
+msgstr[2] "Способы оповещения удалены"
 
 #: app/controllers/CControllerMediatypeDisable.php:68
 msgid "Media type disabled"
@@ -16304,7 +16304,7 @@ msgstr "Microsoft Edge"
 #: widgets/item/includes/WidgetForm.php:186
 #: widgets/item/includes/WidgetForm.php:234
 msgid "Middle"
-msgstr "По середине"
+msgstr "Посередине"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:390
 #: widgets/gauge/includes/WidgetForm.php:176
@@ -16390,9 +16390,9 @@ msgstr "Минимальная важность"
 #, c-format
 msgid "Minimum time period to display is %1$s minute."
 msgid_plural "Minimum time period to display is %1$s minutes."
-msgstr[0] "Минимально отображаемым периодом является %1$s минута."
-msgstr[1] "Минимально отображаемым периодом является %1$s минуты."
-msgstr[2] "Минимально отображаемым периодом является %1$s минут."
+msgstr[0] "Минимальный период отображения — %1$s минута."
+msgstr[1] "Минимальный период отображения — %1$s минуты."
+msgstr[2] "Минимальный период отображения — %1$s минут."
 
 #: app/controllers/CControllerMaintenanceTimePeriodCheck.php:82
 #, c-format
@@ -16473,16 +16473,16 @@ msgstr "Модуль"
 msgid "Module added: %1$s."
 msgid_plural "Modules added: %1$s."
 msgstr[0] "Модуль добавлен: %1$s."
-msgstr[1] "Модуля добавлено: %1$s."
-msgstr[2] "Модулей добавлено: %1$s."
+msgstr[1] "Модули добавлены: %1$s."
+msgstr[2] "Модули добавлены: %1$s."
 
 #: app/controllers/CControllerModuleScan.php:115
 #, c-format
 msgid "Module deleted: %1$s."
 msgid_plural "Modules deleted: %1$s."
 msgstr[0] "Модуль удален: %1$s."
-msgstr[1] "Модуля удалено: %1$s."
-msgstr[2] "Модулей удалено: %1$s."
+msgstr[1] "Модули удалены: %1$s."
+msgstr[2] "Модули удалены: %1$s."
 
 #: app/controllers/CControllerModuleDisable.php:67
 msgid "Module disabled"
@@ -16644,7 +16644,7 @@ msgstr "Должно быть не менее %1$s."
 #: app/controllers/CControllerMaintenanceUpdateGeneral.php:32
 #, c-format
 msgid "Must be greater than \"%1$s\"."
-msgstr "Должно быть не больше \"%1$s\"."
+msgstr "Должно быть больше \"%1$s\"."
 
 #: include/classes/validators/CFormValidator.php:340
 msgid "Must be selected."
@@ -16662,7 +16662,7 @@ msgstr "Отключить звук"
 #: jsLoader.php:286
 #, c-format
 msgid "Mute for %1$s"
-msgstr "Приглушить для %1$s"
+msgstr "Отключить звук на %1$s"
 
 #: app/views/monitoring.dashboard.list.php:95
 msgid "My"
@@ -17191,7 +17191,7 @@ msgstr "Новый прототип триггеров"
 
 #: include/views/js/monitoring.sysmaps.js.php:191
 msgid "New triggers"
-msgstr "Новые триггера"
+msgstr "Новые триггеры"
 
 #: app/partials/administration.system.info.php:58
 #: app/partials/administration.system.info.php:63
@@ -17541,7 +17541,7 @@ msgstr "Нет прав на импорт способов оповещения.
 
 #: include/classes/api/services/CConfiguration.php:324
 msgid "No permissions to import template dashboards."
-msgstr "Нет прав на импорт шаблонов панелей."
+msgstr "Нет прав на импорт панелей шаблонов."
 
 #: include/classes/api/services/CConfiguration.php:315
 msgid "No permissions to import template groups."
@@ -17549,7 +17549,7 @@ msgstr "Нет прав на импорт групп шаблонов."
 
 #: include/classes/api/services/CConfiguration.php:322
 msgid "No permissions to import template links."
-msgstr "Нет прав на импорт шаблонов связей."
+msgstr "Нет прав на импорт связей с шаблонами."
 
 #: include/classes/api/services/CConfiguration.php:323
 msgid "No permissions to import templates."
@@ -18070,7 +18070,7 @@ msgstr "Количество CPU. Возвращает целое число"
 
 #: include/classes/data/CItemData.php:1967
 msgid "Number of available DS paths, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - Datastore name, \"partitionid\" - internal id of physical device from vmware.hv.datastore.discovery"
-msgstr "Количество доступных путей к хранилищу данных, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор гипервизора VMware, \"хранилище данных\" - имя хранилища данных, \"id раздела\" - внутренний id физического устройства с vmware.hv.datastore.discovery"
+msgstr "Количество доступных путей к хранилищу данных, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор гипервизора VMware, \"datastore\" - имя хранилища данных, \"partitionid\" - внутренний id физического устройства с vmware.hv.datastore.discovery"
 
 #: widgets/piechart/includes/WidgetForm.php:216
 #: widgets/svggraph/includes/WidgetForm.php:366
@@ -18108,7 +18108,7 @@ msgstr "Количество элементов данных в очереди, 
 #: include/classes/data/CItemData.php:2615
 #: include/classes/data/CItemData.php:2778
 msgid "Number of items in the queue which are delayed in Zabbix server or proxy by \"from\" till \"to\" seconds, inclusive."
-msgstr "Количество элементов данных в очереди, которые задерживаются на Zabbix сервере или прокси \"от\" и \"до\" секунд, включительно."
+msgstr "Количество элементов данных в очереди, которые задерживаются на Zabbix сервере или прокси \"from\" и \"to\" секунд, включительно."
 
 #: include/classes/data/CItemData.php:2687
 msgid "Number of monitored hosts"
@@ -18223,7 +18223,7 @@ msgstr "Числовой (целочисленный)"
 #: include/views/configuration.item.edit.php:122
 #: include/views/configuration.item.prototype.edit.php:107
 msgid "Numeric (unsigned)"
-msgstr "Числовой (целое положительное)"
+msgstr "Числовой (целое без знака)"
 
 #: app/views/mediatype.edit.php:127 app/views/oauth.edit.php:237
 msgid "OAuth"
@@ -18555,11 +18555,11 @@ msgstr "Порядок выполнения операций:"
 
 #: app/controllers/CControllerActionOperationCheck.php:163
 msgid "Operation has no group to operate."
-msgstr "Операция не имеет группу для функционирования."
+msgstr "Для операции не указана группа."
 
 #: app/controllers/CControllerActionOperationCheck.php:172
 msgid "Operation has no template to operate."
-msgstr "Операция не имеет шаблон для функционирования."
+msgstr "Для операции не указан шаблон."
 
 #: app/views/apm.trace.list.php:69 app/views/js/apm.trace.list.js.php:166
 msgid "Operation name"
@@ -20017,7 +20017,7 @@ msgstr "Прокси \"%1$s\" уже существует."
 #, c-format
 msgid "Proxy \"%1$s\" cannot be added to the proxy list because it is already managed by proxy group."
 msgid_plural "Proxies \"%1$s\" cannot be added to the proxy list because they are already managed by proxy group."
-msgstr[0] "Прокси \"%1$s\" нельзя добавить в список прокси, так как они уже управляются группой прокси."
+msgstr[0] "Прокси \"%1$s\" нельзя добавить в список прокси, так как он уже управляется группой прокси."
 msgstr[1] "Прокси \"%1$s\" нельзя добавить в список прокси, так как они уже управляются группой прокси."
 msgstr[2] "Прокси \"%1$s\" нельзя добавить в список прокси, так как они уже управляются группой прокси."
 
@@ -20052,8 +20052,8 @@ msgstr "Адрес прокси"
 msgid "Proxy deleted"
 msgid_plural "Proxies deleted"
 msgstr[0] "Прокси удален"
-msgstr[1] "Прокси удален"
-msgstr[2] "Прокси удален"
+msgstr[1] "Прокси удалены"
+msgstr[2] "Прокси удалены"
 
 #: app/controllers/CControllerPopup.php:53
 msgid "Proxy edit"
@@ -20345,7 +20345,7 @@ msgstr "Получатель уже существует."
 
 #: app/views/reports.actionlog.list.csv.php:39
 msgid "Recipient's Zabbix username"
-msgstr "Имена пользователей получателей"
+msgstr "Имя пользователя получателя в Zabbix"
 
 #: app/views/reports.actionlog.list.csv.php:40
 msgid "Recipient's name"
@@ -20780,7 +20780,7 @@ msgstr "Замена"
 #: include/classes/api/services/CReport.php:262
 #, c-format
 msgid "Report \"%1$s\" already exists."
-msgstr "Отчет %1$s\" уже существует."
+msgstr "Отчет \"%1$s\" уже существует."
 
 #: app/views/js/reports.scheduledreport.edit.js.php:75
 msgid "Report generated by other users will be changed to the current user."
@@ -21111,7 +21111,7 @@ msgstr "Возвращает JSON массив с MBean объектами и и
 
 #: include/classes/data/CItemData.php:949
 msgid "Return first column of the first row of the SQL query result."
-msgstr "Возвращает первую колонку первой строки результата SQL запрос."
+msgstr "Возвращает первый столбец первой строки результата SQL запроса."
 
 #: include/classes/data/CItemData.php:1011
 msgid "Return value of an attribute of MBean object."
@@ -21119,7 +21119,7 @@ msgstr "Возвращает значение атрибута MBean объек�
 
 #: include/classes/data/CItemData.php:1655
 msgid "Returns 4-digit string containing octal number with Unix permissions"
-msgstr "Получение строки в виде четырех цифр, содержащую восьмеричное число с Unix правами"
+msgstr "Возвращает строку из 4 цифр, содержащую восьмеричное число с правами доступа Unix"
 
 #: include/classes/data/CItemData.php:983
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
@@ -21322,14 +21322,14 @@ msgstr "SLA создан"
 msgid "SLA deleted"
 msgid_plural "SLAs deleted"
 msgstr[0] "SLA удален"
-msgstr[1] "SLA удалено"
+msgstr[1] "SLA удалены"
 msgstr[2] "SLA удалены"
 
 #: app/controllers/CControllerSlaDisable.php:73
 msgid "SLA disabled"
 msgid_plural "SLAs disabled"
 msgstr[0] "SLA деактивирован"
-msgstr[1] "SLA деактивировано"
+msgstr[1] "SLA деактивированы"
 msgstr[2] "SLA деактивированы"
 
 #: app/controllers/CControllerPopup.php:58
@@ -21340,7 +21340,7 @@ msgstr "Редактировать SLA "
 msgid "SLA enabled"
 msgid_plural "SLAs enabled"
 msgstr[0] "SLA активирован"
-msgstr[1] "SLA активировано"
+msgstr[1] "SLA активированы"
 msgstr[2] "SLA активированы"
 
 #: widgets/slareport/views/widget.view.php:35
@@ -21829,8 +21829,8 @@ msgstr "Скрипт добавлен"
 msgid "Script deleted"
 msgid_plural "Scripts deleted"
 msgstr[0] "Скрипт удален"
-msgstr[1] "Скрипт удален"
-msgstr[2] "Скрипт удален"
+msgstr[1] "Скрипты удалены"
+msgstr[2] "Скрипты удалены"
 
 #: app/views/mediatype.test.edit.php:62
 msgid "Script does not have parameters."
@@ -22229,12 +22229,12 @@ msgstr "Период хранения данных услуг"
 msgid "Service deleted"
 msgid_plural "Services deleted"
 msgstr[0] "Услуга удалена"
-msgstr[1] "Услуги удалено"
-msgstr[2] "Услуг удалено"
+msgstr[1] "Услуги удалены"
+msgstr[2] "Услуги удалены"
 
 #: app/controllers/CControllerPopup.php:57
 msgid "Service edit"
-msgstr "Редактировать сервис"
+msgstr "Редактировать услугу"
 
 #: app/views/administration.userrole.edit.php:166
 #: app/views/administration.userrole.edit.php:207
@@ -22814,7 +22814,7 @@ msgstr "Простой (один раз) — то же, что и «Просто
 
 #: app/views/js/host.wizard.edit.js.php:97
 msgid "Simple Network Management Protocol (SNMP) interface"
-msgstr "Интерфейса Simple Network Management Protocol (SNMP)"
+msgstr "Интерфейс Simple Network Management Protocol (SNMP)"
 
 #: include/items.inc.php:1578
 msgid "Simple change"
@@ -22933,7 +22933,7 @@ msgstr "Интервал слайд-шоу"
 
 #: include/locales.inc.php:61
 msgid "Slovak (sk_SK)"
-msgstr "Slovak (sk_SK)"
+msgstr "Словацкий (sk_SK)"
 
 #: widgets/scatterplot/includes/CWidgetFieldDataSetView.php:443
 msgid "Small"
@@ -22941,12 +22941,12 @@ msgstr "Мал."
 
 #: jsLoader.php:288
 msgid "Snooze"
-msgstr "Заснуть"
+msgstr "Отложить"
 
 #: jsLoader.php:291
 #, c-format
 msgid "Snooze for %1$s"
-msgstr "Отложить для %1$s"
+msgstr "Отложить на %1$s"
 
 #: include/hosts.inc.php:174
 msgid "Software"
@@ -22982,7 +22982,7 @@ msgstr "Информация об архитектуре программног�
 
 #: app/partials/administration.system.info.php:96
 msgid "Software update last checked"
-msgstr "Время последней проверки программного обеспечения"
+msgstr "Время последней проверки обновлений программного обеспечения"
 
 #: jsLoader.php:556
 msgid "Solid color"
@@ -23036,16 +23036,16 @@ msgstr "Интервал между секторами"
 #: app/views/js/apm.trace.list.js.php:149
 #: app/views/js/apm.trace.list.js.php:590
 msgid "Span ID"
-msgstr "ID диапазона"
+msgstr "ID спана"
 
 #: app/views/apm.trace.list.php:114 app/views/js/apm.trace.list.js.php:207
 #: app/views/js/apm.trace.list.js.php:649
 msgid "Span attributes"
-msgstr "Атрибуты диапазона"
+msgstr "Атрибуты спана"
 
 #: app/views/js/apm.trace.list.js.php:557
 msgid "Span details"
-msgstr "Сведения о диапазоне"
+msgstr "Сведения о спане"
 
 #: app/views/js/apm.trace.list.js.php:171
 msgid "Span kind"
@@ -23529,7 +23529,7 @@ msgstr "Начиная с Zabbix 7.0, поддержка БД Oracle являе�
 
 #: include/classes/html/widgets/fields/CWidgetFieldLatLngView.php:37
 msgid "Supported formats:"
-msgstr "Поддерживаемые макросы:"
+msgstr "Поддерживаемые форматы:"
 
 #: widgets/gauge/views/widget.edit.php:111
 #: widgets/item/views/widget.edit.php:85
@@ -23562,8 +23562,8 @@ msgstr "Подавление проблем"
 msgid "Suppress trigger"
 msgid_plural "Suppress triggers"
 msgstr[0] "Подавить триггер"
-msgstr[1] "Подавить триггера"
-msgstr[2] "Подавить триггеров"
+msgstr[1] "Подавить триггеры"
+msgstr[2] "Подавить триггеры"
 
 #: include/actions.inc.php:1571
 msgid "Suppress until"
@@ -23669,7 +23669,7 @@ msgstr "Системное время. Возвращает целое числ�
 
 #: include/classes/data/CItemData.php:1543
 msgid "System uptime in seconds. Returns integer"
-msgstr "Системное время в секундах. Возвращает число"
+msgstr "Время работы системы в секундах. Возвращает целое число"
 
 #: jsLoader.php:245
 msgctxt "Thursday short"
@@ -23944,11 +23944,11 @@ msgstr "Шаблон не может быть присоединен к друг
 
 #: app/controllers/CControllerAuditLogList.php:256
 msgid "Template dashboard"
-msgstr "Шаблон панели"
+msgstr "Панель шаблона"
 
 #: app/views/popup.import.php:37
 msgid "Template dashboards"
-msgstr "Шаблоны панелей"
+msgstr "Панели шаблонов"
 
 #: app/controllers/CControllerTemplateDelete.php:133
 msgid "Template deleted"
@@ -23967,7 +23967,7 @@ msgstr "Редактировать шаблон"
 #: app/views/popup.generic.php:62 app/views/popup.templategroup.edit.php:31
 #: app/views/search.php:372 report2.php:390
 msgid "Template group"
-msgstr "Группа шаблона"
+msgstr "Группа шаблонов"
 
 #: include/classes/api/services/CTemplateGroup.php:538
 #, c-format
@@ -23996,7 +23996,7 @@ msgstr "Группа шаблонов обновлена"
 #: include/classes/api/services/CUserGroup.php:494
 #, c-format
 msgid "Template group with ID \"%1$s\" is not available."
-msgstr "Группа шаблонов с \"%1$s\" недоступна."
+msgstr "Группа шаблонов с ID \"%1$s\" недоступна."
 
 #: app/controllers/CControllerPopupGeneric.php:203
 #: app/controllers/CControllerPopupImportCompare.php:171
@@ -24478,8 +24478,8 @@ msgstr "В этом действии отсутствуют условия ил�
 msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
 msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
 msgstr[0] "Эту проверку нельзя удалить, так как она используется как условие в действии обнаружения %1$s."
-msgstr[1] "Эту проверку нельзя удалить, так как она используется как условие в действии обнаружения %1$s."
-msgstr[2] "Эту проверку нельзя удалить, так как она используется как условие в действии обнаружения %1$s."
+msgstr[1] "Эту проверку нельзя удалить, так как она используется как условие в действиях обнаружения %1$s."
+msgstr[2] "Эту проверку нельзя удалить, так как она используется как условие в действиях обнаружения %1$s."
 
 #: include/classes/helpers/CTelemetryHelper.php:165
 #: include/classes/helpers/CTelemetryHelper.php:173
@@ -24635,8 +24635,8 @@ msgstr "Это значение слишком короткое."
 msgid "This value must be %1$s."
 msgid_plural "This value must be one of %1$s."
 msgstr[0] "Это значение должно быть %1$s."
-msgstr[1] "Это значение должно одним из %1$s."
-msgstr[2] "Это значение должно одним из %1$s."
+msgstr[1] "Это значение должно быть одним из %1$s."
+msgstr[2] "Это значение должно быть одним из %1$s."
 
 #: include/classes/validators/CFormValidator.php:847
 #: include/classes/validators/CFormValidator.php:898 jsLoader.php:433
@@ -24752,7 +24752,7 @@ msgstr "Время"
 
 #: include/classes/data/CItemData.php:2729
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
-msgstr "Время конкретного процесса Zabbix или группы процессов (задаётся <типом> и <режимом>) проведённое в <состоянии> в процентах."
+msgstr "Время, которое определённый процесс Zabbix или группа процессов (задаваемых <type> и <mode>) провели в состоянии <state>, в процентах."
 
 #: app/views/js/mediatype.test.edit.js.php:91
 #: app/views/js/popup.scriptexec.js.php:44
@@ -24958,7 +24958,7 @@ msgstr "Топ узлов сети"
 
 #: widgets/topitems/Widget.php:32
 msgid "Top items"
-msgstr "Часто используемые эелемнты"
+msgstr "Топ элементов данных"
 
 #: widgets/toptriggers/Widget.php:29
 msgid "Top triggers"
@@ -25196,8 +25196,8 @@ msgstr "Триггер добавлен"
 msgid "Trigger copied"
 msgid_plural "Triggers copied"
 msgstr[0] "Триггер скопирован"
-msgstr[1] "Триггера скопированы"
-msgstr[2] "Триггера скопированы"
+msgstr[1] "Триггеры скопированы"
+msgstr[2] "Триггеры скопированы"
 
 #: widgets/toptriggers/includes/WidgetForm.php:76
 msgid "Trigger count"
@@ -25615,7 +25615,7 @@ msgstr "Параметр URL не может быть массивом."
 
 #: include/html.inc.php:107
 msgid "URL parameter name is empty."
-msgstr "Параметр URL не может быть пустым."
+msgstr "Имя параметра URL пустое."
 
 #: include/classes/validators/CUrlValidator.php:148
 msgid "URL scheme is required"
@@ -25692,7 +25692,7 @@ msgstr "Не удалось загрузить данные из ClickHouse: %1$
 #: include/classes/vaults/CVaultCyberArk.php:106
 #: include/classes/vaults/CVaultHashiCorp.php:93
 msgid "Unable to load database credentials from Vault."
-msgstr "Не удалось загрузить базу данных учётных данных c Хранилища."
+msgstr "Не удалось загрузить учётные данные базы данных из Vault."
 
 #: include/classes/helpers/CHousekeepingHelper.php:72
 msgid "Unable to load housekeeping API parameters."
@@ -26387,7 +26387,7 @@ msgstr "Пользователь \"%1$s\" используется в \"%2$s\" �
 #: include/classes/api/services/CUser.php:1405
 #, c-format
 msgid "User \"%1$s\" is user on whose behalf report \"%2$s\" is created."
-msgstr "Пользователь \"%1$s\" является пользователем от имени которого создан \"%2$s\" шаблон."
+msgstr "Пользователь \"%1$s\" является пользователем, от имени которого создан отчёт \"%2$s\"."
 
 #: include/classes/api/services/CUser.php:937
 #, c-format
@@ -26649,7 +26649,7 @@ msgid "User role deleted"
 msgid_plural "User roles deleted"
 msgstr[0] "Роль пользователя удалена"
 msgstr[1] "Роли пользователей удалены"
-msgstr[2] "Ролей пользователей удалено"
+msgstr[2] "Роли пользователей удалены"
 
 #: app/controllers/CControllerUserroleUpdate.php:179
 msgid "User role updated"
@@ -26782,7 +26782,7 @@ msgstr "Виртуальный распределенный коммутатор
 
 #: include/classes/data/CItemData.php:1883
 msgid "VMware FetchDVPorts wrapper, \"url\" - VMware service URL, \"uuid\" - VMware DVSwitch global unique identifier, \"filter\" - vmware data object DistributedVirtualSwitchPortCriteria, \"mode\"- state(default)/full. Returns JSON"
-msgstr "FetchDVPorts оболочка VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор VMware DVSwitch, \"фильтр\" - DistributedVirtualSwitchPortCriteria объект данных VMware, \"режим\" - state (по умолчанию) / full. Возвращает JSON"
+msgstr "FetchDVPorts оболочка VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор VMware DVSwitch, \"filter\" - DistributedVirtualSwitchPortCriteria объект данных VMware, \"mode\" - state (по умолчанию) / full. Возвращает JSON"
 
 #: include/classes/data/CItemData.php:2834
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
@@ -26794,15 +26794,15 @@ msgstr "Данные оповещений кластера VMware, \"url\" - URL
 
 #: include/classes/data/CItemData.php:1750
 msgid "VMware cluster performance counter, \"url\" - VMware service URL, \"id\" - VMware cluster id, \"path\" - performance counter path, \"instance\" - performance counter instance"
-msgstr "Счетчик производительности VMware кластера, \"url\" - URL службы VMware, \"id\" - id VMware кластера, \"path\" - путь к счетчику производительности, \"экземпляр\" - экземпляр счетчика производительности"
+msgstr "Счетчик производительности VMware кластера, \"url\" - URL службы VMware, \"id\" - id VMware кластера, \"path\" - путь к счетчику производительности, \"instance\" - экземпляр счетчика производительности"
 
 #: include/classes/data/CItemData.php:1771
 msgid "VMware cluster property, \"url\" - VMware service URL, \"id\" - VMware cluster id, \"prop\" - property path"
-msgstr "Свойство кластера VMware, \"url\" - URL службы VMware, \"id\" - id кластера VMware, \"свойство\" - путь к свойству"
+msgstr "Свойство кластера VMware, \"url\" - URL службы VMware, \"id\" - id кластера VMware, \"prop\" - путь к свойству"
 
 #: include/classes/data/CItemData.php:1778
 msgid "VMware cluster status, \"url\" - VMware service URL, \"name\" - VMware cluster name"
-msgstr "Состояние кластера VMware, \"url\" - URL службы VMware, \"имя\" - имя кластера VMware"
+msgstr "Состояние кластера VMware, \"url\" - URL службы VMware, \"name\" - имя кластера VMware"
 
 #: include/classes/data/CItemData.php:1785
 msgid "VMware cluster tags array, \"url\" - VMware service URL, \"id\" - VMware cluster id"
@@ -26826,7 +26826,7 @@ msgstr "Данные оповещений хранилища данных VMware
 
 #: include/classes/data/CItemData.php:1981
 msgid "VMware datastore capacity statistics in bytes or in percentage from total, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\" - total(default)/free/pfree/uncommitted. Returns integer for bytes; float for percentage"
-msgstr "Статистика размера хранилища данных VMware в байтах или в процентах от общего размера, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор гипервизора VMware, \"datastore\" - имя хранилища данных, \"режим\" - total(по умолчанию)/free/pfree/uncommitted. Возвращает целое число для байт; число с плавающей точкой для процентов"
+msgstr "Статистика размера хранилища данных VMware в байтах или в процентах от общего размера, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор гипервизора VMware, \"datastore\" - имя хранилища данных, \"mode\" - total(по умолчанию)/free/pfree/uncommitted. Возвращает целое число для байт; число с плавающей точкой для процентов"
 
 #: include/classes/data/CItemData.php:1834
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
@@ -26838,15 +26838,15 @@ msgstr "Список гипервизоров хранилища данных VM
 
 #: include/classes/data/CItemData.php:1813
 msgid "VMware datastore performance counter, \"url\" - VMware service URL, \"uuid\" - VMware datastore global unique identifier, \"path\" - performance counter path, \"instance\" - datastore perfcounter instance from vmware.hv.diskinfo.get"
-msgstr "Счетчик производительности хранилища данных VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор хранилища данных VMware, \"путь\" - путь к счетчику производительности, \"экземпляр\" - экземпляр счетчика производительности с vmware.hv.diskinfo.get"
+msgstr "Счетчик производительности хранилища данных VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор хранилища данных VMware, \"path\" - путь к счетчику производительности, \"instance\" - экземпляр счетчика производительности с vmware.hv.diskinfo.get"
 
 #: include/classes/data/CItemData.php:1820
 msgid "VMware datastore property, \"url\" - VMware service URL, \"uuid\" - VMware datastore global unique identifier, \"prop\" - property path"
-msgstr "Свойство хранилища данных VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор хранилища данных, \"свойство\" - путь к свойству"
+msgstr "Свойство хранилища данных VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор хранилища данных, \"prop\" - путь к свойству"
 
 #: include/classes/data/CItemData.php:1827
 msgid "VMware datastore read statistics, \"url\" - VMware service URL, \"datastore\" - datastore name, \"mode\"- latency/maxlatency - average or maximum"
-msgstr "Статистика чтения c хранилища данных VMware, \"url\" - URL службы VMware, \"datastore\" - имя хранилища данных, \"режим\" - latency/maxlatency - среднее или максимальное"
+msgstr "Статистика чтения c хранилища данных VMware, \"url\" - URL службы VMware, \"datastore\" - имя хранилища данных, \"mode\" - latency/maxlatency - среднее или максимальное"
 
 #: include/classes/data/CItemData.php:1841
 msgid "VMware datastore tags array, \"url\" - VMware service URL, \"uuid\" - VMware datastore global unique identifier. Returns JSON"
@@ -26854,7 +26854,7 @@ msgstr "Массив тегов хранилища данных VMware, \"url\" 
 
 #: include/classes/data/CItemData.php:1848
 msgid "VMware datastore write statistics, \"url\" - VMware service URL, \"datastore\" - datastore name, \"mode\"- latency/maxlatency - average or maximum"
-msgstr "Статистика записи на хранилище данных VMware, \"url\" - URL службы VMware, \"datastore\" - имя хранилища данных, \"режим\" - latency/maxlatency - среднее или максимальное"
+msgstr "Статистика записи на хранилище данных VMware, \"url\" - URL службы VMware, \"datastore\" - имя хранилища данных, \"mode\" - latency/maxlatency - среднее или максимальное"
 
 #: include/classes/data/CItemData.php:1890
 msgid "VMware event log, \"url\" - VMware service URL, \"mode\"- all (default) or skip - skip processing of older data, \"severity\" - filtering is disabled by default or \"error,warning,info,user\" in any combination"
@@ -26862,7 +26862,7 @@ msgstr "Журнал событий VMware log, \"url\" - URL службы VMwar
 
 #: include/classes/data/CItemData.php:1890
 msgid "VMware event log, \"url\" - VMware service URL, \"mode\"- all (default), skip - skip processing of older data"
-msgstr "Журнал событий VMware, \"url\" - URL службы VMware, \"режим\" - all (по умолчанию), skip - пропуск обработки устаревших данных"
+msgstr "Журнал событий VMware, \"url\" - URL службы VMware, \"mode\" - all (по умолчанию), skip - пропуск обработки устаревших данных"
 
 #: include/classes/data/CItemData.php:2072
 msgid "VMware hypervisor BIOS UUID, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
@@ -26894,11 +26894,11 @@ msgstr "Имя центра обработки данных гипервизор
 
 #: include/classes/data/CItemData.php:1974
 msgid "VMware hypervisor datastore read statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\"- latency"
-msgstr "Статистика чтения из хранилища данных гипервизора VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор гипервизора VMware, \"datastore\" - имя хранилища данных, \"режим\" - задержка"
+msgstr "Статистика чтения из хранилища данных гипервизора VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор гипервизора VMware, \"datastore\" - имя хранилища данных, \"mode\" - latency"
 
 #: include/classes/data/CItemData.php:1988
 msgid "VMware hypervisor datastore write statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\"- latency"
-msgstr "Статистика записи в хранилище данных гипервизора VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор гипервизора VMware, \"datastore\" - имя хранилища данных, \"режим\" - задержка"
+msgstr "Статистика записи в хранилище данных гипервизора VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор гипервизора VMware, \"datastore\" - имя хранилища данных, \"mode\" - latency"
 
 #: include/classes/data/CItemData.php:1960
 msgid "VMware hypervisor datastores list, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
@@ -26910,7 +26910,7 @@ msgstr "Состояние обобщенного датчика работос�
 
 #: include/classes/data/CItemData.php:2237
 msgid "VMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
-msgstr "Состояние обслуживания гипервизора VMware, <url> - URL службы VMware, <uuid> - имя хоста гипервизора VMware. Возвращается 0 - не в обслуживании; 1 - в обслуживании"
+msgstr "Состояние обслуживания гипервизора VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор гипервизора VMware. Возвращает 0 - не в обслуживании; 1 - в обслуживании"
 
 #: include/classes/data/CItemData.php:2051
 msgid "VMware hypervisor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
@@ -26922,7 +26922,7 @@ msgstr "Имя VMware гипервизора, \"url\" - URL службы VMware,
 
 #: include/classes/data/CItemData.php:2114
 msgid "VMware hypervisor network input statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"mode\"- bps"
-msgstr "Статистика входящего трафика на сетевом интерфейсе гипервизора VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор гипервизора VMware, \"режим\" - bps"
+msgstr "Статистика входящего трафика на сетевом интерфейсе гипервизора VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор гипервизора VMware, \"mode\" - bps"
 
 #: include/classes/data/CItemData.php:2121
 msgid "VMware hypervisor network interface speed, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, <ifname> - interface name"
@@ -26930,11 +26930,11 @@ msgstr "Скорость сетевого интерфейса гипервиз�
 
 #: include/classes/data/CItemData.php:2128
 msgid "VMware hypervisor network output statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"mode\"- bps"
-msgstr "Статистика исходящего трафика на сетевом интерфейсе гипервизора VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор гипервизора VMware, \"режим\" - bps"
+msgstr "Статистика исходящего трафика на сетевом интерфейсе гипервизора VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор гипервизора VMware, \"mode\" - bps"
 
 #: include/classes/data/CItemData.php:2135
 msgid "VMware hypervisor performance counter, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"path\" - performance counter path, \"instance\" - performance counter instance"
-msgstr "Счетчик производительности гипервизора VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор гипервизора VMware, \"путь\" - путь к счетчику производительности, \"instance\" - экземпляр счетчика производительности"
+msgstr "Счетчик производительности гипервизора VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор гипервизора VMware, \"path\" - путь к счетчику производительности, \"instance\" - экземпляр счетчика производительности"
 
 #: include/classes/data/CItemData.php:2016
 msgid "VMware hypervisor processor frequency, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
@@ -26950,7 +26950,7 @@ msgstr "Использование процессора гипервизором
 
 #: include/classes/data/CItemData.php:2149
 msgid "VMware hypervisor property , \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"prop\" - property path"
-msgstr "Свойство гипервизора VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор гипервизора VMware, \"свойство\" - путь к свойству"
+msgstr "Свойство гипервизора VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор гипервизора VMware, \"prop\" - путь к свойству"
 
 #: include/classes/data/CItemData.php:2058
 msgid "VMware hypervisor sensors value, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
@@ -27018,7 +27018,7 @@ msgstr "Размер сжатой памяти виртуальной машин
 
 #: include/classes/data/CItemData.php:2233
 msgid "VMware virtual machine custom attribute value, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"name\" - custom attribute name"
-msgstr "Значение пользовательского атрибута виртуальной машины VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор виртуальной машины VMware, \"имя\" - имя пользовательского атрибута"
+msgstr "Значение пользовательского атрибута виртуальной машины VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор виртуальной машины VMware, \"name\" - имя пользовательского атрибута"
 
 #: include/classes/data/CItemData.php:2303
 msgid "VMware virtual machine datacenter name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns string"
@@ -27026,11 +27026,11 @@ msgstr "Имя центра обработки данных виртуально
 
 #: include/classes/data/CItemData.php:2548
 msgid "VMware virtual machine disk device read statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance, \"mode\"- bps/ops - bytes/operations per second"
-msgstr "Статистика чтения дискового устройства виртуальной машины VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор виртуальной машины VMware, \"instance\" - экземпляр дискового устройства, \"режим\" - bps/ops - байт/операций в секунду"
+msgstr "Статистика чтения дискового устройства виртуальной машины VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор виртуальной машины VMware, \"instance\" - экземпляр дискового устройства, \"mode\" - bps/ops - байт/операций в секунду"
 
 #: include/classes/data/CItemData.php:2555
 msgid "VMware virtual machine disk device write statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance, \"mode\"- bps/ops - bytes/operations per second"
-msgstr "Статистика записи на дисковое устройство виртуальной машины VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор виртуальной машины VMware, \"instance\" - экземпляр дискового устройства, \"режим\" - bps/ops - байт/операций в секунду"
+msgstr "Статистика записи на дисковое устройство виртуальной машины VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор виртуальной машины VMware, \"instance\" - экземпляр дискового устройства, \"mode\" - bps/ops - байт/операций в секунду"
 
 #: include/classes/data/CItemData.php:2247
 msgid "VMware virtual machine disk requires consolidation, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
@@ -27038,7 +27038,7 @@ msgstr "Необходимость консолидации диска вирт�
 
 #: include/classes/data/CItemData.php:2569
 msgid "VMware virtual machine file system statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"fsname\" - file system name, \"mode\"- total/free/used/pfree/pused"
-msgstr "Статистика файловой системы виртуальной машины VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор виртуальной машины VMware, \"fsname\" - имя файловой системы, \"режим\" - total/free/used/pfree/pused"
+msgstr "Статистика файловой системы виртуальной машины VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор виртуальной машины VMware, \"fsname\" - имя файловой системы, \"mode\" - total/free/used/pfree/pused"
 
 #: include/classes/data/CItemData.php:2380
 msgid "VMware virtual machine guest memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
@@ -27062,15 +27062,15 @@ msgstr "Имя виртуальной машины VMware, \"url\" - URL слу�
 
 #: include/classes/data/CItemData.php:2415
 msgid "VMware virtual machine network interface input statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance, \"mode\"- bps/pps - bytes/packets per second"
-msgstr "Статистика входящего трафика на сетевом интерфейсе виртуальной машины VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор виртуальной машины VMware, \"экземпляр\" - экземпляр сетевого интерфейса, \"режим\" - bps/pps - байт/пакетов в секунду"
+msgstr "Статистика входящего трафика на сетевом интерфейсе виртуальной машины VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор виртуальной машины VMware, \"instance\" - экземпляр сетевого интерфейса, \"mode\" - bps/pps - байт/пакетов в секунду"
 
 #: include/classes/data/CItemData.php:2422
 msgid "VMware virtual machine network interface output statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance, \"mode\"- bps/pps - bytes/packets per second"
-msgstr "Статистика исходящего трафика на сетевом интерфейсе виртуальной машины VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор виртуальной машины VMware, \"экземпляр\" - экземпляр сетевого интерфейса, \"режим\" - bps/pps - байт/пакетов в секунду"
+msgstr "Статистика исходящего трафика на сетевом интерфейсе виртуальной машины VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор виртуальной машины VMware, \"instance\" - экземпляр сетевого интерфейса, \"mode\" - bps/pps - байт/пакетов в секунду"
 
 #: include/classes/data/CItemData.php:2436
 msgid "VMware virtual machine performance counter, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"path\" - performance counter path, \"instance\" - performance counter instance"
-msgstr "Счетчик производительности виртуальной машины VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор виртуальной машины VMware, \"путь\" - путь к счетчику производительности, \"экземпляр\" - экземпляр счетчика производительности"
+msgstr "Счетчик производительности виртуальной машины VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор виртуальной машины VMware, \"path\" - путь к счетчику производительности, \"instance\" - экземпляр счетчика производительности"
 
 #: include/classes/data/CItemData.php:2443
 msgid "VMware virtual machine power state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
@@ -27094,7 +27094,7 @@ msgstr "Использование процессора виртуальной �
 
 #: include/classes/data/CItemData.php:2450
 msgid "VMware virtual machine property, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"prop\" - property path"
-msgstr "Свойство виртуальной машины VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор виртуальной машины VMware, \"свойство\" - путь к свойству"
+msgstr "Свойство виртуальной машины VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор виртуальной машины VMware, \"prop\" - путь к свойству"
 
 #: include/classes/data/CItemData.php:2366
 msgid "VMware virtual machine shared memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
@@ -27118,7 +27118,7 @@ msgstr "Массив тегов виртуальной машины VMware, \"ur
 
 #: include/classes/data/CItemData.php:2527
 msgid "VMware virtual machine tools state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"mode\"- version or status"
-msgstr "Состояние инструментария виртуальной машины VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор виртуальной машины VMware, \"режим\" - version или status"
+msgstr "Состояние инструментария виртуальной машины VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор виртуальной машины VMware, \"mode\" - version или status"
 
 #: include/classes/data/CItemData.php:2394
 msgid "VMware virtual machine total memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
@@ -27821,7 +27821,7 @@ msgstr "С данными"
 
 #: app/views/maintenance.edit.php:137 app/views/maintenance.list.php:122
 msgid "With data collection"
-msgstr "Со cбором данных"
+msgstr "Со сбором данных"
 
 #: app/views/trigger.list.php:151
 msgid "With dependencies"
@@ -28716,7 +28716,7 @@ msgstr "ожидается ID элемента данных / прототипа
 #: include/classes/validators/CApiInputValidator.php:833
 #: include/classes/validators/CApiInputValidator.php:3353
 msgid "an unsigned integer is expected"
-msgstr "ожидается целое положительное число"
+msgstr "ожидается целое число без знака"
 
 #: app/views/administration.authentication.edit.php:112
 msgid "an uppercase and a lowercase Latin letter"
@@ -28862,7 +28862,7 @@ msgstr "бинарное значение"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:405
 msgid "bitand() - Bitwise AND"
-msgstr "band() - Побитовое И"
+msgstr "bitand() - Побитовое И"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:418
 msgid "bitlength() - Returns the length in bits"
@@ -28870,7 +28870,7 @@ msgstr "bitlength() - Возвращает длину в битах"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:425
 msgid "bitlshift() - Bitwise shift left"
-msgstr "bitlshift() - Битовый сдвиг слева"
+msgstr "bitlshift() - Побитовый сдвиг влево"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:438
 msgid "bitnot() - Bitwise NOT"
@@ -28882,7 +28882,7 @@ msgstr "bitor() - Побитовое ИЛИ"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:458
 msgid "bitrshift() - Bitwise shift right"
-msgstr "bitrshift() - Битовый сдвиг справа"
+msgstr "bitrshift() - Побитовый сдвиг вправо"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:471
 msgid "bitxor() - Bitwise exclusive OR"
@@ -29444,7 +29444,7 @@ msgstr "формат файла не поддерживается"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:617
 msgid "find() - Check occurrence of pattern V (which fulfill operator O) for period T (1 - match, 0 - no match)"
-msgstr "find() - Проверка наличия шаблона V (который удволетворяет оператору O) за период T (1 - соответствует, 0 - не соответствует)"
+msgstr "find() - Проверка наличия шаблона V (который удовлетворяет оператору O) за период T (1 - соответствует, 0 - не соответствует)"
 
 #: include/classes/helpers/CMaintenanceHelper.php:44 include/graphs.inc.php:86
 #: widgets/piechart/actions/WidgetView.php:668
@@ -29925,7 +29925,7 @@ msgstr "слева"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:731
 msgid "left() - Returns the leftmost count characters"
-msgstr "left() - Возвращает самые левые символы"
+msgstr "left() - Возвращает заданное количество символов с начала строки"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:744
 msgid "length() - Length of last (most recent) T value in characters"
@@ -30163,7 +30163,7 @@ msgstr "должен содержать по крайней мере один с
 
 #: include/classes/validators/CApiInputValidator.php:3918
 msgid "must have a polling interval not blocked by non-active interval periods"
-msgstr "должен иметь не блокирующий интервал опроса неактивными периодами интервалов"
+msgstr "интервал опроса не должен быть заблокирован неактивными интервалами"
 
 #: include/classes/validators/CApiInputValidator.php:3753
 msgid "must have at least one interval greater than 0"
@@ -30232,19 +30232,19 @@ msgstr "для типа \"%1$s\" нет интерфейса по умолчан
 
 #: include/classes/api/services/CEvent.php:1557
 msgid "no permissions to acknowledge problems"
-msgstr "недостаточно права доступа для подтверждения проблем"
+msgstr "недостаточно прав доступа для подтверждения проблем"
 
 #: include/classes/api/services/CEvent.php:1544
 msgid "no permissions to add problem comments"
-msgstr "недостаточно права доступа для добавления комментария к проблемам"
+msgstr "недостаточно прав доступа для добавления комментария к проблемам"
 
 #: include/classes/api/services/CEvent.php:1550
 msgid "no permissions to change problem severity"
-msgstr "недостаточно права доступа для изменения важности проблем"
+msgstr "недостаточно прав доступа для изменения важности проблем"
 
 #: include/classes/api/services/CEvent.php:1538
 msgid "no permissions to close problems"
-msgstr "недостаточно права доступа для закрытия проблем"
+msgstr "недостаточно прав доступа для закрытия проблем"
 
 #: include/classes/api/services/CEvent.php:1577
 msgid "no permissions to convert cause problems to symptom problems"
@@ -30256,15 +30256,15 @@ msgstr "недостаточно прав доступа для преобраз
 
 #: include/classes/api/services/CConfiguration.php:221
 msgid "no permissions to create and edit maps"
-msgstr "недостаточно права доступа на создание и редактирование карт"
+msgstr "недостаточно прав доступа на создание и редактирование карт"
 
 #: include/classes/api/services/CUser.php:502
 msgid "no permissions to create and edit own media"
-msgstr "недостаточно права доступа на создание и редактирование собственных оповещений"
+msgstr "недостаточно прав доступа на создание и редактирование собственных оповещений"
 
 #: include/classes/api/services/CUser.php:508
 msgid "no permissions to create and edit user media"
-msgstr "недостаточно права доступа на создание и редактирование пользовательских оповещений"
+msgstr "недостаточно прав доступа на создание и редактирование пользовательских оповещений"
 
 #: include/classes/api/services/CEvent.php:1566
 msgid "no permissions to suppress problems"
@@ -30272,7 +30272,7 @@ msgstr "недостаточно прав доступа для подавлен
 
 #: include/classes/api/services/CEvent.php:1558
 msgid "no permissions to unacknowledge problems"
-msgstr "недостаточно права доступа для отмены подтверждения проблем"
+msgstr "недостаточно прав доступа для отмены подтверждения проблем"
 
 #: include/classes/api/services/CEvent.php:1567
 msgid "no permissions to unsuppress problems"
@@ -30297,7 +30297,7 @@ msgstr "нет"
 #: include/classes/api/services/CItemGeneral.php:275
 #: include/classes/api/services/CItemGeneral.php:293
 msgid "nonempty key and value pair expected"
-msgstr "ожидался не пустая пара ключа и значения"
+msgstr "ожидается непустая пара ключа и значения"
 
 #: include/actions.inc.php:31
 msgid "not in"
@@ -30420,7 +30420,7 @@ msgstr "в комбинациях %1$s может существовать то�
 
 #: app/controllers/CControllerPopupItemTestSend.php:202
 msgid "only one time unit is allowed"
-msgstr "разрешено только одно преобразование времени"
+msgstr "разрешена только одна единица времени"
 
 #: include/classes/api/services/CCepRule.php:925
 msgid "operations must be grouped by \"execute_when\" in ascending order"
@@ -30578,7 +30578,7 @@ msgstr "справа"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:953
 msgid "right() - Returns the rightmost count characters"
-msgstr "right() - Возвращает количество самых правых символов"
+msgstr "right() - Возвращает заданное количество символов с конца строки"
 
 #: widgets/navtree/Widget.php:41
 msgid "root"
@@ -30586,7 +30586,7 @@ msgstr "корневой элемент"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:966
 msgid "round() - Rounds a value to decimal places"
-msgstr "round() - Округление значение до десятичных знаков"
+msgstr "round() - Округление значения до заданного числа десятичных знаков"
 
 #: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
 msgid "rows must be unique"
@@ -30790,7 +30790,7 @@ msgstr "шаблон с ID \"%1$s\" был встречен %2$s раз"
 
 #: include/classes/api/services/CTemplateDashboard.php:395
 msgid "template dashboard with the same UUID already exists"
-msgstr "шаблон панели с таким UUID уже существует"
+msgstr "панель шаблона с таким UUID уже существует"
 
 #: include/classes/api/services/CTemplateGroup.php:594
 msgid "template group with the same UUID already exists"
@@ -31218,8 +31218,8 @@ msgstr "преобразование значений с таким UUID уже 
 msgid "value must be %1$s"
 msgid_plural "value must be one of %1$s"
 msgstr[0] "значение должно быть %1$s"
-msgstr[1] "значение должно быть одно из %1$s"
-msgstr[2] "значение должно быть одно из %1$s"
+msgstr[1] "значение должно быть одним из %1$s"
+msgstr[2] "значение должно быть одним из %1$s"
 
 #: app/controllers/CControllerMaintenanceTimePeriodCheck.php:95
 #: include/classes/validators/CActionCondValidator.php:171
@@ -31306,7 +31306,7 @@ msgstr "значение должно быть не меньше чем \"%1$s\"
 #: include/validate.inc.php:612
 #, c-format
 msgid "value must be one of %1$s"
-msgstr "значение должно быть одно из %1$s"
+msgstr "значение должно быть одним из %1$s"
 
 #: include/classes/validators/CApiInputValidator.php:1176
 #, c-format
