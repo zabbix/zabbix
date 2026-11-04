@@ -430,8 +430,8 @@ static int	threads_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, in
 					if (ZBX_THREAD_HANDLE_NULL == threads[j] || priority != threads_flags[j])
 						continue;
 
-					zabbix_log(LOG_LEVEL_WARNING, "process with PID %d has not exited, no shutdown"
-							" progress in %d seconds after shutdown request, killing it",
+					zabbix_log(LOG_LEVEL_WARNING, "process with PID %d made no progress in %d"
+							" seconds after shutdown request, killing it",
 							(int)threads[j], timeout);
 				}
 
