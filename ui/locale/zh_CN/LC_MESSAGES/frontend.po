@@ -138,6 +138,13 @@ msgid "%1$s action"
 msgid_plural "%1$s actions"
 msgstr[0] "%1$s 动作"
 
+#: include/actions.inc.php:1960
+#, c-format
+msgctxt "screen reader"
+msgid "%1$s action have been taken"
+msgid_plural "%1$s actions have been taken"
+msgstr[0] ""
+
 #: jsLoader.php:321
 #, c-format
 msgid "%1$s characters"
@@ -378,6 +385,11 @@ msgstr "(已关联主机自动发现)"
 msgid "(no proxy)"
 msgstr "(无Proxy)"
 
+#: include/classes/helpers/CProxyHelper.php:225
+#, c-format
+msgid "+ %1$d more"
+msgstr ""
+
 #: include/classes/setup/CSetupWizard.php:541
 msgid "0 - use default port"
 msgstr "0 - 使用默认端口"
@@ -390,6 +402,10 @@ msgstr "0 或 1"
 #: app/views/administration.queue.overview.proxy.php:50
 msgid "1 minute"
 msgstr "1分"
+
+#: app/views/ceprule.edit.php:192
+msgid "1) \"Event occurred\""
+msgstr ""
 
 #: app/views/host.wizard.edit.php:861
 msgid "1. Install Java Gateway on the same machine running Zabbix server by following the instructions in"
@@ -405,6 +421,10 @@ msgstr "10秒"
 msgid "12-hour"
 msgstr "12小时制"
 
+#: app/views/ceprule.edit.php:193
+msgid "2) \"Event added to window\""
+msgstr ""
+
 #: app/views/host.wizard.edit.php:867
 msgid "2. Configure your Java application to support remote JMX monitoring. For example:"
 msgstr "2. 配置您的Java应用程序以支持远程JMX监控，例如："
@@ -417,6 +437,10 @@ msgstr "24小时制"
 #: app/views/popup.sla.edit.php:101 include/classes/helpers/CSlaHelper.php:254
 msgid "24x7"
 msgstr "7x24"
+
+#: app/views/ceprule.edit.php:194
+msgid "3) \"Event evicted\""
+msgstr ""
 
 #: app/views/administration.queue.overview.php:49
 #: app/views/administration.queue.overview.proxy.php:49
@@ -558,6 +582,34 @@ msgstr "API token已更新"
 #: include/classes/helpers/CRoleHelper.php:495 include/html.inc.php:848
 msgid "API tokens"
 msgstr "API tokens"
+
+#: app/views/administration.apm.db.edit.php:25
+#: app/views/administration.apm.db.edit.php:124 app/views/proxy.edit.php:458
+#: include/classes/helpers/CMenuHelper.php:96
+#: include/classes/helpers/CMenuHelper.php:367
+#: include/classes/helpers/CRoleHelper.php:386
+msgid "APM"
+msgstr ""
+
+#: include/classes/db/ApmDb.php:130
+msgid "APM DB is not configured."
+msgstr ""
+
+#: app/controllers/CControllerApmDbEdit.php:39
+msgid "APM data source"
+msgstr ""
+
+#: app/controllers/CControllerApmDbUpdate.php:82
+msgid "APM data source updated."
+msgstr ""
+
+#: app/views/usergroup.edit.php:418
+msgid "APM filter"
+msgstr ""
+
+#: include/classes/data/CItemData.php:2838
+msgid "APM statistics for <type>. Returns JSON."
+msgstr ""
 
 #: widgets/gauge/includes/WidgetForm.php:265
 #: widgets/item/includes/WidgetForm.php:209
@@ -811,6 +863,11 @@ msgstr "主动式"
 msgid "Active checks"
 msgstr "主动检查"
 
+#: app/controllers/CControllerPopupGeneric.php:553
+#: app/views/popup.media.edit.php:116
+msgid "Active devices"
+msgstr ""
+
 #: app/views/maintenance.edit.php:144 app/views/maintenance.list.php:96
 msgid "Active since"
 msgstr "启用自从"
@@ -818,6 +875,11 @@ msgstr "启用自从"
 #: app/views/maintenance.edit.php:154 app/views/maintenance.list.php:97
 msgid "Active till"
 msgstr "启用直到"
+
+#: app/controllers/CControllerMaintenanceEdit.php:216
+#, c-format
+msgid "Ad-hoc: %1$s"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:204
 #: app/partials/action.operations.php:134
@@ -1018,6 +1080,15 @@ msgstr "添加子服务"
 msgid "Add child services"
 msgstr "添加子服务"
 
+#: jsLoader.php:283
+msgid "Add columns in the Customize table panel"
+msgstr ""
+
+#: app/views/user.device.init.view.php:93 app/views/user.device.list.php:31
+#: app/views/userprofile.device.list.php:31
+msgid "Add device"
+msgstr ""
+
 #: app/partials/configuration.valuemap.php:57
 msgid "Add from host"
 msgstr "从主机添加"
@@ -1025,6 +1096,10 @@ msgstr "从主机添加"
 #: app/partials/configuration.valuemap.php:54
 msgid "Add from template"
 msgstr "从模板添加"
+
+#: app/controllers/CControllerFavoriteDelete.php:65 include/html.inc.php:178
+msgid "Add graph to Favorite graphs widget"
+msgstr ""
 
 #: include/actions.inc.php:629 include/actions.inc.php:860
 msgid "Add host"
@@ -1048,6 +1123,10 @@ msgstr "添加主机触发器"
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
 msgid "Add item"
 msgstr "添加监控项"
+
+#: app/controllers/CControllerFavoriteDelete.php:64 include/html.inc.php:177
+msgid "Add map to Favorite maps widget"
+msgstr ""
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -1135,6 +1214,10 @@ msgstr "添加小组件"
 #: app/controllers/CControllerPopupImportCompare.php:167
 msgid "Added"
 msgstr "已添加"
+
+#: app/views/user.device.list.php:123 app/views/userprofile.device.list.php:45
+msgid "Added on"
+msgstr ""
 
 #: jsLoader.php:333
 #, c-format
@@ -1292,6 +1375,16 @@ msgstr ""
 msgid "Aggregate functions"
 msgstr "聚合函数"
 
+#: app/views/popup.telemetry.aggregatedcolumn.edit.php:75
+msgid "Aggregated column"
+msgstr ""
+
+#: app/partials/item.edit.item.tab.php:736
+#: app/partials/lldrule.edit.lldrule.tab.php:700
+#: app/partials/lldrule.edit.prototype.tab.php:700
+msgid "Aggregated columns"
+msgstr ""
+
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:283
 msgid "Aggregates each item in the data set."
 msgstr "聚合数据中的监控项。"
@@ -1317,6 +1410,12 @@ msgstr ""
 msgid "Aggregation interval"
 msgstr "聚合时间间隔"
 
+#: app/views/js/apm.metric.list.js.php:200
+#: app/views/js/apm.metric.list.js.php:750
+#: app/views/js/apm.metric.list.js.php:780
+msgid "Aggregation temporality"
+msgstr ""
+
 #: include/actions.inc.php:2048
 msgid "Alert message"
 msgstr "告警消息"
@@ -1333,6 +1432,16 @@ msgstr "运算"
 #: include/hosts.inc.php:114
 msgid "Alias"
 msgstr "别名"
+
+#: app/controllers/CControllerItemCreate.php:447
+#: app/controllers/CControllerItemPrototypeCreate.php:447
+#: app/controllers/CControllerItemPrototypeUpdate.php:435
+#: app/controllers/CControllerItemUpdate.php:447
+#: app/controllers/CControllerLldRuleUpdateGeneral.php:606
+#: app/controllers/CControllerPopupItemTestEdit.php:162
+#: app/controllers/CControllerPopupTelemetryAggregatedColumnEdit.php:77
+msgid "Alias is not unique."
+msgstr ""
 
 #: include/views/monitoring.sysmap.constructor.php:75
 msgid "Align map elements"
@@ -1382,6 +1491,15 @@ msgstr "全部可用"
 #: app/views/monitoring.dashboard.view.php:189
 msgid "All dashboards"
 msgstr "仪表盘"
+
+#: app/partials/ceprule.modal.operation.php:335
+#: include/classes/helpers/CCepRuleHelper.php:483
+msgid "All events"
+msgstr ""
+
+#: app/partials/ceprule.modal.operation.php:326
+msgid "All events - applies the operation to every event in the window. You can filter which events to include."
+msgstr ""
 
 #: app/views/monitoring.charts.view.php:82
 msgid "All graphs"
@@ -1613,9 +1731,18 @@ msgstr "导入文件中不存在的任何现有模板实体将被删除。点击
 msgid "Apache, AWS, MySQL, etc."
 msgstr "Apache, AWS, MySQL等"
 
+#: include/classes/setup/CSetupWizard.php:745
+#: include/classes/setup/CSetupWizard.php:1081
+msgid "AppRole"
+msgstr ""
+
 #: include/classes/core/CJsonRpc.php:225
 msgid "Application error."
 msgstr "应用错误."
+
+#: app/partials/ceprule.modal.operation.php:321 app/views/ceprule.edit.php:238
+msgid "Applies to"
+msgstr ""
 
 #: app/partials/timeselector.filter.php:104
 #: app/views/dashboard.page.properties.edit.php:64
@@ -1774,6 +1901,21 @@ msgstr "至少需要执行一项操作。"
 msgid "At least one active user must exist with role \"%1$s\"."
 msgstr "角色\"%1$s\"至少存在一个启用的用户"
 
+#: app/controllers/CControllerItemCreate.php:445
+#: app/controllers/CControllerItemCreate.php:446
+#: app/controllers/CControllerItemPrototypeCreate.php:445
+#: app/controllers/CControllerItemPrototypeCreate.php:446
+#: app/controllers/CControllerItemPrototypeUpdate.php:433
+#: app/controllers/CControllerItemPrototypeUpdate.php:434
+#: app/controllers/CControllerItemUpdate.php:445
+#: app/controllers/CControllerItemUpdate.php:446
+#: app/controllers/CControllerLldRuleUpdateGeneral.php:604
+#: app/controllers/CControllerLldRuleUpdateGeneral.php:605
+#: app/controllers/CControllerPopupItemTestEdit.php:160
+#: app/controllers/CControllerPopupItemTestEdit.php:161
+msgid "At least one aggregated column must be specified."
+msgstr ""
+
 #: app/controllers/CControllerMaintenanceTimePeriodCheck.php:40
 msgid "At least one day must be selected."
 msgstr "至少需要选择一天。"
@@ -1804,6 +1946,14 @@ msgstr "至少需要添加一个表达式。"
 msgid "At least one host group or host must be selected."
 msgstr "至少选择一个主机组或主机。"
 
+#: app/controllers/CControllerMaintenanceCreate.php:87
+#: app/controllers/CControllerMaintenanceUpdate.php:88
+#: app/views/maintenance.edit.php:301
+#: include/classes/api/services/CMaintenance.php:688
+#: include/classes/api/services/CMaintenance.php:706
+msgid "At least one host group, host or trigger must be selected."
+msgstr ""
+
 #: app/controllers/CControllerGraphPrototypeCreate.php:116
 #: app/controllers/CControllerGraphPrototypeUpdate.php:118
 msgid "At least one item must be a prototype"
@@ -1830,6 +1980,11 @@ msgstr "应该至少支持MySQL，PostgreSQL或Oracle之一。"
 #: app/views/correlation.edit.php:264
 msgid "At least one operation must be selected."
 msgstr "至少需要选择一项操作。"
+
+#: app/controllers/CControllerCepRuleCreate.php:184
+#: app/controllers/CControllerCepRuleUpdate.php:185
+msgid "At least one operation must execute when pattern matched."
+msgstr ""
 
 #: app/views/popup.action.edit.php:179 app/views/popup.action.edit.php:252
 msgid "At least one operation must exist."
@@ -1895,6 +2050,29 @@ msgstr "尝试次数"
 #: app/views/popup.mediatypemapping.edit.php:59
 msgid "Attribute"
 msgstr "属性"
+
+#: app/views/popup.telemetry.condition.edit.php:54
+msgid "Attribute key"
+msgstr ""
+
+#: app/controllers/CControllerProxyCreate.php:131
+#: app/controllers/CControllerProxyUpdate.php:130
+msgid "Attribute key and category are not unique."
+msgstr ""
+
+#: app/controllers/CControllerUsergroupCreate.php:96
+#: app/controllers/CControllerUsergroupUpdate.php:97
+msgid "Attribute key, value and category are not unique."
+msgstr ""
+
+#: app/views/popup.telemetry.condition.edit.php:67
+msgid "Attribute value"
+msgstr ""
+
+#: app/views/apm.metric.list.php:83 app/views/js/apm.metric.list.js.php:210
+#: app/views/js/apm.metric.list.js.php:851
+msgid "Attributes"
+msgstr ""
 
 #: app/views/administration.geomaps.edit.php:86
 msgid "Attribution text"
@@ -1975,6 +2153,10 @@ msgstr "认证口令"
 #: app/views/popup.itemtestedit.view.php:204
 msgid "Authentication protocol"
 msgstr "认证协议"
+
+#: include/classes/vaults/CVaultHashiCorp.php:79
+msgid "Authentication role ID and secret ID must be empty if authentication token is provided."
+msgstr ""
 
 #: app/controllers/CControllerAuthenticationUpdate.php:302
 msgid "Authentication settings updated"
@@ -2179,6 +2361,11 @@ msgstr "基色"
 msgid "Basic"
 msgstr "基础的"
 
+#: app/views/js/apm.log.list.js.php:594 app/views/js/apm.metric.list.js.php:803
+#: app/views/js/apm.trace.list.js.php:583
+msgid "Basic information"
+msgstr ""
+
 #: app/views/connector.edit.php:132
 msgid "Bearer"
 msgstr "持票人"
@@ -2332,6 +2519,14 @@ msgstr "倒数N"
 msgid "Brackets to specify IPv6 addresses"
 msgstr "括号用于指定 IPv6 地址"
 
+#: app/views/mediatype.edit.php:464
+msgid "Bridge Adapter connection details can be found in Zabbix configuration file."
+msgstr ""
+
+#: app/views/mediatype.edit.php:463
+msgid "Bridge adapter connection"
+msgstr ""
+
 #: jsLoader.php:266
 msgid "Bring forward"
 msgstr "向上一层"
@@ -2349,6 +2544,11 @@ msgstr "浏览器"
 msgid "Bulgarian (bg_BG)"
 msgstr "保加利亚语 (bg_BG)"
 
+#: app/controllers/CControllerProxyEdit.php:156
+#, c-format
+msgid "By adding the proxy to a proxy group, it will be removed from proxy allow/deny lists of the following user groups: %1$s."
+msgstr ""
+
 #: report2.php:191
 msgid "By host"
 msgstr "按主机"
@@ -2361,6 +2561,15 @@ msgstr "我"
 #: report2.php:192
 msgid "By trigger template"
 msgstr "按触发器模板"
+
+#: include/classes/api/services/CCepRule.php:957
+#, c-format
+msgid "CEP rule \"%1$s\" already exists."
+msgstr ""
+
+#: app/controllers/CControllerPopup.php:43
+msgid "CEP rule edit"
+msgstr ""
 
 #: app/views/administration.proxy.list.php:161
 #: app/views/administration.proxy.list.php:177
@@ -2514,10 +2723,32 @@ msgstr "无法添加一个非数值型的监控项目 \"%1$s\"到数据图模板
 msgid "Cannot add action"
 msgstr "无法添加操作"
 
+#: app/controllers/CControllerCepRuleCreate.php:207
+#: app/controllers/CControllerCepRuleCreate.php:234
+msgid "Cannot add complex event processing rule"
+msgstr ""
+
 #: jsLoader.php:133
 #, c-format
 msgid "Cannot add dashboard page: maximum number of %1$d dashboard pages has been added."
 msgstr "无法添加仪表盘页面：已添加最多 %1$d 个仪表盘页面。"
+
+#: app/controllers/CControllerUserDeviceInit.php:39
+#: app/controllers/CControllerUserDeviceInit.php:88
+msgid "Cannot add device"
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:679
+msgid "Cannot add device because the device limit has been reached. Please remove redundant devices, or contact your system administrator."
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:677
+msgid "Cannot add device. Please contact your system administrator."
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:678
+msgid "Cannot add device. Please try again later. If error persists, please contact your system administrator."
+msgstr ""
 
 #: host_discovery_prototypes.php:518
 msgid "Cannot add discovery prototype"
@@ -2979,6 +3210,11 @@ msgid "Cannot delete event correlation"
 msgid_plural "Cannot delete event correlations"
 msgstr[0] "无法删除事件关联"
 
+#: app/controllers/CControllerCepRuleDelete.php:70
+msgid "Cannot delete event processing rule"
+msgid_plural "Cannot delete event processing rules"
+msgstr[0] ""
+
 #: graphs.php:281 graphs.php:338
 msgid "Cannot delete graph"
 msgid_plural "Cannot delete graphs"
@@ -2999,6 +3235,12 @@ msgstr[0] "无法删除主机"
 msgid "Cannot delete host \"%1$s\": %2$s."
 msgstr "无法删除主机“%1$s”：%2$s。"
 
+#: include/classes/api/services/CHost.php:1352
+#, c-format
+msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host group, host or trigger."
+msgid_plural "Cannot delete hosts %1$s because maintenance \"%2$s\" must contain at least one host group, host or trigger."
+msgstr[0] ""
+
 #: include/classes/api/services/CHost.php:1461
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
@@ -3014,6 +3256,12 @@ msgstr[0] "无法删除主机组"
 #, c-format
 msgid "Cannot delete host group \"%1$s\": %2$s."
 msgstr "无法删除主机组“%1$s”：%2$s。"
+
+#: include/classes/api/services/CHostGroup.php:796
+#, c-format
+msgid "Cannot delete host group %1$s because maintenance \"%2$s\" must contain at least one host group, host or trigger."
+msgid_plural "Cannot delete host groups %1$s because maintenance \"%2$s\" must contain at least one host group, host or trigger."
+msgstr[0] ""
 
 #: include/classes/api/services/CHostGroup.php:858
 #, c-format
@@ -3185,6 +3433,12 @@ msgstr[0] "无法删除触发器"
 msgid "Cannot delete trigger \"%1$s\": %2$s."
 msgstr "无法删除触发器“%1$s”：%2$s。"
 
+#: include/classes/api/managers/CTriggerManager.php:128
+#, c-format
+msgid "Cannot delete trigger %1$s because maintenance \"%2$s\" must contain at least one host group, host or trigger."
+msgid_plural "Cannot delete triggers %1$s because maintenance \"%2$s\" must contain at least one host group, host or trigger."
+msgstr[0] ""
+
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
 msgid "Cannot delete trigger prototype"
 msgid_plural "Cannot delete trigger prototypes"
@@ -3265,6 +3519,11 @@ msgid "Cannot disable event correlation"
 msgid_plural "Cannot disable event correlations"
 msgstr[0] "无法禁用事件关联"
 
+#: app/controllers/CControllerCepRuleDisable.php:86
+msgid "Cannot disable event processing rule"
+msgid_plural "Cannot disable event processing rules"
+msgstr[0] ""
+
 #: app/controllers/CControllerHostGroupDisable.php:91
 #: app/controllers/CControllerPopupMassupdateHost.php:498
 #: app/controllers/CControllerProxyHostDisable.php:93
@@ -3332,6 +3591,11 @@ msgid "Cannot enable connector"
 msgid_plural "Cannot enable connectors"
 msgstr[0] "无法启用连接器"
 
+#: include/classes/api/services/CRole.php:851
+#, c-format
+msgid "Cannot enable device action \"%2$s\" for user role \"%1$s\" because device access is disabled."
+msgstr ""
+
 #: host_discovery_prototypes.php:585
 msgid "Cannot enable discovery prototype"
 msgid_plural "Cannot enable discovery prototypes"
@@ -3346,6 +3610,11 @@ msgstr[0] "无法启用自动发现规则"
 msgid "Cannot enable event correlation"
 msgid_plural "Cannot enable event correlations"
 msgstr[0] "无法启用事件关联"
+
+#: app/controllers/CControllerCepRuleEnable.php:86
+msgid "Cannot enable event processing rule"
+msgid_plural "Cannot enable event processing rules"
+msgstr[0] ""
 
 #: app/controllers/CControllerHostGroupEnable.php:91
 #: app/controllers/CControllerPopupMassupdateHost.php:497
@@ -4167,6 +4436,10 @@ msgstr "无法从 Zabbix server \\%1$s\" 读取响应。\""
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
 msgstr "无法获取响应, 检查与Zabbix服务器 \"%1$s\" 的连接."
 
+#: app/controllers/CControllerUserDeviceDelete.php:120
+msgid "Cannot remove device"
+msgstr ""
+
 #: app/controllers/CControllerPopupMassupdateHost.php:363
 #, c-format
 msgid "Cannot remove the tag with name \"%1$s\" and value \"%2$s\", defined in a host prototype, from host \"%3$s\"."
@@ -4180,6 +4453,10 @@ msgstr "无法重新命名访客用户."
 msgid "Cannot reset TOTP secret"
 msgid_plural "Cannot reset TOTP secrets"
 msgstr[0] "无法重置 TOTP 密钥"
+
+#: app/controllers/CControllerCepRuleResetTimeWindows.php:62
+msgid "Cannot reset rule time windows"
+msgstr ""
 
 #: include/classes/api/services/CDRule.php:273
 #: include/classes/api/services/CDRule.php:433
@@ -4286,6 +4563,10 @@ msgstr "此设备不支持声音通知。"
 msgid "Cannot switch host for interface."
 msgstr "无法切换接口主机."
 
+#: app/controllers/CControllerApmDbTest.php:36
+msgid "Cannot test configuration"
+msgstr ""
+
 #: app/controllers/CControllerMediatypeTestEdit.php:75
 #: app/controllers/CControllerMediatypeTestSend.php:84
 msgid "Cannot test disabled media type."
@@ -4295,6 +4576,15 @@ msgstr "无法测试禁用的消息媒介类型。"
 msgid "Cannot unblock user"
 msgid_plural "Cannot unblock users"
 msgstr[0] "无法解锁用户"
+
+#: include/classes/server/CZabbixServer.php:687
+#: include/classes/server/CZabbixServer.php:696
+msgid "Cannot unlink device. Please contact your system administrator."
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:688
+msgid "Cannot unlink device. Please try again later. If error persists, please contact your system administrator."
+msgstr ""
 
 #: include/classes/api/services/CHost.php:1143
 msgid "Cannot unlink template"
@@ -4414,6 +4704,11 @@ msgstr "无法更新动作"
 msgid "Cannot update authentication"
 msgstr "无法更新验证信息"
 
+#: app/controllers/CControllerCepRuleUpdate.php:208
+#: app/controllers/CControllerCepRuleUpdate.php:236
+msgid "Cannot update complex event processing rule"
+msgstr ""
+
 #: app/controllers/CControllerAuditSettingsUpdate.php:45
 #: app/controllers/CControllerAuditSettingsUpdate.php:82
 #: app/controllers/CControllerAutoregUpdate.php:41
@@ -4437,6 +4732,10 @@ msgstr "无法更新配置"
 #: app/controllers/CControllerConnectorUpdate.php:157
 msgid "Cannot update connector"
 msgstr "无法更新连接器"
+
+#: app/controllers/CControllerDiscoveryCheckCheck.php:227
+msgid "Cannot update discovery check"
+msgstr ""
 
 #: host_discovery_prototypes.php:526 host_discovery_prototypes.php:550
 msgid "Cannot update discovery prototype"
@@ -4505,6 +4804,46 @@ msgstr "无法更新图标映射"
 #: app/controllers/CControllerImageUpdate.php:156
 msgid "Cannot update image"
 msgstr "无法更新图片"
+
+#: include/classes/api/services/CItemGeneral.php:934
+#, c-format
+msgid "Cannot update inherited discovery rule prototype with key \"%1$s\" on host \"%2$s\" because granularity cannot be greater than lookback limit."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:933
+#, c-format
+msgid "Cannot update inherited discovery rule prototype with key \"%1$s\" on template \"%2$s\" because granularity cannot be greater than lookback limit."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:944
+#, c-format
+msgid "Cannot update inherited discovery rule with key \"%1$s\" on host \"%2$s\" because granularity cannot be greater than lookback limit."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:943
+#, c-format
+msgid "Cannot update inherited discovery rule with key \"%1$s\" on template \"%2$s\" because granularity cannot be greater than lookback limit."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:929
+#, c-format
+msgid "Cannot update inherited item prototype with key \"%1$s\" on host \"%2$s\" because granularity cannot be greater than lookback limit."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:928
+#, c-format
+msgid "Cannot update inherited item prototype with key \"%1$s\" on template \"%2$s\" because granularity cannot be greater than lookback limit."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:939
+#, c-format
+msgid "Cannot update inherited item with key \"%1$s\" on host \"%2$s\" because granularity cannot be greater than lookback limit."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:938
+#, c-format
+msgid "Cannot update inherited item with key \"%1$s\" on template \"%2$s\" because granularity cannot be greater than lookback limit."
+msgstr ""
 
 #: include/classes/api/services/CHostInterface.php:373
 #, c-format
@@ -4678,6 +5017,10 @@ msgstr "无法更新web场景步骤"
 msgid "Cannot use both %1$s and %2$s at the same time."
 msgstr ""
 
+#: app/partials/ceprule.window.php:62
+msgid "Capacity"
+msgstr ""
+
 #: app/views/administration.regex.edit.php:55
 msgid "Case sensitive"
 msgstr "区分大小写"
@@ -4700,10 +5043,25 @@ msgstr "采集所有符合规则的 SNMP 信息，如果没有规则则会采集
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr "采集所有SNMP traps规则以外的snmptrap[]"
 
+#: app/partials/apm.attributes.php:35 app/partials/item.edit.item.tab.php:653
+#: app/partials/lldrule.edit.lldrule.tab.php:617
+#: app/partials/lldrule.edit.prototype.tab.php:617 include/forms.inc.php:712
+msgid "Category"
+msgstr ""
+
 #: include/actions.inc.php:1991 include/classes/screens/CScreenProblem.php:1178
 #: include/events.inc.php:182
 msgid "Cause"
 msgstr "起因"
+
+#: app/partials/ceprule.window.php:41
+msgid "Cause and symptom grouping - first event from the fixed time window will be treated as cause, others - as symptoms."
+msgstr ""
+
+#: app/partials/ceprule.window.php:50
+#: include/classes/helpers/CCepRuleHelper.php:539
+msgid "Cause and symptoms grouping"
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:35
 #: widgets/item/includes/WidgetForm.php:146
@@ -4772,6 +5130,10 @@ msgstr "更改客户端密钥"
 #: widgets/item/views/widget.edit.php:200
 msgid "Change indicator"
 msgstr "变化指示器"
+
+#: include/classes/html/CMacroValue.php:239
+msgid "Change macro value type"
+msgstr ""
 
 #: app/views/administration.mediatype.edit.php:157
 #: app/views/administration.user.edit.php:209 app/views/mediatype.edit.php:214
@@ -5075,6 +5437,14 @@ msgstr "时钟类型"
 msgid "Clone"
 msgstr "克隆"
 
+#: include/classes/helpers/CCepRuleHelper.php:466
+msgid "Clone first"
+msgstr ""
+
+#: include/classes/helpers/CCepRuleHelper.php:467
+msgid "Clone last"
+msgstr ""
+
 #: app/views/configuration.host.edit.php:61
 #: app/views/js/popup.host.edit.js.php:44 host_prototypes.php:203
 msgid "Cloned host parameter values have been modified."
@@ -5098,15 +5468,27 @@ msgstr "复制的模板参数值已被修改。"
 msgid "Close"
 msgstr "关闭"
 
+#: include/classes/helpers/CCepRuleHelper.php:475
+msgid "Close (window)"
+msgstr ""
+
 #: app/partials/trigger.edit.trigger.tab.php:151
 #: app/partials/trigger.edit.trigger.tab.php:229
 msgid "Close expression constructor"
 msgstr "关闭表达式构造器"
 
+#: jsLoader.php:520
+msgid "Close modal window"
+msgstr ""
+
 #: app/views/correlation.edit.php:254
 #: include/classes/helpers/CCorrelationHelper.php:71
 msgid "Close new event"
 msgstr "关闭新的事件"
+
+#: include/func.inc.php:1617 jsLoader.php:394
+msgid "Close notification"
+msgstr ""
 
 #: app/views/correlation.edit.php:247
 #: include/classes/helpers/CCorrelationHelper.php:70
@@ -5137,6 +5519,12 @@ msgstr "校验码长度"
 #: jsLoader.php:304 widgets/problems/Widget.php:35
 msgid "Collapse"
 msgstr "折叠"
+
+#: include/classes/html/CSectionCollapsible.php:54
+#: include/classes/html/CSectionCollapsible.php:60 jsLoader.php:532
+#: jsLoader.php:570
+msgid "Collapse section"
+msgstr ""
 
 #: app/partials/layout.htmlpage.aside.php:40
 msgid "Collapse sidebar"
@@ -5186,8 +5574,21 @@ msgstr "颜色插值"
 msgid "Colors"
 msgstr "颜色"
 
+#: app/views/popup.telemetry.aggregatedcolumn.edit.php:54
+msgid "Column"
+msgstr ""
+
 #: widgets/topitems/views/column.edit.php:293
 msgid "Column aggregation function"
+msgstr ""
+
+#: app/controllers/CControllerItemCreate.php:434
+#: app/controllers/CControllerItemPrototypeCreate.php:434
+#: app/controllers/CControllerItemPrototypeUpdate.php:422
+#: app/controllers/CControllerItemUpdate.php:434
+#: app/controllers/CControllerLldRuleUpdateGeneral.php:593
+#: app/controllers/CControllerPopupItemTestEdit.php:149
+msgid "Column and key name combination is not unique."
 msgstr ""
 
 #: jsLoader.php:304
@@ -5255,6 +5656,32 @@ msgstr "紧凑视图"
 msgid "Complete authentication to get tokens."
 msgstr "完成认证以获取令牌"
 
+#: app/controllers/CControllerCepRuleEdit.php:90 app/views/ceprule.edit.php:284
+#: app/views/ceprule.list.php:65 app/views/ceprule.list.php:165
+msgid "Complex event processing"
+msgstr ""
+
+#: app/controllers/CControllerAuditLogList.php:219
+msgid "Complex event processing rule"
+msgstr ""
+
+#: app/controllers/CControllerCepRuleCreate.php:222
+msgid "Complex event processing rule added"
+msgstr ""
+
+#: app/controllers/CControllerCepRuleUpdate.php:224
+msgid "Complex event processing rule updated"
+msgstr ""
+
+#: include/events.inc.php:146
+msgid "Complex event processing rule."
+msgstr ""
+
+#: include/actions.inc.php:2277 include/html.inc.php:1158
+#, c-format
+msgid "Complex event processing: %1$s"
+msgstr ""
+
 #: include/classes/core/CComponentRegistry.php:53
 #, c-format
 msgid "Component %1$s already registered."
@@ -5286,6 +5713,11 @@ msgstr "并发会话"
 msgid "Condition"
 msgstr "条件"
 
+#: app/views/js/ceprule.edit.js.php:512
+#: app/views/js/ceprule.operation.edit.js.php:598
+msgid "Condition details"
+msgstr ""
+
 #: app/controllers/CControllerServiceCreate.php:45
 #: app/controllers/CControllerServiceUpdate.php:46
 msgid "Condition, limit and status combination is not unique."
@@ -5307,6 +5739,10 @@ msgstr "配置"
 #: include/classes/data/CItemData.php:2764
 msgid "Configuration cache statistics. Cache - buffer (modes: pfree, total, used, free)."
 msgstr "配置缓存统计。缓存 - 缓冲区（模式：pfree、total、used、free）。"
+
+#: include/classes/db/ApmDb.php:45
+msgid "Configuration cannot be retrieved if a local database is defined for APM."
+msgstr ""
 
 #: app/views/host.wizard.edit.php:1024
 msgid "Configuration complete"
@@ -5346,6 +5782,10 @@ msgstr "发现原型配置"
 #: app/controllers/CControllerDiscoveryList.php:143 host_discovery.php:27
 msgid "Configuration of discovery rules"
 msgstr "配置自动发现规则"
+
+#: app/controllers/CControllerCepRuleList.php:102
+msgid "Configuration of event processing rules"
+msgstr ""
 
 #: graphs.php:27
 msgid "Configuration of graph prototypes"
@@ -5518,6 +5958,10 @@ msgstr "配置加密"
 msgid "Configure host"
 msgstr "配置主机"
 
+#: app/views/mediatype.edit.php:468
+msgid "Configured"
+msgstr ""
+
 #: app/controllers/CControllerOauthAuthorize.php:166
 #: app/views/mediatype.edit.php:155
 #, c-format
@@ -5560,6 +6004,11 @@ msgstr "连接"
 #: app/views/mediatype.edit.php:105
 msgid "Connection security"
 msgstr "安全连接"
+
+#: app/views/js/administration.apm.db.edit.js.php:337
+#, c-format
+msgid "Connection timeout of %1$s seconds exceeded when connecting to APM data source."
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:521
 #, c-format
@@ -5698,6 +6147,14 @@ msgstr "联系"
 msgid "Contains"
 msgstr "包含"
 
+#: include/classes/helpers/CRegexHelper.php:22
+msgid "Contains any substring from list"
+msgstr ""
+
+#: include/classes/helpers/CRegexHelper.php:21
+msgid "Contains string"
+msgstr ""
+
 #: app/views/action.list.php:75 app/views/administration.iconmap.list.php:36
 #: app/views/administration.image.list.php:69
 #: app/views/administration.proxy.list.php:241
@@ -5823,6 +6280,10 @@ msgstr "复制到剪贴板"
 msgid "Correlation edit"
 msgstr "关联编辑"
 
+#: app/controllers/CControllerApmDbTest.php:78
+msgid "Could not connect to APM data source."
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:52
 #: app/controllers/CControllerPopupTriggerExpr.php:693
 #: app/controllers/CControllerPopupTriggerExpr.php:734
@@ -5905,6 +6366,10 @@ msgstr "创建和编辑用户媒体"
 #: app/views/administration.image.list.php:60
 msgid "Create background"
 msgstr "创建背景"
+
+#: app/views/ceprule.list.php:29
+msgid "Create complex event processing"
+msgstr ""
 
 #: app/views/connector.list.php:140
 msgid "Create connector"
@@ -6081,6 +6546,14 @@ msgstr "创建Proxy"
 msgid "Create proxy group"
 msgstr "创建Proxy组"
 
+#: app/views/administration.proxy.list.php:273
+msgid "Create proxy in Cloud"
+msgstr ""
+
+#: app/views/administration.regex.list.php:35
+msgid "Create regular expression"
+msgstr ""
+
 #: app/views/reports.scheduledreport.list.php:37
 msgid "Create report"
 msgstr "创建报表"
@@ -6183,6 +6656,10 @@ msgstr "由用户创建"
 msgid "Critical"
 msgstr "严重"
 
+#: app/views/js/apm.metric.list.js.php:79
+msgid "Cumulative"
+msgstr ""
+
 #: app/views/administration.proxy.list.php:66
 msgid "Current"
 msgstr "当前"
@@ -6194,6 +6671,15 @@ msgstr "当前 SP 证书将被删除。"
 #: app/views/js/administration.authentication.edit.js.php:425
 msgid "Current SP private key will be deleted."
 msgstr "当前 SP 私钥将被删除。"
+
+#: app/partials/ceprule.modal.operation.php:333
+#: include/classes/helpers/CCepRuleHelper.php:481
+msgid "Current event"
+msgstr ""
+
+#: app/partials/ceprule.modal.operation.php:324
+msgid "Current event - applies the operation to the current event."
+msgstr ""
 
 #: app/views/popup.operation.edit.php:256
 msgid "Current host"
@@ -6288,6 +6774,14 @@ msgstr "自定义大小"
 msgid "Custom templates are not supported."
 msgstr "不支持自定义模板。"
 
+#: app/views/js/configuration.host.list.js.php:299
+#: app/views/js/monitoring.host.view.js.php:181
+#: app/views/js/monitoring.latest.view.js.php:229
+#: app/views/js/monitoring.problem.view.js.php:150
+#: app/views/js/template.list.js.php:158 jsLoader.php:316
+msgid "Custom text"
+msgstr ""
+
 #: jsLoader.php:270
 msgid "Customize table"
 msgstr ""
@@ -6357,6 +6851,10 @@ msgstr "暗色"
 msgid "Dark (classic)"
 msgstr "深色（经典）"
 
+#: include/classes/core/ZBase.php:392
+msgid "Dark blue"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:227
 #: app/controllers/CControllerDashboardPrint.php:71
 #: app/controllers/CControllerDashboardView.php:93
@@ -6378,6 +6876,10 @@ msgstr "仪表盘 \"%1$s\" 已经存在。"
 #, c-format
 msgid "Dashboard \"%1$s\" is used in report \"%2$s\"."
 msgstr "报表 \"%2$s\"中已使用仪表盘 \"%1$s\"。"
+
+#: app/views/monitoring.dashboard.view.php:101
+msgid "Dashboard actions"
+msgstr ""
 
 #: app/controllers/CControllerDashboardUpdate.php:218
 #: app/controllers/CControllerTemplateDashboardUpdate.php:190
@@ -6461,11 +6963,21 @@ msgstr "数据"
 msgid "Data collection"
 msgstr "数据采集"
 
+#: app/views/proxy.edit.php:250
+msgid "Data collection enabled"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:2241
 #: include/classes/graphdraw/CPieGraphDraw.php:793
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
 msgstr "数据来自 %1$s. 产生于 %2$s 秒."
+
+#: app/partials/item.edit.item.tab.php:938
+#: app/partials/lldrule.edit.lldrule.tab.php:922
+#: app/partials/lldrule.edit.prototype.tab.php:924
+msgid "Data gaps are possible."
+msgstr ""
 
 #: app/views/host.wizard.edit.php:168
 msgid "Data is collected by Zabbix agent, a lightweight software `component installed on your monitoring target."
@@ -6508,6 +7020,11 @@ msgstr "数据集聚合"
 msgid "Data set label"
 msgstr "数据集标签"
 
+#: include/classes/helpers/CMenuHelper.php:365
+#: include/classes/helpers/CRoleHelper.php:561
+msgid "Data source"
+msgstr ""
+
 #: app/views/administration.audit.settings.edit.php:52
 #: app/views/administration.housekeeping.edit.php:102
 #: app/views/administration.housekeeping.edit.php:115
@@ -6516,9 +7033,23 @@ msgstr "数据集标签"
 msgid "Data storage period"
 msgstr "数据存储期"
 
+#: include/classes/helpers/CSystemInfoHelper.php:310
+msgid "Data stores"
+msgstr ""
+
 #: app/views/connector.edit.php:54 app/views/connector.list.php:74
 msgid "Data type"
 msgstr "数据类型"
+
+#: app/partials/item.edit.item.tab.php:953
+#: app/partials/lldrule.edit.lldrule.tab.php:937
+#: app/partials/lldrule.edit.prototype.tab.php:939
+msgid "Data will likely overlap."
+msgstr ""
+
+#: app/views/administration.apm.db.edit.php:91
+msgid "Database"
+msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:660
 #: include/classes/setup/CSetupWizard.php:840
@@ -6707,6 +7238,14 @@ msgstr "小数位"
 msgid "Decrease by"
 msgstr "减少"
 
+#: include/classes/helpers/CCepRuleHelper.php:463
+msgid "Decrease severity"
+msgstr ""
+
+#: include/classes/helpers/CCepRuleHelper.php:472
+msgid "Decrease value"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:707
 #: app/controllers/CControllerPopupTriggerExpr.php:1226
 #: app/partials/action.operations.php:73
@@ -6742,6 +7281,10 @@ msgstr "默认访问新的界面元素"
 msgid "Default access to new actions"
 msgstr "默认访问新的动作"
 
+#: app/views/administration.userrole.edit.php:429
+msgid "Default access to new device actions"
+msgstr ""
+
 #: app/views/administration.userrole.edit.php:285
 msgid "Default access to new modules"
 msgstr "默认访问新的模块"
@@ -6749,6 +7292,10 @@ msgstr "默认访问新的模块"
 #: app/views/administration.authentication.edit.php:42
 msgid "Default authentication"
 msgstr "默认认证方式"
+
+#: include/classes/html/CTabFilter.php:169
+msgid "Default filter tab"
+msgstr ""
 
 #: app/views/administration.miscconfig.edit.php:58
 msgid "Default host inventory mode"
@@ -6771,6 +7318,11 @@ msgstr "默认语言"
 msgid "Default login form"
 msgstr "默认登录表格"
 
+#: app/views/administration.user.edit.php:306
+#: app/views/userprofile.edit.php:260
+msgid "Default maintenance period"
+msgstr ""
+
 #: app/views/popup.operation.edit.php:171
 msgid "Default media type"
 msgstr "默认媒介类型"
@@ -6782,6 +7334,10 @@ msgstr "默认操作步骤持续时间"
 #: app/views/dashboard.properties.edit.php:78
 msgid "Default page display period"
 msgstr "默认页面显示周期"
+
+#: app/views/dashboard.properties.edit.php:75
+msgid "Default slideshow interval"
+msgstr ""
 
 #: app/views/administration.gui.edit.php:85
 #: include/classes/setup/CSetupWizard.php:723
@@ -6888,6 +7444,10 @@ msgstr "删除并清除模板? (警告: 所有链接的主机将被清除!)"
 msgid "Delete column"
 msgstr ""
 
+#: app/views/js/ceprule.edit.js.php:237
+msgid "Delete complex event processing rule?"
+msgstr ""
+
 #: app/views/popup.action.edit.php:292
 msgid "Delete current action?"
 msgstr "删除当前的动作?"
@@ -6990,6 +7550,14 @@ msgstr "删除选定的动作?"
 #: app/views/js/action.list.js.php:112
 msgid "Delete selected actions?"
 msgstr "删除选定的动作?"
+
+#: app/views/js/ceprule.list.js.php:105
+msgid "Delete selected complex event processing rule?"
+msgstr ""
+
+#: app/views/js/ceprule.list.js.php:104
+msgid "Delete selected complex event processing rules?"
+msgstr ""
 
 #: app/views/connector.edit.php:318 app/views/js/connector.list.js.php:118
 msgid "Delete selected connector?"
@@ -7302,6 +7870,10 @@ msgstr "已删除触发器"
 msgid "Delimiter"
 msgstr "分隔符"
 
+#: app/views/js/apm.metric.list.js.php:78
+msgid "Delta"
+msgstr ""
+
 #: app/views/administration.user.edit.php:693
 msgid "Denied methods"
 msgstr "拒绝方法"
@@ -7328,6 +7900,10 @@ msgstr "依赖"
 #: include/items.inc.php:102
 msgid "Dependent item"
 msgstr "相关项目"
+
+#: include/triggers.inc.php:2018 widgets/trigover/includes/ViewHelper.php:94
+msgid "Dependent trigger"
+msgstr ""
 
 #: app/views/popup.generic.php:364 app/views/trigger.list.php:266
 #: app/views/trigger.prototype.list.php:94 include/triggers.inc.php:2013
@@ -7444,13 +8020,54 @@ msgstr "偏差"
 msgid "Device"
 msgstr "设备"
 
+#: app/views/user.device.list.php:120 app/views/userprofile.device.list.php:44
+msgid "Device ID"
+msgstr ""
+
+#: include/classes/api/services/CRole.php:830
+#, c-format
+msgid "Device action \"%2$s\" is not available for user role \"%1$s\"."
+msgstr ""
+
+#: app/views/administration.userrole.edit.php:422
+msgid "Device actions"
+msgstr ""
+
+#: app/controllers/CControllerUserDeviceStatus.php:68
+msgid "Device added"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1367
 msgid "Device interrupts. Returns integer"
 msgstr "设备的中断数。返回整数"
 
+#: app/views/administration.timeouts.edit.php:208
+msgid "Device link"
+msgstr ""
+
+#: app/views/js/user.device.list.js.php:63
+msgid "Device not found. Remove device from the database?"
+msgstr ""
+
+#: app/controllers/CControllerUserDeviceDelete.php:114
+msgid "Device removed"
+msgstr ""
+
 #: app/views/configuration.discovery.edit.php:122
 msgid "Device uniqueness criteria"
 msgstr "设备唯一性准则"
+
+#: app/controllers/CControllerUserDeviceList.php:232
+#: app/controllers/CControllerUserProfileDeviceList.php:127
+#: app/views/administration.user.edit.php:650
+#: app/views/administration.user.list.php:135
+#: app/views/administration.userrole.edit.php:393
+#: app/views/user.device.list.php:26 app/views/userprofile.device.list.php:26
+#: include/classes/helpers/CMenuHelper.php:348
+#: include/classes/helpers/CMenuHelper.php:519
+#: include/classes/helpers/CRoleHelper.php:549
+msgid "Devices"
+msgstr ""
 
 #: app/views/connector.edit.php:131 include/httptest.inc.php:31
 msgid "Digest"
@@ -7550,6 +8167,14 @@ msgstr "停用所选的动作?"
 #: app/views/js/action.list.js.php:97
 msgid "Disable selected actions?"
 msgstr "禁用所选的动作?"
+
+#: app/views/js/ceprule.list.js.php:147
+msgid "Disable selected complex event processing rule?"
+msgstr ""
+
+#: app/views/js/ceprule.list.js.php:146
+msgid "Disable selected complex event processing rules?"
+msgstr ""
 
 #: app/views/js/connector.list.js.php:103
 msgid "Disable selected connector?"
@@ -7702,10 +8327,18 @@ msgstr "停用"
 msgid "Disabled automatically by an LLD rule."
 msgstr "由LLD规则自动禁用。"
 
+#: app/views/administration.userrole.edit.php:157
+msgid "Disabled: Users can set personal URL (after login), Redirect URL after login is used as fallback."
+msgstr ""
+
 #: app/views/administration.trigdisplay.edit.php:146
 #: widgets/geomap/Widget.php:44
 msgid "Disaster"
 msgstr "灾难"
+
+#: include/classes/helpers/CCepRuleHelper.php:460
+msgid "Discard"
+msgstr ""
 
 #: include/items.inc.php:1630
 msgid "Discard unchanged"
@@ -7855,6 +8488,10 @@ msgstr[0] "发现原型已删除"
 msgid "Discovery prototype disabled"
 msgid_plural "Discovery prototypes disabled"
 msgstr[0] "发现原型已禁用"
+
+#: app/controllers/CControllerPopup.php:56
+msgid "Discovery prototype edit"
+msgstr ""
 
 #: host_discovery_prototypes.php:578
 msgid "Discovery prototype enabled"
@@ -8064,6 +8701,10 @@ msgstr "您想要替换条件式表达式吗?"
 msgid "Does not contain"
 msgstr "不包含"
 
+#: include/classes/helpers/CRegexHelper.php:23
+msgid "Does not contain string"
+msgstr ""
+
 #: app/partials/monitoring.host.filter.php:54
 #: app/partials/monitoring.host.filter.php:205
 #: app/partials/monitoring.latest.filter.php:117
@@ -8255,6 +8896,10 @@ msgstr "编辑"
 msgid "Edit dashboard"
 msgstr "编辑仪表盘"
 
+#: jsLoader.php:708
+msgid "Edit filter properties"
+msgstr ""
+
 #: app/views/monitoring.map.view.php:58
 msgid "Edit map"
 msgstr "编辑拓扑图"
@@ -8271,6 +8916,10 @@ msgstr "编辑树元素"
 #: include/classes/html/widgets/CWidgetFormView.php:169
 msgid "Edit widget"
 msgstr "编辑构件"
+
+#: jsLoader.php:348
+msgid "Edit widget settings"
+msgstr ""
 
 #: jsLoader.php:185
 msgid "Editing other objects is not allowed in dashboard editing mode."
@@ -8432,6 +9081,10 @@ msgstr "在所选组中启用调试模式？"
 msgid "Enable debug mode in selected groups?"
 msgstr "启用所选用户群组的调试模式?"
 
+#: app/views/administration.apm.db.edit.php:31
+msgid "Enable global data source"
+msgstr ""
+
 #: include/actions.inc.php:664 include/actions.inc.php:862
 msgid "Enable host"
 msgstr "启用主机"
@@ -8495,6 +9148,14 @@ msgstr "启用所选的动作?"
 #: app/views/js/action.list.js.php:82
 msgid "Enable selected actions?"
 msgstr "启用所选的动作?"
+
+#: app/views/js/ceprule.list.js.php:126
+msgid "Enable selected complex event processing rule?"
+msgstr ""
+
+#: app/views/js/ceprule.list.js.php:125
+msgid "Enable selected complex event processing rules?"
+msgstr ""
 
 #: app/views/js/connector.list.js.php:88
 msgid "Enable selected connector?"
@@ -8656,6 +9317,10 @@ msgstr "启用用户输入"
 msgid "Enabled"
 msgstr "已启用"
 
+#: app/views/administration.userrole.edit.php:156
+msgid "Enabled: Users are restricted to Redirect URL after login."
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:393
 msgid "Encrypt"
 msgstr "加密"
@@ -8684,6 +9349,10 @@ msgstr "结束日期"
 msgid "End of line sequence"
 msgstr "行序结束"
 
+#: app/views/administration.userrole.edit.php:154
+msgid "Enforce redirect after login"
+msgstr ""
+
 #: include/locales.inc.php:33
 msgid "English (en_GB)"
 msgstr "英语 (en_GB)"
@@ -8699,6 +9368,10 @@ msgstr "输入非机密的预共享密钥标识字符串，避免包含敏感数
 #: app/views/host.wizard.edit.php:470
 msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
 msgstr "请输入 Zabbix 组件用于识别预共享密钥的唯一名称。"
+
+#: include/html.inc.php:201
+msgid "Enter full screen mode"
+msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:612
 msgid "Enter one or more values as host:port or [host]:port (IPv6), separated by commas."
@@ -8791,6 +9464,11 @@ msgstr "错误！无法启动 Zabbix 服务器。"
 msgid "Error: %1$s"
 msgstr "错误: %1$s"
 
+#: app/partials/apm.trace.list.split.view.php:48
+#, c-format
+msgid "Errors: %1s"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1120
 msgid "Evaluation period"
 msgstr "评估周期"
@@ -8806,6 +9484,18 @@ msgstr "事件ID"
 #: include/actions.inc.php:63
 msgid "Event acknowledged"
 msgstr "事件已确认"
+
+#: include/classes/helpers/CCepRuleHelper.php:444
+msgid "Event added to window"
+msgstr ""
+
+#: app/views/js/apm.trace.list.js.php:662
+msgid "Event attributes"
+msgstr ""
+
+#: include/classes/helpers/CCepRuleHelper.php:446
+msgid "Event closed"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:226
 #: app/views/correlation.edit.php:339 app/views/correlation.list.php:30
@@ -8851,9 +9541,17 @@ msgstr "关联事件规则"
 msgid "Event correlation updated"
 msgstr "事件关联已更新"
 
+#: app/partials/ceprule.window.php:112
+msgid "Event count tag"
+msgstr ""
+
 #: tr_events.php:29 tr_events.php:172 tr_events.php:191
 msgid "Event details"
 msgstr "事件详情"
+
+#: include/classes/helpers/CCepRuleHelper.php:445
+msgid "Event evicted"
+msgstr ""
 
 #: include/triggers.inc.php:610
 msgid "Event generation"
@@ -8863,9 +9561,18 @@ msgstr "事件生成"
 msgid "Event is acknowledged"
 msgstr "事件已确认"
 
+#: include/classes/helpers/CCepRuleHelper.php:349
+#: include/classes/helpers/CCepRuleHelper.php:376
+msgid "Event is cloned"
+msgstr ""
+
 #: app/views/js/popup.operation.edit.js.php:516 include/actions.inc.php:368
 msgid "Event is not acknowledged"
 msgstr "事件未确认"
+
+#: include/classes/helpers/CCepRuleHelper.php:377
+msgid "Event is not cloned"
+msgstr ""
 
 #: tr_events.php:182
 msgid "Event list [previous 20]"
@@ -8886,6 +9593,35 @@ msgstr "事件名称"
 #: app/views/popup.condition.edit.php:672
 msgid "Event name matches Trigger name (with macros expanded) unless a custom Event name is specified in Trigger settings."
 msgstr "事件名称与触发器名称匹配（已展开宏）,在触发器设置中指定了自定义事件名称的例外。"
+
+#: app/controllers/CControllerMaintenanceCreate.php:90
+#: app/controllers/CControllerMaintenanceUpdate.php:91
+msgid "Event name operator and value combination is not unique."
+msgstr ""
+
+#: include/classes/helpers/CCepRuleHelper.php:443
+msgid "Event occurred"
+msgstr ""
+
+#: app/views/ceprule.list.php:25 include/classes/helpers/CMenuHelper.php:222
+#: include/classes/helpers/CRoleHelper.php:505
+msgid "Event processing"
+msgstr ""
+
+#: app/controllers/CControllerCepRuleDelete.php:60
+msgid "Event processing rule deleted"
+msgid_plural "Event processing rules deleted"
+msgstr[0] ""
+
+#: app/controllers/CControllerCepRuleDisable.php:76
+msgid "Event processing rule disabled"
+msgid_plural "Event processing rules disabled"
+msgstr[0] ""
+
+#: app/controllers/CControllerCepRuleEnable.php:76
+msgid "Event processing rule enabled"
+msgid_plural "Event processing rules enabled"
+msgstr[0] ""
 
 #: include/classes/helpers/CCorrelationHelper.php:55
 msgid "Event tag pair"
@@ -8999,6 +9735,22 @@ msgstr "执行在"
 msgid "Execute scripts"
 msgstr "执行脚本"
 
+#: app/partials/ceprule.modal.operation.php:163 app/views/ceprule.edit.php:120
+#: include/classes/helpers/CCepRuleHelper.php:524
+msgid "Execute when"
+msgstr ""
+
+#: app/views/ceprule.edit.php:214
+#, c-format
+msgid "Execute when %1$s: There is no \"%2$s\" operation defined."
+msgstr ""
+
+#: app/controllers/CControllerCepRuleEdit.php:212
+#: app/controllers/CControllerCepRuleGeneral.php:134
+#, c-format
+msgid "Execute when type not allowed for window type \"%1$s\"."
+msgstr ""
+
 #: app/views/reports.actionlog.list.csv.php:66
 #: app/views/reports.actionlog.list.php:148 include/actions.inc.php:2073
 msgid "Executed"
@@ -9015,6 +9767,11 @@ msgstr "已执行的脚本"
 msgid "Execution confirmation"
 msgstr "执行确认"
 
+#: app/views/js/apm.metric.list.js.php:658
+#, c-format
+msgid "Exemplar  %1$s"
+msgstr ""
+
 #: app/partials/monitoring.host.filter.php:50
 #: app/partials/monitoring.host.filter.php:201
 #: app/partials/monitoring.latest.filter.php:113
@@ -9027,6 +9784,10 @@ msgstr "执行确认"
 #: include/classes/html/widgets/fields/CWidgetFieldTagsView.php:93
 msgid "Exists"
 msgstr "存在"
+
+#: include/classes/html/CHtmlPage.php:131 include/html.inc.php:192
+msgid "Exit full screen mode"
+msgstr ""
 
 #: app/views/js/monitoring.problem.view.js.php:230
 #: include/classes/html/CFormFieldsetCollapsible.php:45
@@ -9041,6 +9802,12 @@ msgstr "扩展"
 msgid "Expand macros"
 msgstr "展开宏"
 
+#: include/classes/html/CSectionCollapsible.php:54
+#: include/classes/html/CSectionCollapsible.php:63 jsLoader.php:531
+#: jsLoader.php:569
+msgid "Expand section"
+msgstr ""
+
 #: app/partials/layout.htmlpage.aside.php:43
 msgid "Expand sidebar"
 msgstr "展开侧边栏"
@@ -9048,6 +9815,12 @@ msgstr "展开侧边栏"
 #: include/views/monitoring.sysmap.edit.php:156
 msgid "Expand single problem"
 msgstr "展开单一问题"
+
+#: app/controllers/CControllerLldRuleUpdateGeneral.php:376
+#: app/controllers/CControllerLldRuleUpdateGeneral.php:403
+#: app/controllers/CControllerLldRuleUpdateGeneral.php:443
+msgid "Expected LLD macro format is \"{#MACRO}\"."
+msgstr ""
 
 #: app/controllers/CControllerHostCreate.php:195
 #: app/controllers/CControllerHostUpdate.php:200
@@ -9085,6 +9858,14 @@ msgstr "过期时间小于"
 #: app/views/popup.generic.php:623 include/graphs.inc.php:27
 msgid "Exploded"
 msgstr "爆炸饼图"
+
+#: app/partials/item.edit.item.tab.php:674
+#: app/partials/lldrule.edit.lldrule.tab.php:638
+#: app/partials/lldrule.edit.prototype.tab.php:638
+#: app/views/js/apm.metric.list.js.php:837
+#: include/classes/helpers/CApmMetricHelper.php:24
+msgid "Exponential histogram"
+msgstr ""
 
 #: include/classes/html/CButtonExport.php:32
 msgid "Export"
@@ -9205,6 +9986,11 @@ msgstr "无法粘贴仪表盘页面。"
 msgid "Failed to paste widget."
 msgstr "无法粘贴小组件。"
 
+#: include/classes/server/CZabbixServer.php:663
+#, c-format
+msgid "Failed to process \"%1$s\" request. Please contact your system administrator."
+msgstr ""
+
 #: app/controllers/CControllerAuthenticationUpdate.php:274
 msgid "Failed to select default LDAP server."
 msgstr "未能选择默认 LDAP 服务器。"
@@ -9245,6 +10031,10 @@ msgstr "故障转移周期"
 #: include/items.inc.php:37
 msgid "Failure Audit"
 msgstr "审计失败"
+
+#: include/classes/helpers/CApmLogHelper.php:27
+msgid "Fatal"
+msgstr ""
 
 #: app/views/system.warning.php:27 app/views/system.warning.php:52
 msgid "Fatal error, please report to the Zabbix team"
@@ -9537,6 +10327,11 @@ msgctxt "page navigation"
 msgid "First"
 msgstr "首"
 
+#: include/classes/helpers/CCepRuleHelper.php:346
+#: include/classes/helpers/CCepRuleHelper.php:364
+msgid "First event in time window"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:268
 #: app/controllers/CControllerPopupTriggerExpr.php:297
 msgid "Fit"
@@ -9551,9 +10346,21 @@ msgstr "调整至拓扑图"
 msgid "Fixed"
 msgstr "固定的"
 
+#: app/partials/item.edit.item.tab.php:946
+#: app/partials/lldrule.edit.lldrule.tab.php:930
+#: app/partials/lldrule.edit.prototype.tab.php:932
+msgid "Fixed duration of each aggregated bucket within the processing window."
+msgstr ""
+
 #: include/classes/helpers/CServiceHelper.php:152
 msgid "Fixed status"
 msgstr "固定状态"
+
+#: app/views/js/apm.log.list.js.php:181 app/views/js/apm.log.list.js.php:609
+#: app/views/js/apm.metric.list.js.php:195
+#: app/views/js/apm.metric.list.js.php:735
+msgid "Flags"
+msgstr ""
 
 #: app/views/js/popup.massupdate.tmpl.js.php:81
 #: app/views/popup.lldoperation.php:114 app/views/popup.massupdate.item.php:232
@@ -9710,6 +10517,10 @@ msgstr "报表生成于"
 msgid "Generated in %1$s sec"
 msgstr "产生于%1$s 秒"
 
+#: app/views/user.device.init.view.php:66
+msgid "Generating secure QR code..."
+msgstr ""
+
 #: app/controllers/CControllerGeomapsEdit.php:75
 #: app/views/administration.geomaps.edit.php:119
 #: app/views/administration.geomaps.edit.php:126
@@ -9764,6 +10575,10 @@ msgstr "该值映射名称已被占用"
 msgid "Global"
 msgstr "全局"
 
+#: app/views/js/correlation.edit.js.php:27
+msgid "Global event correlation is deprecated and may be removed in next releases."
+msgstr ""
+
 #: include/classes/api/services/CIconMap.php:366
 #, c-format
 msgid "Global regular expression \"%1$s\" does not exist."
@@ -9813,6 +10628,10 @@ msgstr "返回首页"
 msgid "Go to last page, %1$s"
 msgstr "跳转到尾页，%1$s"
 
+#: include/classes/html/CTabFilter.php:387
+msgid "Go to next filter tab"
+msgstr ""
+
 #: include/classes/helpers/CPagerHelper.php:227
 #, c-format
 msgid "Go to next page, %1$s"
@@ -9828,6 +10647,10 @@ msgstr "跳转到第 %1$s 页"
 msgid "Go to page %1$s, current page"
 msgstr "跳转到第 %1$s 页，当前页"
 
+#: include/classes/html/CTabFilter.php:400
+msgid "Go to previous filter tab"
+msgstr ""
+
 #: include/classes/helpers/CPagerHelper.php:199
 #, c-format
 msgid "Go to previous page, %1$s"
@@ -9840,6 +10663,13 @@ msgstr "谷歌 Chrome"
 #: include/graphs.inc.php:65
 msgid "Gradient line"
 msgstr "梯度线"
+
+#: app/partials/item.edit.item.tab.php:945
+#: app/partials/lldrule.edit.lldrule.tab.php:929
+#: app/partials/lldrule.edit.prototype.tab.php:931
+#: app/views/item.massupdate.php:307
+msgid "Granularity"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:229
 #: app/partials/monitoring.latest.view.html.php:219
@@ -10127,6 +10957,10 @@ msgstr "归类统计"
 msgid "Groups"
 msgstr "群组"
 
+#: app/partials/ceprule.window.php:103
+msgid "Groups tags by value and applies the first available tag match."
+msgstr ""
+
 #: include/classes/helpers/CMenuHelper.php:454
 msgid "Guest user"
 msgstr "来宾用户"
@@ -10308,6 +11142,14 @@ msgstr "高亮整行"
 #: widgets/itemhistory/views/column.edit.php:132
 msgid "Highlights"
 msgstr "高亮显示"
+
+#: app/partials/item.edit.item.tab.php:673
+#: app/partials/lldrule.edit.lldrule.tab.php:637
+#: app/partials/lldrule.edit.prototype.tab.php:637
+#: app/views/js/apm.metric.list.js.php:831
+#: include/classes/helpers/CApmMetricHelper.php:23
+msgid "Histogram"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:232
 #: app/controllers/CControllerPopupLldOperation.php:218
@@ -11309,6 +12151,10 @@ msgstr "已成功导入"
 msgid "Impossible to filter by inventory field \"%1$s\", which does not exist."
 msgstr "无法按资产字段“%1$s”过滤，该字段不存在。"
 
+#: include/classes/helpers/CCepRuleHelper.php:384
+msgid "In"
+msgstr ""
+
 #: app/views/js/administration.user.edit.js.php:61
 #: app/views/js/administration.userprofile.edit.js.php:69
 msgid "In case of successful password change user will be logged out of all active sessions. Continue?"
@@ -11341,10 +12187,18 @@ msgstr "无法访问SLA"
 msgid "Inaccessible action"
 msgstr "无法访问动作"
 
+#: include/actions.inc.php:2276 include/classes/screens/CScreenProblem.php:436
+msgid "Inaccessible complex event processing rule"
+msgstr ""
+
 #: app/controllers/CControllerPopupScheduledReportEdit.php:123
 #: app/controllers/CControllerScheduledReportEdit.php:303
 msgid "Inaccessible dashboard"
 msgstr "无法访问仪表盘"
+
+#: app/partials/js/user.edit.media.tab.js.php:143
+msgid "Inaccessible device"
+msgstr ""
 
 #: app/partials/configuration.host.edit.html.php:64
 #: app/partials/configuration.hostgroup.edit.html.php:69
@@ -11396,6 +12250,17 @@ msgstr "无法访问的拓扑图"
 msgid "Inaccessible media type"
 msgstr "无法访问的媒介类型"
 
+#: app/controllers/CControllerHostListData.php:345
+#: app/controllers/CControllerPopupItemTestEdit.php:640
+#: include/classes/helpers/CProxyHelper.php:48
+msgid "Inaccessible proxy"
+msgstr ""
+
+#: app/controllers/CControllerHostListData.php:346
+#: include/classes/helpers/CProxyHelper.php:83
+msgid "Inaccessible proxy group"
+msgstr ""
+
 #: include/classes/widgets/fields/CWidgetFieldMultiSelectService.php:31
 msgid "Inaccessible service"
 msgstr "无法访问服务"
@@ -11435,6 +12300,10 @@ msgstr "用户无法访问"
 #: app/controllers/CControllerScheduledReportEdit.php:231
 msgid "Inaccessible user group"
 msgstr "无法访问用户组"
+
+#: include/classes/helpers/CItemGeneralHelper.php:305
+msgid "Inaccessible value mapping"
+msgstr ""
 
 #: jsLoader.php:153
 msgid "Inaccessible widget"
@@ -11529,6 +12398,14 @@ msgstr "映射 \"%2$s\" 中存在错误的 %1$s 标签类型数据."
 #, c-format
 msgid "Incorrect API \"%1$s\"."
 msgstr "不正确的API接口 \"%1$s\""
+
+#: include/classes/db/ApmDbClickHouse.php:280
+#: include/classes/db/ApmDbClickHouse.php:293
+#: include/classes/db/ApmDbClickHouse.php:307
+#: include/classes/db/ApmDbClickHouse.php:326
+#, c-format
+msgid "Incorrect ClickHouse query parameter %1$s for type %2$s."
+msgstr ""
 
 #: app/controllers/CControllerHostCreate.php:65
 #: app/controllers/CControllerHostUpdate.php:69
@@ -11828,6 +12705,13 @@ msgstr "端口不正确"
 msgid "Incorrect regular expression \"%1$s\": \"%2$s\""
 msgstr "不正确的正则表达式 \"%1$s\": \"%2$s\""
 
+#: app/controllers/CControllerRegExCreate.php:43
+#: app/controllers/CControllerRegExTest.php:70
+#: app/controllers/CControllerRegExUpdate.php:44
+#, c-format
+msgid "Incorrect regular expression: \"%2$s\""
+msgstr ""
+
 #: include/classes/server/CZabbixServer.php:533
 #: include/classes/server/CZabbixServer.php:575
 #: include/classes/server/CZabbixServer.php:582
@@ -11846,6 +12730,33 @@ msgstr "计划不正确：%1$s。"
 #, c-format
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "主机\"%1$s\"的状态值不正确."
+
+#: include/classes/core/CConfigFile.php:282
+#: include/classes/core/CConfigFile.php:292
+#, c-format
+msgid "Incorrect telemetry Certificate authority (CA) configuration %1$s: %2$s."
+msgstr ""
+
+#: include/classes/core/CConfigFile.php:270
+#: include/classes/core/CConfigFile.php:793
+#: include/classes/core/CConfigFile.php:799
+#: include/classes/core/CConfigFile.php:805
+#: include/classes/core/CConfigFile.php:813
+#: include/classes/core/CConfigFile.php:825
+#: include/classes/core/CConfigFile.php:834
+#: include/classes/core/CConfigFile.php:841
+#: include/classes/core/CConfigFile.php:848
+#: include/classes/core/CConfigFile.php:854
+#: include/classes/core/CConfigFile.php:866
+#: include/classes/core/CConfigFile.php:875
+#: include/classes/core/CConfigFile.php:883
+#: include/classes/core/CConfigFile.php:889
+#: include/classes/core/CConfigFile.php:895
+#: include/classes/core/CConfigFile.php:904
+#: include/classes/core/CConfigFile.php:913
+#, c-format
+msgid "Incorrect telemetry provider configuration %1$s: %2$s."
+msgstr ""
 
 #: include/classes/api/services/CHttpTest.php:882
 msgid "Incorrect templated web scenario step count."
@@ -12195,6 +13106,14 @@ msgstr "宏'%1$s'的值不正确：%2$s"
 msgid "Increase by"
 msgstr "增长"
 
+#: include/classes/helpers/CCepRuleHelper.php:462
+msgid "Increase severity"
+msgstr ""
+
+#: include/classes/helpers/CCepRuleHelper.php:471
+msgid "Increase value"
+msgstr ""
+
 #: app/views/popup.acknowledge.edit.php:91 include/actions.inc.php:1583
 #: include/actions.inc.php:2008 include/html.inc.php:971
 msgid "Indefinitely"
@@ -12353,6 +13272,10 @@ msgstr "初始视图"
 #: include/classes/html/widgets/fields/CWidgetFieldLatLngView.php:45
 msgid "Initial view is ignored if the default view is set."
 msgstr "如果设置了默认视图，则忽略初始视图。"
+
+#: app/views/proxy.edit.php:245
+msgid "Input"
+msgstr ""
 
 #: app/views/administration.script.edit.php:339
 msgid "Input prompt"
@@ -12680,6 +13603,11 @@ msgstr "媒介类型映射配置无效。"
 msgid "Invalid method parameters."
 msgstr "无效的方法参数."
 
+#: app/controllers/CControllerCepRuleEdit.php:221
+#: app/controllers/CControllerCepRuleGeneral.php:143
+msgid "Invalid operation."
+msgstr ""
+
 #: app/controllers/CControllerDashboardUpdate.php:259
 #: app/controllers/CControllerDashboardUpdate.php:268
 #: app/controllers/CControllerDashboardUpdate.php:280
@@ -12962,6 +13890,11 @@ msgstr "无效的范围表达式"
 msgid "Invalid range."
 msgstr "无效的范围"
 
+#: index_http.php:72 index_mfa.php:127 index.php:103 index.php:121
+#: index_sso.php:331
+msgid "Invalid redirect URL."
+msgstr ""
+
 #: app/controllers/CControllerDataTable.php:59
 #: app/controllers/CControllerDataTable.php:138
 msgid "Invalid request"
@@ -13042,6 +13975,13 @@ msgstr "无效的时间段"
 msgid "Invalid user group mapping configuration."
 msgstr "无效的用户组映射配置。"
 
+#: app/controllers/CControllerCepRuleEdit.php:379
+#: app/controllers/CControllerCepRuleEdit.php:386
+#: app/controllers/CControllerCepRuleGeneral.php:218
+#: app/controllers/CControllerCepRuleGeneral.php:223
+msgid "Invalid value."
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:3323
 #, c-format
 msgid "Invalid zoomparameter \"%1$s\": %2$s."
@@ -13085,6 +14025,18 @@ msgstr ""
 #: include/classes/helpers/CRoleHelper.php:560
 msgid "Invoke \"Execute now\" on read-only hosts"
 msgstr "在只读权限主机上调用“立即执行”"
+
+#: include/classes/helpers/CCepRuleHelper.php:391
+msgid "Is less than or equal"
+msgstr ""
+
+#: app/views/js/apm.metric.list.js.php:754
+msgid "Is monotonic"
+msgstr ""
+
+#: include/classes/helpers/CCepRuleHelper.php:390
+msgid "Is more than or equal"
+msgstr ""
 
 #: app/views/administration.user.list.php:134
 msgid "Is online?"
@@ -13484,6 +14436,15 @@ msgstr "Kerberos"
 msgid "Key"
 msgstr "键值"
 
+#: app/partials/item.edit.item.tab.php:710
+#: app/partials/item.edit.item.tab.php:713
+#: app/partials/lldrule.edit.lldrule.tab.php:674
+#: app/partials/lldrule.edit.lldrule.tab.php:677
+#: app/partials/lldrule.edit.prototype.tab.php:674
+#: app/partials/lldrule.edit.prototype.tab.php:677
+msgid "Key name"
+msgstr ""
+
 #: app/views/administration.script.edit.php:172
 #: include/views/js/common.item.edit.js.php:56
 msgid "Key passphrase"
@@ -13647,11 +14608,20 @@ msgstr "最后访问"
 msgid "Last accessed at"
 msgstr "最后访问时间"
 
+#: app/views/user.device.list.php:124 app/views/userprofile.device.list.php:46
+msgid "Last active"
+msgstr ""
+
 #: app/partials/monitoring.latest.view.html.php:76
 #: app/partials/monitoring.latest.view.html.php:89
 #: include/classes/screens/CScreenHttpTest.php:112
 msgid "Last check"
 msgstr "最近检查记录"
+
+#: include/classes/helpers/CCepRuleHelper.php:347
+#: include/classes/helpers/CCepRuleHelper.php:368
+msgid "Last event in time window"
+msgstr ""
 
 #: jsLoader.php:377
 msgid "Last hour graph"
@@ -13795,6 +14765,16 @@ msgstr "限制条件对每个'监控项模式'单独生效"
 msgid "Limit for search and filter results"
 msgstr "搜索/过滤组件限制"
 
+#: app/partials/item.edit.item.tab.php:930
+#: app/partials/lldrule.edit.lldrule.tab.php:914
+#: app/partials/lldrule.edit.prototype.tab.php:916
+msgid "Limit processing window historical lookup when previous item updates are missing or too old."
+msgstr ""
+
+#: app/partials/ceprule.window.php:71
+msgid "Limited"
+msgstr ""
+
 #: include/graphs.inc.php:55 include/views/js/monitoring.sysmaps.js.php:364
 #: include/views/js/monitoring.sysmaps.js.php:413
 #: include/views/js/monitoring.sysmaps.js.php:801
@@ -13936,6 +14916,10 @@ msgstr "已安装文件系统及其类型的列表。返回 JSON"
 msgid "List of mounted filesystems, their types, disk space and inode statistics. Returns JSON"
 msgstr "挂载的文件系统、类型、磁盘空间列表和 inode 统计信息。返回 JSON"
 
+#: include/classes/data/CItemData.php:1903
+msgid "List of mounted filesystems, their types, disk space and inode statistics. Returns JSON. Mode: full(default), short; mountpoint: exact match."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1266
 msgid "List of network interfaces with detailed information. Returns JSON"
 msgstr ""
@@ -13951,6 +14935,10 @@ msgstr "Windows 性能计数器的对象实例列表，发现的英文对象名�
 #: include/classes/data/CItemData.php:1241
 msgid "List of object instances of Windows performance counters. Returns JSON"
 msgstr "Windows 性能计数器的对象实例列表。返回 JSON"
+
+#: include/classes/html/CTabFilter.php:382
+msgid "List of open filter tabs"
+msgstr ""
 
 #: app/views/popup.dashboard.share.edit.php:126
 #: include/views/monitoring.sysmap.edit.php:402
@@ -14025,9 +15013,18 @@ msgstr "位置经度"
 msgid "Log"
 msgstr "日志"
 
+#: app/views/apm.log.list.php:97 app/views/js/apm.log.list.js.php:211
+#: app/views/js/apm.log.list.js.php:651
+msgid "Log attributes"
+msgstr ""
+
 #: app/views/administration.audit.settings.edit.php:50
 msgid "Log changes by low-level discovery, network discovery and autoregistration"
 msgstr "通过低级别自动发现、网络发现和自动注册日志更改"
+
+#: app/views/js/apm.log.list.js.php:516
+msgid "Log details"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1063
 msgid "Log file monitoring with log rotation support. Returns log"
@@ -14095,6 +15092,24 @@ msgstr "注销请求"
 #: app/views/administration.authentication.edit.php:384
 msgid "Logout responses"
 msgstr "注销响应"
+
+#: app/controllers/CControllerApmLogList.php:162
+#: app/partials/item.edit.item.tab.php:662
+#: app/partials/lldrule.edit.lldrule.tab.php:626
+#: app/partials/lldrule.edit.prototype.tab.php:626
+#: app/views/apm.log.list.php:150 app/views/js/apm.metric.list.js.php:641
+#: app/views/proxy.edit.php:299 app/views/usergroup.edit.php:397
+#: include/classes/helpers/CMenuHelper.php:89
+#: include/classes/helpers/CRoleHelper.php:442
+msgid "Logs"
+msgstr ""
+
+#: app/partials/item.edit.item.tab.php:928
+#: app/partials/lldrule.edit.lldrule.tab.php:912
+#: app/partials/lldrule.edit.prototype.tab.php:914
+#: app/views/item.massupdate.php:302
+msgid "Lookback limit"
+msgstr ""
 
 #: include/discovery.inc.php:113
 msgid "Lost"
@@ -14291,9 +15306,17 @@ msgstr "管理API tokens"
 msgid "Manage SLA"
 msgstr "管理 SLA"
 
+#: include/classes/helpers/CRoleHelper.php:633
+msgid "Manage own devices"
+msgstr ""
+
 #: include/classes/helpers/CRoleHelper.php:554
 msgid "Manage scheduled reports"
 msgstr "管理定时报表"
+
+#: include/classes/helpers/CRoleHelper.php:634
+msgid "Manage user devices"
+msgstr ""
 
 #: app/partials/configuration.host.edit.html.php:344
 #: app/views/administration.miscconfig.edit.php:61
@@ -14567,6 +15590,10 @@ msgstr "表格位中最多可展示的的组件数量."
 msgid "Max history display period"
 msgstr "最长历史显示周期"
 
+#: app/views/proxy.edit.php:260
+msgid "Max messages per second"
+msgstr ""
+
 #: app/views/administration.gui.edit.php:99
 msgid "Max number of columns and rows in overview tables"
 msgstr "概览表中的最大列数和行数"
@@ -14597,9 +15624,18 @@ msgstr "最大重复次数"
 msgid "Max repetition count is applicable to discovery and walk only."
 msgstr "最大重复计数仅适用于自动发现和遍历。"
 
+#: app/partials/configuration.host.interface.row.php:57
+#: app/views/host.wizard.edit.php:752
+msgid "Max repetition count is applicable to walk only."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:96
 msgid "Max zoom level"
 msgstr "最大缩放级别"
+
+#: app/views/apm.trace.list.php:90
+msgid "Max. duration"
+msgstr ""
 
 #: app/views/configuration.discovery.edit.php:84
 msgid "Maximum concurrent checks"
@@ -14616,6 +15652,11 @@ msgstr "操作系统最大的文件打开数量。返回整数"
 #: include/classes/data/CItemData.php:1026
 msgid "Maximum number of processes supported by OS. Returns integer"
 msgstr "操作系统最大的进程数。返回整数"
+
+#: app/partials/configuration.host.interface.row.php:75
+#: app/views/host.wizard.edit.php:765
+msgid "Maximum number of retries after a timeout for walk[]/get[] items. For walk[], retries are shared across the entire walk. 0 disables retries."
+msgstr ""
 
 #: widgets/piechart/views/widget.edit.js.php:680
 #: widgets/svggraph/views/widget.edit.js.php:805
@@ -14905,6 +15946,26 @@ msgstr "未发现方法."
 msgid "Methods"
 msgstr "方法"
 
+#: app/views/js/apm.metric.list.js.php:205
+#: app/views/js/apm.metric.list.js.php:727
+msgid "Metric description"
+msgstr ""
+
+#: app/views/js/apm.metric.list.js.php:847
+msgid "Metric information"
+msgstr ""
+
+#: app/views/apm.metric.list.php:48 app/views/js/apm.metric.list.js.php:150
+#: app/views/js/apm.metric.list.js.php:806
+msgid "Metric name"
+msgstr ""
+
+#: app/partials/item.edit.item.tab.php:668
+#: app/partials/lldrule.edit.lldrule.tab.php:632
+#: app/partials/lldrule.edit.prototype.tab.php:632
+msgid "Metric points"
+msgstr ""
+
 #: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:74
 msgid "Metrics"
 msgstr "指标"
@@ -14929,6 +15990,10 @@ msgstr "居中"
 #: widgets/tophosts/views/column.edit.php:219
 msgid "Min"
 msgstr "最小"
+
+#: app/views/apm.trace.list.php:83
+msgid "Min. duration"
+msgstr ""
 
 #: app/views/popup.proxygroup.edit.php:59
 msgid "Minimum number of proxies"
@@ -15195,6 +16260,14 @@ msgstr "严重异常如果下一层都有问题"
 msgid "Most critical of child services"
 msgstr "最重要的子服务"
 
+#: include/classes/html/CFilter.php:256 include/classes/html/CTabFilter.php:332
+msgid "Move time range backward"
+msgstr ""
+
+#: include/classes/html/CFilter.php:261 include/classes/html/CTabFilter.php:339
+msgid "Move time range forward"
+msgstr ""
+
 #: include/httptest.inc.php:402
 msgid "Mozilla Firefox"
 msgstr "Mozilla Firefox"
@@ -15223,6 +16296,10 @@ msgstr "多重"
 #: include/triggers.inc.php:611
 msgid "Multiple PROBLEM events"
 msgstr "多重问题事件"
+
+#: app/partials/ceprule.modal.operation.php:235
+msgid "Multiple: Clones any problem."
+msgstr ""
 
 #: app/partials/administration.system.info.php:235
 #, c-format
@@ -15522,6 +16599,10 @@ msgstr "指针"
 msgid "Nested"
 msgstr "嵌套"
 
+#: include/classes/db/ApmDbClickHouse.php:261
+msgid "Nested arrays are not supported in ClickHouse query parameters."
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:77
 msgid "Network discovery data storage period"
 msgstr "网络发现数据存储期"
@@ -15561,6 +16642,11 @@ msgstr "时间间隔内的网络利用率（传输速率和接收速率之和）
 msgid "Never"
 msgstr "从未"
 
+#: app/controllers/CControllerUserDeviceList.php:225
+#: app/views/user.device.list.php:104
+msgid "New"
+msgstr ""
+
 #: app/views/popup.token.edit.php:159
 msgid "New API token"
 msgstr "新的API token"
@@ -15590,9 +16676,18 @@ msgstr "新的动作"
 msgid "New additional rule"
 msgstr "添加附加规则"
 
+#: app/views/popup.telemetry.aggregatedcolumn.edit.php:75
+msgid "New aggregated column"
+msgstr ""
+
 #: widgets/tophosts/views/column.edit.php:300
 msgid "New column"
 msgstr "添加栏目"
+
+#: app/controllers/CControllerCepRuleEdit.php:89 app/views/ceprule.edit.php:283
+#: app/views/js/ceprule.edit.js.php:397
+msgid "New complex event processing"
+msgstr ""
 
 #: app/controllers/CControllerActionConditionCheck.php:107
 #: app/controllers/CControllerCorrelationConditionEdit.php:62
@@ -15609,6 +16704,10 @@ msgstr "新连接器"
 #: app/controllers/CControllerTemplateDashboardEdit.php:79
 msgid "New dashboard"
 msgstr "新仪表盘"
+
+#: app/views/lldrule.prototype.edit.php:168
+msgid "New discovery prototype"
+msgstr ""
 
 #: app/views/configuration.discovery.edit.php:244
 #: app/views/configuration.discovery.edit.php:285
@@ -15849,6 +16948,10 @@ msgstr "无变化。"
 msgid "No color"
 msgstr "无颜色"
 
+#: jsLoader.php:282
+msgid "No columns selected"
+msgstr ""
+
 #: jsLoader.php:194
 msgid "No compatible widgets."
 msgstr "没有兼容的小组件。"
@@ -15872,6 +16975,12 @@ msgstr "未找到数据"
 #: include/classes/html/CTableInfo.php:35
 msgid "No data found."
 msgstr "未发现数据"
+
+#: app/controllers/CControllerApmLogListData.php:97
+#: app/controllers/CControllerApmMetricListData.php:116
+#: app/controllers/CControllerApmTraceListData.php:103
+msgid "No data source"
+msgstr ""
 
 #: widgets/dataover/actions/WidgetView.php:40
 #: widgets/plaintext/actions/WidgetView.php:47
@@ -16061,6 +17170,10 @@ msgstr ""
 msgid "No permissions to import discovery rules."
 msgstr "无导入发现规则的权限。"
 
+#: include/classes/api/services/CConfiguration.php:347
+msgid "No permissions to import global regexes."
+msgstr ""
+
 #: include/classes/api/services/CConfiguration.php:313
 msgid "No permissions to import graphs."
 msgstr "无导入图形的权限。"
@@ -16116,6 +17229,16 @@ msgstr "无导入值映射的权限。"
 #: include/classes/api/services/CConfiguration.php:317
 msgid "No permissions to import web scenarios."
 msgstr "无导入 Web 场景的权限。"
+
+#: include/classes/api/services/CDevice.php:232
+#: include/classes/api/services/CDevice.php:516
+msgid "No permissions to manage own devices."
+msgstr ""
+
+#: include/classes/api/services/CDevice.php:239
+#: include/classes/api/services/CDevice.php:520
+msgid "No permissions to manage user devices."
+msgstr ""
 
 #: app/controllers/CControllerChartsView.php:133
 #: app/controllers/CControllerDashboardPrint.php:99
@@ -16342,9 +17465,18 @@ msgstr "没有Proxy代理程序"
 msgid "No recipients specified for action operation message."
 msgstr "没有为操作操作消息指定收件人。"
 
+#: app/views/js/apm.metric.list.js.php:712
+msgid "No recorded value"
+msgstr ""
+
 #: include/classes/core/CWidget.php:197 jsLoader.php:174
 msgid "No refresh"
 msgstr "没有刷新"
+
+#: app/controllers/CControllerApmTraceListData.php:215
+#: app/controllers/CControllerApmTraceListData.php:219
+msgid "No root span found"
+msgstr ""
 
 #: include/classes/api/services/CUser.php:3489
 msgid "No saved state, please login again."
@@ -16414,6 +17546,10 @@ msgstr "不推荐使用非布尔标志。"
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:255
 msgid "None"
 msgstr "无"
+
+#: app/partials/ceprule.window.php:38
+msgid "None - there will be no time window specific processing."
+msgstr ""
 
 #: app/controllers/CControllerLatest.php:541
 #: app/partials/configuration.filter.items.php:183
@@ -16492,13 +17628,29 @@ msgstr "不可用"
 msgid "Not classified"
 msgstr "未分类"
 
+#: app/views/mediatype.edit.php:468
+msgid "Not configured"
+msgstr ""
+
 #: app/controllers/CControllerMediatypeEnable.php:88
 msgid "Not enabled"
 msgstr "未启用"
 
+#: include/classes/helpers/CCepRuleHelper.php:365
+msgid "Not first event in time window"
+msgstr ""
+
+#: include/classes/helpers/CCepRuleHelper.php:385
+msgid "Not in"
+msgstr ""
+
 #: include/forms.inc.php:308
 msgid "Not inherited items"
 msgstr "未继承的监控项"
+
+#: include/classes/helpers/CCepRuleHelper.php:369
+msgid "Not last event in time window"
+msgstr ""
 
 #: app/views/host.wizard.edit.php:175
 msgid "Not linked"
@@ -16527,6 +17679,10 @@ msgstr "请注意，如果不使用单引号，%1$s 或 %2$s 将被视为主机�
 #: app/views/host.wizard.edit.php:518 app/views/host.wizard.edit.php:541
 msgid "Note that during agent installation, you will need to configure both the PSK identity and PSK. Make sure they match the PSK identity and PSK set in step 1."
 msgstr "请注意：在安装agent时，您需要同时配置PSK标识和PSK密钥，确保它们与第1步中设置的PSK标识和密钥匹配"
+
+#: app/views/ceprule.edit.php:196
+msgid "Note: \"Event closed\", \"Window closed\" and \"Pattern matched\" operate independently and are not affected by this execution order."
+msgstr ""
 
 #: app/views/host.wizard.edit.php:578
 #, c-format
@@ -16941,6 +18097,10 @@ msgstr "只有管理员才可以设置拓扑图的所有人。"
 msgid "Only disabled group can be set for deprovisioned users."
 msgstr "只有禁用的组才能设置为取消预配置的用户。"
 
+#: include/classes/api/services/CTriggerGeneral.php:2083
+msgid "Only hosts referenced in problem or recovery expressions can be used in event name."
+msgstr ""
+
 #: app/partials/administration.system.info.php:66
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "只计算指派给启用的主机的监控项"
@@ -16983,6 +18143,11 @@ msgstr "只计算指派给启用的主机的和相依于启用的监控项的触
 msgid "Open URL"
 msgstr "打开网址"
 
+#: app/views/popup.generic.php:455 include/classes/html/CHtmlPage.php:221
+#: jsLoader.php:521
+msgid "Open Zabbix documentation in a new tab"
+msgstr ""
+
 #: app/views/administration.script.edit.php:228
 msgid "Open in a new window"
 msgstr "在新窗口中打开"
@@ -16995,6 +18160,10 @@ msgstr "打开安装说明"
 #: app/views/mediatype.test.edit.php:101 app/views/popup.scriptexec.php:41
 msgid "Open log"
 msgstr "打开日志"
+
+#: jsLoader.php:349
+msgid "Open widget actions"
+msgstr ""
 
 #: include/classes/validators/CSslCertificateValidator.php:28
 #: include/classes/validators/CSslPrivateKeyValidator.php:28
@@ -17041,6 +18210,10 @@ msgstr "由于未认证的请求, 操作无法完成."
 msgid "Operation details"
 msgstr "操作详情"
 
+#: app/views/ceprule.edit.php:191
+msgid "Operation execution order:"
+msgstr ""
+
 #: app/controllers/CControllerActionOperationCheck.php:163
 msgid "Operation has no group to operate."
 msgstr "操作无对应的群组。"
@@ -17048,6 +18221,10 @@ msgstr "操作无对应的群组。"
 #: app/controllers/CControllerActionOperationCheck.php:172
 msgid "Operation has no template to operate."
 msgstr "操作无对应的模板。"
+
+#: app/views/apm.trace.list.php:69 app/views/js/apm.trace.list.js.php:166
+msgid "Operation name"
+msgstr ""
 
 #: app/partials/trigger.edit.trigger.tab.php:64 app/views/trigger.list.php:222
 #: app/views/trigger.prototype.list.php:65 include/blocks.inc.php:582
@@ -17066,6 +18243,10 @@ msgstr "运营数据"
 #: app/views/popup.action.edit.php:258 app/views/popup.lldoverride.php:195
 msgid "Operations"
 msgstr "操作"
+
+#: app/partials/ceprule.modal.operation.php:201
+msgid "Operations are applied to all events in the window by default, except \"Event occurred\"."
+msgstr ""
 
 #: app/views/correlation.condition.edit.php:66
 #: app/views/correlation.condition.edit.php:101
@@ -17213,6 +18394,15 @@ msgstr "其他操作系统"
 msgid "Other configuration parameters"
 msgstr "其它配置参数"
 
+#: app/partials/ceprule.modal.operation.php:334
+#: include/classes/helpers/CCepRuleHelper.php:482
+msgid "Other events"
+msgstr ""
+
+#: app/partials/ceprule.modal.operation.php:325
+msgid "Other events - applies the operation to all events in the window except the current one. You can filter which events to include."
+msgstr ""
+
 #: app/views/administration.miscconfig.edit.php:151
 msgid "Other parameters"
 msgstr "其他参数"
@@ -17270,6 +18460,10 @@ msgstr "覆盖监控项趋势期间"
 #: app/views/popup.tabfilter.edit.php:40
 msgid "Override time period selector"
 msgstr "覆盖时间段选择器"
+
+#: widgets/clock/includes/WidgetForm.php:122
+msgid "Override time zone"
+msgstr ""
 
 #: app/controllers/CControllerPopupLldOverride.php:90
 #, c-format
@@ -17332,6 +18526,10 @@ msgstr "PHP bcmath"
 #: include/classes/setup/CFrontendSetup.php:295
 msgid "PHP bcmath extension missing (PHP configuration parameter --enable-bcmath)."
 msgstr "PHP不支持bcmath扩展(PHP配置参数--enable-bcmath)."
+
+#: include/classes/db/ApmDbClickHouse.php:26
+msgid "PHP cURL extension is not available. "
+msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:575
 msgid "PHP ctype"
@@ -17637,9 +18835,17 @@ msgstr "上层监控项"
 msgid "Parent services"
 msgstr "父服务"
 
+#: app/views/js/apm.trace.list.js.php:586
+msgid "Parent span ID"
+msgstr ""
+
 #: app/partials/configuration.tags.tab.php:46
 msgid "Parent templates"
 msgstr "父模板"
+
+#: include/triggers.inc.php:2018 widgets/trigover/includes/ViewHelper.php:94
+msgid "Parent trigger"
+msgstr ""
 
 #: app/partials/trigger.edit.trigger.tab.php:32
 msgid "Parent triggers"
@@ -17746,6 +18952,19 @@ msgstr "粘贴无外部链接"
 #: app/controllers/CControllerPopupTriggerExpr.php:938
 msgid "Pattern"
 msgstr "图案"
+
+#: app/partials/ceprule.window.php:51
+#: include/classes/helpers/CCepRuleHelper.php:540
+msgid "Pattern match"
+msgstr ""
+
+#: app/partials/ceprule.window.php:42
+msgid "Pattern match - executes JavaScript to identify event patterns in sliding time window."
+msgstr ""
+
+#: include/classes/helpers/CCepRuleHelper.php:448
+msgid "Pattern matched"
+msgstr ""
 
 #: widgets/topitems/includes/CWidgetFieldColumnsListView.php:58
 msgid "Patterns"
@@ -18216,6 +19435,10 @@ msgstr "问题已创建"
 msgid "Problem display"
 msgstr "问题显示"
 
+#: app/partials/ceprule.modal.operation.php:233
+msgid "Problem event generation mode impacts cloning:"
+msgstr ""
+
 #: app/views/js/trigger.edit.js.php:268 include/triggers.inc.php:603
 msgid "Problem expression"
 msgstr "问题表达式"
@@ -18225,14 +19448,32 @@ msgstr "问题表达式"
 msgid "Problem hosts"
 msgstr "问题主机"
 
+#: include/classes/helpers/CCepRuleHelper.php:357
+msgid "Problem is not opened"
+msgstr ""
+
 #: app/views/js/popup.action.edit.js.php:289 include/actions.inc.php:365
 msgid "Problem is not suppressed"
 msgstr "问题没有被制止"
+
+#: include/classes/helpers/CCepRuleHelper.php:361
+msgid "Problem is not symptom"
+msgstr ""
+
+#: include/classes/helpers/CCepRuleHelper.php:344
+#: include/classes/helpers/CCepRuleHelper.php:356
+msgid "Problem is opened"
+msgstr ""
 
 #: app/views/js/popup.action.edit.js.php:288 include/actions.inc.php:45
 #: include/actions.inc.php:364
 msgid "Problem is suppressed"
 msgstr "问题已被制止"
+
+#: include/classes/helpers/CCepRuleHelper.php:345
+#: include/classes/helpers/CCepRuleHelper.php:360
+msgid "Problem is symptom"
+msgstr ""
 
 #: jsLoader.php:282
 msgid "Problem on"
@@ -18247,6 +19488,21 @@ msgstr "问题恢复"
 #: include/actions.inc.php:1981
 msgid "Problem resolved"
 msgstr "问题已解决"
+
+#: include/actions.inc.php:1849
+msgctxt "screen reader"
+msgid "Problem severity changed"
+msgstr ""
+
+#: include/actions.inc.php:1839
+msgctxt "screen reader"
+msgid "Problem severity decreased"
+msgstr ""
+
+#: include/actions.inc.php:1844
+msgctxt "screen reader"
+msgid "Problem severity increased"
+msgstr ""
 
 #: app/views/usergroup.edit.php:273
 msgid "Problem tag filter"
@@ -18287,6 +19543,10 @@ msgstr "问题"
 #: widgets/problemsbysv/Widget.php:32
 msgid "Problems by severity"
 msgstr "按严重性的问题"
+
+#: app/views/proxy.edit.php:284
+msgid "Process"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1257
 msgid "Process CPU utilization percentage. Returns float"
@@ -18339,6 +19599,16 @@ msgstr "提供的 API 接入点“%1$s”无效。"
 #, c-format
 msgid "Provided URL \"%1$s\" is invalid."
 msgstr "提供的 URL \"%1$s\" 无效。"
+
+#: include/classes/vaults/CVaultHashiCorp.php:69
+#, c-format
+msgid "Provided authentication role ID \"%1$s\" is empty."
+msgstr ""
+
+#: include/classes/vaults/CVaultHashiCorp.php:73
+#, c-format
+msgid "Provided authentication secret ID \"%1$s\" is empty."
+msgstr ""
 
 #: include/classes/vaults/CVaultHashiCorp.php:64
 #, c-format
@@ -18404,6 +19674,12 @@ msgstr "Proxy"
 msgid "Proxy \"%1$s\" already exists."
 msgstr "Proxy“%1$s”已存在。"
 
+#: app/controllers/CControllerUsergroupUpdateGeneral.php:105
+#, c-format
+msgid "Proxy \"%1$s\" cannot be added to the proxy list because it is already managed by proxy group."
+msgid_plural "Proxies \"%1$s\" cannot be added to the proxy list because they are already managed by proxy group."
+msgstr[0] ""
+
 #: include/classes/import/importers/CHostImporter.php:333
 #, c-format
 msgid "Proxy \"%1$s\" for host \"%2$s\" does not exist."
@@ -18418,6 +19694,10 @@ msgstr "Proxy代理  \"%1$s\" 已被动作 \"%2$s\" 使用。"
 #, c-format
 msgid "Proxy \"%1$s\" is used by discovery rule \"%2$s\"."
 msgstr "Proxy代理程序\"%1$s\"是用在自动发现规则\"%2$s\"上."
+
+#: app/views/usergroup.edit.php:414
+msgid "Proxy access list"
+msgstr ""
 
 #: app/controllers/CControllerProxyCreate.php:227
 msgid "Proxy added"
@@ -18454,6 +19734,11 @@ msgstr "Proxy组 \"%1$s\" 已存在。"
 #, c-format
 msgid "Proxy group \"%1$s\" for host \"%2$s\" does not exist."
 msgstr "主机 \"%2$s\" 的Proxy组 \"%1$s\" 不存在。"
+
+#: include/classes/api/services/CProxyGroup.php:423
+#, c-format
+msgid "Proxy group \"%1$s\" is used by action \"%2$s\"."
+msgstr ""
 
 #: include/classes/api/services/CProxyGroup.php:437
 #, c-format
@@ -18535,6 +19820,15 @@ msgstr "公钥文件"
 #: app/controllers/CControllerAuditLogList.php:210
 msgid "Push"
 msgstr "推"
+
+#: app/views/js/user.device.init.view.js.php:122
+msgid "QR code has expired."
+msgstr ""
+
+#: app/views/js/user.device.init.view.js.php:125
+#, c-format
+msgid "QR code will expire in %1$s."
+msgstr ""
 
 #: include/views/js/item.preprocessing.js.php:208
 msgid "Qualifier"
@@ -18763,6 +20057,11 @@ msgstr "恢复时间"
 #: include/views/js/monitoring.sysmaps.js.php:525
 msgid "Rectangle"
 msgstr "矩形"
+
+#: app/views/administration.user.edit.php:471
+#: app/views/administration.userrole.edit.php:171
+msgid "Redirect URL after login"
+msgstr ""
 
 #: app/views/oauth.edit.php:44
 msgid "Redirection endpoint"
@@ -19036,6 +20335,10 @@ msgstr "移除"
 msgid "Remove all"
 msgstr "移除全部"
 
+#: app/views/js/user.device.list.js.php:61
+msgid "Remove device?"
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:176
 msgid "Remove domain name"
 msgstr "删除域名"
@@ -19052,6 +20355,10 @@ msgstr "自主机群组移除"
 msgid "Remove from host groups"
 msgstr "自主机群组移除"
 
+#: app/controllers/CControllerFavoriteCreate.php:54 include/html.inc.php:169
+msgid "Remove graph from the Favorite graphs widget"
+msgstr ""
+
 #: include/actions.inc.php:633 include/actions.inc.php:861
 msgid "Remove host"
 msgstr "移除主机"
@@ -19059,6 +20366,14 @@ msgstr "移除主机"
 #: include/actions.inc.php:656 include/actions.inc.php:872
 msgid "Remove host tags"
 msgstr "删除主机标签"
+
+#: app/controllers/CControllerFavoriteCreate.php:53 include/html.inc.php:168
+msgid "Remove map from the Favorite maps widget"
+msgstr ""
+
+#: app/views/user.device.list.php:164 app/views/userprofile.device.list.php:75
+msgid "Remove selected device?"
+msgstr ""
 
 #: widgets/favgraphs/views/widget.view.php:43
 #: widgets/favmaps/views/widget.view.php:42
@@ -19271,6 +20586,10 @@ msgstr "重设预设"
 msgid "Reset layout"
 msgstr ""
 
+#: app/views/ceprule.edit.php:47
+msgid "Reset time windows"
+msgstr ""
+
 #: widgets/geomap/Widget.php:37
 msgid "Reset to initial view"
 msgstr "重置为初始视图"
@@ -19288,6 +20607,17 @@ msgstr "已解决"
 #: include/events.inc.php:171
 msgid "Resolved by"
 msgstr "处理方法"
+
+#: app/controllers/CControllerProblemViewData.php:196
+#: widgets/problems/includes/WidgetProblems.php:274
+#, c-format
+msgid "Resolved by complex event processing rule \"%1$s\"."
+msgstr ""
+
+#: app/controllers/CControllerProblemViewData.php:199
+#: widgets/problems/includes/WidgetProblems.php:277
+msgid "Resolved by complex event processing rule."
+msgstr ""
 
 #: include/classes/screens/CScreenProblem.php:1398
 #: widgets/problems/includes/WidgetProblems.php:251
@@ -19319,6 +20649,24 @@ msgstr "资源"
 #: app/views/reports.auditlog.list.php:92
 msgid "Resource ID"
 msgstr "资源 ID"
+
+#: app/views/apm.log.list.php:112 app/views/apm.metric.list.php:98
+#: app/views/apm.trace.list.php:99 app/views/js/apm.log.list.js.php:219
+#: app/views/js/apm.log.list.js.php:657 app/views/js/apm.metric.list.js.php:218
+#: app/views/js/apm.metric.list.js.php:857
+#: app/views/js/apm.trace.list.js.php:214
+#: app/views/js/apm.trace.list.js.php:639 app/views/proxy.edit.php:288
+#: app/views/usergroup.edit.php:385
+msgid "Resource attributes"
+msgstr ""
+
+#: app/views/js/apm.log.list.js.php:629
+msgid "Resource schema URL"
+msgstr ""
+
+#: app/views/js/apm.metric.list.js.php:723
+msgid "Resource schema url"
+msgstr ""
 
 #: app/views/mediatype.test.edit.php:93 app/views/popup.scriptexec.php:48
 msgid "Response"
@@ -19385,6 +20733,11 @@ msgstr "结果类型"
 #: app/views/js/popup.itemtestedit.view.js.php:339
 msgid "Result with value map applied"
 msgstr "结果已使用值映射"
+
+#: app/partials/configuration.host.interface.row.php:74
+#: app/views/host.wizard.edit.php:764 app/views/popup.itemtestedit.view.php:210
+msgid "Retries"
+msgstr ""
 
 #: app/views/webscenario.step.edit.php:247
 #: include/views/configuration.host.discovery.edit.php:381
@@ -19525,6 +20878,10 @@ msgstr "行"
 #: app/views/administration.user.edit.php:314
 msgid "Rows per page"
 msgstr "每页行数"
+
+#: app/controllers/CControllerCepRuleResetTimeWindows.php:54
+msgid "Rule time windows are reset"
+msgstr ""
 
 #: app/views/popup.import.php:165
 msgid "Rules"
@@ -19911,6 +21268,10 @@ msgstr "STARTTLS(纯文本通信协议扩展)"
 msgid "Safari"
 msgstr "Safari"
 
+#: app/views/js/apm.log.list.js.php:675
+msgid "Sampled"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:60
 msgid "Sans-Serif"
 msgstr "无衬线字体"
@@ -19957,6 +21318,10 @@ msgstr "扫描目录"
 #: include/views/mfa.login.php:60
 msgid "Scan this QR code"
 msgstr "扫描此二维码"
+
+#: app/views/user.device.init.view.php:72
+msgid "Scan this QR code to add your device and setup your notifications."
+msgstr ""
 
 #: widgets/scatterplot/Widget.php:24
 msgid "Scatter plot"
@@ -20050,6 +21415,30 @@ msgstr "范围"
 msgctxt "selected problems"
 msgid "Scope"
 msgstr "范围"
+
+#: app/views/apm.log.list.php:127 app/views/apm.metric.list.php:113
+#: app/views/js/apm.log.list.js.php:227 app/views/js/apm.log.list.js.php:663
+#: app/views/js/apm.metric.list.js.php:226
+#: app/views/js/apm.metric.list.js.php:863
+msgid "Scope attributes"
+msgstr ""
+
+#: app/views/apm.log.list.php:76 app/views/apm.metric.list.php:74
+#: app/views/apm.trace.list.php:76 app/views/js/apm.log.list.js.php:193
+#: app/views/js/apm.log.list.js.php:637 app/views/js/apm.metric.list.js.php:170
+#: app/views/js/apm.trace.list.js.php:177
+#: app/views/js/apm.trace.list.js.php:602
+msgid "Scope name"
+msgstr ""
+
+#: app/views/js/apm.log.list.js.php:633
+msgid "Scope schema URL"
+msgstr ""
+
+#: app/views/js/apm.log.list.js.php:199 app/views/js/apm.log.list.js.php:641
+#: app/views/js/apm.trace.list.js.php:183
+msgid "Scope version"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:252
 #: app/views/administration.mediatype.edit.php:233
@@ -20150,6 +21539,10 @@ msgstr "查找式样为空"
 msgid "Search string"
 msgstr "搜索字符串"
 
+#: include/classes/data/CTriggerConditionFunctionData.php:2781
+msgid "Search value"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:114
 #: app/controllers/CControllerPopupTriggerExpr.php:1135
 msgid "Season"
@@ -20236,6 +21629,10 @@ msgstr "看"
 msgid "Select"
 msgstr "选择"
 
+#: include/classes/helpers/CRoleHelper.php:624
+msgid "Select \"Server\" for monitoring and discovery"
+msgstr ""
+
 #: app/views/slareport.list.php:104
 msgid "Select SLA to display SLA report."
 msgstr "选择 SLA 以显示 SLA 报表。"
@@ -20243,6 +21640,10 @@ msgstr "选择 SLA 以显示 SLA 报表。"
 #: app/views/host.wizard.edit.php:137 app/views/js/host.wizard.edit.js.php:1116
 msgid "Select a template"
 msgstr "选择模板"
+
+#: include/classes/html/CDateSelector.php:199
+msgid "Select date"
+msgstr ""
 
 #: app/views/popup.massupdate.item.php:458 app/views/popup.triggerexpr.php:95
 #: include/views/configuration.graph.edit.php:242
@@ -20271,6 +21672,10 @@ msgstr "已选"
 #: app/views/popup.acknowledge.edit.php:63
 msgid "Selected and all other problems of related triggers"
 msgstr "已选择的和所有其他问题的关联触发器"
+
+#: app/views/popup.media.edit.php:117
+msgid "Selected devices"
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:654
 msgid "Selected elements"
@@ -20559,6 +21964,14 @@ msgstr "会话初始化错误。"
 msgid "Session terminated, re-login, please."
 msgstr "会话已中断, 请重新登录."
 
+#: include/classes/helpers/CCepRuleHelper.php:469
+msgid "Set"
+msgstr ""
+
+#: include/classes/helpers/CCepRuleHelper.php:626
+msgid "Set as symptom"
+msgstr ""
+
 #: app/views/popup.tabfilter.edit.php:40
 msgid "Set custom time period"
 msgstr "设置自定义时间段"
@@ -20577,9 +21990,17 @@ msgstr "设置到期日期和时间"
 msgid "Set host inventory mode"
 msgstr "设置主机资产模式"
 
+#: include/classes/helpers/CCepRuleHelper.php:458
+msgid "Set name"
+msgstr ""
+
 #: include/classes/html/CInputSecret.php:80 jsLoader.php:423
 msgid "Set new value"
 msgstr "设置新值"
+
+#: include/classes/helpers/CCepRuleHelper.php:461
+msgid "Set severity"
+msgstr ""
 
 #: app/views/popup.service.statusrule.edit.php:39
 msgid "Set status to"
@@ -20600,6 +22021,10 @@ msgstr "通过执行以下PowerShell脚本[需管理员权限]在监控目标上
 #: app/views/host.wizard.edit.php:477
 msgid "Set up Zabbix agent on your monitoring target by executing the following script [bash under root]:"
 msgstr "通过执行以下脚本[root权限下的bash]在监控目标上设置Zabbix agent："
+
+#: include/classes/helpers/CCepRuleHelper.php:470
+msgid "Set value"
+msgstr ""
 
 #: app/views/js/popup.itemtestedit.view.js.php:383 include/forms.inc.php:1599
 #: include/views/js/item.preprocessing.js.php:67
@@ -20680,6 +22105,14 @@ msgctxt "screen reader"
 msgid "Severity increased"
 msgstr "严重性提升"
 
+#: app/views/js/apm.log.list.js.php:164 app/views/js/apm.log.list.js.php:617
+msgid "Severity number"
+msgstr ""
+
+#: app/views/js/apm.log.list.js.php:159 app/views/js/apm.log.list.js.php:613
+msgid "Severity text"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:360
 #: include/views/js/monitoring.sysmaps.js.php:523
 #: include/views/monitoring.sysmap.constructor.php:37
@@ -20700,6 +22133,12 @@ msgstr "分享"
 #, c-format
 msgid "Sharing option \"%1$s\" is missing a value for map \"%2$s\"."
 msgstr "共享选项 \"%1$s\" 没有在拓补图中指定值 \"%2$s\" 。"
+
+#: app/partials/item.edit.item.tab.php:918
+#: app/partials/lldrule.edit.lldrule.tab.php:902
+#: app/partials/lldrule.edit.prototype.tab.php:904
+msgid "Shift the processing window back by a fixed amount."
+msgstr ""
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:135
 #: widgets/clock/includes/WidgetForm.php:135
@@ -20747,6 +22186,15 @@ msgstr "查看"
 #: widgets/svggraph/includes/WidgetForm.php:355
 msgid "Show aggregation function"
 msgstr "显示聚合函数"
+
+#: app/views/js/apm.log.list.js.php:389 app/views/js/apm.metric.list.js.php:374
+#: app/views/js/apm.trace.list.js.php:340
+msgid "Show all attributes"
+msgstr ""
+
+#: include/classes/helpers/CTagHelper.php:133 jsLoader.php:281
+msgid "Show all tags"
+msgstr ""
 
 #: widgets/gauge/includes/WidgetForm.php:302
 msgid "Show arc"
@@ -20812,6 +22260,10 @@ msgstr "查看线条"
 #: include/views/monitoring.sysmap.edit.php:274
 msgid "Show link labels"
 msgstr "显示链接标签"
+
+#: include/classes/html/CHtmlPage.php:190
+msgid "Show main menu"
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:267
 msgid "Show map element labels"
@@ -20979,6 +22431,24 @@ msgstr "退出"
 msgid "Simple"
 msgstr "简单"
 
+#: app/partials/ceprule.window.php:48
+#: include/classes/helpers/CCepRuleHelper.php:537
+msgid "Simple (multiple)"
+msgstr ""
+
+#: app/partials/ceprule.window.php:39
+msgid "Simple (multiple) - sets up sliding time window based event operations."
+msgstr ""
+
+#: app/partials/ceprule.window.php:49
+#: include/classes/helpers/CCepRuleHelper.php:538
+msgid "Simple (once)"
+msgstr ""
+
+#: app/partials/ceprule.window.php:40
+msgid "Simple (once) - same as 'Simple (multiple)', except that an event cannot be processed by another window of this type."
+msgstr ""
+
 #: app/views/js/host.wizard.edit.js.php:97
 msgid "Simple Network Management Protocol (SNMP) interface"
 msgstr "简单网络管理协议(SNMP)接口"
@@ -21019,6 +22489,10 @@ msgstr "单行"
 #: widgets/itemhistory/views/column.edit.php:140
 msgid "Single line - result will be displayed in a single line and truncated to specified length."
 msgstr "单行 - 结果将在一行中显示，并截断到指定长度。"
+
+#: app/partials/ceprule.modal.operation.php:236
+msgid "Single: Clones closed problems only."
+msgstr ""
 
 #: include/hosts.inc.php:364
 msgid "Site ZIP / postal"
@@ -21085,6 +22559,14 @@ msgstr "Zabbix服务器\"%1$s\" 收到响应的大小字节超过允许的大小
 #: app/views/host.wizard.edit.php:355
 msgid "Skip OS selection if you already have Zabbix agent installed."
 msgstr "如果已安装Zabbix agent，可跳过操作系统选择"
+
+#: app/views/layout.htmlpage.php:63 include/page_header.php:217
+msgid "Skip to main content"
+msgstr ""
+
+#: app/views/dashboard.page.properties.edit.php:50
+msgid "Slideshow interval"
+msgstr ""
 
 #: include/locales.inc.php:61
 msgid "Slovak (sk_SK)"
@@ -21162,6 +22644,10 @@ msgstr "某些模板（%1$s）与主机向导不兼容。"
 msgid "Sort entries by"
 msgstr "排序对象以"
 
+#: app/views/ceprule.edit.php:261 app/views/ceprule.list.php:91
+msgid "Sort order"
+msgstr ""
+
 #: app/views/popup.service.edit.php:105
 msgid "Sort order (0->999)"
 msgstr "排序(0->999)"
@@ -21180,6 +22666,31 @@ msgstr "来源 "
 #: widgets/piechart/includes/WidgetForm.php:132
 msgid "Space between sectors"
 msgstr "扇区的间隙"
+
+#: app/views/apm.log.list.php:62 app/views/apm.trace.list.php:55
+#: app/views/js/apm.log.list.js.php:175 app/views/js/apm.log.list.js.php:605
+#: app/views/js/apm.metric.list.js.php:690
+#: app/views/js/apm.trace.list.js.php:149
+#: app/views/js/apm.trace.list.js.php:590
+msgid "Span ID"
+msgstr ""
+
+#: app/views/apm.trace.list.php:114 app/views/js/apm.trace.list.js.php:207
+#: app/views/js/apm.trace.list.js.php:649
+msgid "Span attributes"
+msgstr ""
+
+#: app/views/js/apm.trace.list.js.php:557
+msgid "Span details"
+msgstr ""
+
+#: app/views/js/apm.trace.list.js.php:171
+msgid "Span kind"
+msgstr ""
+
+#: app/partials/apm.trace.list.split.view.php:87
+msgid "Span tree"
+msgstr ""
 
 #: include/locales.inc.php:62
 msgid "Spanish (es_ES)"
@@ -21422,6 +22933,11 @@ msgstr "状态计算规则"
 msgid "Status calculation rule and additional rules are only applicable if child services exist."
 msgstr "状态计算规则和附加规则仅适用于存在子服务的情况。"
 
+#: app/views/js/apm.trace.list.js.php:189
+#: app/views/js/apm.trace.list.js.php:618
+msgid "Status code"
+msgstr ""
+
 #: include/views/configuration.httpconf.edit.php:229
 msgid "Status codes"
 msgstr "状态码"
@@ -21433,6 +22949,11 @@ msgstr "状态已禁用"
 #: include/classes/helpers/CMapHelper.php:287
 msgid "Status maintenance"
 msgstr "维护状态"
+
+#: app/views/js/apm.trace.list.js.php:195
+#: app/views/js/apm.trace.list.js.php:625
+msgid "Status message"
+msgstr ""
 
 #: app/controllers/CControllerDiscoveryView.php:90
 #: app/views/monitoring.discovery.view.php:34
@@ -21490,6 +23011,10 @@ msgstr "步骤"
 #: app/views/administration.user.edit.php:801
 msgid "Stop"
 msgstr "停止"
+
+#: app/views/ceprule.edit.php:254 app/views/ceprule.list.php:90
+msgid "Stop after this rule"
+msgstr ""
 
 #: app/views/popup.lldoverride.php:55
 #: include/views/configuration.host.discovery.edit.php:973
@@ -21598,9 +23123,25 @@ msgstr "成功审计"
 msgid "Success message"
 msgstr "成功消息"
 
+#: app/controllers/CControllerApmDbTest.php:74
+msgid "Successfully connected to APM data source."
+msgstr ""
+
+#: app/partials/item.edit.item.tab.php:671
+#: app/partials/lldrule.edit.lldrule.tab.php:635
+#: app/partials/lldrule.edit.prototype.tab.php:635
+#: app/views/js/apm.metric.list.js.php:776
+#: include/classes/helpers/CApmMetricHelper.php:22
+msgid "Sum"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1141
 msgid "Sum of incoming and outgoing traffic statistics on network interface. Returns integer"
 msgstr "网络接口上传下载的流量总和。返回整数"
+
+#: app/views/js/apm.metric.list.js.php:181
+msgid "Sum/Value"
+msgstr ""
 
 #: include/func.inc.php:212
 msgid "Sun"
@@ -21637,9 +23178,27 @@ msgstr "支持的宏："
 msgid "Suppress"
 msgstr "抑制"
 
+#: jsLoader.php:640
+msgid "Suppress by event name"
+msgstr ""
+
+#: jsLoader.php:641
+msgid "Suppress by tags"
+msgstr ""
+
+#: jsLoader.php:638
+msgid "Suppress host"
+msgstr ""
+
 #: include/classes/helpers/CRoleHelper.php:546
 msgid "Suppress problems"
 msgstr "抑制问题"
+
+#: app/views/acknowledge.edit.php:177 app/views/acknowledge.edit.php:182
+#: jsLoader.php:639
+msgid "Suppress trigger"
+msgid_plural "Suppress triggers"
+msgstr[0] ""
 
 #: include/actions.inc.php:1571
 msgid "Suppress until"
@@ -21648,6 +23207,10 @@ msgstr "抑制到"
 #: include/actions.inc.php:1580 include/classes/screens/CScreenProblem.php:1250
 msgid "Suppressed"
 msgstr "抑制"
+
+#: include/html.inc.php:1154
+msgid "Suppressed by complex event processing"
+msgstr ""
 
 #: include/actions.inc.php:2241 include/html.inc.php:1134
 msgid "Suppressed by maintenance"
@@ -21967,6 +23530,11 @@ msgstr "目标列表"
 msgid "Target type"
 msgstr "目标类型"
 
+#: app/views/administration.timeouts.edit.php:134 app/views/proxy.edit.php:443
+#: include/items.inc.php:101
+msgid "Telemetry query"
+msgstr ""
+
 #: app/views/administration.script.edit.php:105
 #: app/views/administration.script.list.php:181 include/discovery.inc.php:61
 msgid "Telnet"
@@ -22205,6 +23773,10 @@ msgstr "测试确认"
 msgid "Test data"
 msgstr "测试数据"
 
+#: app/views/administration.regex.edit.php:94
+msgid "Test expression"
+msgstr ""
+
 #: app/views/administration.regex.edit.php:129
 msgid "Test expressions"
 msgstr "测试表达式"
@@ -22228,6 +23800,10 @@ msgstr "不支持测试“%1$s”项。"
 #: app/controllers/CControllerPopupScheduledReportTest.php:78
 msgid "Test report generating"
 msgstr "测试生成报表"
+
+#: app/views/administration.regex.edit.php:43
+msgid "Test result"
+msgstr ""
 
 #: app/views/administration.regex.edit.php:124
 msgid "Test string"
@@ -22260,6 +23836,10 @@ msgstr "使用测试"
 #: widgets/tophosts/views/column.edit.php:73
 msgid "Text"
 msgstr "文本"
+
+#: jsLoader.php:317
+msgid "Text, macros, or combined"
+msgstr ""
 
 #: widgets/tophosts/views/column.edit.php:77
 msgid "Text, supports {INVENTORY.*}, {HOST.*} macros"
@@ -22346,6 +23926,10 @@ msgstr "在更改用于主机监控的 proxy 或 proxy 组时，必须指定“m
 msgid "The following placeholders are supported:"
 msgstr "支持以下占位符："
 
+#: app/views/administration.apm.db.edit.php:32
+msgid "The global data source will be used by the Frontend, Server, and Proxies, unless explicitly overridden in the respective configuration files."
+msgstr ""
+
 #: include/html.inc.php:724
 #, c-format
 msgid "The graph is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
@@ -22421,6 +24005,10 @@ msgstr "进程数。返回整数"
 msgid "The parameter \"%1$s\" is missing from the user attributes."
 msgstr "用户属性中缺少参数“%1$s”。"
 
+#: app/views/administration.apm.db.edit.php:83
+msgid "The previous password was cleared due to a URL change. Please enter the new password."
+msgstr ""
+
 #: app/views/popup.ldap.edit.php:101
 msgid "The previous password was cleared due to a host change. Please enter the new password."
 msgstr "由于主机变更，先前密码已被清除。请输入新密码。"
@@ -22428,6 +24016,11 @@ msgstr "由于主机变更，先前密码已被清除。请输入新密码。"
 #: include/classes/core/CJsonRpc.php:206
 msgid "The received JSON is not a valid JSON-RPC request."
 msgstr "收到的 JSON 不是有效的 JSON-RPC 请求。"
+
+#: include/classes/scim/API.php:55
+#, c-format
+msgid "The requested endpoint \"%1$s\" is not supported."
+msgstr ""
 
 #: include/classes/core/CJsonRpc.php:211
 msgid "The requested remote-procedure does not exist / is not available"
@@ -22456,6 +24049,12 @@ msgstr "您选择的模板(%1$s)需要额外配置"
 #, c-format
 msgid "The template you selected (%1$s) requires the %2$s to be added to the host (%3$s)."
 msgstr "您选择的模板(%1$s)要求将%2$s添加到主机(%3$s)"
+
+#: app/partials/item.edit.item.tab.php:996
+#: app/partials/lldrule.edit.lldrule.tab.php:974
+#: app/partials/lldrule.edit.prototype.tab.php:976
+msgid "The timeout value is unavailable because it is configured on a proxy that you do not have permission to."
+msgstr ""
 
 #: app/views/popup.token.view.php:62
 msgid "The token has expired. Please update the expiry date to use the token."
@@ -22504,6 +24103,18 @@ msgstr "由于先前删除的对象，此操作缺少条件或操作。"
 msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
 msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
 msgstr[0] "此检查无法删除，因为它在%1$s发现操作中被用作一个条件。"
+
+#: include/classes/helpers/CTelemetryHelper.php:165
+#: include/classes/helpers/CTelemetryHelper.php:173
+msgid "This column is not available for the selected category."
+msgstr ""
+
+#: include/classes/helpers/CTelemetryHelper.php:183
+#: include/classes/helpers/CTelemetryHelper.php:194
+#: include/classes/helpers/CTelemetryHelper.php:205
+#: include/classes/helpers/CTelemetryHelper.php:216
+msgid "This column is not available for the selected metric points."
+msgstr ""
 
 #: app/views/host.wizard.edit.php:384
 msgid "This configuration will overwrite all existing encryption settings on the host."
@@ -22808,6 +24419,18 @@ msgstr "间隔(秒)"
 msgid "Time type"
 msgstr "时间类型"
 
+#: app/partials/ceprule.window.php:36
+msgid "Time window"
+msgstr ""
+
+#: app/partials/ceprule.window.php:64
+msgid "Time window may be limited to contain specific event count. When this limit is reached, new events will be evicted due to capacity restriction."
+msgstr ""
+
+#: app/views/ceprule.list.php:88
+msgid "Time window processing"
+msgstr ""
+
 #: app/views/administration.user.edit.php:287 app/views/popup.sla.edit.php:84
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:82
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:130
@@ -22886,6 +24509,10 @@ msgstr "到"
 msgid "To complete the setup, configure the following variables (host macros)."
 msgstr "请配置以下变量（主机宏）以完成设置"
 
+#: app/views/proxy.edit.php:251
+msgid "To enable OpenTelemetry data collection set up Proxy configuration file first."
+msgstr ""
+
 #: jsLoader.php:398
 msgid "To set a host interface select a single item type for all items"
 msgstr "要设定一个主机接口, 选择一个单一的监控项类型给所有的监控项"
@@ -22898,6 +24525,11 @@ msgstr "今天"
 msgid "Today so far"
 msgstr "今天到目前为止"
 
+#: include/classes/setup/CSetupWizard.php:744
+#: include/classes/setup/CSetupWizard.php:1081
+msgid "Token"
+msgstr ""
+
 #: app/controllers/CControllerPopup.php:60
 msgid "Token edit"
 msgstr "令牌编辑"
@@ -22905,6 +24537,10 @@ msgstr "令牌编辑"
 #: app/views/oauth.edit.php:188
 msgid "Token endpoint"
 msgstr "令牌端点"
+
+#: app/views/user.device.list.php:143
+msgid "Token expired"
+msgstr ""
 
 #: app/views/oauth.edit.php:201
 msgid "Token parameters"
@@ -22994,6 +24630,32 @@ msgstr "合计"
 #: app/controllers/CControllerMediatypeTestSend.php:192
 msgid "Trace"
 msgstr "跟踪"
+
+#: app/partials/apm.trace.list.split.view.php:32 app/views/apm.log.list.php:55
+#: app/views/apm.trace.list.php:48 app/views/js/apm.log.list.js.php:169
+#: app/views/js/apm.log.list.js.php:601 app/views/js/apm.metric.list.js.php:678
+#: app/views/js/apm.trace.list.js.php:143
+msgid "Trace ID"
+msgstr ""
+
+#: app/controllers/CControllerApmTraceListSplitView.php:72
+msgid "Trace not found."
+msgstr ""
+
+#: app/views/js/apm.trace.list.js.php:155
+msgid "Trace state"
+msgstr ""
+
+#: app/controllers/CControllerApmTraceList.php:164
+#: app/partials/item.edit.item.tab.php:660
+#: app/partials/lldrule.edit.lldrule.tab.php:624
+#: app/partials/lldrule.edit.prototype.tab.php:624
+#: app/views/apm.trace.list.php:148 app/views/js/apm.metric.list.js.php:640
+#: app/views/proxy.edit.php:297 app/views/usergroup.edit.php:395
+#: include/classes/helpers/CMenuHelper.php:81
+#: include/classes/helpers/CRoleHelper.php:440
+msgid "Traces"
+msgstr ""
 
 #: include/page_footer.php:40
 msgid "Transaction has not been closed. Aborting..."
@@ -23560,6 +25222,10 @@ msgstr "URL 参数不能为数组."
 msgid "URL parameter name is empty."
 msgstr "URL 参数名为空."
 
+#: include/classes/validators/CUrlValidator.php:148
+msgid "URL scheme is required"
+msgstr ""
+
 #: include/classes/api/services/CMap.php:955
 #: include/classes/api/services/CMap.php:1430
 #, c-format
@@ -23601,6 +25267,10 @@ msgstr "由于TLS设置无法连接Zabbix服务器，部分功能不可用"
 msgid "Unable to create the configuration file."
 msgstr "无法创建配置文件。"
 
+#: include/classes/db/ApmDbClickHouse.php:373
+msgid "Unable to decode data received from ClickHouse."
+msgstr ""
+
 #: include/classes/db/MysqlDbBackend.php:35
 #: include/classes/db/OracleDbBackend.php:36
 #: include/classes/db/PostgresqlDbBackend.php:61
@@ -23617,6 +25287,12 @@ msgstr "无法找到 SAML 用户目录。"
 msgid "Unable to load authentication API parameters."
 msgstr "无法加载身份验证 API 参数。"
 
+#: include/classes/db/ApmDbClickHouse.php:93
+#: include/classes/db/ApmDbClickHouse.php:127
+#, c-format
+msgid "Unable to load data from ClickHouse: %1$s."
+msgstr ""
+
 #: include/classes/core/ZBase.php:469
 #: include/classes/vaults/CVaultCyberArk.php:106
 #: include/classes/vaults/CVaultHashiCorp.php:93
@@ -23630,6 +25306,11 @@ msgstr "无法加载管家服务 API 参数。"
 #: include/classes/helpers/CSettingsHelper.php:124
 msgid "Unable to load settings API parameters."
 msgstr "无法加载设置API的参数。"
+
+#: include/classes/vaults/CVaultHashiCorp.php:125
+#: include/classes/vaults/CVaultHashiCorp.php:133
+msgid "Unable to load token from Vault."
+msgstr ""
 
 #: include/classes/core/CConfigFile.php:233
 msgid "Unable to overwrite the existing configuration file."
@@ -23686,6 +25367,11 @@ msgstr "未确认的 RESOLVED 事件"
 #: widgets/problemsbysv/includes/WidgetForm.php:116
 msgid "Unacknowledged only"
 msgstr "仅未确认的"
+
+#: app/controllers/CControllerUserDeviceList.php:227
+#: app/views/user.device.list.php:106
+msgid "Unassigned"
+msgstr ""
 
 #: app/partials/administration.ha.nodes.php:56
 msgid "Unavailable"
@@ -23813,6 +25499,11 @@ msgstr "意外响应动作 %1$s。"
 msgid "Unexpected server error."
 msgstr "服务器意外错误。"
 
+#: app/views/js/apm.metric.list.js.php:160
+#: app/views/js/apm.metric.list.js.php:814
+msgid "Unit"
+msgstr ""
+
 #: app/views/popup.massupdate.item.php:157
 #: include/views/configuration.item.edit.php:763
 #: include/views/configuration.item.prototype.edit.php:730
@@ -23933,6 +25624,20 @@ msgstr "取消静音"
 msgid "Unmute for %1$s"
 msgstr "取消静音%1$s"
 
+#: include/classes/helpers/CApmTraceHelper.php:21
+msgid "Unset"
+msgstr ""
+
+#: widgets/svggraph/includes/WidgetForm.php:339
+#: widgets/svggraph/includes/WidgetForm.php:375
+msgid "Unsigned"
+msgstr ""
+
+#: app/views/js/apm.metric.list.js.php:77
+#: include/classes/helpers/CApmLogHelper.php:21
+msgid "Unspecified"
+msgstr ""
+
 #: app/partials/administration.system.info.php:161
 #, c-format
 msgid "Unsupported %1$s database server version. Must be at least %2$s."
@@ -23942,6 +25647,11 @@ msgstr "不支持的 %1$s 数据库服务版本。必须至少为 %2$s。"
 #, c-format
 msgid "Unsupported %1$s database server version. Must not be higher than %2$s."
 msgstr "不支持的 %1$s 数据库服务版本。不得高于 %2$s。"
+
+#: include/classes/db/ApmDbClickHouse.php:247
+#, c-format
+msgid "Unsupported ClickHouse query parameter type: %1$s."
+msgstr ""
 
 #: app/partials/administration.system.info.php:206
 #: app/views/administration.housekeeping.edit.php:169
@@ -24021,6 +25731,11 @@ msgstr "上"
 #: app/partials/administration.system.info.php:64
 msgid "Up to date"
 msgstr "最新"
+
+#: app/views/maintenance.list.php:66 app/views/maintenance.list.php:104
+msgctxt "maintenance status"
+msgid "Upcoming"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:205
 #: app/partials/massupdate.macros.tab.php:126
@@ -24403,6 +26118,10 @@ msgstr "用户组映射"
 msgid "User group membership attribute"
 msgstr "用户组成员属性"
 
+#: app/views/administration.user.edit.php:428
+msgid "User group permissions"
+msgstr ""
+
 #: include/classes/api/services/CMap.php:784
 #: include/classes/api/services/CMap.php:1252
 #, c-format
@@ -24449,6 +26168,10 @@ msgstr "用户是不允许删除自己"
 msgid "User is not allowed to delete oneself."
 msgstr "不允许用户删除自己。"
 
+#: include/classes/api/services/CDevice.php:254
+msgid "User is not allowed to use linked devices."
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:462
 #: app/views/popup.ldap.edit.php:222
 msgid "User last name attribute"
@@ -24491,6 +26214,11 @@ msgstr "用户密码"
 #: app/views/administration.user.edit.php:40 include/html.inc.php:847
 msgid "User profile"
 msgstr "用户基本资料"
+
+#: app/views/administration.user.edit.php:468
+#: app/views/administration.userrole.edit.php:148
+msgid "User profile settings"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:263
 #: app/views/administration.authentication.edit.php:488
@@ -25246,10 +26974,29 @@ msgstr "具体处理的各个信息。返回浮点数"
 msgid "Vault API endpoint"
 msgstr "保险库API 接入点"
 
+#: include/classes/vaults/CVaultHashiCorp.php:117
+msgid "Vault AppRole login connection failed"
+msgstr ""
+
+#: include/classes/setup/CSetupWizard.php:762
+#: include/classes/setup/CSetupWizard.php:1093
+msgid "Vault authentication role ID"
+msgstr ""
+
+#: include/classes/setup/CSetupWizard.php:773
+#: include/classes/setup/CSetupWizard.php:1097
+msgid "Vault authentication secret ID"
+msgstr ""
+
 #: include/classes/setup/CSetupWizard.php:598
 #: include/classes/setup/CSetupWizard.php:799
 msgid "Vault authentication token"
 msgstr "保险库身份验证令牌"
+
+#: include/classes/setup/CSetupWizard.php:742
+#: include/classes/setup/CSetupWizard.php:1080
+msgid "Vault authentication type"
+msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:616
 #: include/classes/setup/CSetupWizard.php:815
@@ -25261,6 +27008,10 @@ msgstr "保险库证书"
 #: include/classes/vaults/CVaultHashiCorp.php:85 include/config.inc.php:53
 msgid "Vault connection failed."
 msgstr "保险库连接失败。"
+
+#: include/classes/db/ApmDb.php:94
+msgid "Vault is not configured."
+msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:609
 #: include/classes/setup/CSetupWizard.php:640
@@ -25311,6 +27062,14 @@ msgstr "用途:.验证 server, proxy 或 cluster 地址 agent 必须能够连接
 #: include/classes/setup/CSetupWizard.php:655
 msgid "Verify database certificate"
 msgstr "验证数据库证书"
+
+#: app/views/administration.apm.db.edit.php:111
+msgid "Verify hostname"
+msgstr ""
+
+#: app/views/administration.apm.db.edit.php:99
+msgid "Verify server certificate"
+msgstr ""
 
 #: include/classes/setup/CSetupWizard.php:881
 msgid "Verify server certificate issuer and subject"
@@ -25624,6 +27383,14 @@ msgstr "部件"
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:213
 msgid "Width"
 msgstr "宽(px)"
+
+#: app/partials/ceprule.modal.operation.php:42
+msgid "Window"
+msgstr ""
+
+#: include/classes/helpers/CCepRuleHelper.php:447
+msgid "Window closed"
+msgstr ""
 
 #: app/views/host.wizard.edit.php:435
 msgid "Windows"
@@ -25992,6 +27759,10 @@ msgstr "您无法切换当前选择的主机。"
 msgid "You cannot switch templates for current selection."
 msgstr "当前所选不能切换模板。"
 
+#: app/controllers/CControllerHostWizardGet.php:83
+msgid "You do not have permission to add a host monitored by Zabbix server."
+msgstr ""
+
 #: include/classes/api/services/CAuditLog.php:73
 #: include/classes/api/services/CHaNode.php:45
 #: include/classes/api/services/CHost.php:896
@@ -26047,6 +27818,10 @@ msgstr "Zabbix 集成"
 #: app/views/connector.edit.php:49
 msgid "Zabbix Streaming Protocol v1.0"
 msgstr "Zabbix 流协议v1.0"
+
+#: include/classes/helpers/CMenuHelper.php:470
+msgid "Zabbix Subscriptions"
+msgstr ""
 
 #: include/classes/helpers/CMenuHelper.php:427
 msgid "Zabbix Technical Support"
@@ -26126,6 +27901,11 @@ msgstr ""
 msgid "Zabbix server (proxy)"
 msgstr "Zabbix server (Proxy)"
 
+#: app/partials/administration.system.info.php:32
+#: include/classes/helpers/CSystemInfoHelper.php:225
+msgid "Zabbix server ID"
+msgstr ""
+
 #: app/views/administration.miscconfig.edit.php:112
 msgid "Zabbix server and proxy"
 msgstr "Zabbix server和proxy"
@@ -26202,6 +27982,10 @@ msgstr "应为 PEM 编码的证书"
 msgid "a PEM-encoded private key is expected"
 msgstr "应为 PEM 编码的私钥"
 
+#: include/classes/validators/CUuidV7Validator.php:49
+msgid "a UUIDv7 is expected"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:1381
 msgid "a boolean is expected"
 msgstr "预先设定的布尔值"
@@ -26254,6 +28038,10 @@ msgstr "需用浮点值"
 msgid "a hexadecimal color code (6 symbols) is expected"
 msgstr "应为十六进制颜色代码（6 个符号）"
 
+#: include/classes/validators/CUuidV7Validator.php:39
+msgid "a hyphenated UUID is expected"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:2090
 msgid "a low-level discovery macro is expected"
 msgstr "需用一个自动发现宏"
@@ -26283,6 +28071,13 @@ msgstr "一个数值预计"
 msgid "a port number is expected"
 msgstr "需要输入端口号"
 
+#: include/classes/validators/CFrontendActionValidator.php:35
+#: include/classes/validators/CFrontendActionValidator.php:42
+#: include/classes/validators/CFrontendActionValidator.php:51
+#: include/classes/validators/CFrontendActionValidator.php:59
+msgid "a relative URL to the frontend is expected"
+msgstr ""
+
 #: app/controllers/CControllerPopupItemTestSend.php:193
 #: app/controllers/CControllerPopupItemTestSend.php:207
 msgid "a relative time is expected"
@@ -26291,6 +28086,14 @@ msgstr "预计相对时间"
 #: app/views/administration.authentication.edit.php:122
 msgid "a special character"
 msgstr "一个特殊的字符"
+
+#: include/classes/core/CConfigFile.php:283
+#: include/classes/core/CConfigFile.php:293
+#: include/classes/core/CConfigFile.php:800
+#: include/classes/core/CConfigFile.php:835
+#: include/classes/core/CConfigFile.php:876
+msgid "a string is expected"
+msgstr ""
 
 #: app/views/administration.miscconfig.edit.php:133
 #, c-format
@@ -26336,9 +28139,17 @@ msgstr "预设时间单位"
 msgid "a timestamp is too large"
 msgstr "时间戳太大"
 
+#: include/classes/validators/CPushNotificationRecipientValidator.php:37
+msgid "a wildcard pattern '*' or a UUIDv7 is expected"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:333
 msgid "abs() - Absolute value"
 msgstr "abs() - 绝对值"
+
+#: include/classes/api/services/CUserGroup.php:694
+msgid "access to this proxy is managed by its proxy group"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:339
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
@@ -26562,6 +28373,10 @@ msgstr "至少需要1个链接触发器"
 #: app/controllers/CControllerScheduledReportUpdate.php:87
 msgid "at least one day of the week must be selected"
 msgstr "至少选择一周中的一天"
+
+#: include/classes/api/services/CCepRule.php:908
+msgid "at least one operation must execute when pattern matched"
+msgstr ""
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:63
 #: widgets/clock/includes/WidgetForm.php:63
@@ -26829,6 +28644,11 @@ msgstr "不能大于或等于字段的值 \"%1$s\""
 msgid "cannot be greater than or equal to the value of parameter \"%1$s\""
 msgstr "不能大于或等于参数的值 \"%1$s\""
 
+#: include/classes/api/item_types/CItemTypeTelemetryQuery.php:245
+#, c-format
+msgid "cannot be greater than the value of parameter \"%1$s\""
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:3487
 #, c-format
 msgid "cannot be less than or equal to the value of parameter \"%1$s\""
@@ -26962,6 +28782,10 @@ msgstr "配置"
 msgid "contains"
 msgstr "包含"
 
+#: include/classes/data/CTriggerConditionFunctionData.php:177
+msgid "contains() - Returns 1 if search value is found in value, 0 otherwise"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:538
 msgid "cos() - The cosine of a value, where the value is an angle expressed in radians"
 msgstr "cos() - 余弦，其中值是以弧度表示的角度"
@@ -27000,6 +28824,10 @@ msgstr "d.M"
 #: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:100
 msgid "data is missing"
 msgstr "数据缺失"
+
+#: include/classes/core/CConfigFile.php:855
+msgid "database vault should be configured if vault path is provided"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:573
 msgid "date() - Current date"
@@ -27118,6 +28946,12 @@ msgstr "不匹配"
 msgid "duplicate"
 msgstr ""
 
+#: app/views/js/ceprule.edit.js.php:770
+#: include/classes/helpers/CCepRuleHelper.php:504
+#, c-format
+msgid "duration %1$s"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:598
 msgid "e() - Returns Euler's number"
 msgstr "e() - 返回自然常数（欧拉数）"
@@ -27153,6 +28987,10 @@ msgstr "错误文本"
 msgid "error-matching"
 msgstr "错误匹配"
 
+#: app/partials/ceprule.modal.condition.php:84
+msgid "event name"
+msgstr ""
+
 #: app/views/popup.lldoverride.php:104
 #: include/views/configuration.host.discovery.edit.php:820
 #: include/views/js/configuration.host.discovery.edit.js.php:50
@@ -27179,6 +29017,11 @@ msgstr "表达式为空"
 #: include/classes/helpers/CElasticsearchHelper.php:185
 msgid "failed to parse JSON"
 msgstr "无法解析 JSON"
+
+#: include/classes/api/services/CDevice.php:329
+#: include/classes/api/services/CDevice.php:335
+msgid "failed to parse key material"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:3251
 msgid "file format is unsupported"
@@ -27287,10 +29130,19 @@ msgstr "hh.mm"
 msgid "host"
 msgstr "主机"
 
+#: include/classes/validators/CEventNameValidator.php:108
+#, c-format
+msgid "host \"%1$s\" is not allowed in event name"
+msgstr ""
+
 #: include/classes/api/services/CMap.php:849
 #: include/classes/api/services/CMap.php:1317
 msgid "host group"
 msgstr "主机群组"
+
+#: app/partials/ceprule.modal.condition.php:98
+msgid "host group name"
+msgstr ""
 
 #: include/classes/api/services/CHostGroup.php:797
 msgid "host group with the same UUID already exists"
@@ -27436,6 +29288,10 @@ msgstr "无效的Prometheus标签"
 #: include/classes/validators/CApiInputValidator.php:4263
 msgid "invalid Prometheus pattern"
 msgstr "无效的Prometheus模式"
+
+#: include/classes/validators/CFrontendActionValidator.php:65
+msgid "invalid action in the frontend URL"
+msgstr ""
 
 #: include/classes/parsers/CIPRangeParser.php:135
 #, c-format
@@ -27607,6 +29463,11 @@ msgstr "具有相同 UUID 的监控项已存在"
 #: app/controllers/CControllerPopupTriggerExpr.php:688
 msgid "jsonpath() - Returns JSONPath result"
 msgstr "jsonpath() - 返回 JSONPath 结果"
+
+#: include/classes/helpers/CTagFilterFieldHelper.php:100
+#: include/forms.inc.php:697
+msgid "key"
+msgstr ""
 
 #: include/classes/parsers/CItemKey.php:54
 msgid "key is empty"
@@ -27787,6 +29648,10 @@ msgstr "达到最大数量的依赖关系"
 msgid "memberOf is a preferable way to configure groups because it is faster. Use groupOfNames if your LDAP server does not support memberOf or group filtering is required."
 msgstr "memberOf 是配置组的首选方法，因为它速度更快。如果您的 LDAP 服务器不支持 memberOf 或需要组过滤，请使用 groupOfNames。"
 
+#: include/classes/data/CTriggerConditionFunctionData.php:213
+msgid "mid() - Alias for substring()"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:813
 msgid "mid() - Returns a substring beginning at the character position specified by start for N characters"
 msgstr "mid() - 返回从 start 指定的字符位置开始的 N 个字符的子字符串"
@@ -27934,6 +29799,11 @@ msgctxt "new element in multiselect"
 msgid "new"
 msgstr "新"
 
+#: app/partials/ceprule.modal.operation.php:288
+#: app/partials/ceprule.modal.operation.php:289
+msgid "new name"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:1515
 #: include/classes/graphdraw/CPieGraphDraw.php:347
 #: include/classes/html/svg/CSvgGraphLegend.php:116
@@ -28030,6 +29900,14 @@ msgstr "不曾使用"
 msgid "now() - Number of seconds since the Epoch"
 msgstr "now() - UNIX 时间"
 
+#: app/controllers/CControllerApmTraceListData.php:241
+#: app/controllers/CControllerApmTraceListSplitView.php:131
+#: app/controllers/CControllerApmTraceListSplitView.php:145
+#: include/func.inc.php:546
+msgctxt "nanosecond short"
+msgid "ns"
+msgstr ""
+
 #: include/forms.inc.php:1311 include/views/js/item.preprocessing.js.php:293
 msgid "number"
 msgstr "数字"
@@ -28089,6 +29967,11 @@ msgstr "其"
 msgid "off"
 msgstr "关闭"
 
+#: app/partials/ceprule.modal.operation.php:283
+#: app/partials/ceprule.modal.operation.php:284
+msgid "old name"
+msgstr ""
+
 #: app/views/administration.user.edit.php:381
 #: include/classes/setup/CFrontendSetup.php:292
 #: include/classes/setup/CFrontendSetup.php:309
@@ -28124,6 +30007,10 @@ msgstr "%1$s 的组合中只能存在一个对象"
 msgid "only one time unit is allowed"
 msgstr "只允许一个时间单位"
 
+#: include/classes/api/services/CCepRule.php:925
+msgid "operations must be grouped by \"execute_when\" in ascending order"
+msgstr ""
+
 #: include/views/general.login.php:41
 msgid "or"
 msgstr "或者"
@@ -28148,6 +30035,10 @@ msgstr "模式表达式"
 #: include/classes/html/widgets/fields/CWidgetFieldPatternSelectView.php:36
 msgid "patterns"
 msgstr "模式"
+
+#: include/classes/helpers/CTelemetryHelper.php:238
+msgid "percentile"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:878
 msgid "percentile() - Percentile P of a period T"
@@ -28295,6 +30186,10 @@ msgctxt "second short"
 msgid "s"
 msgstr "s"
 
+#: app/views/js/apm.metric.list.js.php:880
+msgid "schema url"
+msgstr ""
+
 #: app/views/administration.mediatype.edit.php:236
 #: app/views/administration.script.edit.php:242
 #: app/views/mediatype.edit.php:293 include/forms.inc.php:1362
@@ -28346,9 +30241,32 @@ msgstr "简要描述"
 msgid "should be empty"
 msgstr "可能是空的"
 
+#: include/classes/core/CConfigFile.php:914
+msgid "should be empty string if the url scheme is not \"https\""
+msgstr ""
+
+#: include/classes/core/CConfigFile.php:884
+#, c-format
+msgid "should be enabled if \"%1$s\" is enabled"
+msgstr ""
+
+#: include/classes/core/CConfigFile.php:890
+#: include/classes/core/CConfigFile.php:896
+#, c-format
+msgid "should be enabled if \"%1$s\" is provided"
+msgstr ""
+
 #: app/controllers/CControllerPopupItemTestSend.php:217
 msgid "should be less than current time"
 msgstr "应该早于当前时间"
+
+#: include/classes/validators/CRelativeTimeValidator.php:72
+msgid "should be less than or equal to current time"
+msgstr ""
+
+#: include/classes/core/CConfigFile.php:905
+msgid "should be set to false if the url scheme is not \"https\""
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:137
 msgid "show icon mappings"
@@ -28395,6 +30313,10 @@ msgstr "stddevsamp() - 样本标准差"
 msgid "subject or body text"
 msgstr "标题或正文"
 
+#: include/classes/data/CTriggerConditionFunctionData.php:238
+msgid "substring() - Returns a substring beginning at the character position specified by start for N characters"
+msgstr ""
+
 #: include/graphs.inc.php:84 widgets/piechart/actions/WidgetView.php:666
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:397
 #: widgets/tophosts/views/column.edit.php:156
@@ -28437,6 +30359,10 @@ msgstr "标记"
 #: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
 msgid "tag cannot be empty"
 msgstr "标签不能为空"
+
+#: app/partials/ceprule.window.php:26
+msgid "tag names"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1055
 msgid "tan() - The tangent of a value"
@@ -28632,6 +30558,11 @@ msgstr "在此输入搜索"
 msgid "unacceptable URL"
 msgstr "不可用的URL"
 
+#: include/classes/validators/CUrlValidator.php:156
+#: include/classes/validators/CUrlValidator.php:163
+msgid "unacceptable URL scheme"
+msgstr ""
+
 #: include/classes/import/validators/CXmlValidatorGeneral.php:296
 #, c-format
 msgid "unexpected constant \"%1$s\""
@@ -28719,6 +30650,10 @@ msgstr "更新间隔“%1$s”比周期“%2$s”长"
 msgid "uppercase identifier expected"
 msgstr "应为大写标识符"
 
+#: include/classes/core/CConfigFile.php:849
+msgid "username and password must be empty if vault path is provided"
+msgstr ""
+
 #: app/partials/configuration.tags.tab.php:79
 #: app/partials/monitoring.host.filter.php:61
 #: app/partials/monitoring.host.filter.php:212
@@ -28792,6 +30727,11 @@ msgstr "值 \"%1$s\" 未找到"
 #, c-format
 msgid "value %1$s already exists"
 msgstr "值 %1$s 已存在"
+
+#: include/classes/api/item_types/CItemTypeTelemetryQuery.php:307
+#, c-format
+msgid "value cannot have more than %1$s fractional digits"
+msgstr ""
 
 #: include/classes/parsers/CEscapedStringParser.php:72
 #, c-format
@@ -28954,6 +30894,11 @@ msgstr "值必须是 %1$s 之一"
 msgid "value must be within the range of %1$s"
 msgstr "值必须在 %1$s 的范围内"
 
+#: include/classes/api/item_types/CItemTypeTelemetryQuery.php:316
+#, c-format
+msgid "value must not be %1$s"
+msgstr ""
+
 #: app/views/js/correlation.edit.js.php:235
 #: include/classes/helpers/CCorrelationHelper.php:141
 msgid "value of new event tag"
@@ -28971,9 +30916,17 @@ msgstr "varpop() - 总体方差"
 msgid "varsamp() - Sample variance"
 msgstr "varsamp() - 样本方差"
 
+#: app/views/js/apm.metric.list.js.php:876
+msgid "version"
+msgstr ""
+
 #: include/actions.inc.php:552 include/actions.inc.php:568
 msgid "via"
 msgstr "通过"
+
+#: app/partials/ceprule.modal.condition.php:91
+msgid "visible name"
+msgstr ""
 
 #: include/func.inc.php:633
 msgctxt "week short"
@@ -29053,7 +31006,29 @@ msgctxt "year short"
 msgid "y"
 msgstr "y"
 
+#: include/classes/api/services/CHost.php:2186
+msgid "you do not have permission to current proxy"
+msgstr ""
+
+#: include/classes/api/services/CHost.php:2197
+msgid "you do not have permission to current proxy group"
+msgstr ""
+
+#: include/classes/api/services/CDRule.php:682
+#: include/classes/api/services/CHost.php:2120
+msgid "you do not have permission to select Server for monitoring and discovery"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:1439
+msgid "you do not have permission to update the parameter while redirect url is enforced by role rule"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:3324
 #, c-format
 msgid "zoom level must be between \"%1$s\" and \"%2$s\""
 msgstr "缩放级别必须在“%1$s”和“%2$s”之间"
+
+#: include/func.inc.php:545
+msgctxt "microsecond short"
+msgid "μs"
+msgstr ""
