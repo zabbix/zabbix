@@ -132,7 +132,7 @@ class testFormTagsDiscoveredHost extends testFormTags {
 		$this->query('button:Reset')->one()->click();
 		$this->page->waitUntilReady();
 
-		$this->query('link', $this->clone_name)->waitUntilClickable()->one()->click();
+		$this->query('link', $this->clone_name)->waitUntilClickable()->one()->scrollIntoView(50)->click();
 		$form = COverlayDialogElement::find()->waitUntilVisible()->asForm()->one();
 		$form->selectTab('Tags');
 		$tags_table = $this->query('class:tags-table')->asMultifieldTable()->one();

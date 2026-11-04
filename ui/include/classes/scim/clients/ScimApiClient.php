@@ -16,53 +16,37 @@
 
 namespace SCIM\clients;
 
-use APIException;
 use CLocalApiClient;
-use Exception;
+use CJsonRpc;
 use CUser;
+use CApiClientResponse;
+use Exception;
+use APIException;
 
 class ScimApiClient extends CLocalApiClient {
-	/**
-	 * Returns true if the given API is valid.
-	 *
-	 * @param string $api
-	 *
-	 * @return bool
-	 */
-	protected function isValidApi($api) {
-		if (!$this->serviceFactory->hasObject($api)) {
-			throw new Exception(sprintf('The requested endpoint "%1$s" is not supported.', $api), 501);
-		}
 
-		return true;
-	}
-
-	/**
-	 * Returns true if calling the given method requires a valid authentication token.
-	 *
-	 * @param $api
-	 * @param $method
-	 *
-	 * @return bool
-	 */
-	protected function requiresAuthentication($api, $method) {
+	public function requiresAuthentication(string $api, string $method): bool {
 		return !($api === 'serviceproviderconfig' && $method === 'get');
 	}
 
-	/**
-	 * Checks if the authentication token is valid.
-	 *
-	 * @param string $auth
-	 *
-	 * @throws APIException
-	 */
-	protected function authenticate($auth) {
-		if ($auth === null) {
-			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+	public function authenticate(array $auth, string $requested_api_method = ''): CApiClientResponse {
+		$response = new CApiClientResponse();
+
+		try {
+			if ($auth['type'] != CJsonRpc::AUTH_TYPE_BEARER || $auth['auth'] === null) {
+				throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+			}
+
+			$user = (new CUser())->checkAuthentication(['token' => $auth['auth']]);
+
+			if (array_key_exists('debug_mode', $user)) {
+				$this->debug = (bool) $user['debug_mode'];
+			}
+		}
+		catch (Exception $e) {
+			$response->setErrorByException($e, $this->debug);
 		}
 
-		$user = (new CUser())->checkAuthentication(['token' => $auth]);
-
-		$this->debug = $user['debug_mode'];
+		return $response;
 	}
 }

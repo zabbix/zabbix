@@ -470,6 +470,18 @@ int	zbx_problem_get_actions(const zbx_db_acknowledge *ack, int actions, const ch
 		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "ranked as cause");
 	}
 
+	if (0 != (flags & ZBX_PROBLEM_UPDATE_MAINTENANCE_SUPPRESS))
+	{
+		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, prefixes[index]);
+		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "suppressed by maintenance");
+	}
+
+	if (0 != (flags & ZBX_PROBLEM_UPDATE_MAINTENANCE_UNSUPPRESS))
+	{
+		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, prefixes[index]);
+		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "unsuppressed by maintenance");
+	}
+
 	zbx_free(*out);
 	*out = buf;
 

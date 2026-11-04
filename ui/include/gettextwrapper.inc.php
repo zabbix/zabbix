@@ -225,6 +225,8 @@ function setupLocale(string $language, ?string &$error = null): bool {
 	// Since LC_MESSAGES may be unavailable on some systems, try to set all of the locales and then make adjustments.
 	foreach ($locale_variants as $locale) {
 		if (setlocale(LC_ALL, $locale)) {
+			putenv('LANGUAGE='.$locale);
+			putenv('LANG='.$locale);
 			$locale_set = true;
 			break;
 		}

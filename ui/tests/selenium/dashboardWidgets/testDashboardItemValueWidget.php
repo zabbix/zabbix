@@ -525,7 +525,7 @@ class testDashboardItemValueWidget extends testWidgets {
 		$this->assertEquals(['Widget', 'Dashboard'], $menu->getItems()->asText());
 		$menu->select('Dashboard');
 		$form->checkValue(['Override host' => 'Dashboard']);
-		$this->assertTrue($override->query('xpath:.//span[@data-hintbox-contents="Dashboard is used as data source."]')
+		$this->assertTrue($override->query('xpath:.//span[@data-hintbox-html="Dashboard is used as data source."]')
 				->one()->isVisible()
 		);
 
@@ -2089,7 +2089,7 @@ class testDashboardItemValueWidget extends testWidgets {
 				[
 					'numeric' => false,
 					'fields' => [
-						'Item' => 'Get filesystems',
+						'Item' => 'Get network interfaces',
 						'Name' => 'Item Widget with type of information - text',
 						'Advanced configuration' => true
 					],
@@ -2129,7 +2129,7 @@ class testDashboardItemValueWidget extends testWidgets {
 				[
 					'numeric' => false,
 					'fields' => [
-						'Item' => 'Get filesystems',
+						'Item' => 'Get network interfaces',
 						'Name' => 'Type of information - text & aggregation function - max',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'max'
@@ -2185,7 +2185,7 @@ class testDashboardItemValueWidget extends testWidgets {
 				[
 					'numeric' => false,
 					'fields' => [
-						'Item' => 'Get filesystems',
+						'Item' => 'Get network interfaces',
 						'Name' => 'Item Widget with type of information - text',
 						'Advanced configuration' => true,
 						'History data' => 'Trends'

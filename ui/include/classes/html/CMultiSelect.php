@@ -98,7 +98,7 @@ class CMultiSelect extends CTag {
 
 		$options_list = [
 			'defaultValue', 'disabled', 'selectedLimit', 'addNew', 'newItemName', 'styles', 'placeholder', 'hidden',
-			'readonly', 'maxlength'
+			'readonly', 'maxlength', 'ms_list_of_string_mode'
 		];
 		foreach ($options_list as $option) {
 			if (array_key_exists($option, $options)) {
@@ -154,7 +154,7 @@ class CMultiSelect extends CTag {
 	protected function mapOptions(array $options) {
 		$valid_fields = ['name', 'object_name', 'multiselect_id', 'multiple', 'disabled', 'default_value', 'data',
 			'add_new', 'new_item_name', 'add_post_js', 'styles', 'popup', 'custom_select', 'placeholder', 'autosuggest',
-			'hidden', 'readonly', 'maxlength'
+			'hidden', 'readonly', 'maxlength', 'ms_list_of_string_mode'
 		];
 
 		foreach ($options as $field => $value) {
@@ -174,6 +174,7 @@ class CMultiSelect extends CTag {
 			'data' => 'data',
 			'add_new' => 'addNew',
 			'new_item_name' => 'newItemName',
+			'ms_list_of_string_mode' => 'ms_list_of_string_mode',
 			'add_post_js' => 'add_post_js',
 			'styles' => 'styles',
 			'placeholder' => 'placeholder',
@@ -252,7 +253,8 @@ class CMultiSelect extends CTag {
 					'with_items', 'with_simple_graph_items', 'with_simple_graph_item_prototypes', 'with_triggers',
 					'value_types', 'excludeids', 'disableids', 'enrich_parent_groups', 'with_monitored_items',
 					'with_httptests', 'user_type', 'disable_selected', 'hostids', 'with_inherited', 'context',
-					'enabled_only', 'group_status', 'hide_host_filter', 'resolve_macros', 'exclude_provisioned'
+					'enabled_only', 'group_status', 'hide_host_filter', 'resolve_macros', 'exclude_provisioned',
+					'has_devices_access', 'userid', 'without_proxy_group'
 				];
 
 				foreach ($parameters as $field => $value) {
@@ -282,6 +284,11 @@ class CMultiSelect extends CTag {
 				if (array_key_exists('hostid', $parameters) && $parameters['hostid'] > 0) {
 					$popup_parameters['only_hostid'] = (string) $parameters['hostid'];
 					$autocomplete_parameters['hostid'] = (string) $parameters['hostid'];
+				}
+
+				if (array_key_exists('userid', $parameters) && $parameters['userid'] > 0) {
+					$popup_parameters['only_userid'] = (string) $parameters['userid'];
+					$autocomplete_parameters['userid'] = (string) $parameters['userid'];
 				}
 
 				if (array_key_exists('hide_host_filter', $parameters)) {
@@ -430,6 +437,16 @@ class CMultiSelect extends CTag {
 				if (array_key_exists('exclude_provisioned', $parameters) && $parameters['exclude_provisioned']) {
 					$popup_parameters['exclude_provisioned'] = 1;
 					$autocomplete_parameters['exclude_provisioned'] = 1;
+				}
+
+				if (array_key_exists('has_devices_access', $parameters) && $parameters['has_devices_access']) {
+					$popup_parameters['has_devices_access'] = 1;
+					$autocomplete_parameters['has_devices_access'] = 1;
+				}
+
+				if (array_key_exists('without_proxy_group', $parameters) && $parameters['without_proxy_group']) {
+					$popup_parameters['without_proxy_group'] = '1';
+					$autocomplete_parameters['without_proxy_group'] = true;
 				}
 			}
 

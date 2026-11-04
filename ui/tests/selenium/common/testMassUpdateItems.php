@@ -71,24 +71,28 @@ class testMassUpdateItems extends CWebTest{
 	 * Add interface to host.
 	 */
 	public function prepareInterfaceData() {
-		CDataHelper::call('hostinterface.create', [
-			[
-				'hostid' => self::HOSTID,
-				'dns' => '',
-				'ip' => '127.0.5.5',
-				'main' => 0,
-				'port' => '10055',
-				'type' => 2,
-				'useip' => 1,
-				'details' => [
-					'version' => 3,
-					'bulk' => 1,
-					'max_repetitions' => 10,
-					'securityname' => 'zabbix',
-					'securitylevel' => 0,
-					'authprotocol' => 0,
-					'privprotocol' => 0,
-					'contextname' => 'zabbix'
+		CDataHelper::call('host.massadd', [
+			'hosts' => [
+				['hostid' => self::HOSTID]
+			],
+			'interfaces' => [
+				[
+					'dns' => '',
+					'ip' => '127.0.5.5',
+					'main' => 0,
+					'port' => '10055',
+					'type' => 2,
+					'useip' => 1,
+					'details' => [
+						'version' => 3,
+						'bulk' => 1,
+						'max_repetitions' => 10,
+						'securityname' => 'zabbix',
+						'securitylevel' => 0,
+						'authprotocol' => 0,
+						'privprotocol' => 0,
+						'contextname' => 'zabbix'
+					]
 				]
 			]
 		]);
@@ -1729,9 +1733,6 @@ class testMassUpdateItems extends CWebTest{
 
 				// It is necessary because of unexpected viewport shift.
 				$this->page->updateViewport();
-				// TODO: unstable screenshots on Jenkins. Added border radius 0 for checkboxes.
-				$this->page->getDriver()->executeScript('document.querySelectorAll(\'.checkbox-radio[type="checkbox"]'.
-						'+ label span\').forEach(function (e){ e.style.borderRadius = 0; });');
 				$this->assertScreenshot($form->query('id:preprocessing')->waitUntilPresent()->one(),
 						'Item mass update preprocessing'.$prototypes
 				);

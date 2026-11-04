@@ -19,11 +19,8 @@
  */
 abstract class CControllerProblem extends CController {
 
-	// Filter idx prefix.
-	const FILTER_IDX = 'web.monitoring.problem';
-
 	// Filter fields default values.
-	const FILTER_FIELDS_DEFAULT = [
+	public const FILTER_FIELDS_DEFAULT = [
 		'show' => TRIGGERS_OPTION_RECENT_PROBLEM,
 		'groupids' => [],
 		'hostids' => [],
@@ -35,43 +32,17 @@ abstract class CControllerProblem extends CController {
 		'inventory' => [],
 		'evaltype' => TAG_EVAL_TYPE_AND_OR,
 		'tags' => [],
-		'show_tags' => SHOW_TAGS_3,
 		'show_symptoms' => 0,
 		'show_suppressed' => 0,
 		'acknowledgement_status' => ZBX_ACK_STATUS_ALL,
 		'acknowledged_by_me' => 0,
-		'compact_view' => 0,
-		'show_timeline' => ZBX_TIMELINE_ON,
-		'details' => 0,
-		'highlight_row' => ZBX_HIGHLIGHT_OFF,
-		'show_opdata' => OPERATIONAL_DATA_SHOW_NONE,
-		'tag_name_format' => TAG_NAME_FULL,
-		'tag_priority' => '',
 		'page' => null,
-		'sort' => 'clock',
-		'sortorder' => ZBX_SORT_DOWN,
 		'from' => '',
 		'to' => ''
 	];
 
-	/**
-	 * Get count of resulting rows for specified filter.
-	 *
-	 * @param array $filter   Filter fields values.
-	 *
-	 * @return int
-	 */
-	protected function getCount(array $filter): int {
-		$range_time_parser = new CRangeTimeParser();
-		$range_time_parser->parse($filter['from']);
-		$filter['from'] = $range_time_parser->getDateTime(true)->getTimestamp();
-		$range_time_parser->parse($filter['to']);
-		$filter['to'] = $range_time_parser->getDateTime(false)->getTimestamp();
-
-		$data = CScreenProblem::getData($filter, CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT));
-
-		return count($data['problems']);
-	}
+	public const DEFAULT_SORT = 'clock';
+	public const DEFAULT_SORTORDER = ZBX_SORT_DOWN;
 
 	/**
 	 * Get additional data required for render filter as HTML.
@@ -216,7 +187,7 @@ abstract class CControllerProblem extends CController {
 	 *
 	 * @return array
 	 */
-	protected static function sanitizeFilter(array &$filter): array {
+	public static function sanitizeFilter(array &$filter): array {
 		if ($filter['hostids']) {
 			$hosts = API::Host()->get([
 				'output' => [],

@@ -98,6 +98,13 @@ class testMediatype extends CAPITest {
 					'token_url' => 'http://example123.com'
 				]],
 				'Invalid parameter "/1": the parameter "client_secret" is missing.'
+			],
+			'OAuth not accepting invalid authorization_url' => [
+				[[
+					'mediatypeid' => ':media_type:OAuth SMTP with tokens',
+					'authorization_url' => 'javascript:alert()'
+				]],
+				'Invalid parameter "/1/authorization_url": unacceptable URL scheme.'
 			]
 		];
 	}
@@ -334,6 +341,24 @@ class testMediatype extends CAPITest {
 					'redirection_url' => 'http://example.com'
 				]],
 				'Invalid parameter "/1/redirection_url": value must be empty.'
+			],
+			'OAuth not accepting invalid authorization_url' =>
+			[
+				[[
+					'name' => 'OAuth not accepting invalid authorization_url',
+					'type' => MEDIA_TYPE_EMAIL,
+					'provider' => CMediatypeHelper::EMAIL_PROVIDER_SMTP,
+					'smtp_server' => 'smtp.generic.com',
+					'smtp_helo' => 'example.com',
+					'smtp_email' => 'zabbix@example.com',
+					'smtp_authentication' => SMTP_AUTHENTICATION_OAUTH,
+					'redirection_url' => 'http://example.com',
+					'client_id' => 'client_id',
+					'client_secret' => 'client',
+					'authorization_url' => 'javascript:alert()',
+					'token_url' => 'http://example.com'
+				]],
+				'Invalid parameter "/1/authorization_url": unacceptable URL scheme.'
 			]
 		];
 	}

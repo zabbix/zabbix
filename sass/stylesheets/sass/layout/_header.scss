@@ -1,10 +1,8 @@
 header {
-	display: flex;
-	align-items: center;
-	height: 45px;
-	padding: 0 10px;
+	height: var(--header-size);
 	background: $header-bg-color;
 	border-bottom: 1px solid $ui-border-color;
+	box-shadow: 0 -6px 6px 4px $action-shadow-color;
 
 	> div {
 		overflow: hidden;
@@ -29,6 +27,13 @@ header {
 		}
 	}
 
+	.header-title {
+		display: flex;
+		align-items: center;
+		height: 100%;
+		padding: 0 10px;
+	}
+
 	.header-controls {
 		flex-shrink: 0;
 		margin: 0 -2px 0 auto;
@@ -37,6 +42,10 @@ header {
 
 		label {
 			line-height: 24px;
+		}
+
+		.btn {
+			box-sizing: border-box;
 		}
 
 		.radio-list-control {

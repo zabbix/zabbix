@@ -957,7 +957,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 			if ($label === 'Hosts') {
 				$menu_button->select('Dashboard');
 				$form->checkValue(['Hosts' => 'Dashboard']);
-				$this->assertTrue($field->query('xpath:.//span[@data-hintbox-contents="Dashboard is used as data source."]')
+				$this->assertTrue($field->query('xpath:.//span[@data-hintbox-html="Dashboard is used as data source."]')
 						->one()->isVisible()
 				);
 			}
@@ -1075,7 +1075,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 		}
 
 		// Thresholds warning message.
-		$form->getLabel('Thresholds')->query('xpath:./button[@data-hintbox-contents]')->one()->click();
+		$form->getLabel('Thresholds')->query('xpath:./button[@data-hintbox-html]')->one()->click();
 		$warning = $this->query('xpath://div[@data-hintboxid]')->waitUntilVisible();
 		$this->assertEquals('This setting applies only to numeric data.', $warning->one()->getText());
 		$warning->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();

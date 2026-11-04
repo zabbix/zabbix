@@ -46,6 +46,11 @@ class testAuditlogScript extends testAuditlogCommon {
 	 */
 	protected static $resourceid_authtype;
 
+	/**
+	 * Resource type Script
+	 */
+	const RESOURCE_TYPE = 25;
+
 	public function testAuditlogScript_CreateSSH() {
 		$create = $this->call('script.create', [
 			[
@@ -99,7 +104,7 @@ class testAuditlogScript extends testAuditlogCommon {
 			'script.scriptid' => ['add', self::$resourceid_ssh]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $created, self::$resourceid_ssh);
+		$this->getAuditDetails('details', self::ACTION_ADD, $created, self::$resourceid_ssh, self::RESOURCE_TYPE);
 	}
 
 	/**
@@ -149,7 +154,7 @@ class testAuditlogScript extends testAuditlogCommon {
 			'script.manualinput_default_value' => ['update', '', 'test_validator']
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, self::$resourceid_ssh);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, self::$resourceid_ssh, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogScript_CreateWebhook() {
@@ -188,7 +193,7 @@ class testAuditlogScript extends testAuditlogCommon {
 			'script.scriptid' => ['add', self::$resourceid_webhook]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $created, self::$resourceid_webhook);
+		$this->getAuditDetails('details', self::ACTION_ADD, $created, self::$resourceid_webhook, self::RESOURCE_TYPE);
 	}
 
 	/**
@@ -228,7 +233,7 @@ class testAuditlogScript extends testAuditlogCommon {
 					=> ['add', $updated_parameterid['script_paramid']]
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, self::$resourceid_webhook);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, self::$resourceid_webhook, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogScript_CreateScript() {
@@ -253,7 +258,7 @@ class testAuditlogScript extends testAuditlogCommon {
 			'script.scriptid' => ['add', self::$resourceid_script]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $created, self::$resourceid_script);
+		$this->getAuditDetails('details', self::ACTION_ADD, $created, self::$resourceid_script, self::RESOURCE_TYPE);
 	}
 
 	/**
@@ -275,7 +280,7 @@ class testAuditlogScript extends testAuditlogCommon {
 			'script.execute_on' => ['update', '1', '0']
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, self::$resourceid_script);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, self::$resourceid_script, self::RESOURCE_TYPE);
 	}
 
 	public function testAuditlogScript_CreateAuthtype() {
@@ -303,7 +308,7 @@ class testAuditlogScript extends testAuditlogCommon {
 			'script.scriptid' => ['add', self::$resourceid_authtype]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $created, self::$resourceid_authtype);
+		$this->getAuditDetails('details', self::ACTION_ADD, $created, self::$resourceid_authtype, self::RESOURCE_TYPE);
 	}
 
 	/**
@@ -329,7 +334,7 @@ class testAuditlogScript extends testAuditlogCommon {
 			'script.privatekey' => ['update', 'update_private_key', '']
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, self::$resourceid_authtype);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, self::$resourceid_authtype, self::RESOURCE_TYPE);
 	}
 
 	/**
@@ -337,6 +342,6 @@ class testAuditlogScript extends testAuditlogCommon {
 	 */
 	public function testAuditlogScript_Delete() {
 		$this->call('script.delete', [self::$resourceid_ssh]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid, 'Updated SSH script', self::$resourceid_ssh);
+		$this->getAuditDetails('resourcename', self::ACTION_DELETE, 'Updated SSH script', self::$resourceid_ssh, self::RESOURCE_TYPE);
 	}
 }

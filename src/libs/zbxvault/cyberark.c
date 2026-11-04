@@ -20,15 +20,17 @@
 
 #include "zbxjson.h"
 
-int	zbx_vault_get_kvs_cyberark(const char *vault_url, const char *prefix, const char *token,
+int	zbx_vault_get_kvs_cyberark(const char *vault_url, const char *prefix, const char *token, const char *approle,
 		const char *ssl_cert_file, const char *ssl_key_file, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location, const char *path, long timeout, zbx_kvs_t *kvs, char **error)
+		const char *config_ssl_key_location, const char *path, long timeout, zbx_kvs_t *kvs,
+		int *vault_ret, char **error)
 {
 #ifndef HAVE_LIBCURL
 	ZBX_UNUSED(vault_url);
 	ZBX_UNUSED(prefix);
 	ZBX_UNUSED(token);
+	ZBX_UNUSED(approle);
 	ZBX_UNUSED(ssl_cert_file);
 	ZBX_UNUSED(ssl_key_file);
 	ZBX_UNUSED(config_source_ip);
@@ -38,16 +40,21 @@ int	zbx_vault_get_kvs_cyberark(const char *vault_url, const char *prefix, const 
 	ZBX_UNUSED(path);
 	ZBX_UNUSED(timeout);
 	ZBX_UNUSED(kvs);
+	ZBX_UNUSED(vault_ret);
 
 	*error = zbx_dsprintf(*error, "missing cURL library");
 	return FAIL;
 #else
+#define ZBX_HTTP_STATUS_CODE_OK	200
+
 	char			*out = NULL, *url;
 	struct zbx_json_parse	jp, jp_data;
 	int			ret = FAIL;
 	long			response_code;
 
 	ZBX_UNUSED(token);
+	ZBX_UNUSED(vault_ret);
+	ZBX_UNUSED(approle);
 
 	if (NULL == prefix || '\0' == *prefix)
 		prefix = "/AIMWebService/api/Accounts?";
@@ -61,7 +68,7 @@ int	zbx_vault_get_kvs_cyberark(const char *vault_url, const char *prefix, const 
 		goto fail;
 	}
 
-	if (200 != response_code)
+	if (ZBX_HTTP_STATUS_CODE_OK != response_code)
 	{
 		*error = zbx_dsprintf(*error, "unsuccessful response code \"%ld\"", response_code);
 		goto fail;
@@ -87,5 +94,7 @@ fail:
 	zbx_free(out);
 
 	return ret;
+
+#undef ZBX_HTTP_STATUS_CODE_OK
 #endif
 }

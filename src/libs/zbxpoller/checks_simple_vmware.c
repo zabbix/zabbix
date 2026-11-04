@@ -498,11 +498,45 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: checks and updates scheduled job requests                         *
+ *                                                                            *
+ * Parameters: service   - [IN/OUT] vmware service                            *
+ *             job_types - [IN] set of ZBX_VMWARE_UPDATE_* types              *
+*                                                                             *
+******************************************************************************/
+static void	vmware_service_jobs_request(zbx_vmware_service_t *service, int job_types)
+{
+	int	job_type;
+
+	job_type = job_types & ZBX_VMWARE_UPDATE_CONF;
+
+	if (0 != job_type && 0 == (service->jobs_flag & job_type))
+		service->jobs_flag |= ZBX_VMWARE_TO_REQ(job_type);
+
+	job_type = job_types & ZBX_VMWARE_UPDATE_PERFCOUNTERS;
+
+	if (0 != job_type && 0 == (service->jobs_flag & job_type))
+		service->jobs_flag |= ZBX_VMWARE_TO_REQ(job_type);
+
+	job_type = job_types & ZBX_VMWARE_UPDATE_REST_TAGS;
+
+	if (0 != job_type && 0 == (service->jobs_flag & job_type))
+		service->jobs_flag |= ZBX_VMWARE_TO_REQ(job_type);
+
+	job_type = job_types & ZBX_VMWARE_UPDATE_EVENTLOG;
+
+	if (0 != job_type && 0 == (service->jobs_flag & job_type))
+		service->jobs_flag |= ZBX_VMWARE_TO_REQ(job_type);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: gets vmware service object                                        *
  *                                                                            *
  * Parameters: url       - [IN] vmware service URL                            *
  *             username  - [IN] vmware service username                       *
  *             password  - [IN] vmware service password                       *
+ *             job_types - [IN] set of the ZBX_VMWARE_UPDATE_* flags          *
  *             result    - [OUT]                                              *
  *             ret       - [OUT] operation result code                        *
  *                                                                            *
@@ -526,7 +560,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static zbx_vmware_service_t	*get_vmware_service(const char *url, const char *username, const char *password,
-		AGENT_RESULT *result, int *ret)
+		int job_types, AGENT_RESULT *result, int *ret)
 {
 	zbx_vmware_service_t	*service;
 
@@ -537,6 +571,8 @@ static zbx_vmware_service_t	*get_vmware_service(const char *url, const char *use
 		*ret = SYSINFO_RET_OK;
 		goto out;
 	}
+
+	vmware_service_jobs_request(service, job_types);
 
 	if (0 != (service->state & ZBX_VMWARE_STATE_FAILED))
 	{
@@ -595,7 +631,7 @@ static int	get_vcenter_vmprop(const AGENT_REQUEST *request, const char *username
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (vm = service_vm_get(service, uuid)))
@@ -661,7 +697,7 @@ static int	get_vcenter_hvprop(const AGENT_REQUEST *request, const char *username
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
@@ -732,11 +768,10 @@ static void	vmware_tags_uuid_json(const zbx_vmware_data_tags_t *data_tags, const
 	zbx_vmware_entity_tags_t	entity_cmp;
 	zbx_vector_vmware_tag_ptr_t	*tags;
 
-	if (NULL != data_tags->error)
+	/* we return data from the cache despite the error */
+	if (NULL != error && NULL != data_tags->error)
 	{
-		if (NULL != error)
-			*error = zbx_strdup(NULL, data_tags->error);
-
+		*error = zbx_strdup(NULL, data_tags->error);
 		return;
 	}
 
@@ -817,7 +852,7 @@ int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, const char *username
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
@@ -907,7 +942,7 @@ int	check_vcenter_cluster_property(AGENT_REQUEST *request, const char *username,
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (cl = cluster_get(&service->data->clusters, id)))
@@ -964,7 +999,7 @@ int	check_vcenter_cluster_status(AGENT_REQUEST *request, const char *username, c
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (cluster = cluster_get_by_name(&service->data->clusters, name)))
@@ -1024,7 +1059,7 @@ int	check_vcenter_cluster_tags_get(AGENT_REQUEST *request, const char *username,
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (cl = cluster_get(&service->data->clusters, id)))
@@ -1222,8 +1257,11 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, item->username, item->password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, item->username, item->password, ZBX_VMWARE_UPDATE_EVENTLOG,
+			result, &ret)))
+	{
 		goto unlock;
+	}
 
 	if (0 != service->eventlog.lastaccess &&
 			service->eventlog.interval != service->lastaccess - service->eventlog.lastaccess)
@@ -1233,9 +1271,6 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 	}
 
 	service->eventlog.lastaccess = service->lastaccess;
-
-	if (0 == (service->jobs_flag & ZBX_VMWARE_UPDATE_EVENTLOG))
-		service->jobs_flag |= ZBX_VMWARE_REQ_UPDATE_EVENTLOG;
 
 	if (severity != service->eventlog.severity)
 		service->eventlog.severity = severity;
@@ -1314,7 +1349,7 @@ int	check_vcenter_version(AGENT_REQUEST *request, const char *username, const ch
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == service->version)
@@ -1350,7 +1385,7 @@ int	check_vcenter_fullname(AGENT_REQUEST *request, const char *username, const c
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == service->fullname)
@@ -1395,7 +1430,7 @@ int	check_vcenter_hv_cluster_name(AGENT_REQUEST *request, const char *username, 
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
@@ -1476,7 +1511,7 @@ int	check_vcenter_hv_cpu_usage_perf(AGENT_REQUEST *request, const char *username
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
@@ -1516,7 +1551,7 @@ int	check_vcenter_hv_cpu_utilization(AGENT_REQUEST *request, const char *usernam
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
@@ -1576,7 +1611,7 @@ int	check_vcenter_hv_power(AGENT_REQUEST *request, const char *username, const c
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
@@ -1616,7 +1651,7 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
@@ -1711,7 +1746,7 @@ int	check_vcenter_hv_diskinfo_get(AGENT_REQUEST *request, const char *username, 
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
@@ -1946,7 +1981,7 @@ int	check_vcenter_hv_memory_size_ballooned(AGENT_REQUEST *request, const char *u
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
@@ -2032,7 +2067,7 @@ int	check_vcenter_hv_property(AGENT_REQUEST *request, const char *username, cons
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
@@ -2232,7 +2267,7 @@ int	check_vcenter_hv_vm_num(AGENT_REQUEST *request, const char *username, const 
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
@@ -2304,7 +2339,7 @@ static int	check_vcenter_hv_network_common(AGENT_REQUEST *request, const char *u
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
@@ -2359,7 +2394,7 @@ int	check_vcenter_hv_net_if_discovery(AGENT_REQUEST *request, const char *userna
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
@@ -2422,7 +2457,7 @@ int	check_vcenter_hv_network_linkspeed(AGENT_REQUEST *request, const char *usern
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
@@ -2476,7 +2511,7 @@ int	check_vcenter_hv_tags_get(AGENT_REQUEST *request, const char *username, cons
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
@@ -2533,7 +2568,7 @@ int	check_vcenter_hv_datacenter_name(AGENT_REQUEST *request, const char *usernam
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
@@ -2575,7 +2610,7 @@ int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *use
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (hv = hv_get(&service->data->hvs, hv_uuid)))
@@ -2687,7 +2722,7 @@ static int	check_vcenter_hv_datastore_metrics(AGENT_REQUEST *request, const char
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (hv = hv_get(&service->data->hvs, hv_uuid)))
@@ -2815,7 +2850,7 @@ static int	check_vcenter_datastore_metrics(AGENT_REQUEST *request, const char *u
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	/* allow passing ds uuid or name for backwards compatibility */
@@ -3065,7 +3100,7 @@ static int	check_vcenter_ds_size(const char *url, const char *hv_uuid, const cha
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL != hv_uuid)
@@ -3253,7 +3288,7 @@ int	check_vcenter_cl_perfcounter(AGENT_REQUEST *request, const char *username, c
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (FAIL == zbx_vmware_service_get_counterid(service, path, &counterid, &unit))
@@ -3315,7 +3350,7 @@ int	check_vcenter_hv_perfcounter(AGENT_REQUEST *request, const char *username, c
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (hv = hv_get(&service->data->hvs, uuid)))
@@ -3370,7 +3405,7 @@ int	check_vcenter_hv_datastore_list(AGENT_REQUEST *request, const char *username
 	hv_uuid = get_rparam(request, 1);
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (hv = hv_get(&service->data->hvs, hv_uuid)))
@@ -3444,7 +3479,7 @@ int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *use
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (hv = hv_get(&service->data->hvs, hv_uuid)))
@@ -3529,7 +3564,7 @@ int	check_vcenter_datastore_hv_list(AGENT_REQUEST *request, const char *username
 	ds_name = get_rparam(request, 1);
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (datastore = ds_get(&service->data->datastores, ds_name)))
@@ -3604,7 +3639,7 @@ int	check_vcenter_datastore_perfcounter(AGENT_REQUEST *request, const char *user
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (ds = ds_get(&service->data->datastores, uuid)))
@@ -3672,7 +3707,7 @@ int	check_vcenter_datastore_property(AGENT_REQUEST *request, const char *usernam
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (ds = ds_get(&service->data->datastores, uuid)))
@@ -3766,7 +3801,7 @@ int	check_vcenter_datastore_discovery(AGENT_REQUEST *request, const char *userna
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	zbx_vector_str_create(&ids);
@@ -3866,7 +3901,7 @@ int	check_vcenter_datastore_tags_get(AGENT_REQUEST *request, const char *usernam
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (ds = ds_get(&service->data->datastores, uuid)))
@@ -3922,7 +3957,7 @@ int	check_vcenter_dvswitch_discovery(AGENT_REQUEST *request, const char *usernam
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
@@ -4076,7 +4111,7 @@ int	check_vcenter_dvswitch_fetchports_get(AGENT_REQUEST *request, const char *us
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (dvs = dvs_get(&service->data->dvswitches, uuid)))
@@ -4163,7 +4198,7 @@ int	check_vcenter_vm_attribute(AGENT_REQUEST *request, const char *username, con
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (vm = service_vm_get(service, vm_uuid)))
@@ -4247,7 +4282,7 @@ int	check_vcenter_vm_cluster_name(AGENT_REQUEST *request, const char *username, 
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (hv = service_hv_get_by_vm_uuid(service, uuid)))
@@ -4295,7 +4330,7 @@ int	check_vcenter_vm_cpu_ready(AGENT_REQUEST *request, const char *username, con
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	ret = vmware_service_get_vm_counter(service, uuid, "", "cpu/ready[summation]", 1, result);
@@ -4351,7 +4386,7 @@ int	check_vcenter_vm_datacenter_name(AGENT_REQUEST *request, const char *usernam
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (hv = service_hv_get_by_vm_uuid(service, uuid)))
@@ -4393,7 +4428,7 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
@@ -4538,6 +4573,12 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 				zbx_json_addstring(&json_data, "ifbackingdevice", ZBX_NULL2EMPTY_STR(
 						dev->props[ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE]),
 						ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json_data, "ifbackingname", ZBX_NULL2EMPTY_STR(
+						dev->props[ZBX_VMWARE_DEV_PROPS_IFBACKINGNAME]),
+						ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json_data, "ifbackingnetwork", ZBX_NULL2EMPTY_STR(
+						dev->props[ZBX_VMWARE_DEV_PROPS_IFBACKINGNETWORK]),
+						ZBX_JSON_TYPE_STRING);
 				zbx_json_addstring(&json_data, "ifdvswitch_uuid", ZBX_NULL2EMPTY_STR(
 						dev->props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_UUID]),
 						ZBX_JSON_TYPE_STRING);
@@ -4597,7 +4638,7 @@ int	check_vcenter_vm_hv_maintenance(AGENT_REQUEST *request, const char *username
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (hv = service_hv_get_by_vm_uuid(service, uuid)))
@@ -4653,7 +4694,7 @@ int	check_vcenter_vm_hv_name(AGENT_REQUEST *request, const char *username, const
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (hv = service_hv_get_by_vm_uuid(service, uuid)))
@@ -4847,7 +4888,7 @@ int	check_vcenter_vm_property(AGENT_REQUEST *request, const char *username, cons
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (vm = service_vm_get(service, uuid)))
@@ -4926,6 +4967,12 @@ static void	check_vcenter_vm_discovery_props_nic_cb(struct zbx_json *j, zbx_vmwa
 	zbx_json_addstring(j, "{#IFBACKINGDEVICE}",
 			ZBX_NULL2EMPTY_STR(dev->props[ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE]),
 			ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(j, "{#IFBACKINGNAME}",
+			ZBX_NULL2EMPTY_STR(dev->props[ZBX_VMWARE_DEV_PROPS_IFBACKINGNAME]),
+			ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(j, "{#IFBACKINGNETWORK}",
+			ZBX_NULL2EMPTY_STR(dev->props[ZBX_VMWARE_DEV_PROPS_IFBACKINGNETWORK]),
+			ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(j, "{#IFDVSWITCH.UUID}", ZBX_NULL2EMPTY_STR(
 			dev->props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_UUID]), ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(j, "{#IFDVSWITCH.PORTGROUP}", ZBX_NULL2EMPTY_STR(
@@ -4972,7 +5019,7 @@ static int	check_vcenter_vm_discovery_common(AGENT_REQUEST *request, const char 
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (vm = service_vm_get(service, uuid)))
@@ -5054,7 +5101,7 @@ static int	check_vcenter_vm_common(AGENT_REQUEST *request, const char *username,
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bps"))
@@ -5180,7 +5227,7 @@ int	check_vcenter_vm_tags_get(AGENT_REQUEST *request, const char *username, cons
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (vm = service_vm_get(service, uuid)))
@@ -5262,7 +5309,7 @@ int	check_vcenter_vm_tools(AGENT_REQUEST *request, const char *username, const c
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (vm = service_vm_get(service, uuid)))
@@ -5354,7 +5401,7 @@ int	check_vcenter_vm_vfs_fs_discovery(AGENT_REQUEST *request, const char *userna
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (vm = service_vm_get(service, uuid)))
@@ -5419,7 +5466,7 @@ int	check_vcenter_vm_vfs_fs_size(AGENT_REQUEST *request, const char *username, c
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (vm = service_vm_get(service, uuid)))
@@ -5494,7 +5541,7 @@ int	check_vcenter_vm_perfcounter(AGENT_REQUEST *request, const char *username, c
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (NULL == (vm = service_vm_get(service, uuid)))
@@ -5548,7 +5595,7 @@ int	check_vcenter_dc_discovery(AGENT_REQUEST *request, const char *username, con
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
@@ -5606,7 +5653,7 @@ int	check_vcenter_dc_tags_get(AGENT_REQUEST *request, const char *username, cons
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	for (i = 0; i < service->data->datacenters.values_num; i++)
@@ -5680,7 +5727,7 @@ int	check_vcenter_vm_net_if_usage(AGENT_REQUEST *request, const char *username, 
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	ret = vmware_service_get_vm_counter(service, uuid, instance, "net/usage[average]", ZBX_KIBIBYTE, result);
@@ -5718,7 +5765,7 @@ int	check_vcenter_vm_guest_memory_size_swapped(AGENT_REQUEST *request, const cha
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	ret = vmware_service_get_vm_counter(service, uuid, "", "mem/swapped[average]", ZBX_KIBIBYTE, result);
@@ -5756,7 +5803,7 @@ int	check_vcenter_vm_memory_size_consumed(AGENT_REQUEST *request, const char *us
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	ret = vmware_service_get_vm_counter(service, uuid, "", "mem/consumed[average]", ZBX_KIBIBYTE, result);
@@ -5794,7 +5841,7 @@ int	check_vcenter_vm_memory_usage(AGENT_REQUEST *request, const char *username, 
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	ret = vmware_service_get_vm_counter(service, uuid, "", "mem/usage[average]", 0, result);
@@ -5832,7 +5879,7 @@ int	check_vcenter_vm_cpu_latency(AGENT_REQUEST *request, const char *username, c
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	ret = vmware_service_get_vm_counter(service, uuid, "", "cpu/latency[average]", 0, result);
@@ -5874,7 +5921,7 @@ int	check_vcenter_vm_cpu_readiness(AGENT_REQUEST *request, const char *username,
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	ret = vmware_service_get_vm_counter(service, uuid, instance, "cpu/readiness[average]", 0, result);
@@ -5916,7 +5963,7 @@ int	check_vcenter_vm_cpu_swapwait(AGENT_REQUEST *request, const char *username, 
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	ret = vmware_service_get_vm_counter(service, uuid, instance, "cpu/swapwait[summation]", 0, result);
@@ -5954,7 +6001,7 @@ int	check_vcenter_vm_cpu_usage_perf(AGENT_REQUEST *request, const char *username
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	ret = vmware_service_get_vm_counter(service, uuid, "", "cpu/usage[average]", 0, result);
@@ -5999,7 +6046,7 @@ static int	check_vcenter_vm_storage_common(AGENT_REQUEST *request, const char *u
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	ret = vmware_service_get_vm_counter(service, uuid, instance, counter_name, 1, result);
@@ -6066,7 +6113,7 @@ int	check_vcenter_vm_guest_uptime(AGENT_REQUEST *request, const char *username, 
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	ret = vmware_service_get_vm_counter(service, uuid, "", "sys/osUptime[latest]", 1, result);
@@ -6088,7 +6135,7 @@ static int	check_vcenter_rp_common(const char *url, const char *username, const 
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))
 		goto unlock;
 
 	if (FAIL == zbx_vmware_service_get_counterid(service, counter, &counterid, &unit))
@@ -6240,6 +6287,12 @@ static int	check_vcenter_alarm_get_common(zbx_vector_vmware_alarm_ptr_t *alarms,
 		zbx_json_addstring(&json_data, "overall_status", alarm->overall_status, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "acknowledged", (0 == alarm->acknowledged ? "false" : "true"),
 				ZBX_JSON_TYPE_INT);
+		zbx_json_addobject(&json_data, "entity");
+		zbx_json_addstring(&json_data, "id", ZBX_NULL2EMPTY_STR(alarm->entity_id), ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "uuid", ZBX_NULL2EMPTY_STR(alarm->entity_uuid), ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "type", ZBX_NULL2EMPTY_STR(alarm->entity_type), ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "name", ZBX_NULL2EMPTY_STR(alarm->entity_name), ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&json_data);
 		zbx_json_close(&json_data);
 	}
 
@@ -6276,7 +6329,7 @@ static int	check_vcenter_alarm_get_common(zbx_vector_vmware_alarm_ptr_t *alarms,
 												\
 	zbx_vmware_lock();									\
 												\
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))	\
+	if (NULL == (service = get_vmware_service(url, username, password, ZBX_VMWARE_JOBSET_CPT, result, &ret)))\
 		goto unlock
 
 #define	ALARMS_GET_END(ids)									\

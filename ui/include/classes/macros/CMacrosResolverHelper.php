@@ -57,12 +57,14 @@ class CMacrosResolverHelper {
 	 * @param string $interfaces[n]['ip']
 	 * @param string $interfaces[n]['dns']
 	 * @param string $interfaces[n]['port']
-	 * @param array  $interfaces[n]['details']                    (optional)
-	 * @param string $interfaces[n]['details']['securityname']    (optional)
-	 * @param string $interfaces[n]['details']['authpassphrase']  (optional)
-	 * @param string $interfaces[n]['details']['privpassphrase']  (optional)
-	 * @param string $interfaces[n]['details']['contextname']     (optional)
-	 * @param string $interfaces[n]['details']['community']       (optional)
+	 * @param array  $interfaces[n]['details']                     (optional)
+	 * @param string $interfaces[n]['details']['securityname']     (optional)
+	 * @param string $interfaces[n]['details']['authpassphrase']   (optional)
+	 * @param string $interfaces[n]['details']['privpassphrase']   (optional)
+	 * @param string $interfaces[n]['details']['contextname']      (optional)
+	 * @param string $interfaces[n]['details']['community']        (optional)
+	 * @param string $interfaces[n]['details']['max_repetitions']  (optional)
+	 * @param string $interfaces[n]['details']['retries']          (optional)
 	 *
 	 * @return array
 	 */
@@ -154,7 +156,9 @@ class CMacrosResolverHelper {
 			'authpassphrase' => [],
 			'privpassphrase' => [],
 			'contextname' => [],
-			'community' => []
+			'community' => [],
+			'max_repetitions' => [],
+			'retries' => []
 		];
 
 		foreach ($interfaces as $index => $interface) {
@@ -179,6 +183,14 @@ class CMacrosResolverHelper {
 
 				if (array_key_exists('community', $interface['details'])) {
 					$data['community'][$hostid][$index] = $interface['details']['community'];
+				}
+
+				if (array_key_exists('max_repetitions', $interface['details'])) {
+					$data['max_repetitions'][$hostid][$index] = $interface['details']['max_repetitions'];
+				}
+
+				if (array_key_exists('retries', $interface['details'])) {
+					$data['retries'][$hostid][$index] = $interface['details']['retries'];
 				}
 			}
 		}
@@ -208,6 +220,16 @@ class CMacrosResolverHelper {
 			'data' => $data['community']
 		]);
 
+		$resolved_max_repetitions = CMacrosResolver::resolve([
+			'config' => 'hostInterfaceDetailsMaxRepetitions',
+			'data' => $data['max_repetitions']
+		]);
+
+		$resolved_retries = CMacrosResolver::resolve([
+			'config' => 'hostInterfaceDetailsRetries',
+			'data' => $data['retries']
+		]);
+
 		foreach ($interfaces as $index => $interface) {
 			$hostid = $interface['hostid'];
 
@@ -230,6 +252,14 @@ class CMacrosResolverHelper {
 
 				if (array_key_exists('community', $interface['details'])) {
 					$interfaces[$index]['details']['community'] = $resolved_community[$hostid][$index];
+				}
+
+				if (array_key_exists('max_repetitions', $interface['details'])) {
+					$interfaces[$index]['details']['max_repetitions'] = $resolved_max_repetitions[$hostid][$index];
+				}
+
+				if (array_key_exists('retries', $interface['details'])) {
+					$interfaces[$index]['details']['retries'] = $resolved_retries[$hostid][$index];
 				}
 			}
 		}
@@ -261,45 +291,63 @@ class CMacrosResolverHelper {
 	}
 
 	/**
-	 * Resolve macros in trigger operational data.
+	 * Resolve macros in event descriptions.
 	 *
-	 * @param array  $trigger
-	 * @param string $trigger['expression']
-	 * @param string $trigger['opdata']
-	 * @param int    $trigger['clock']       (optional)
-	 * @param int    $trigger['ns']          (optional)
+	 * @param array  $events
+	 * @param string $events[<eventid>]['triggerid']
+	 * @param string $events[<eventid>]['expression']
+	 * @param int    $events[<eventid>]['clock']
+	 * @param int    $events[<eventid>]['ns']
+	 * @param string $events[<eventid>]['opdata']
 	 * @param array  $options
-	 * @param bool   $options['events']      (optional) Resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields.
-	 *                                       Default: false.
-	 * @param bool   $options['html']        (optional) Default: false.
+	 * @param bool   $options['html']                  (optional) Default: false.
 	 *
 	 * @return string
 	 */
-	public static function resolveTriggerOpdata(array $trigger, array $options = []) {
-		return self::resolveTriggerDescriptions([$trigger['triggerid'] => $trigger],
-			$options + ['sources' => ['opdata']]
-		)[$trigger['triggerid']]['opdata'];
+	public static function resolveEventOpdatas(array $events, array $options = []) {
+		$options += ['html' => false];
+		return CMacrosResolver::resolveEventMacros($events, ['scope' => 'opdata', 'sources' => ['opdata']] + $options);
 	}
 
 	/**
-	 * Resolve macros in trigger description.
+	 * Resolve macros in event opdatas.
 	 *
-	 * @param array  $trigger
-	 * @param string $trigger['expression']
-	 * @param string $trigger['comments']
-	 * @param int    $trigger['clock']       (optional)
-	 * @param int    $trigger['ns']          (optional)
-	 * @param array  $options
-	 * @param bool   $options['events']      (optional) Resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields.
-	 *                                       Default: false.
-	 * @param bool   $options['html']        (optional) Default: false.
+	 * @param array  $events
+	 * @param string $events[<eventid>]['triggerid']
+	 * @param string $events[<eventid>]['expression']
+	 * @param int    $events[<eventid>]['clock']
+	 * @param int    $events[<eventid>]['ns']
+	 * @param string $events[<eventid>]['comments']
 	 *
 	 * @return string
 	 */
-	public static function resolveTriggerDescription(array $trigger, array $options = []) {
-		return self::resolveTriggerDescriptions([$trigger['triggerid'] => $trigger],
-			$options + ['sources' => ['comments']]
-		)[$trigger['triggerid']]['comments'];
+	public static function resolveEventDescriptions(array $events) {
+		return CMacrosResolver::resolveEventMacros($events, [
+			'scope' => 'description',
+			'sources' => ['comments'],
+			'html' => false
+		]);
+	}
+
+	/**
+	 * Resolve macros in event custom texts.
+	 *
+	 * @param array  $events
+	 * @param string $events[<eventid>]['triggerid']
+	 * @param string $events[<eventid>]['expression']
+	 * @param int    $events[<eventid>]['clock']
+	 * @param int    $events[<eventid>]['ns']
+	 * @param string $events[<eventid>][<sources>]     See $options['sources'].
+	 * @param array  $options
+	 * @param array  $options['sources']               An array of trigger field names: 'opdata', '<custom_text_id1>',
+	 *                                                 '<custom_text_id2>'.
+	 *
+	 * @return string
+	 */
+	public static function resolveEventCustomTexts(array $events, array $options) {
+		$options += ['html' => false];
+
+		return CMacrosResolver::resolveEventMacros($events, ['scope' => 'custom_text'] + $options);
 	}
 
 	/**
@@ -308,22 +356,12 @@ class CMacrosResolverHelper {
 	 * @param array  $triggers
 	 * @param string $triggers[<triggerid>]['expression']
 	 * @param string $triggers[<triggerid>][<sources>]     See $options['sources'].
-	 * @param int    $triggers[<triggerid>]['clock']       (optional)
-	 * @param int    $triggers[<triggerid>]['ns']          (optional)
 	 * @param array  $options
-	 * @param bool   $options['events']                   (optional) Resolve {ITEM.VALUE} macro using 'clock' and 'ns'
-	 *                                                    fields. Default: false.
-	 * @param bool   $options['html']                     (optional) Default: false.
-	 * @param array  $options['sources']                  An array of trigger field names: 'comments', 'opdata'.
+	 * @param array  $options['sources']                   An array of trigger field names: 'comments', 'opdata'.
 	 *
 	 * @return array
 	 */
 	public static function resolveTriggerDescriptions(array $triggers, array $options): array {
-		$options += [
-			'events' => false,
-			'html' => false
-		];
-
 		return CMacrosResolver::resolveTriggerDescriptions($triggers, $options);
 	}
 
@@ -492,15 +530,27 @@ class CMacrosResolverHelper {
 	}
 
 	/**
-	 * Resolve text-type column macros for top-hosts widget.
+	 * Resolve host macros.
 	 *
 	 * @param array $columns
 	 * @param array $hostids
 	 *
 	 * @return array
 	 */
-	public static function resolveWidgetTopHostsTextColumns(array $columns, array $hostids): array {
-		return CMacrosResolver::resolveWidgetTopHostsTextColumns($columns, $hostids);
+	public static function resolveHostMacros(array $columns, array $hostids): array {
+		return CMacrosResolver::resolveHostMacros($columns, $hostids, ['context' => 'host']);
+	}
+
+	/**
+	 * Resolve template macros.
+	 *
+	 * @param array $columns
+	 * @param array $hostids
+	 *
+	 * @return array
+	 */
+	public static function resolveTemplateMacros(array $columns, array $hostids): array {
+		return CMacrosResolver::resolveHostMacros($columns, $hostids, ['context' => 'template']);
 	}
 
 	/**

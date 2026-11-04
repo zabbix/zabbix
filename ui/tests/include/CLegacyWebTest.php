@@ -584,7 +584,7 @@ class CLegacyWebTest extends CWebTest {
 	 * @throws NoSuchElementException
 	 */
 	public function zbxTestContentControlButtonClickText($text) {
-		$xpath = "//header[@class='header-title']".
+		$xpath = "//div[contains(@class, 'header-title')]".
 				"//nav[@aria-label='Content controls']".
 					"//button[text()='{$text}']";
 
@@ -631,7 +631,7 @@ class CLegacyWebTest extends CWebTest {
 	 * @throws NoSuchElementException
 	 */
 	public function zbxTestContentControlButtonClickTextWait($text) {
-		$xpath = "//header[contains(@class, 'header-title')]".
+		$xpath = "//div[contains(@class, 'header-title')]".
 					"//nav[@aria-label='Content controls']".
 						"//button[text()='{$text}']";
 
@@ -689,7 +689,6 @@ class CLegacyWebTest extends CWebTest {
 
 	public function __get($attribute) {
 		if ($attribute === 'webDriver') {
-			self::zbxAddWarning('Web driver should not be accessed directly from test cases.');
 			return CElementQuery::getDriver();
 		}
 

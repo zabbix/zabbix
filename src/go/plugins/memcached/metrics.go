@@ -34,16 +34,21 @@ var (
 
 // Common params: [URI|Session][,User][,Password]
 var (
+	//nolint:gochecknoglobals // global constant
 	paramURI = metric.NewConnParam("URI", "URI to connect or session name.").
 			WithDefault(uriDefaults.Scheme + "://localhost:" + uriDefaults.Port).WithSession().
 			WithValidator(uri.URIValidator{Defaults: uriDefaults, AllowedSchemes: []string{"tcp", "unix"}})
-	paramUser     = metric.NewConnParam("User", "Memcached user.").WithDefault("")
+	//nolint:gochecknoglobals // global constant
+	paramUser = metric.NewConnParam("User", "Memcached user.").WithDefault("")
+	//nolint:gochecknoglobals // global constant
 	paramPassword = metric.NewConnParam("Password", "User's password.").WithDefault("")
+	//nolint:gochecknoglobals // global constant
+	paramConnTimeout = metric.NewSessionOnlyParam("ConnectionTimeout", "Time for connection to timeout.")
 )
 
 var metrics = metric.MetricSet{
 	keyPing: metric.New("Test if connection is alive or not.",
-		[]*metric.Param{paramURI, paramUser, paramPassword}, false),
+		[]*metric.Param{paramURI, paramUser, paramPassword, paramConnTimeout}, false),
 
 	keyStats: metric.New(
 		"Returns output of stats command.",
@@ -64,6 +69,7 @@ var metrics = metric.MetricSet{
 					},
 					CaseInsensitive: true,
 				}),
+			paramConnTimeout,
 		},
 		false,
 	),

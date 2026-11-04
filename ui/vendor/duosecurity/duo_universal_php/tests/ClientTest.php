@@ -39,6 +39,17 @@ final class ClientTest extends TestCase
     public $expected_good_http_request = array("response" => array("timestamp" => 1607009339),
                                          "stat" => "OK");
 
+    /**
+     * Pads the client secret to meet minimum key length requirements for HS512.
+     *
+     * Note: This reimplements the logic from Client::getPaddedSecret() for testing purposes.
+     * The real implementation is tested through integration tests like testTokenExchangeSuccess().
+     * testPaddedSecretMatchesImplementation() verifies this reimplementation stays in sync.
+     */
+    private function getPaddedSecret(): string
+    {
+        return str_pad($this->client_secret, Client::HS512_MIN_KEY_LENGTH, "\0");
+    }
 
     protected function setUp(): void
     {
@@ -102,7 +113,7 @@ final class ClientTest extends TestCase
         if ($change_val) {
             $payload[key($change_val)] = $change_val[key($change_val)];
         }
-        return JWT::encode($payload, $this->client_secret, Client::SIG_ALGORITHM);
+        return JWT::encode($payload, $this->getPaddedSecret(), Client::SIG_ALGORITHM);
     }
 
     /**
@@ -121,6 +132,31 @@ final class ClientTest extends TestCase
                 "access_token" => "90101112",
                 "expires_in" => "1234567890",
                 "token_type" => "Bearer"];
+    }
+
+    /**
+     * Test that the test's getPaddedSecret() reimplementation matches the real Client implementation.
+     * This ensures the test helper stays in sync with the actual implementation.
+     */
+    public function testPaddedSecretMatchesImplementation(): void
+    {
+        $client = $this->createGoodClient();
+
+        // Create a JWT using the Client's internal getPaddedSecret() (via createAuthUrl)
+        $auth_url = $client->createAuthUrl($this->username, $this->good_state);
+
+        // Extract the JWT from the URL
+        $query_str = parse_url($auth_url, PHP_URL_QUERY);
+        parse_str($query_str, $query_params);
+        $token = $query_params["request"];
+
+        // Try to decode it using the test's getPaddedSecret()
+        // If the signatures don't match, this will throw SignatureInvalidException
+        $jwt_key = new Key($this->getPaddedSecret(), Client::SIG_ALGORITHM);
+        $decoded = JWT::decode($token, $jwt_key);
+
+        // Verify the decoded token contains expected data
+        $this->assertEquals($this->username, $decoded->duo_uname);
     }
 
     /**
@@ -422,7 +458,7 @@ final class ClientTest extends TestCase
     {
         $id_token = $this->createIdToken();
         $result = $this->createTokenResult($id_token);
-        $jwt_key = new Key($this->client_secret, Client::SIG_ALGORITHM);
+        $jwt_key = new Key($this->getPaddedSecret(), Client::SIG_ALGORITHM);
         $expected_result_obj = JWT::decode($id_token, $jwt_key);
         $expected_result = json_decode(json_encode($expected_result_obj), true);
         $client = $this->createClientMockHttp($result);
@@ -494,7 +530,7 @@ final class ClientTest extends TestCase
         $query_str = parse_url($url, PHP_URL_QUERY);
         parse_str($query_str, $query_params);
         $token = $query_params["request"];
-        $jwt_key = new Key($this->client_secret, Client::SIG_ALGORITHM);
+        $jwt_key = new Key($this->getPaddedSecret(), Client::SIG_ALGORITHM);
         $result_obj = JWT::decode($token, $jwt_key);
         return json_decode(json_encode($result_obj), true);
     }

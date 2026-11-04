@@ -12,7 +12,7 @@ Zabbix version: 8.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- PostgreSQL 10-17
+- PostgreSQL 10-18
 
 ## Configuration
 
@@ -53,6 +53,8 @@ chown zabbix:zabbix /var/lib/zabbix
 
 3. Copy the `template_db_postgresql.conf` file, containing user parameters, to the Zabbix agent configuration directory `/etc/zabbix/zabbix_agentd.d/` and restart Zabbix agent service.
 
+**Note:** the template and these files are shipped together and have to be updated together. The `postgresql/` directory and `template_db_postgresql.conf` carry a revision number, reported by the *User parameters revision* item. If the deployed files are older than the template requires, the trigger *User parameters are outdated* is raised - copy both the directory and the configuration file of the current template version to the host and restart Zabbix agent. Newer files always work with an older template, so the agent side can be updated first.
+
 **Note:** if you want to use SSL/TLS encryption to protect communications with the remote PostgreSQL instance, you can modify the connection string in user parameters. For example, to enable required encryption in transport mode without identity checks you could append `?sslmode=required` to the end of the connection string for all keys that use `psql`:
 
 ```bash
@@ -88,17 +90,29 @@ For more information please read the PostgreSQL documentation `https://www.postg
 |{$PG.PASSWORD}|<p>PostgreSQL user password.</p>||
 |{$PG.DATABASE}|<p>Default PostgreSQL database for the connection.</p>|`postgres`|
 |{$PG.LLD.FILTER.DBNAME}|<p>Filter of discoverable databases.</p>|`.+`|
-|{$PG.LOCKS.MAX.WARN}|<p>Maximum number of locks for trigger expression.</p>|`100`|
-|{$PG.PING_TIME.MAX.WARN}|<p>Maximum time of connection response for trigger expression.</p>|`1s`|
-|{$PG.QUERY_ETIME.MAX.WARN}|<p>Execution time limit for count of slow queries.</p>|`30`|
-|{$PG.REPL_LAG.MAX.WARN}|<p>Maximum replication lag time for trigger expression.</p>|`10m`|
-|{$PG.SLOW_QUERIES.MAX.WARN}|<p>Slow queries count threshold for a trigger.</p>|`5`|
+|{$PG.LLD.FILTER.SCHEMA}|<p>Filter of discoverable schemas.</p>|`.+`|
+|{$PG.LLD.FILTER.SUBSCRIPTION}|<p>Filter of discoverable logical replication subscriptions.</p>|`.+`|
+|{$PG.LLD.FILTER.TABLESPACE}|<p>Filter of discoverable tablespaces.</p>|`.+`|
 |{$PG.CACHE_HITRATIO.MIN.WARN}|<p>Minimum cache hit ratio percentage for trigger expression.</p>|`90`|
 |{$PG.CHECKPOINTS_REQ.MAX.WARN}|<p>Maximum required checkpoint occurrences for trigger expression.</p>|`5`|
+|{$PG.CONFLICTS.MAX.WARN}|<p>Maximum number of recovery conflicts for trigger expression.</p>|`0`|
 |{$PG.CONN_TOTAL_PCT.MAX.WARN}|<p>Maximum percentage of current connections for trigger expression.</p>|`90`|
 |{$PG.DEADLOCKS.MAX.WARN}|<p>Maximum number of detected deadlocks for trigger expression.</p>|`0`|
 |{$PG.FROZENXID_PCT_STOP.MIN.HIGH}|<p>Minimum frozen XID before stop percentage for trigger expression.</p>|`75`|
-|{$PG.CONFLICTS.MAX.WARN}|<p>Maximum number of recovery conflicts for trigger expression.</p>|`0`|
+|{$PG.IO.CACHE.MIN.WARN}|<p>Minimum shared buffers hit ratio percentage for trigger expression.</p>|`90`|
+|{$PG.LOCKS.MAX.WARN}|<p>Maximum number of locks for trigger expression.</p>|`100`|
+|{$PG.PING_TIME.MAX.WARN}|<p>Maximum time of connection response for trigger expression.</p>|`1s`|
+|{$PG.QUERY_EXECUTION_TIME.MAX.WARN}|<p>Execution time limit for count of slow queries.</p>|`30`|
+|{$PG.REPLICATION.SLOTS.RETAINING.MAX.HIGH}|<p>Critical number of inactive replication slots retaining WAL for trigger expression.</p>|`2`|
+|{$PG.REPLICATION.SLOTS.RETAINING.MAX.WARN}|<p>Maximum number of inactive replication slots retaining WAL for trigger expression.</p>|`1`|
+|{$PG.REPL_LAG.MAX.WARN}|<p>Maximum replication lag time for trigger expression.</p>|`10m`|
+|{$PG.SLOW_QUERIES.MAX.WARN}|<p>Slow queries count threshold for a trigger.</p>|`5`|
+|{$PG.SLRU.CACHE.MIN.HIGH}|<p>Critical SLRU cache hit ratio percentage for trigger expression.</p>|`95`|
+|{$PG.SLRU.CACHE.MIN.WARN}|<p>Minimum SLRU cache hit ratio percentage for trigger expression.</p>|`98`|
+|{$PG.SUBSCRIPTION.ERRORS.MAX.WARN}|<p>Maximum number of logical replication subscription errors for trigger expression.</p>|`2`|
+|{$PG.TABLESPACE.SIZE.MAX.HIGH}|<p>Critical tablespace size for trigger expression.</p>|`15G`|
+|{$PG.TABLESPACE.SIZE.MAX.WARN}|<p>Maximum tablespace size for trigger expression.</p>|`5G`|
+|{$PG.WAL.BUFFERS_FULL.MAX.WARN}|<p>Maximum number of WAL buffer exhaustions per second for trigger expression.</p>|`10`|
 
 ### Items
 
@@ -129,18 +143,24 @@ For more information please read the PostgreSQL documentation `https://www.postg
 |Get locks|<p>Collect all metrics from pg_locks per database:</p><p>https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</p>|Zabbix agent (active)|pgsql.locks["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]|
 |Ping time|<p>Used to get the `SELECT 1` query execution time.</p>|Zabbix agent (active)|pgsql.ping.time["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]<p>**Preprocessing**</p><ul><li><p>Regular expression: `Time:\s+(\d+\.\d+)\s+ms \1`</p></li><li><p>Custom multiplier: `0.001`</p></li></ul>|
 |Ping|<p>Used to test a connection to see if it is alive. It is set to 0 if the instance doesn't accept the connections.</p>|Zabbix agent (active)|pgsql.ping["{$PG.HOST}","{$PG.PORT}"]<p>**Preprocessing**</p><ul><li><p>JavaScript: `return value.search(/accepting connections/)>0 ? 1 : 0`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Get queries|<p>Collect all metrics by query execution time.</p>|Zabbix agent (active)|pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{$PG.QUERY_ETIME.MAX.WARN}"]|
+|Get queries|<p>Collect all metrics by query execution time.</p>|Zabbix agent (active)|pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{$PG.QUERY_EXECUTION_TIME.MAX.WARN}"]|
+|Get relation sizes|<p>Collects the on-disk size of the tables, their indexes and TOAST data, summed per schema of the "{$PG.DATABASE}" database.</p><p>Reads the size metadata of every relation, therefore it is polled less frequently than the other metrics.</p>|Zabbix agent (active)|pgsql.relation.size["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]|
 |Replication: Standby count|<p>Number of standby servers.</p>|Zabbix agent (active)|pgsql.replication.count["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]|
 |Replication: Lag in seconds|<p>Replication lag with master, in seconds.</p>|Zabbix agent (active)|pgsql.replication.lag.sec["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]|
 |Replication: Recovery role|<p>Replication role: 1 — recovery is still in progress (standby mode), 0 — master mode.</p>|Zabbix agent (active)|pgsql.replication.recovery_role["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]|
 |Replication: Status|<p>Replication status: 0 — streaming is down, 1 — streaming is up, 2 — master mode.</p>|Zabbix agent (active)|pgsql.replication.status["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]|
+|Get subscription stats|<p>Collects the error counters of the logical replication subscriptions from `pg_stat_subscription_stats`:</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-SUBSCRIPTION-STATS</p>|Zabbix agent (active)|pgsql.subscription.stats["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]|
+|Get tablespace sizes|<p>Collects the size, location and owner of every tablespace of the instance.</p><p>Scans the tablespace directories, therefore it is polled less frequently than the other metrics.</p>|Zabbix agent (active)|pgsql.tablespace.size["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]|
 |Transactions: Max active transaction time|<p>Current max active transaction time.</p>|Dependent item|pgsql.transactions.active<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.active`</p></li></ul>|
 |Transactions: Max idle transaction time|<p>Current max idle transaction time.</p>|Dependent item|pgsql.transactions.idle<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.idle`</p></li></ul>|
 |Transactions: Max prepared transaction time|<p>Current max prepared transaction time.</p>|Dependent item|pgsql.transactions.prepared<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.prepared`</p></li></ul>|
 |Transactions: Max waiting transaction time|<p>Current max waiting transaction time.</p>|Dependent item|pgsql.transactions.waiting<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.waiting`</p></li></ul>|
 |Get transactions|<p>Collect metrics by transaction execution time.</p>|Zabbix agent (active)|pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]|
 |Uptime|<p>Time since the server started.</p>|Zabbix agent (active)|pgsql.uptime["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]|
+|User parameters revision|<p>Revision of the user parameter files deployed on the host with Zabbix agent.</p><p>Reported by the `pgsql.userparam.revision` user parameter; 0 means the deployed files are older than the revision mechanism itself.</p>|Zabbix agent (active)|pgsql.userparam.revision<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Version|<p>PostgreSQL version.</p>|Zabbix agent (active)|pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Version (numeric)|<p>The PostgreSQL version as an integer, the same way `server_version_num` reports it - 18.4 becomes 180004.</p>|Dependent item|pgsql.version.num<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Version validator|<p>Converts the PostgreSQL version into low-level discovery data: one entry with a `{#BELOW_V<major>}` macro per release that introduced monitored metrics.</p><p>Discovery rules filter on those macros, which is how version-specific metrics are created only where PostgreSQL provides them.</p>|Dependent item|pgsql.version.validator<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |WAL: Segments count|<p>Number of WAL segments.</p>|Dependent item|pgsql.wal.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.count`</p></li></ul>|
 |Get WAL|<p>Collect write-ahead log (WAL) metrics.</p>|Zabbix agent (active)|pgsql.wal.stat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]|
 |WAL: Bytes written|<p>WAL write, in bytes.</p>|Dependent item|pgsql.wal.write<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.write`</p></li><li>Change per second</li></ul>|
@@ -159,7 +179,8 @@ For more information please read the PostgreSQL documentation `https://www.postg
 |PostgreSQL: Streaming lag with master is too high|<p>Replication lag with master is higher than {$PG.REPL_LAG.MAX.WARN} for 5m.</p>|`min(/PostgreSQL by Zabbix agent active/pgsql.replication.lag.sec["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"],5m) > {$PG.REPL_LAG.MAX.WARN}`|Average||
 |PostgreSQL: Replication is down|<p>Replication is enabled and data streaming was down for 5m.</p>|`max(/PostgreSQL by Zabbix agent active/pgsql.replication.status["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"],5m)=0`|Average||
 |PostgreSQL: Service has been restarted|<p>PostgreSQL uptime is less than 10 minutes.</p>|`last(/PostgreSQL by Zabbix agent active/pgsql.uptime["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]) < 10m`|Average||
-|PostgreSQL: Version has changed||`last(/PostgreSQL by Zabbix agent active/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"],#1)<>last(/PostgreSQL by Zabbix agent active/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"],#2) and length(last(/PostgreSQL by Zabbix agent active/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]))>0`|Info||
+|PostgreSQL: User parameters are outdated|<p>The user parameter files deployed on the host with Zabbix agent are older than this template version, so some items cannot collect data.<br>Copy the `postgresql/` directory and the `template_db_postgresql.conf` file of this template version to the host with Zabbix agent and restart the agent.</p>|`last(/PostgreSQL by Zabbix agent active/pgsql.userparam.revision) < 2`|Warning||
+|PostgreSQL: Version has changed|<p>The PostgreSQL version has changed. Check whether the update was planned, since a major version change can affect the availability of the collected metrics.</p>|`last(/PostgreSQL by Zabbix agent active/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"],#1)<>last(/PostgreSQL by Zabbix agent active/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"],#2) and length(last(/PostgreSQL by Zabbix agent active/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]))>0`|Info||
 
 ### LLD rule Database discovery
 
@@ -211,8 +232,163 @@ For more information please read the PostgreSQL documentation `https://www.postg
 |PostgreSQL: DB [{#DBNAME}]: Too many recovery conflicts|<p>The primary and standby servers are in many ways loosely connected. Actions on the primary will have an effect on the standby. As a result, there is potential for negative interactions or conflicts between them.<br>https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</p>|`min(/PostgreSQL by Zabbix agent active/pgsql.dbstat.conflicts.rate["{#DBNAME}"],5m) > {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"}`|Average||
 |PostgreSQL: DB [{#DBNAME}]: Deadlock occurred|<p>Number of deadlocks detected per second exceeds {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"} for 5m.</p>|`min(/PostgreSQL by Zabbix agent active/pgsql.dbstat.deadlocks.rate["{#DBNAME}"],5m) > {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}`|High||
 |PostgreSQL: DB [{#DBNAME}]: VACUUM FREEZE is required to prevent wraparound|<p>Preventing Transaction ID Wraparound Failures:<br>https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAROUND</p>|`last(/PostgreSQL by Zabbix agent active/pgsql.frozenxid.prc_before_stop["{#DBNAME}"])<{$PG.FROZENXID_PCT_STOP.MIN.HIGH:"{#DBNAME}"}`|Average||
-|PostgreSQL: DB [{#DBNAME}]: Number of locks is too high||`min(/PostgreSQL by Zabbix agent active/pgsql.locks.total["{#DBNAME}"],5m)>{$PG.LOCKS.MAX.WARN:"{#DBNAME}"}`|Warning||
+|PostgreSQL: DB [{#DBNAME}]: Number of locks is too high|<p>The number of locks in the database "{#DBNAME}" has exceeded {$PG.LOCKS.MAX.WARN:"{#DBNAME}"} for 5m. A growing number of locks indicates contention between transactions and can lead to queries waiting instead of being executed.</p>|`min(/PostgreSQL by Zabbix agent active/pgsql.locks.total["{#DBNAME}"],5m)>{$PG.LOCKS.MAX.WARN:"{#DBNAME}"}`|Warning||
 |PostgreSQL: DB [{#DBNAME}]: Too many slow queries|<p>The number of detected slow queries exceeds the limit of {$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"}.</p>|`min(/PostgreSQL by Zabbix agent active/pgsql.queries.query.slow_count["{#DBNAME}"],5m)>{$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"}`|Warning||
+
+### LLD rule WAL statistics metrics discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|WAL statistics metrics discovery|<p>Discovers the `pg_stat_wal` metrics available in PostgreSQL 14 and newer.</p>|Dependent item|pgsql.stat.wal.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Item prototypes for WAL statistics metrics discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|WAL statistics: Get data|<p>Collects write-ahead log activity from `pg_stat_wal`:</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-WAL-VIEW</p>|Zabbix agent (active)|pgsql.stat.wal["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{#SINGLETON}"]|
+|WAL statistics: Bytes generated total|<p>Total amount of WAL generated since the last statistics reset.</p>|Dependent item|pgsql.stat.wal.bytes[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.wal_bytes`</p></li></ul>|
+|WAL statistics: Records total|<p>Total number of WAL records generated since the last statistics reset.</p>|Dependent item|pgsql.stat.wal.records[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.wal_records`</p></li></ul>|
+|WAL statistics: Full page images total|<p>Total number of full page images written to WAL since the last statistics reset.</p><p>Full page images increase the WAL volume and are usually caused by frequent checkpoints.</p>|Dependent item|pgsql.stat.wal.fpi[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.wal_fpi`</p></li></ul>|
+|WAL statistics: Buffers full total|<p>Total number of times the WAL buffers were full and WAL had to be written out before the transaction could continue, since the last statistics reset.</p><p>A growing value indicates WAL buffer pressure - consider increasing `wal_buffers`.</p>|Dependent item|pgsql.stat.wal.buffers_full[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.wal_buffers_full`</p></li></ul>|
+|WAL statistics: Buffers full per second|<p>Number of times per second the WAL buffers were full and had to be written out.</p>|Dependent item|pgsql.stat.wal.buffers_full.rate[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.wal_buffers_full`</p></li><li>Change per second</li></ul>|
+|WAL statistics: Statistics reset time|<p>Time of the last reset of the WAL statistics. The totals above are counted from this moment.</p>|Dependent item|pgsql.stat.wal.reset_time[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.stats_reset`</p></li><li><p>Discard unchanged with heartbeat: `7d`</p></li></ul>|
+
+### Trigger prototypes for WAL statistics metrics discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|PostgreSQL: WAL statistics: WAL buffers are full too often|<p>The WAL buffers are exhausted more than {$PG.WAL.BUFFERS_FULL.MAX.WARN} times per second, so backends have to flush WAL themselves instead of doing useful work.<br>Increasing `wal_buffers` usually removes the bottleneck.</p>|`min(/PostgreSQL by Zabbix agent active/pgsql.stat.wal.buffers_full.rate[{#SINGLETON}],15m) > {$PG.WAL.BUFFERS_FULL.MAX.WARN}`|Warning||
+
+### LLD rule SLRU metrics discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|SLRU metrics discovery|<p>Discovers the `pg_stat_slru` metrics available in PostgreSQL 13 and newer.</p>|Dependent item|pgsql.stat.slru.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Item prototypes for SLRU metrics discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|SLRU: Get data|<p>Collects the SLRU cache statistics from `pg_stat_slru`:</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-SLRU-VIEW</p>|Zabbix agent (active)|pgsql.stat.slru["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{#SINGLETON}"]|
+|SLRU: Blocks read total|<p>Total number of blocks read from disk into the SLRU caches since the last statistics reset.</p>|Dependent item|pgsql.stat.slru.blks_read[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[*].blks_read`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|SLRU: Blocks read per second|<p>Number of blocks per second read from disk into the SLRU caches.</p>|Dependent item|pgsql.stat.slru.blks_read.rate[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[*].blks_read`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
+|SLRU: Blocks hit total|<p>Total number of blocks found in the SLRU caches since the last statistics reset.</p>|Dependent item|pgsql.stat.slru.blks_hit[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[*].blks_hit`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|SLRU: Blocks written total|<p>Total number of dirty SLRU blocks written to disk since the last statistics reset.</p>|Dependent item|pgsql.stat.slru.blks_written[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[*].blks_written`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|SLRU: Cache hit ratio|<p>Percentage of the SLRU cache lookups served from memory, over all caches.</p><p>A dropping ratio means the transaction status and multixact caches no longer fit, which shows up as extra disk reads under high concurrency.</p>|Dependent item|pgsql.stat.slru.hit_ratio[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+
+### Trigger prototypes for SLRU metrics discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|PostgreSQL: SLRU: Cache hit ratio too low|<p>The SLRU caches serve less than {$PG.SLRU.CACHE.MIN.WARN}% of their lookups from memory. Check the disk load and the concurrency of transactions using multixacts (`SELECT ... FOR SHARE`, subtransactions).</p>|`max(/PostgreSQL by Zabbix agent active/pgsql.stat.slru.hit_ratio[{#SINGLETON}],5m) < {$PG.SLRU.CACHE.MIN.WARN}`|Warning|**Depends on**:<br><ul><li>PostgreSQL: SLRU: Cache hit ratio is critically low</li></ul>|
+|PostgreSQL: SLRU: Cache hit ratio is critically low|<p>The SLRU caches serve less than {$PG.SLRU.CACHE.MIN.HIGH}% of their lookups from memory, so the instance is doing significant extra I/O for transaction status lookups.</p>|`max(/PostgreSQL by Zabbix agent active/pgsql.stat.slru.hit_ratio[{#SINGLETON}],5m) < {$PG.SLRU.CACHE.MIN.HIGH}`|High||
+
+### LLD rule Replication slots metrics discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Replication slots metrics discovery|<p>Discovers the `pg_replication_slots` metrics available in PostgreSQL 14 and newer.</p>|Dependent item|pgsql.replication.slots.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Item prototypes for Replication slots metrics discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Replication slots: Get data|<p>Collects the state of the replication slots from `pg_replication_slots`:</p><p>https://www.postgresql.org/docs/current/view-pg-replication-slots.html</p>|Zabbix agent (active)|pgsql.replication.slots["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{#SINGLETON}"]|
+|Replication slots: Total|<p>Total number of replication slots.</p>|Dependent item|pgsql.replication.slots.total[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.slots_total`</p></li></ul>|
+|Replication slots: Active|<p>Number of replication slots currently in use by a connected consumer.</p>|Dependent item|pgsql.replication.slots.active[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.slots_active`</p></li></ul>|
+|Replication slots: Inactive|<p>Number of replication slots without a connected consumer.</p>|Dependent item|pgsql.replication.slots.inactive[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.slots_inactive`</p></li></ul>|
+|Replication slots: Worst slot lag|<p>Amount of WAL the most lagging slot has not confirmed yet. Reported as 0 on a standby, where the current WAL position is not defined.</p>|Dependent item|pgsql.replication.slots.worst_lag[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.worst_slot_lag_bytes`</p></li></ul>|
+|Replication slots: Min safe WAL size|<p>Amount of WAL that can still be written before the slot closest to the limit starts losing the data it needs.</p><p>Turns negative once that slot is past its safety margin: the WAL it needs is only kept until the next checkpoint.</p><p>Always 0 when `max_slot_wal_keep_size` is not limited.</p>|Dependent item|pgsql.replication.slots.min_safe_wal_size[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.min_safe_wal_size`</p></li></ul>|
+|Replication slots: Inactive retaining WAL|<p>Number of inactive replication slots that still hold WAL segments.</p><p>Such slots prevent WAL cleanup and are the usual cause of a slowly filling disk on the primary.</p>|Dependent item|pgsql.replication.slots.inactive_retaining[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.inactive_retaining_slots`</p></li></ul>|
+
+### Trigger prototypes for Replication slots metrics discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|PostgreSQL: Replication slots: Inactive slots are retaining WAL|<p>Inactive replication slots are holding WAL segments. Check whether the consumers are gone for good and drop the slots that are no longer needed.</p>|`min(/PostgreSQL by Zabbix agent active/pgsql.replication.slots.inactive_retaining[{#SINGLETON}],5m) > {$PG.REPLICATION.SLOTS.RETAINING.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>PostgreSQL: Replication slots: Too many inactive slots are retaining WAL</li></ul>|
+|PostgreSQL: Replication slots: Too many inactive slots are retaining WAL|<p>Several inactive replication slots are holding WAL segments, which can fill the disk and stop the instance from accepting writes. Drop the slots that are no longer needed.</p>|`min(/PostgreSQL by Zabbix agent active/pgsql.replication.slots.inactive_retaining[{#SINGLETON}],5m) > {$PG.REPLICATION.SLOTS.RETAINING.MAX.HIGH}`|High||
+
+### LLD rule Subscription discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Subscription discovery|<p>Discovers the logical replication subscriptions of the instance.</p>|Dependent item|pgsql.subscription.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Item prototypes for Subscription discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Subscription [{#SUBNAME}]: Get subscription stats|<p>Subscription stats of the "{#SUBNAME}" subscription.</p>|Dependent item|pgsql.subscription.get_metrics["{#SUBNAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.subname=="{#SUBNAME}")].first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Subscription [{#SUBNAME}]: Apply errors|<p>Number of errors that occurred while applying the changes received from the publisher, since the last statistics reset.</p>|Dependent item|pgsql.subscription.apply_errors["{#SUBNAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.apply_error_count`</p></li></ul>|
+|Subscription [{#SUBNAME}]: Sync errors|<p>Number of errors that occurred during the initial data copy of the subscribed tables, since the last statistics reset.</p>|Dependent item|pgsql.subscription.sync_errors["{#SUBNAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.sync_error_count`</p></li></ul>|
+|Subscription [{#SUBNAME}]: Statistics reset time|<p>Time of the last reset of the subscription statistics. The error counters above are counted from this moment.</p>|Dependent item|pgsql.subscription.reset_time["{#SUBNAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.stats_reset`</p></li><li><p>Discard unchanged with heartbeat: `7d`</p></li></ul>|
+
+### Trigger prototypes for Subscription discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|PostgreSQL: Subscription [{#SUBNAME}]: Errors while applying changes|<p>The subscription "{#SUBNAME}" fails to apply the changes it receives, so the subscriber data is drifting away from the publisher. Check the subscription worker errors in the PostgreSQL log.</p>|`min(/PostgreSQL by Zabbix agent active/pgsql.subscription.apply_errors["{#SUBNAME}"],5m) > {$PG.SUBSCRIPTION.ERRORS.MAX.WARN:"{#SUBNAME}"}`|Warning||
+|PostgreSQL: Subscription [{#SUBNAME}]: Errors while synchronizing tables|<p>The initial table synchronization of the subscription "{#SUBNAME}" keeps failing, so the subscribed tables never reach a consistent state. Check the table sync worker errors in the PostgreSQL log.</p>|`min(/PostgreSQL by Zabbix agent active/pgsql.subscription.sync_errors["{#SUBNAME}"],5m) > {$PG.SUBSCRIPTION.ERRORS.MAX.WARN:"{#SUBNAME}"}`|Warning||
+
+### LLD rule I/O metrics discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|I/O metrics discovery|<p>Discovers the `pg_stat_io` metrics available in PostgreSQL 16 and newer.</p>|Dependent item|pgsql.stat.io.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Item prototypes for I/O metrics discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|I/O: Get data|<p>Collects the I/O activity of the instance from `pg_stat_io`:</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-IO-VIEW</p>|Zabbix agent (active)|pgsql.stat.io["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{#SINGLETON}"]|
+|I/O: Reads per second|<p>Number of read operations per second the instance issues to the storage. Reads mean the data was not found in the shared buffers.</p>|Dependent item|pgsql.stat.io.reads.rate[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.reads`</p></li><li>Change per second</li></ul>|
+|I/O: Writes per second|<p>Number of write operations per second the instance issues to the storage.</p>|Dependent item|pgsql.stat.io.writes.rate[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.writes`</p></li><li>Change per second</li></ul>|
+|I/O: Read per second|<p>Amount of data per second the instance reads from the storage.</p>|Dependent item|pgsql.stat.io.read_bytes.rate[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.read_bytes`</p></li><li>Change per second</li></ul>|
+|I/O: Written per second|<p>Amount of data per second the instance writes to the storage.</p>|Dependent item|pgsql.stat.io.write_bytes.rate[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.write_bytes`</p></li><li>Change per second</li></ul>|
+|I/O: Fsyncs per second|<p>Number of `fsync` calls per second issued by the instance.</p><p>Most of them are normally done by the checkpointer, so a high rate from other backends points at a checkpoint or WAL configuration problem.</p>|Dependent item|pgsql.stat.io.fsyncs.rate[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.fsyncs`</p></li><li>Change per second</li></ul>|
+|I/O: Time spent per second|<p>Time per second the instance spends waiting for reads and writes to complete.</p><p>Requires `track_io_timing` to be enabled, otherwise it stays at zero.</p>|Dependent item|pgsql.stat.io.time.rate[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.io_time_ms`</p></li><li>Change per second</li><li><p>Custom multiplier: `0.001`</p></li></ul>|
+|I/O: Buffer hit ratio|<p>Percentage of the block requests served from the shared buffers instead of the storage, since the last statistics reset.</p><p>A low value means the working set does not fit into `shared_buffers`.</p>|Dependent item|pgsql.stat.io.hit_ratio[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+
+### Trigger prototypes for I/O metrics discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|PostgreSQL: I/O: Buffer hit ratio too low|<p>Less than {$PG.IO.CACHE.MIN.WARN}% of the block requests are served from the shared buffers, so the instance keeps going to the storage for data. Consider increasing `shared_buffers` or reviewing the queries that read the most data.</p>|`max(/PostgreSQL by Zabbix agent active/pgsql.stat.io.hit_ratio[{#SINGLETON}],15m) < {$PG.IO.CACHE.MIN.WARN}`|Warning||
+
+### LLD rule Schema discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Schema discovery|<p>Discovers the schemas of the "{$PG.DATABASE}" database, except the system ones.</p>|Dependent item|pgsql.relation.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Item prototypes for Schema discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Schema [{#SCHEMA.NAME}]: Size|<p>Total on-disk size of the tables of the schema "{#SCHEMA.NAME}", including their indexes and TOAST data.</p>|Dependent item|pgsql.relation.size["{#SCHEMA.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="{#SCHEMA.NAME}")].total_bytes.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Schema [{#SCHEMA.NAME}]: Number of tables|<p>Number of tables in the schema "{#SCHEMA.NAME}", partitioned tables included.</p>|Dependent item|pgsql.relation.tables["{#SCHEMA.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="{#SCHEMA.NAME}")].table_count.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+
+### LLD rule Tablespace discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Tablespace discovery|<p>Discovers the tablespaces of the instance, including the built-in `pg_default` and `pg_global`.</p>|Dependent item|pgsql.tablespace.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Item prototypes for Tablespace discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Tablespace [{#TABLESPACE.NAME}]: Get tablespace data|<p>Data of the tablespace "{#TABLESPACE.NAME}".</p>|Dependent item|pgsql.tablespace.get_metrics["{#TABLESPACE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.name=="{#TABLESPACE.NAME}")].first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Tablespace [{#TABLESPACE.NAME}]: Size|<p>Total size of the files stored in the tablespace "{#TABLESPACE.NAME}".</p>|Dependent item|pgsql.tablespace.size["{#TABLESPACE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.size_bytes`</p></li></ul>|
+|Tablespace [{#TABLESPACE.NAME}]: Location|<p>Directory the tablespace "{#TABLESPACE.NAME}" is stored in. Empty for the built-in `pg_default` and `pg_global` tablespaces, which live in the data directory.</p>|Dependent item|pgsql.tablespace.location["{#TABLESPACE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.location`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Tablespace [{#TABLESPACE.NAME}]: Owner|<p>Owner of the tablespace "{#TABLESPACE.NAME}".</p>|Dependent item|pgsql.tablespace.owner["{#TABLESPACE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.owner`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+
+### Trigger prototypes for Tablespace discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|PostgreSQL: Tablespace [{#TABLESPACE.NAME}]: Size is too big|<p>The tablespace "{#TABLESPACE.NAME}" has grown beyond the expected size. Check the storage capacity and the growth rate before it becomes a problem.</p>|`min(/PostgreSQL by Zabbix agent active/pgsql.tablespace.size["{#TABLESPACE.NAME}"],5m) > {$PG.TABLESPACE.SIZE.MAX.WARN:"{#TABLESPACE.NAME}"}`|Warning|**Depends on**:<br><ul><li>PostgreSQL: Tablespace [{#TABLESPACE.NAME}]: Size is critically big</li></ul>|
+|PostgreSQL: Tablespace [{#TABLESPACE.NAME}]: Size is critically big|<p>The tablespace "{#TABLESPACE.NAME}" is close to exhausting its storage. Free up space or move relations to another tablespace - a full disk stops the instance from accepting writes.</p>|`min(/PostgreSQL by Zabbix agent active/pgsql.tablespace.size["{#TABLESPACE.NAME}"],5m) > {$PG.TABLESPACE.SIZE.MAX.HIGH:"{#TABLESPACE.NAME}"}`|High||
 
 ## Feedback
 

@@ -152,6 +152,7 @@ class testNestedLLD extends CIntegrationTest{
 			'key_' => self::LLDRULE_MAIN,
 			'hostid' => self::$templateid_main,
 			'type' => ITEM_TYPE_TRAPPER,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}',
 			'delay' => 0,
 			'lifetime' => '7d',
 			'lld_macro_paths' => [
@@ -271,6 +272,7 @@ class testNestedLLD extends CIntegrationTest{
 			'hostid' => self::$templateid_main,
 			'type' => ITEM_TYPE_TRAPPER,
 			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}',
 			'delay' => 0,
 			'ruleid' => self::$lld_ruleid_main
 		]);
@@ -312,6 +314,7 @@ class testNestedLLD extends CIntegrationTest{
 			'key_' => self::LLDRULE_ITEMTYPES,
 			'hostid' => self::$templateid_item_types,
 			'type' => ITEM_TYPE_TRAPPER,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}',
 			'delay' => 0,
 			'lifetime' => '7d'
 		]);
@@ -325,6 +328,7 @@ class testNestedLLD extends CIntegrationTest{
 			'hostid' => self::$templateid_item_types,
 			'type' => ITEM_TYPE_TRAPPER,
 			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}',
 			'delay' => 0,
 			'ruleid' => self::$lld_ruleid_item_types
 		]);
@@ -346,7 +350,51 @@ class testNestedLLD extends CIntegrationTest{
 
 		$response = $this->call('host.create', [
 			'host' => self::HOSTNAME_ITEMTYPES,
-			'interfaces' => [],
+			'interfaces' => [
+				[
+					'useip' => INTERFACE_USE_DNS,
+					'ip' => '',
+					'dns' => 'zabbix.local',
+					'main' => 1,
+					'port' => '10163',
+					'type' => INTERFACE_TYPE_SNMP,
+					'details' => [
+						'version' => 3,
+						'bulk' => 1,
+						'max_repetitions' => 10,
+						'retries' => 5,
+						'securityname' => 'zabbix',
+						'securitylevel' => 0,
+						'authprotocol' => 0,
+						'privprotocol' => 0,
+						'contextname' => 'zabbix'
+					]
+				],
+				[
+					'type' => INTERFACE_TYPE_IPMI,
+					'useip' => INTERFACE_USE_DNS,
+					'ip' => '',
+					'dns' => 'zabbix.local',
+					'port' => '1023',
+					'main' => 1
+				],
+				[
+					'type' => INTERFACE_TYPE_JMX,
+					'useip' => INTERFACE_USE_DNS,
+					'dns' => 'zabbix.com',
+					'port' => '1234',
+					'ip' => '',
+					'main' => 1
+				],
+				[
+					'ip' => '127.0.0.1',
+					'dns' => '',
+					'main' => 1,
+					'port' => '20000',
+					'type' => INTERFACE_TYPE_AGENT,
+					'useip' => INTERFACE_USE_IP
+				]
+			],
 			'groups' => [
 				['groupid' => 4]
 			],
@@ -357,55 +405,6 @@ class testNestedLLD extends CIntegrationTest{
 		$this->assertArrayHasKey('hostids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
 		self::$hostid_item_types = $response['result']['hostids'][0];
-
-		$response = $this->call('hostinterface.create', [
-			[
-				'hostid' => self::$hostid_item_types,
-				'useip' => INTERFACE_USE_DNS,
-				'ip' => '',
-				'dns' => 'zabbix.local',
-				'main' => 1,
-				'port' => '10163',
-				'type' => INTERFACE_TYPE_SNMP,
-				'details' => [
-					'version' => 3,
-					'bulk' => 1,
-					'max_repetitions' => 10,
-					'securityname' => 'zabbix',
-					'securitylevel' => 0,
-					'authprotocol' => 0,
-					'privprotocol' => 0,
-					'contextname' => 'zabbix'
-				]
-			],
-			[
-				'hostid' => self::$hostid_item_types,
-				'type' => INTERFACE_TYPE_IPMI,
-				'useip' => INTERFACE_USE_DNS,
-				'ip' => '',
-				'dns' => 'zabbix.local',
-				'port' => '1023',
-				'main' => 1
-			],
-			[
-				'hostid' => self::$hostid_item_types,
-				'type' => INTERFACE_TYPE_JMX,
-				'useip' => INTERFACE_USE_DNS,
-				'dns' => 'zabbix.com',
-				'port' => '1234',
-				'ip' => '',
-				'main' => 1
-			],
-			[
-				'hostid' => self::$hostid_item_types,
-				'ip' => '127.0.0.1',
-				'dns' => '',
-				'main' => 1,
-				'port' => '20000',
-				'type' => INTERFACE_TYPE_AGENT,
-				'useip' => INTERFACE_USE_IP
-			]
-		]);
 
 		/* for nested macro testing ZBXNEXT-10068 */
 		$response = $this->call('host.create', [
@@ -424,6 +423,7 @@ class testNestedLLD extends CIntegrationTest{
 			'key_' => self::LLDRULE_KEY_ROOT,
 			'hostid' => self::$hostid_macros,
 			'type' => ITEM_TYPE_TRAPPER,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}',
 			'lld_macro_paths' => [
 				[
 					'lld_macro' => '{#L0}',
@@ -441,6 +441,7 @@ class testNestedLLD extends CIntegrationTest{
 			'hostid' => self::$hostid_macros,
 			'type' => ITEM_TYPE_TRAPPER,
 			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}',
 			'ruleid' => self::$lld_ruleid_macros_root
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
@@ -477,6 +478,7 @@ class testNestedLLD extends CIntegrationTest{
 			'hostid' => self::$hostid_macros,
 			'type' => ITEM_TYPE_TRAPPER,
 			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'trapper_hosts' => '{$TRAPPER.ALLOWED_HOSTS}',
 			'ruleid' => self::$lld_drule_protoid_macros_1st_level
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
@@ -1790,6 +1792,7 @@ class testNestedLLD extends CIntegrationTest{
 	private function sendRuleData($hostname, $rule, $data) {
 		$this->sendSenderValue($hostname, $rule, $data);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->sendSenderValue($hostname, $rule, $data);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 	}
@@ -2088,6 +2091,7 @@ class testNestedLLD extends CIntegrationTest{
 
 		$this->sendSenderValue($hostname, 'main_drule', $data);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->sendSenderValue($hostname, 'main_drule', $data);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 
@@ -2218,7 +2222,8 @@ class testNestedLLD extends CIntegrationTest{
 			],
 			'countOutput' => true
 		]);
-		$this->assertEquals(3, $response['result'], "expected discovered rule count does not match");
+		$this->assertEquals(3, $response['result'], "expected discovered rule count does not match, response: " .
+			json_encode($response));
 
 		$response = $this->call('discoveryrule.get', [
 			'hostids' => [$hostid],

@@ -19,6 +19,7 @@ import (
 	"net/http"
 
 	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -28,10 +29,12 @@ type containerDiscovery struct {
 	Name string `json:"{#NAME}"`
 }
 
-func keyContainersDiscovery(client *http.Client, query string, _ ...string) (string, error) {
+func keyContainersDiscovery(
+	ctx plugin.ContextProvider, client *http.Client, query string, _ ...string,
+) (string, error) {
 	var data []*container
 
-	body, err := queryDockerAPI(client, query)
+	body, err := queryDockerAPI(ctx, client, query)
 	if err != nil {
 		return "", err
 	}

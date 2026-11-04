@@ -41,7 +41,7 @@ else {
 	];
 }
 
-echo '<body';
+echo '<body>';
 
 (new CDiv((new CTag('main', true,
 	new CWarning(_('Fatal error, please report to the Zabbix team'), $data['messages'], $buttons)

@@ -15,6 +15,7 @@
 package main
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"errors"
@@ -24,9 +25,11 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"golang.zabbix.com/agent2/pkg/version"
 	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/zbxflag"
 	"golang.zabbix.com/sdk/zbxnet"
@@ -43,13 +46,19 @@ Options:
 %[2]s
 `
 
+const (
+	tlsAcceptCert         = "cert"
+	serverShutdownTimeout = 5 * time.Second
+)
+
 var (
 	confDefault     string
 	applicationName string
 )
 
 type handler struct {
-	allowedPeers *zbxnet.AllowedPeers
+	allowedPeers    *zbxnet.AllowedPeers
+	breakpadDumpDir string
 }
 
 func main() {
@@ -173,18 +182,15 @@ func main() {
 		fatalExit("cannot initialize logger", err)
 	}
 
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
 
 	log.Infof("starting Zabbix web service")
 
-	go func() {
-		if err := run(); err != nil {
-			fatalExit("failed to start", err)
-		}
-	}()
-
-	<-stop
+	err := run(ctx)
+	if err != nil {
+		fatalExit("failed to start", err)
+	}
 
 	farewell := "Zabbix web service stopped."
 	log.Infof(farewell)
@@ -194,40 +200,106 @@ func main() {
 	}
 }
 
-func run() error {
-	var (
-		h   handler
-		err error
-	)
+func run(ctx context.Context) error {
+	allowedPeers, err := zbxnet.GetAllowedPeers(options.AllowedIP)
+	if err != nil {
+		return errs.Wrap(err, "failed to parse allowed peers")
+	}
 
-	h.allowedPeers, err = zbxnet.GetAllowedPeers(options.AllowedIP)
+	breakpadDumpDir, err := os.MkdirTemp("", "zabbix-web-service-breakpad-*")
+	if err != nil {
+		return errs.Wrap(err, "failed to create temp dir for breakpad dump")
+	}
+
+	defer func() {
+		cleanupErr := os.RemoveAll(breakpadDumpDir)
+		if cleanupErr != nil {
+			log.Errf("failed to remove breakpad dump directory %q: %s", breakpadDumpDir, cleanupErr)
+		}
+	}()
+
+	h := handler{
+		allowedPeers:    allowedPeers,
+		breakpadDumpDir: breakpadDumpDir,
+	}
+	mux := http.NewServeMux()
+	mux.HandleFunc("/report", h.report)
+
+	err = validateTLSFiles()
 	if err != nil {
 		return err
 	}
 
-	http.HandleFunc("/report", h.report)
-
-	if err := validateTLSFiles(); err != nil {
+	server, err := createHTTPServer(mux)
+	if err != nil {
 		return err
 	}
 
-	switch options.TLSAccept {
-	case "cert":
-		server, err := createTLSServer()
+	serverErr := make(chan error, 1)
+
+	go func() {
+		serverErr <- serve(server)
+	}()
+
+	select {
+	case <-ctx.Done():
+		// The shutdown deadline must not inherit cancellation from ctx.
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), serverShutdownTimeout)
+		defer cancel()
+
+		err = server.Shutdown(shutdownCtx) //nolint:contextcheck
 		if err != nil {
-			return err
+			return errs.Wrap(err, "failed to shutdown HTTP server")
 		}
 
-		return server.ListenAndServeTLS(options.TLSCertFile, options.TLSKeyFile)
-	case "", "unencrypted":
-		return http.ListenAndServe(":"+options.ListenPort, nil)
+		return normalizeServerError(<-serverErr)
+
+	case err := <-serverErr:
+		return normalizeServerError(err)
+	}
+}
+
+func createHTTPServer(handler http.Handler) (*http.Server, error) {
+	if options.TLSAccept == tlsAcceptCert {
+		server, err := createTLSServer()
+		if err != nil {
+			return nil, err
+		}
+
+		server.Handler = handler
+
+		return server, nil
 	}
 
-	return nil
+	// Keep the existing timeout behavior; configuring server timeouts is outside this refactor.
+	return &http.Server{ //nolint:gosec
+		Addr:    ":" + options.ListenPort,
+		Handler: handler,
+	}, nil
+}
+
+func serve(server *http.Server) error {
+	if options.TLSAccept == tlsAcceptCert {
+		err := server.ListenAndServeTLS(options.TLSCertFile, options.TLSKeyFile)
+
+		return errs.Wrap(err, "failed to serve HTTPS")
+	}
+
+	err := server.ListenAndServe()
+
+	return errs.Wrap(err, "failed to serve HTTP")
+}
+
+func normalizeServerError(err error) error {
+	if errors.Is(err, http.ErrServerClosed) {
+		return nil
+	}
+
+	return err
 }
 
 func fatalExit(message string, err error) {
-	if len(message) == 0 {
+	if message == "" {
 		message = err.Error()
 	} else {
 		message = fmt.Sprintf("%s: %s", message, err.Error())
@@ -243,7 +315,7 @@ func fatalExit(message string, err error) {
 
 func validateTLSFiles() error {
 	switch options.TLSAccept {
-	case "cert":
+	case tlsAcceptCert:
 		if options.TLSCAFile == "" {
 			return errors.New("missing TLSCAFile configuration parameter")
 		}

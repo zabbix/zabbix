@@ -4,7 +4,7 @@ noinst_PROGRAMS = \
 	zbx_determine_charset
 
 HTTP_LIBS = \
-	$(HTTP_DEPS) \
+	$(ANY_GROUPED_LIBS) \
 	$(MOCK_DATA_DEPS) \
 	$(MOCK_TEST_DEPS)
 

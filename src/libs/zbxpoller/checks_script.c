@@ -14,6 +14,8 @@
 
 #include "checks_script.h"
 
+#include "zbxcommon.h"
+#include "zbxtypes.h"
 #include "zbxembed.h"
 #include "zbxjson.h"
 

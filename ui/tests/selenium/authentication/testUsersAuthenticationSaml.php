@@ -127,16 +127,13 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 					'placeholder' => 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
 			],
 			'id:idp_certificate' => ['value' => '', 'visible' => true, 'placeholder' => 'PEM-encoded IdP certificate'],
-			'id:idp_certificate_file' => ['visible' => true],
 			'id:sp_private_key' => ['value' => '', 'visible' => true, 'placeholder' => 'PEM-encoded SP private key'],
-			'id:sp_private_key_file' => ['visible' => true],
 			'id:sp_certificate' => ['value' => '', 'visible' => true, 'placeholder' => 'PEM-encoded SP certificate'],
-			'id:sp_certificate_file' => ['visible' => true],
-			'id:sign_messages' => ['value' => false, 'visible' => true],
-			'id:sign_assertions' => ['value' => false, 'visible' => true],
-			'id:sign_authn_requests' => ['value' => false, 'visible' => true],
-			'id:sign_logout_requests' => ['value' => false, 'visible' => true],
-			'id:sign_logout_responses' => ['value' => false, 'visible' => true],
+			'id:sign_messages' => ['value' => true, 'visible' => true],
+			'id:sign_assertions' => ['value' => true, 'visible' => true],
+			'id:sign_authn_requests' => ['value' => true, 'visible' => true],
+			'id:sign_logout_requests' => ['value' => true, 'visible' => true],
+			'id:sign_logout_responses' => ['value' => true, 'visible' => true],
 			'id:encrypt_nameid' => ['value' => false, 'visible' => true],
 			'id:encrypt_assertions' => ['value' => false, 'visible' => true],
 			'Case-sensitive login' => ['value' => false, 'visible' => true],
@@ -148,7 +145,6 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 			'Media type mapping' => ['visible' => false],
 			'Enable SCIM provisioning' => ['value' => false, 'visible' => false]
 		];
-
 		foreach ($saml_fields as $field => $attributes) {
 			$this->assertEquals($attributes['visible'], $saml_form->getField($field)->isVisible());
 			$this->assertFalse($saml_form->getField($field)->isEnabled());
@@ -166,10 +162,19 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 			}
 		}
 
+		$this->assertEquals(0, $saml_form->query('button:Choose file')->all()->filter(CElementFilter::CLICKABLE)->count());
+
 		// Check visible mandatory fields.
-		$this->assertEquals(['IdP entity ID', 'SSO service URL', 'Username attribute', 'SP entity ID', 'IdP certificate'],
-				$saml_form->getRequiredLabels()
-		);
+		$visible_mandatory_fields = [
+			'IdP entity ID',
+			'SSO service URL',
+			'Username attribute',
+			'SP entity ID',
+			'IdP certificate',
+			'SP private key',
+			'SP certificate'
+		];
+		$this->assertEquals($visible_mandatory_fields, $saml_form->getRequiredLabels());
 
 		// Check invisible mandatory field.
 		foreach (['Group name attribute', 'User group mapping'] as $manadatory_field) {
@@ -183,12 +188,21 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 			$this->assertTrue($saml_form->getField($label)->isEnabled());
 		}
 
+		$this->assertEquals(3, $saml_form->query('button:Choose file')->all()->filter(CElementFilter::CLICKABLE)->count());
+
 		// Check mandatory SP fields.
 		$sp_fields = ['SP private key', 'SP certificate'];
 		$checkbox_groups = [
 			'Sign' => ['Messages', 'Assertions', 'AuthN requests', 'Logout requests', 'Logout responses'],
 			'Encrypt' => ['Name ID', 'Assertions']
 		];
+
+		// Unchecks all checkboxes.
+		foreach ($checkbox_groups as $group => $checkboxes) {
+			foreach ($checkboxes as $label) {
+				$saml_form->getField($group)->uncheck($label);
+			}
+		}
 
 		foreach ($checkbox_groups as $group => $checkboxes) {
 			foreach ($checkboxes as $label) {
@@ -828,7 +842,12 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'SSO service URL' => 'SSO',
 						'Username attribute' => 'UA',
 						'SP entity ID' => 'SP',
-						'IdP certificate' => self::SSL_CERTIFICATE
+						'IdP certificate' => self::SSL_CERTIFICATE,
+						'id:sign_messages' => false,
+						'id:sign_assertions' => false,
+						'id:sign_authn_requests' => false,
+						'id:sign_logout_requests' => false,
+						'id:sign_logout_responses' => false
 					],
 					'db_check' => [
 						'userdirectory_saml' => [
@@ -854,7 +873,12 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'SP entity ID' => 'SP',
 						'IdP certificate' => self::SSL_CERTIFICATE,
 						'SP private key' => self::SSL_PRIVATE_KEY,
-						'SP certificate' => self::SSL_CERTIFICATE
+						'SP certificate' => self::SSL_CERTIFICATE,
+						'id:sign_messages' => false,
+						'id:sign_assertions' => false,
+						'id:sign_authn_requests' => false,
+						'id:sign_logout_requests' => false,
+						'id:sign_logout_responses' => false
 					],
 					'db_check' => [
 						'userdirectory_saml' => [
@@ -1144,7 +1168,13 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 				'SLO service URL' => PHPUNIT_SLO_SERVICE_URL,
 				'Username attribute' => PHPUNIT_USERNAME_ATTRIBUTE,
 				'SP entity ID' => PHPUNIT_SP_ENTITY_ID,
-				'Case-sensitive login' => false
+				'Case-sensitive login' => false,
+				// Sign.
+				'id:sign_messages' => false,
+				'id:sign_assertions' => false,
+				'id:sign_authn_requests' => false,
+				'id:sign_logout_requests' => false,
+				'id:sign_logout_responses' => false
 			]
 		];
 
@@ -1193,7 +1223,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 		}
 		// Check the header of the page that was displayed to the user after login.
 		$header = CTestArrayHelper::get($data, 'header', 'Global view');
-		$this->assertEquals($header, $this->query('tag:h1')->one()->getText());
+		$this->assertEquals($header, $this->query('tag:h1')->waitUntilVisible()->one()->getText());
 
 		// Make sure that it is possible to log out.
 		$this->query('link:Sign out')->one()->click();

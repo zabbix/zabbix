@@ -13,6 +13,7 @@ zabbix_export:
           type: TRAP
           key: main_drule
           lifetime_type: DELETE_IMMEDIATELY
+          allowed_hosts: '{$TRAPPER.ALLOWED_HOSTS}'
         - name: 'nested[{#PARENTNAME},{#NAME},{#TEST}]'
           type: NESTED
           key: 'nested[{#PARENTNAME},{#NAME},{#TEST}]'

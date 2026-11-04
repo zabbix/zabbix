@@ -21,12 +21,14 @@ class CElasticsearchHelper {
 
 	const MAX_RESULT_WINDOW = 10000;
 	const KEEP_CONTEXT_PERIOD = '10s';
+	const DATE_FORMAT = 'epoch_second';
 
 	private static $scroll_id;
 	private static $scrolls;
 
 	/**
 	 * Perform request to Elasticsearch.
+	 * Return empty string for failed request.
 	 *
 	 * @param string $method      HTTP method to be used to perform request
 	 * @param string $endpoint    requested url
@@ -44,21 +46,16 @@ class CElasticsearchHelper {
 			]
 		];
 
-		if ($request) {
-			$request = json_encode($request);
-			$options['http']['content'] = $request;
-		}
+		$request = $request ? json_encode($request) : '{}';
+		$options['http']['content'] = $request;
 
-		try {
-			$result = file_get_contents($endpoint, false, stream_context_create($options));
-		}
-		catch (Exception $e) {
-			error($e->getMessage());
-		}
+		$result = file_get_contents($endpoint, false, stream_context_create($options));
 
-		CProfiler::getInstance()->profileElasticsearch(microtime(true) - $time_start, $method, $endpoint, $request);
+		CProfiler::getInstance()->profileElasticsearch(microtime(true) - $time_start,
+			parse_url($endpoint, PHP_URL_PATH).' '.$request
+		);
 
-		return $result;
+		return $result === false ? '' : $result;
 	}
 
 	/**
@@ -78,8 +75,8 @@ class CElasticsearchHelper {
 			}
 			else {
 				// Endpoint is in different format, no way to get scroll API url.
-				error(_s('Elasticsearch error: %1$s.',
-						_('cannot perform Scroll API request, data could be truncated'))
+				error(_s('Elasticsearch error: %1$s.', _('cannot perform Scroll API request, data could be truncated')),
+					true
 				);
 
 				return null;
@@ -99,10 +96,11 @@ class CElasticsearchHelper {
 	 * @return array    parsed result
 	 */
 	public static function query($method, $endpoint, $request = null) {
+		$is_search = str_ends_with($endpoint, '/_search');
 		$parse_as = ELASTICSEARCH_RESPONSE_PLAIN;
 
 		// For non-search requests no additional parsing is done.
-		if (substr($endpoint, -strlen('/_search')) === '/_search') {
+		if ($is_search) {
 			$parse_as = ELASTICSEARCH_RESPONSE_DOCUMENTS;
 
 			if (is_array($request) && array_key_exists('aggs', $request)) {
@@ -111,7 +109,8 @@ class CElasticsearchHelper {
 			}
 		}
 
-		if (is_array($request) && (!array_key_exists('size', $request) || $request['size'] > self::MAX_RESULT_WINDOW)) {
+		if ($is_search && is_array($request)
+				&& (!array_key_exists('size', $request) || $request['size'] > self::MAX_RESULT_WINDOW)) {
 			// Scroll API should be used to retrieve all data.
 			$results = [];
 			$limit = array_key_exists('size', $request) ? $request['size'] : null;
@@ -177,7 +176,7 @@ class CElasticsearchHelper {
 	private static function parseResult($data, $parse_as) {
 		$result = json_decode($data, TRUE);
 		if (!is_array($result)) {
-			error(_s('Elasticsearch error: %1$s.', _('failed to parse JSON')));
+			error(_s('Elasticsearch error: %1$s.', _('failed to parse JSON')), true);
 
 			return [];
 		}
@@ -187,7 +186,7 @@ class CElasticsearchHelper {
 					? $result['error']['reason']
 					: _('Unknown error');
 
-			error(_s('Elasticsearch error: %1$s.', $error));
+			error(_s('Elasticsearch error: %1$s.', $error), true);
 
 			return [];
 		}
@@ -247,26 +246,20 @@ class CElasticsearchHelper {
 	 * @return array    Elasticsearch query with added filtering
 	 */
 	public static function addFilter($schema, $query, $options) {
+		$clauses = [];
+
 		foreach ($options['filter'] as $field => $value) {
-			// Skip missing fields, textual fields (different mapping is needed for exact matching) and empty values.
-			if ($value === null || !array_key_exists($field, $schema['fields'])
-					|| $schema['fields'][$field]['type'] & (DB::FIELD_TYPE_CHAR | DB::FIELD_TYPE_TEXT)) {
+			if ($schema['fields'][$field]['type'] & (DB::FIELD_TYPE_CHAR | DB::FIELD_TYPE_TEXT)) {
 				continue;
 			}
 
-			if ($options['searchByAny']) {
-				$type = 'should';
-				$query['minimum_should_match'] = 1;
-			}
-			else {
-				$type = 'must';
-			}
+			$clauses[] = ['terms' => [$field => $value]];
+		}
 
-			$query['query']['bool'][$type][] = [
-				'terms' => [
-					$field => $value
-				]
-			];
+		if ($clauses) {
+			$query['query']['bool']['must'][] = $options['searchByAny']
+				? ['bool' => ['should' => $clauses, 'minimum_should_match' => 1]]
+				: ['bool' => ['must' => $clauses]];
 		}
 
 		return $query;
@@ -275,57 +268,41 @@ class CElasticsearchHelper {
 	/**
 	 * Add search criteria to Elasticsearch query.
 	 *
-	 * @param array $schema     DB schema
-	 * @param array $query      Elasticsearch query
-	 * @param array $options    search options
+	 * @param string $table    Table name
+	 * @param array  $query    Elasticsearch query
+	 * @param array  $options  search options
 	 *
 	 * @return array    Elasticsearch query with added search criteria
 	 */
-	public static function addSearch($schema, $query, $options) {
+	public static function addSearch($table, $query, $options) {
+		$schema = DB::getSchema($table);
 		$start = $options['startSearch'] ? '' : '*';
-		$exclude = $options['excludeSearch'] ? 'must_not' : 'must';
-
-		if ($options['searchByAny']) {
-			if (!$options['excludeSearch']) {
-				$exclude = 'should';
-			}
-
-			$query['minimum_should_match'] = 1;
-		}
+		$clauses = [];
 
 		foreach ($options['search'] as $field => $value) {
-			// Skip missing fields, non textual fields and empty values.
-			if ($value === null || !array_key_exists($field, $schema['fields'])
-					|| ($schema['fields'][$field]['type'] & (DB::FIELD_TYPE_CHAR | DB::FIELD_TYPE_TEXT)) == 0) {
+			if (($schema['fields'][$field]['type'] & (DB::FIELD_TYPE_CHAR | DB::FIELD_TYPE_TEXT)) == 0) {
 				continue;
+			}
+
+			if ($field === 'value' && in_array($table, ['history_str', 'history_text', 'history_log'])) {
+				$field .= '.analyzed';
 			}
 
 			foreach ($value as $phrase) {
 				$phrase = str_replace('?', '\\?', $phrase);
 
 				if (!$options['searchWildcardsEnabled']) {
-					$phrase = str_replace('*', '\\*', $phrase);
-					$criteria = [
-						'wildcard' => [
-							$field => $start.$phrase.'*'
-						]
-					];
-				}
-				else {
-					$criteria = [
-						'wildcard' => [
-							$field => $phrase
-						]
-					];
+					$phrase = $start.str_replace('*', '\\*', $phrase).'*';
 				}
 
-				if ($options['excludeSearch'] && $options['searchByAny']) {
-					$query['query']['bool']['must_not']['bool']['should'][] = $criteria;
-				}
-				else {
-					$query['query']['bool'][$exclude][] = $criteria;
-				}
+				$clauses[] = ['wildcard' => [$field => mb_strtolower($phrase)]];
 			}
+		}
+
+		if ($clauses) {
+			$query['query']['bool'][$options['excludeSearch'] ? 'must_not' : 'must'][] = $options['searchByAny']
+				? ['bool' => ['should' => $clauses, 'minimum_should_match' => 1]]
+				: ['bool' => ['must' => $clauses]];
 		}
 
 		return $query;
@@ -341,23 +318,47 @@ class CElasticsearchHelper {
 	 */
 	public static function addSort($query, $options) {
 		foreach ($options['sortfield'] as $i => $sortfield) {
-			// Add sort field to order.
-			if (is_array($options['sortorder'])) {
-				$sortorder = array_key_exists($i, $options['sortorder']) ? $options['sortorder'][$i] : ZBX_SORT_UP;
-			}
-			else {
-				$sortorder = ($options['sortorder'] !== '') ? $options['sortorder'] : ZBX_SORT_UP;
-			}
-
-			if ($sortorder === ZBX_SORT_DOWN) {
-				$query['sort'][$sortfield] = $sortorder;
-			}
-			else {
-				$query['sort'][] = $sortfield;
-			}
+			$query['sort'][$sortfield] = is_array($options['sortorder'])
+				? $options['sortorder'][$i] ?? ZBX_SORT_UP
+				: $options['sortorder'];
 		}
 
 		return $query;
+	}
+
+	/**
+	 * Convert numeric values of an Elasticsearch document to strings as they are returned by SQL databases.
+	 * The "value" field of float items is converted to the shortest representation that preserves the value, because
+	 * Zabbix server stores it in Elasticsearch with 17 significant digits.
+	 *
+	 * @param array $document    Document fields.
+	 * @param int   $value_type  Item value type.
+	 *
+	 * @return array
+	 */
+	public static function normalizeDocument(array $document, int $value_type): array {
+		foreach ($document as $field => &$value) {
+			if ($field === 'value' && $value_type == ITEM_VALUE_TYPE_FLOAT) {
+				$value = self::floatToString((float) $value);
+			}
+			elseif (is_int($value) || is_float($value)) {
+				$value = (string) $value;
+			}
+		}
+		unset($value);
+
+		return $document;
+	}
+
+	/**
+	 * Convert a floating point number to the shortest string that preserves the value.
+	 *
+	 * @param float $value
+	 *
+	 * @return string
+	 */
+	public static function floatToString(float $value): string {
+		return json_encode($value);
 	}
 
 	/**

@@ -33,9 +33,9 @@ You must set {$TRAVIS.API.TOKEN} and {$TRAVIS.API.URL} macros.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$TRAVIS.API.TOKEN}|<p>Travis API Token</p>||
-|{$TRAVIS.API.URL}|<p>Travis API URL</p>|`api.travis-ci.com`|
-|{$TRAVIS.BUILDS.SUCCESS.PERCENT}|<p>Percent of successful builds in the repo (for trigger expression)</p>|`80`|
+|{$TRAVIS.API.TOKEN}|<p>Travis API Token.</p>||
+|{$TRAVIS.API.URL}|<p>Travis API URL.</p>|`api.travis-ci.com`|
+|{$TRAVIS.BUILDS.SUCCESS.PERCENT}|<p>Percent of successful builds in the repo (for trigger expression).</p>|`80`|
 
 ### Items
 

@@ -99,6 +99,14 @@ var AddValueMap = class {
 		});
 
 		cell.appendChild(this.createHiddenInput('[name]', this.data.name));
+
+		if ('hostname' in this.data) {
+			const hostname = document.createElement('span');
+			hostname.textContent = this.data.hostname + NAME_DELIMITER;
+			hostname.classList.add('<?= ZBX_STYLE_GREY ?>');
+			cell.appendChild(hostname);
+		}
+
 		cell.appendChild(link);
 
 		return cell;

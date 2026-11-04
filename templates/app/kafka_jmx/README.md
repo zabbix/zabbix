@@ -29,8 +29,8 @@ Metrics are collected by JMX.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$KAFKA.USER}||`zabbix`|
-|{$KAFKA.PASSWORD}||`zabbix`|
+|{$KAFKA.USER}|<p>Kafka JMX user.</p>|`zabbix`|
+|{$KAFKA.PASSWORD}|<p>Kafka JMX password.</p>|`zabbix`|
 |{$KAFKA.TOPIC.MATCHES}|<p>Filter of discoverable topics</p>|`.*`|
 |{$KAFKA.TOPIC.NOT_MATCHES}|<p>Filter to exclude discovered topics</p>|`__consumer_offsets`|
 |{$KAFKA.NET_PROC_AVG_IDLE.MIN.WARN}|<p>The minimum Network processor average idle percent for trigger expression.</p>|`30`|

@@ -108,6 +108,19 @@ class CColorPicker extends CTag {
 	}
 
 	/**
+	 * Specify ID of error container.
+	 *
+	 * @param string|null $container_id    ID of form element where to display field errors.
+	 *
+	 * @return self
+	 */
+	public function setErrorContainer(?string $container_id): self {
+		$this->setAttribute('data-error-container', $container_id);
+
+		return $this;
+	}
+
+	/**
 	 * Get array of color variations.
 	 *
 	 * @param string $color  Color hex code.

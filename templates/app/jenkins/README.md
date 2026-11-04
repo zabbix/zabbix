@@ -35,8 +35,8 @@ Don't forget to change macros {$JENKINS.URL}.
 |Name|Description|Default|
 |----|-----------|-------|
 |{$JENKINS.URL}|<p>Jenkins URL in the format `<scheme>://<host>:<port>`</p>||
-|{$JENKINS.API.KEY}|<p>API key to access Metrics Servlet</p>||
-|{$JENKINS.USER}|<p>Username for HTTP BASIC authentication</p>|`zabbix`|
+|{$JENKINS.API.KEY}|<p>API key to access Metrics Servlet.</p>||
+|{$JENKINS.USER}|<p>Username for HTTP BASIC authentication.</p>|`zabbix`|
 |{$JENKINS.API.TOKEN}|<p>API token for HTTP BASIC authentication.</p>||
 |{$JENKINS.PING.REPLY}|<p>Expected reply to the ping.</p>|`pong`|
 |{$JENKINS.FILE_DESCRIPTORS.MAX.WARN}|<p>Maximum percentage of file descriptors usage alert threshold (for trigger expression).</p>|`85`|

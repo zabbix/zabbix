@@ -22,18 +22,18 @@
 
 window.graph_edit_popup = new class {
 
-	init({form_name, action, theme_colors, graphs, readonly, items, context, hostid, overlayid, return_url}) {
-		this.form_name = form_name;
+	init({rules, action, theme_colors, graphs, readonly, items, context, hostid, return_url}) {
 		this.action = action;
 		this.graph = graphs;
 		this.readonly = readonly;
 		this.context = context;
 		this.hostid = hostid;
 		this.graph_type = this.graph.graphtype;
-		this.overlay = overlays_stack.getById(overlayid);
+		this.overlay = overlays_stack.getById(action === 'graph.edit' ? 'graph.edit' : 'graph.prototype.edit');
 		this.dialogue = this.overlay.$dialogue[0];
-		this.return_url = return_url;
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.footer = this.overlay.$dialogue.$footer[0];
+		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form = new CForm(this.form_element, rules);
 
 		colorPalette.setThemeColors(theme_colors);
 
@@ -54,18 +54,20 @@ window.graph_edit_popup = new class {
 			this.#loadItem(item, item_row_template);
 		});
 
-		this.form.style.display = '';
+		this.form_element.style.display = '';
 
 		this.#initActions();
 		this.#initPreviewTab();
 		this.#initPopupListeners();
 
 		this.overlay.recoverFocus();
-		this.initial_form_fields = getFormFields(this.form);
+
+		this.form.discoverAllFields();
+		this.initial_form_fields = this.form.getAllValues();
 	}
 
 	#initActions() {
-		document.getElementById('graphtype').addEventListener('change', (e) => {
+		this.form.findFieldByName('graphtype').getField().addEventListener('change', (e) => {
 			this.#toggleGraphTypeFields(e.target.value);
 			this.#updateItemsTable(e.target.value);
 
@@ -87,21 +89,21 @@ window.graph_edit_popup = new class {
 			}
 		});
 
-		this.form.addEventListener('click', (e) => {
+		this.form_element.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-item-prototype-select')) {
 				this.#openItemPrototypeSelectPopup(e.target.dataset);
 			}
 		});
 
-		this.#toggleGraphTypeFields(document.getElementById('graphtype').value);
+		this.#toggleGraphTypeFields(this.form.findFieldByName('graphtype').getValue());
 		this.#toggleYaxisTypeFields();
 
 		// Percent fields.
-		document.getElementById('visible_percent_left').addEventListener('change', () => {
+		this.form.findFieldByName('visible[percent_left]').getField().addEventListener('change', () => {
 			this.#togglePercentField('left');
 		});
 
-		document.getElementById('visible_percent_right').addEventListener('change', () => {
+		this.form.findFieldByName('visible[percent_right]').getField().addEventListener('change', () => {
 			this.#togglePercentField('right');
 		});
 
@@ -109,13 +111,18 @@ window.graph_edit_popup = new class {
 		this.#togglePercentField('right');
 
 		// Initialize sortable instance for items table.
-		if (this.form.querySelector('#items-table tbody')) {
-			new CSortable(this.form.querySelector('#items-table tbody'), {
+		if (this.form_element.querySelector('#items-table tbody')) {
+			new CSortable(this.form_element.querySelector('#items-table tbody'), {
+				selector_span: ':not(.error-container-row)',
 				selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 				freeze_end: 1,
 				enable_sorting: !this.readonly
-			}).on(CSortable.EVENT_SORT, this.#recalculateSortOrder);
+			}).on(CSortable.EVENT_SORT, () => this.#recalculateSortOrder());
 		}
+
+		this.footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
+		this.footer.querySelector('.js-clone')?.addEventListener('click', () => this.#clone());
+		this.footer.querySelector('.js-delete')?.addEventListener('click', () => this.#delete());
 	}
 
 	#toggleGraphTypeFields(graph_type) {
@@ -148,7 +155,7 @@ window.graph_edit_popup = new class {
 		}
 
 		show_fields.forEach((field) => {
-			const field_element = this.form.querySelector(field);
+			const field_element = this.form_element.querySelector(field);
 
 			field_element.style.display = '';
 			field_element.previousElementSibling.style.display = '';
@@ -156,7 +163,7 @@ window.graph_edit_popup = new class {
 		});
 
 		hide_fields.forEach((field) => {
-			const field_element = this.form.querySelector(field);
+			const field_element = this.form_element.querySelector(field);
 
 			field_element.style.display = 'none';
 			field_element.previousElementSibling.style.display = 'none';
@@ -191,8 +198,8 @@ window.graph_edit_popup = new class {
 	}
 
 	#toggleYaxisTypeFields() {
-		const ymin_type = document.getElementById('ymin_type');
-		const ymax_type = document.getElementById('ymax_type');
+		const ymin_type = this.form.findFieldByName('ymin_type').getField();
+		const ymax_type = this.form.findFieldByName('ymax_type').getField();
 
 		ymin_type.addEventListener('change', (e) => {
 			this.#toggleYAxisFields(e.target, 'min');
@@ -207,15 +214,19 @@ window.graph_edit_popup = new class {
 	}
 
 	#togglePercentField(type) {
-		const percent_field = this.form.querySelector(`#percent_${type}`);
+		const percent_field = this.form.findFieldByName(`percent_${type}`);
 
-		if (this.form.querySelector(`input[name="visible[percent_${type}]"]:checked`)) {
-			percent_field.style.display = '';
-			percent_field.disabled = false;
+		if (this.form.findFieldByName(`visible[percent_${type}]`).getField().checked) {
+			percent_field.getField().style.display = '';
+			percent_field.getField().disabled = false;
+
+			this.form.validateChanges([`percent_${type}`]);
 		}
 		else {
-			percent_field.style.display = 'none';
-			percent_field.disabled = true;
+			percent_field.getField().style.display = 'none';
+			percent_field.getField().disabled = true;
+			percent_field.unsetErrors();
+			percent_field.showErrors();
 		}
 	}
 
@@ -225,71 +236,59 @@ window.graph_edit_popup = new class {
 
 			if ($panel.attr('id') === 'graph-preview-tab') {
 				const $preview_chart = $('#preview-chart');
-				const src = new Curl('chart3.php');
+				let url = 'chart3.php';
 
 				if ($preview_chart.find('.is-loading').length) {
 					return false;
 				}
 
-				src.setArgument('period', '3600');
-				src.setArgument('name', $('#name').val());
-				src.setArgument('width', $('#width').val());
-				src.setArgument('height', $('#height').val());
-				src.setArgument('graphtype', $('#graphtype').val());
-				src.setArgument('legend', $('#show_legend').is(':checked') ? 1 : 0);
-				src.setArgument('resolve_macros', this.context === 'template' ? 0 : 1);
+				const fields = this.form.getAllValues();
+				const parameters = {
+					period: 3600,
+					name: fields.name,
+					width: fields.width,
+					height: fields.height,
+					graphtype: fields.graphtype,
+					legend: fields.show_legend,
+					resolve_macros: this.context === 'template' ? 0 : 1
+				};
 
 				if (this.graph_type == <?= GRAPH_TYPE_PIE ?>
 						|| this.graph_type == <?= GRAPH_TYPE_EXPLODED ?>) {
-					src.setPath('chart7.php');
-					src.setArgument('graph3d', $('#show_3d').is(':checked') ? 1 : 0);
+					url = 'chart7.php';
+					parameters.graph3d = fields.show_3d;
 				}
 				else {
 					if (this.graph_type == <?= GRAPH_TYPE_NORMAL ?>) {
-						src.setArgument('percent_left', $('#percent_left').val());
-						src.setArgument('percent_right', $('#percent_right').val());
+						parameters.percent_left = fields.percent_left ? fields.percent_left : 0;
+						parameters.percent_right = fields.percent_right ? fields.percent_right : 0;
 					}
 
-					src.setArgument('ymin_type', $('#ymin_type').val());
-					src.setArgument('ymax_type', $('#ymax_type').val());
-					src.setArgument('yaxismin', $('#yaxismin').val());
-					src.setArgument('yaxismax', $('#yaxismax').val());
+					parameters.ymin_type = fields.ymin_type;
+					parameters.ymax_type = fields.ymax_type;
+					parameters.yaxismin = fields.yaxismin ? fields.yaxismin : 0;
+					parameters.yaxismax = fields.yaxismax ? fields.yaxismax : 0;
 
-					if ($('#ymin_type').val() == <?= GRAPH_YAXIS_TYPE_ITEM_VALUE ?>) {
-						const ymin_item_data = $('#ymin_itemid').multiSelect('getData');
-
-						if (ymin_item_data.length) {
-							src.setArgument('ymin_itemid', ymin_item_data[0]['id']);
-						}
+					if (fields.ymin_itemid && fields.ymin_type == <?= GRAPH_YAXIS_TYPE_ITEM_VALUE ?>) {
+						parameters.ymin_itemid = fields.ymin_itemid;
 					}
 
-					if ($('#ymax_type').val() == <?= GRAPH_YAXIS_TYPE_ITEM_VALUE ?>) {
-						const ymax_item_data = $('#ymax_itemid').multiSelect('getData');
-
-						if (ymax_item_data.length) {
-							src.setArgument('ymax_itemid', ymax_item_data[0]['id']);
-						}
+					if (fields.ymax_itemid && fields.ymax_type == <?= GRAPH_YAXIS_TYPE_ITEM_VALUE ?>) {
+						parameters.ymax_itemid = fields.ymax_itemid;
 					}
 
-					src.setArgument('showworkperiod', $('#show_work_period').is(':checked') ? 1 : 0);
-					src.setArgument('showtriggers', $('#show_triggers').is(':checked') ? 1 : 0);
+					parameters.showworkperiod = fields.show_work_period;
+					parameters.showtriggers = fields.show_triggers;
 				}
 
-				$('#items-table tbody tr.graph-item').each((i, node) => {
+				Object.keys(fields.items).forEach(i => {
 					const short_fmt = [];
 
-					$(node).find('*[name]').each((_, input) => {
-						if (!$.isEmptyObject(input) && input.name != null) {
-							const regex = /items\[\d+\]\[([a-zA-Z0-9\-\_\.]+)\]/;
-							const name = input.name.match(regex);
-
-							if (input.name !== 'remove') {
-								short_fmt.push((name[1]).substr(0, 2) + ':' + input.value);
-							}
-						}
+					Object.keys(fields.items[i]).forEach(name => {
+						short_fmt.push( `${name.substring(0, 2)}:${fields.items[i][name]}`);
 					});
 
-					src.setArgument('i[' + i + ']', short_fmt.join(','));
+					parameters[`i[${i}]`] = short_fmt.join(',');
 				});
 
 				const $image = $('img', $preview_chart);
@@ -302,7 +301,7 @@ window.graph_edit_popup = new class {
 					.addClass('is-loading'));
 
 				$('<img>')
-					.attr('src', src.getUrl())
+					.attr('src', `${url}?${objectToSearchParams(parameters)}`)
 					.on('load', function() {
 						$preview_chart.html($(this));
 					});
@@ -311,42 +310,51 @@ window.graph_edit_popup = new class {
 	}
 
 	#recalculateSortOrder() {
-		document.querySelectorAll('#items-table tbody tr.graph-item [id]').forEach(element => {
-			element.id = 'tmp' + element.id;
-		});
-
-		document.querySelectorAll('#items-table tbody tr.graph-item').forEach(element => {
-			element.id = 'tmp' + element.id;
-		});
-
 		for (const [index, row] of document.querySelectorAll('#items-table tbody tr.graph-item').entries()) {
-			row.id = row.id.substring(3).replace(/\d+/, `${index}`);
+			row.id = row.id.replace(/\d+/, `${index}`);
 
-			row.querySelectorAll('[id]').forEach(element => {
-				element.id = element.id.substring(3).replace(/\d+/, `${index}`);
+			row.querySelectorAll('input, z-select').forEach(input => {
+				input.id = input.id.replace(/\d+/, `${index}`);
+				input.name = input.name.replace(/\d+/, `${index}`);
 
-				if (element.id.includes('sortorder')) {
-					element.value = index;
+				if ('errorContainer' in input.dataset) {
+					input.dataset.errorContainer = input.dataset.errorContainer.replace(/\d+/, `${index}`);
+				}
+
+				if (input.name.includes('[sortorder]')) {
+					input.value = index;
 				}
 			});
 
-			row.querySelectorAll('[name]').forEach(element => {
-				element.name = element.name.replace(/\d+/, `${index}`);
-			});
-		}
+			const color_picker = row.querySelector('z-color-picker');
+			color_picker.setAttribute('color-field-name', color_picker.querySelector('input').name);
+			color_picker.dataset.errorContainer = color_picker.dataset.errorContainer.replace(/\d+/, `${index}`);
 
-		document.querySelectorAll('#items-table tbody tr.graph-item').forEach((row, index) => {
-			const remove_element = document.getElementById('items_' + index + '_remove');
+			const color_picker_button = color_picker.querySelector('button');
+			color_picker_button.id = color_picker_button.id.replace(/\d+/, `${index}`);
+
+			const item_name_field = row.querySelector('.js-item-name');
+			item_name_field.id = item_name_field.id.replace(/\d+/, `${index}`)
+
+			const remove_element = row.querySelector('.js-remove');
 
 			if (remove_element) {
-				remove_element.setAttribute('data-remove', index);
+				remove_element.id = remove_element.id.replace(/\d+/, `${index}`);
+				remove_element.dataset.remove = index;
 			}
-		});
+
+			const error_container = row.nextSibling.querySelector('td');
+			error_container.id = error_container.id.replace(/\d+/, `${index}`);
+		}
+
+		this.form.discoverAllFields();
 	}
 
 	#openEditItemPopup(target) {
 		const item_num = target.id.match(/\d+/g);
-		const is_prototype = document.getElementById('items_' + item_num + '_flags').value == <?= ZBX_FLAG_DISCOVERY_PROTOTYPE ?>;
+		const flag_field = this.form.findFieldByName(`items[${item_num}][flags]`);
+		const is_prototype = flag_field.getValue() == <?= ZBX_FLAG_DISCOVERY_PROTOTYPE ?>;
+
 		const parameters = this.#getItemPopupParameters(item_num, is_prototype);
 
 		PopUp('popup.generic', parameters, {dialogue_class: "modal-popup-generic", trigger_element: target});
@@ -362,7 +370,7 @@ window.graph_edit_popup = new class {
 		const parameters = {
 			srcfld1: 'itemid',
 			srcfld2: 'name',
-			dstfrm: this.form_name,
+			dstfrm: this.form_element.getAttribute('name'),
 			numeric: 1,
 			writeonly: 1
 		};
@@ -400,14 +408,17 @@ window.graph_edit_popup = new class {
 	}
 
 	#removeItem(target) {
-		const number = target.dataset.remove;
+		const row = target.closest('tr');
 
-		this.form.querySelector(`#items_${number}`).remove();
+		row.nextSibling.remove();
+		row.remove();
+
 		this.#recalculateSortOrder();
+		this.form.validateChanges(['items']);
 	}
 
 	#updateItemsTable(graph_type) {
-		const tbody = this.form.querySelector('#items-table tbody');
+		const tbody = this.form_element.querySelector('#items-table tbody');
 		const template_type = graph_type == <?= GRAPH_TYPE_EXPLODED ?> ?  <?= GRAPH_TYPE_PIE ?> : graph_type;
 		const template = new Template(document.getElementById(`tmpl-item-row-${template_type}`).innerHTML);
 		const rows = [...tbody.querySelectorAll('tr.graph-item')];
@@ -428,18 +439,17 @@ window.graph_edit_popup = new class {
 			const name_element = row.querySelector('[id^="items_"][id$="_name"]');
 			row_data.name = name_element.textContent;
 
-			const new_row_html = template.evaluate(row_data);
+			const new_row = template.evaluateToElement(row_data);
 
-			const temp = document.createElement('tbody');
-			temp.innerHTML = new_row_html.trim();
-			const new_row = temp.firstElementChild;
+			if (!('gitemid' in row_data) || !row_data.gitemid) {
+				new_row.querySelector(`input[name="items[${index}][gitemid]"]`).remove();
+			}
 
 			// Replace the old row with the new row.
 			tbody.replaceChild(new_row, row);
-
-			const $row = $(new_row);
-			$row.find('#items_' + index + '_calc_fnc').val('<?= CALC_FNC_AVG ?>');
 		});
+
+		this.form.discoverAllFields();
 	}
 
 	#loadItem(item, template) {
@@ -453,7 +463,7 @@ window.graph_edit_popup = new class {
 			srctbl: 'item_prototypes',
 			srcfld1: 'itemid',
 			srcfld2: 'name',
-			dstfrm: this.form_name,
+			dstfrm: this.form_element.getAttribute('name'),
 			numeric: '1',
 			parent_discoveryid: this.graph.parent_discoveryid
 		}
@@ -464,9 +474,9 @@ window.graph_edit_popup = new class {
 	}
 
 	#toggleYAxisFields(target, yaxis) {
-		const text_field = this.form.querySelector(`#yaxis_${yaxis}_value`);
-		const ms_field = this.form.querySelector(`#yaxis_${yaxis}_ms`);
-		const ms_prototype_button = this.form.querySelector(`#yaxis_${yaxis}_prototype_ms`);
+		const text_field = this.form_element.querySelector(`#yaxis_${yaxis}_value`);
+		const ms_field = this.form_element.querySelector(`#yaxis_${yaxis}_ms`);
+		const ms_prototype_button = this.form_element.querySelector(`#yaxis_${yaxis}_prototype_ms`);
 
 		const display_text_field = target.value == <?= GRAPH_YAXIS_TYPE_FIXED ?>;
 		const display_ms_field = target.value == <?= GRAPH_YAXIS_TYPE_ITEM_VALUE ?>;
@@ -484,7 +494,7 @@ window.graph_edit_popup = new class {
 
 		ms_prototype_button.style.display = display_ms_prototype ? '' : 'none';
 
-		this.form.querySelector(`label[for="y${yaxis}_type_label"]`)
+		this.form_element.querySelector(`label[for="y${yaxis}_type_label"]`)
 			.classList.toggle('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>',
 				target.value == <?= GRAPH_YAXIS_TYPE_ITEM_VALUE ?>
 			);
@@ -501,7 +511,7 @@ window.graph_edit_popup = new class {
 		for (let i = 0; i < list.length; i++) {
 			const used_colors = [];
 
-			for (const color_picker of this.form.querySelectorAll(`.${ZBX_STYLE_COLOR_PICKER}`)) {
+			for (const color_picker of this.form_element.querySelectorAll(`.${ZBX_STYLE_COLOR_PICKER}`)) {
 				if (color_picker.color !== '') {
 					used_colors.push(color_picker.color);
 				}
@@ -524,60 +534,83 @@ window.graph_edit_popup = new class {
 
 			this.items.push(item);
 
-			const $row = $(template.evaluate(item));
+			const tbody = document.createElement('tbody');
+			tbody.innerHTML = template.evaluate(item);
 
-			$('#item-buttons-row').before($row);
-			$row.find('#items_' + number + '_calc_fnc').val('<?= CALC_FNC_AVG ?>');
+			tbody.querySelector(`input[name="items[${number}][gitemid]"]`).remove();
+			const button_row = document.getElementById('item-buttons-row');
+
+			tbody.querySelectorAll('tr').forEach(row => {
+				button_row.parentNode.insertBefore(row, button_row);
+			});
 		}
 	}
 
-	clone() {
+	#clone() {
 		const form_refresh = document.createElement('input');
 
 		form_refresh.setAttribute('type', 'hidden');
 		form_refresh.setAttribute('name', 'clone');
 		form_refresh.setAttribute('value', '1');
-		this.form.append(form_refresh);
 
-		this.form.querySelector('[name="graphid"]').remove();
+		this.form_element.append(form_refresh);
+		this.form.findFieldByName('graphid').getField().remove();
 		this.graph.graphid = 0;
 
-		reloadPopup(this.form, this.action);
+		this.form.release();
+
+		reloadPopup(this.form_element, this.action);
 	}
 
-	delete() {
-		const action = this.action === 'graph.edit' ? 'graph.delete' : 'graph.prototype.delete';
+	#delete() {
+		const confirm_message = this.action === 'graph.edit'
+			? <?= json_encode(_('Delete graph?')) ?>
+			: <?= json_encode(_('Delete graph prototype?')) ?>;
 
-		const curl = new Curl('zabbix.php');
 
-		curl.setArgument('action', action);
-		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('graph')) ?>);
+		if (window.confirm(confirm_message)) {
+			this.#removePopupMessages();
 
-		this.#post(curl.getUrl(), {graphids: [this.graph.graphid]}, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
+			const fields = {
+				action: this.action === 'graph.edit' ? 'graph.delete' : 'graph.prototype.delete',
+				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('graph')) ?>
+			};
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-		});
-	}
+			this.#post(zabbixUrl(fields), {graphids: [this.graph.graphid]}, (response) => {
+				overlayDialogueDestroy(this.overlay.dialogueid);
 
-	submit() {
-		const fields = getFormFields(this.form);
-
-		fields.name = fields.name.trim();
-
-		const curl = new Curl('zabbix.php');
-
-		if (this.action === 'graph.edit') {
-			curl.setArgument('action', !this.graph.graphid ? 'graph.create' : 'graph.update');
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+			});
 		}
 		else {
-			curl.setArgument('action', !this.graph.graphid ? 'graph.prototype.create' : 'graph.prototype.update');
+			this.overlay.unsetLoading();
 		}
-
-		this.#post(curl.getUrl(), fields);
 	}
 
-	#post(url, data) {
+	#submit() {
+		this.#removePopupMessages();
+		const fields = this.form.getAllValues();
+
+		this.form.validateSubmit(fields)
+			.then((result) => {
+				if (!result) {
+					this.overlay.unsetLoading();
+					return;
+				}
+
+				const action = this.action === 'graph.edit'
+					? (this.graph.graphid ? 'graph.update' : 'graph.create')
+					: (this.graph.graphid ? 'graph.prototype.update' : 'graph.prototype.create');
+
+				this.#post(zabbixUrl({action}), fields, (response) => {
+					overlayDialogueDestroy(this.overlay.dialogueid);
+
+					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+				});
+			});
+	}
+
+	#post(url, data, success_callback) {
 		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
@@ -588,38 +621,22 @@ window.graph_edit_popup = new class {
 				if ('error' in response) {
 					throw {error: response.error};
 				}
-				overlayDialogueDestroy(this.overlay.dialogueid);
 
-				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+				if ('form_errors' in response) {
+					this.form.setErrors(response.form_errors, true, true);
+					this.form.renderErrors();
+
+					return;
+				}
+
+				success_callback(response);
 			})
-			.catch((exception) => {
-				for (const element of this.form.parentNode.children) {
-					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-						element.parentNode.removeChild(element);
-					}
-				}
-
-				let title, messages;
-
-				if (typeof exception === 'object' && 'error' in exception) {
-					title = exception.error.title;
-					messages = exception.error.messages;
-				}
-				else {
-					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
-				}
-
-				const message_box = makeMessageBox('bad', messages, title)[0];
-
-				this.form.parentNode.insertBefore(message_box, this.form);
-			})
-			.finally(() => {
-				this.overlay.unsetLoading();
-			});
+			.catch((exception) => this.#ajaxExceptionHandler(exception))
+			.finally(() => this.overlay.unsetLoading());
 	}
 
 	#isConfirmed() {
-		return JSON.stringify(this.initial_form_fields) === JSON.stringify(getFormFields(this.form))
+		return JSON.stringify(this.initial_form_fields) === JSON.stringify(this.form.getAllValues())
 			|| window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
 	}
 
@@ -658,4 +675,28 @@ window.graph_edit_popup = new class {
 			})
 		);
 	}
-}
+
+	#removePopupMessages() {
+		for (const el of this.form_element.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
+			}
+		}
+	}
+
+	#ajaxExceptionHandler(exception) {
+		let title, messages;
+
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+		}
+
+		const message_box = makeMessageBox('bad', messages, title)[0];
+
+		this.form_element.parentNode.insertBefore(message_box, this.form_element);
+	}
+};

@@ -146,10 +146,10 @@ class CPagerHelper {
 		}
 
 		return (new CDiv())
-			->addClass(ZBX_STYLE_TABLE_PAGING)
+			->addClass(ZBX_STYLE_PAGER)
 			->addItem(
 				(new CTag('nav', true))
-					->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
+					->addClass(ZBX_STYLE_PAGER_CONTAINER)
 					->setAttribute('role', 'navigation')
 					->setAttribute('aria-label', _x('Pager', 'page navigation'))
 					->addItem(self::createLinks($page, $num_pages, $url))
@@ -205,7 +205,7 @@ class CPagerHelper {
 				$link = new CLink($i, $url->getUrl());
 				if ($i == $page) {
 					$link
-						->addClass(ZBX_STYLE_PAGING_SELECTED)
+						->addClass(ZBX_STYLE_SELECTED)
 						->setAttribute('aria-label', _s('Go to page %1$s, current page', $i))
 						->setAttribute('aria-current', 'true');
 				}

@@ -46,6 +46,7 @@ func (*ZBXExec) execute(s string, timeout time.Duration, path string, strict boo
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
+	//nolint:gosec,noctx // intended behavior, might require refactoring for CommandContext.
 	cmd := exec.Command("sh", "-c", s)
 	cmd.Dir = path
 
@@ -107,7 +108,7 @@ func jobDoneListener(done chan<- error, cmd *exec.Cmd) {
 func timeoutListener(ctx context.Context, cmd *exec.Cmd) {
 	<-ctx.Done()
 
-	err := syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
+	err := syscall.Kill(-cmd.Process.Pid, syscall.SIGTERM)
 	if err != nil {
 		log.Debugf("failed to kill cmd processes %s", err)
 	}

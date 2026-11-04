@@ -205,7 +205,7 @@ class CConditionHelper {
 	 * @param array  $conditions
 	 */
 	public static function replaceFormulaIds(string &$formula, array $conditions): void {
-		$parser = new CConditionFormula();
+		$parser = new CConditionFormulaParser();
 		$parser->parse($formula);
 
 		$conditionids = [];
@@ -214,7 +214,7 @@ class CConditionHelper {
 			$conditionids[$condition['formulaid']] = $conditionid;
 		}
 
-		foreach (array_reverse($parser->constants) as $constant) {
+		foreach (array_reverse($parser->getConstants()) as $constant) {
 			$formula = substr_replace($formula, '{'.$conditionids[$constant['value']].'}', $constant['pos'],
 				strlen($constant['value'])
 			);
@@ -384,5 +384,142 @@ class CConditionHelper {
 
 			return 0;
 		});
+	}
+
+	/**
+	 * Sorts the Telemetry query item filter conditions based on the calculation types And/Or, Or.
+	 *
+	 * @param array $conditions  Filter conditions by reference.
+	 */
+	public static function sortTelemetryQueryFilterConditions(array &$conditions): void {
+		uasort($conditions, static function (array $row1, array $row2) {
+			foreach (['column', 'attribute_key'] as $field_name) {
+				if ($cmp = strnatcasecmp($row1[$field_name], $row2[$field_name])) {
+					return $cmp;
+				}
+			}
+
+			return 0;
+		});
+	}
+
+	/**
+	 * Sorts the CEP rule conditions based on the calculation types And/Or, And, Or.
+	 *
+	 * @param array $conditions
+	 */
+	public static function sortCepRuleConditions(array &$conditions): void {
+		$type_order = array_flip(CCepRuleHelper::CONDITION_TYPES);
+
+		uasort($conditions, static function (array $row1, array $row2) use ($type_order): int {
+			if ($cmp = $type_order[$row1['type']] <=> $type_order[$row2['type']]) {
+				return $cmp;
+			}
+
+			$field_names = match ((int) $row1['type']) {
+				CCepRuleHelper::CONDITION_EVENT_NAME => ['operator', 'event_name'],
+				CCepRuleHelper::CONDITION_TAG => ['operator', 'tag'],
+				CCepRuleHelper::CONDITION_TAG_VALUE => ['tag', 'operator', 'tag_value'],
+				CCepRuleHelper::CONDITION_SEVERITY => ['operator', 'severity'],
+				CCepRuleHelper::CONDITION_HOST_VISIBLE_NAME => ['operator', 'host_name'],
+				CCepRuleHelper::CONDITION_HOST_GROUP_NAME => ['operator', 'host_group_name'],
+				CCepRuleHelper::CONDITION_TIME_PERIOD => ['operator', 'time_period']
+			};
+
+			foreach ($field_names as $field_name) {
+				if ($cmp = strnatcasecmp($row1[$field_name], $row2[$field_name])) {
+					return $cmp;
+				}
+			}
+
+			return 0;
+		});
+	}
+
+	/**
+	 * Sorts the CEP rule operation conditions based on the calculation types And/Or, And, Or.
+	 *
+	 * @param array $conditions
+	 */
+	public static function sortCepRuleOperationConditions(array &$conditions): void {
+		$type_order = array_flip(CCepRuleHelper::OPERATION_CONDITION_TYPES);
+
+		uasort($conditions, static function (array $row1, array $row2) use ($type_order): int {
+			if ($cmp = $type_order[$row1['type']] <=> $type_order[$row2['type']]) {
+				return $cmp;
+			}
+
+			$field_names = match ((int) $row1['type']) {
+				ZBX_CONDITION_TYPE_EVENT_TAG => ['operator', 'tag'],
+				ZBX_CONDITION_TYPE_EVENT_TAG_VALUE => ['tag', 'operator', 'tag_value'],
+				ZBX_CONDITION_TYPE_EVENT_OPEN,
+				ZBX_CONDITION_TYPE_EVENT_FIRST,
+				ZBX_CONDITION_TYPE_EVENT_LAST,
+				ZBX_CONDITION_TYPE_EVENT_SYMPTOM,
+				ZBX_CONDITION_TYPE_EVENT_COPIED,
+				ZBX_CONDITION_TYPE_EVENT_SUPPRESSED => ['operator']
+			};
+
+			foreach ($field_names as $field_name) {
+				if ($cmp = strnatcasecmp($row1[$field_name], $row2[$field_name])) {
+					return $cmp;
+				}
+			}
+
+			return 0;
+		});
+	}
+
+	/**
+	 * Sorts the CEP rule operation scope conditions based on the calculation types: And/Or, And, Or.
+	 *
+	 * @param array $conditions
+	 */
+	public static function sortCepRuleOperationScopeConditions(array &$conditions): void {
+		self::sortCepRuleOperationConditions($conditions);
+	}
+
+	/**
+	 * Check that all constants of formula are specified in the filter conditions.
+	 *
+	 * @param array  $objects
+	 * @param string $path
+	 * @param string $filter_field_name
+	 *
+	 * @throws APIException
+	 */
+	public static function checkFilterFormula(array $objects, string $path = '/',
+			string $filter_field_name = 'filter'): void {
+		$condition_formula_parser = new CConditionFormulaParser();
+
+		foreach ($objects as $i => $object) {
+			if (!array_key_exists($filter_field_name, $object)
+					|| $object[$filter_field_name]['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+				continue;
+			}
+
+			$condition_formula_parser->parse($object[$filter_field_name]['formula']);
+
+			$constants = array_unique(array_column($condition_formula_parser->getConstants(), 'value'));
+			$subpath = ($path === '/' ? $path : $path.'/').($i + 1).'/'.$filter_field_name;
+
+			$condition_formulaids = array_column($object[$filter_field_name]['conditions'], 'formulaid');
+
+			foreach ($constants as $constant) {
+				if (!in_array($constant, $condition_formulaids)) {
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+						$subpath.'/formula', _s('missing filter condition "%1$s"', $constant)
+					));
+				}
+			}
+
+			foreach ($object[$filter_field_name]['conditions'] as $j => $condition) {
+				if (!in_array($condition['formulaid'], $constants)) {
+					throw new APIException(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+						$subpath.'/conditions/'.($j + 1).'/formulaid', _('an identifier is not defined in the formula')
+					));
+				}
+			}
+		}
 	}
 }

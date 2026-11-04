@@ -258,6 +258,23 @@
 					timeout
 				};
 				break;
+
+			case <?= ITEM_TYPE_TELEMETRY_QUERY ?>:
+				properties = {
+					key: form_data['key'].trim(),
+					timeout,
+					signal_type: form_data['signal_type'],
+					metric_point_type: form_data['metric_point_type'],
+					columns: form_data['columns'] || [],
+					aggregated_columns: form_data['aggregated_columns'] || [],
+					conditions: form_data['conditions'] || [],
+					evaltype: form_data['evaltype'],
+					formula: form_data['formula'],
+					time_shift: form_data['time_shift'],
+					lookback_limit: form_data['lookback_limit'],
+					granularity: form_data['granularity']
+				};
+				break;
 		}
 
 		// Common properties.
@@ -285,7 +302,7 @@
 	 */
 	function openItemTestDialog(step_nums, show_final_result, get_value, trigger_element, step_obj_nr) {
 		var $row = jQuery(trigger_element)
-					.closest('.preprocessing-list-item, .preprocessing-list-foot, .overlay-dialogue-footer'),
+					.closest(`.preprocessing-list-item, .preprocessing-list-foot, .${ZBX_STYLE_OVERLAY_DIALOGUE_FOOTER}`),
 			item_properties = getItemTestProperties('form[name="itemForm"]'),
 			cached_values = $row.data('test-data') || [];
 
@@ -296,7 +313,7 @@
 			delete cached_values.interface_details;
 		}
 
-		PopUp('popup.itemtest.edit', jQuery.extend(item_properties, {
+		const overlay = PopUp('popup.itemtest.edit', jQuery.extend(item_properties, {
 			steps: getPreprocessingSteps(step_nums),
 			hostid: <?= $data['hostid'] ?>,
 			test_type: <?= $data['preprocessing_test_type'] ?>,
@@ -305,5 +322,12 @@
 			get_value: get_value ? 1 : 0,
 			data: cached_values
 		}), {dialogueid: 'item-test', dialogue_class: 'modal-popup-generic', trigger_element});
+
+		// Display the close button after the screen reader announces the dialog title.
+		overlay.$dialogue.$head.$close_button.show();
+
+		overlay.$dialogue[0].addEventListener('itemtest.close', (e) => {
+			$row.data('test-data', e.detail);
+		});
 	}
 </script>

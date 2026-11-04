@@ -38,16 +38,16 @@ Test availability: `zabbix_get -s mongos.node -k 'mongodb.ping["{$MONGODB.CONNST
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$MONGODB.CONNSTRING}|<p>Connection string in the URI format (password is not used). This param overwrites a value configured in the "Server" option of the configuration file (if it's set), otherwise, the plugin's default value is used: "tcp://localhost:27017"</p>|`tcp://localhost:27017`|
-|{$MONGODB.USER}|<p>MongoDB username</p>||
-|{$MONGODB.PASSWORD}|<p>MongoDB user password</p>||
-|{$MONGODB.CONNS.AVAILABLE.MIN.WARN}|<p>Minimum number of available connections</p>|`1000`|
-|{$MONGODB.LLD.FILTER.COLLECTION.MATCHES}|<p>Filter of discoverable collections</p>|`.*`|
-|{$MONGODB.LLD.FILTER.COLLECTION.NOT_MATCHES}|<p>Filter to exclude discovered collections</p>|`CHANGE_IF_NEEDED`|
-|{$MONGODB.LLD.FILTER.DB.MATCHES}|<p>Filter of discoverable databases</p>|`.*`|
-|{$MONGODB.LLD.FILTER.DB.NOT_MATCHES}|<p>Filter to exclude discovered databases</p>|`(admin\|config\|local)`|
-|{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}|<p>Maximum number of cursors timing out per second</p>|`1`|
-|{$MONGODB.CURSOR.OPEN.MAX.WARN}|<p>Maximum number of open cursors</p>|`10000`|
+|{$MONGODB.CONNSTRING}|<p>MongoDB connection string in URI format (password not included).</p><p>If set, it overrides the Server option from the config file.</p><p>Otherwise, it uses the default: tcp://localhost:27017</p>|`tcp://localhost:27017`|
+|{$MONGODB.USER}|<p>MongoDB username.</p>||
+|{$MONGODB.PASSWORD}|<p>MongoDB password.</p>||
+|{$MONGODB.CONNS.AVAILABLE.MIN.WARN}|<p>Minimum number of available connections.</p>|`1000`|
+|{$MONGODB.LLD.FILTER.COLLECTION.MATCHES}|<p>Filter of discoverable collections.</p>|`.*`|
+|{$MONGODB.LLD.FILTER.COLLECTION.NOT_MATCHES}|<p>Filter to exclude discovered collections.</p>|`CHANGE_IF_NEEDED`|
+|{$MONGODB.LLD.FILTER.DB.MATCHES}|<p>Filter of discoverable databases.</p>|`.*`|
+|{$MONGODB.LLD.FILTER.DB.NOT_MATCHES}|<p>Filter to exclude discovered databases.</p>|`(admin\|config\|local)`|
+|{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}|<p>Maximum number of cursors timing out per second.</p>|`1`|
+|{$MONGODB.CURSOR.OPEN.MAX.WARN}|<p>Maximum number of open cursors.</p>|`10000`|
 
 ### Items
 
@@ -65,7 +65,7 @@ Test availability: `zabbix_get -s mongos.node -k 'mongodb.ping["{$MONGODB.CONNST
 |Operations: query, rate|<p>The number of queries received the mongos instance per second.</p>|Dependent item|mongodb.opcounters.query.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.opcounters.query`</p></li><li>Change per second</li></ul>|
 |Operations: insert, rate|<p>The number of insert operations received the mongos instance per second.</p>|Dependent item|mongodb.opcounters.insert.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.opcounters.insert`</p></li><li>Change per second</li></ul>|
 |Operations: getmore, rate|<p>The number of "getmore" operations the mongos per second. This counter can be high even if the query count is low.</p><p>Secondary nodes send getMore operations as part of the replication process.</p>|Dependent item|mongodb.opcounters.getmore.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.opcounters.getmore`</p></li><li>Change per second</li></ul>|
-|Last seen configserver|<p>The latest optime of the CSRS primary that the mongos has seen.</p>|Dependent item|mongodb.last_seen_config_server<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.sharding.lastSeenConfigServerOpTime.ts.T`</p></li></ul>|
+|Last seen configserver|<p>The latest optime of the CSRS primary that the mongos has seen.</p>|Dependent item|mongodb.last_seen_config_server<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.sharding.lastSeenConfigServerOpTime.ts.T`</p><p>⛔️Custom on fail: Set error to: `The metric is available for a sharded cluster only.`</p></li></ul>|
 |Configserver heartbeat|<p>Difference between the latest optime of the CSRS primary that the mongos has seen and cluster time.</p>|Dependent item|mongodb.config_server_heartbeat<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Bytes in, rate|<p>The total number of bytes that the server has received over network connections initiated by clients or other mongod/mongos instances per second.</p>|Dependent item|mongodb.network.bytes_in.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.network.bytesIn`</p></li><li>Change per second</li></ul>|
 |Bytes out, rate|<p>The total number of bytes that the server has sent over network connections initiated by clients or other mongod/mongos instances per second.</p>|Dependent item|mongodb.network.bytes_out.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.network.bytesOut`</p></li><li>Change per second</li></ul>|

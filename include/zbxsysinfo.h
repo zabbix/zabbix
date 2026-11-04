@@ -85,6 +85,13 @@ typedef enum
 }
 zbx_key_access_rule_type_t;
 
+typedef enum
+{
+	ZBX_KEY_ACCESS_PATTERN_WILDCARD,
+	ZBX_KEY_ACCESS_PATTERN_REGEXP
+}
+zbx_key_access_pattern_type_t;
+
 void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f, zbx_get_config_int_f
 		get_config_enable_remote_commands_f, zbx_get_config_int_f get_config_log_remote_commands_f,
 		zbx_get_config_int_f get_config_unsafe_user_parameters_cb, zbx_get_config_str_f
@@ -101,8 +108,8 @@ void	zbx_init_key_access_rules(void);
 void	zbx_finalize_key_access_rules_configuration(void);
 
 int	zbx_add_key_access_rule(const char *parameter, char *pattern, zbx_key_access_rule_type_t type);
+int	zbx_add_key_access_rule_regexp(const char *parameter, char *pattern, zbx_key_access_rule_type_t type);
 int	zbx_check_key_access_rules(const char *metric);
-int	zbx_check_request_access_rules(AGENT_REQUEST *request);
 void	zbx_free_key_access_rules(void);
 
 int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT *result, int timeout);
@@ -173,6 +180,9 @@ void	zbx_free_perf_collector(void);
 
 #define ZBX_CHECK_TIMEOUT_UNDEFINED	0
 int	zbx_validate_item_timeout(const char *timeout_str, int *sec_out, char *error, size_t error_len);
+int	zbx_validate_item_max_repetitions(const char *max_repetitions_str, int *max_repetitions_out, char *error,
+		size_t error_len);
+int	zbx_validate_item_retries(const char *retries_str, int *retries_out, char *error, size_t error_len);
 
 int	zbx_get_remote_zabbix_stats(const char *ip, unsigned short port, int timeout, AGENT_RESULT *result);
 int	zbx_get_remote_zabbix_stats_queue(const char *ip, unsigned short port, const char *from, const char *to,

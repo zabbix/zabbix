@@ -29,7 +29,7 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 		'enabled_lifetime', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'posts', 'status_codes',
 		'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method', 'output_format',
 		'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps', 'state',
-		'error', 'parameters', 'uuid'
+		'error', 'parameters', 'uuid', 'time_shift', 'lookback_limit', 'granularity', 'query'
 	];
 
 	public static function getOutputFieldsOnHost(): array {
@@ -271,6 +271,30 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 		if ($result) {
 			self::prepareItemsForApi($result, false);
 
+			foreach ($result as &$lldrule) {
+				if (array_key_exists('query', $lldrule) && $lldrule['query']) {
+					$lldrule['query']['signal_type'] = (string) $lldrule['query']['signal_type'];
+					$lldrule['query']['metric_point_type'] = (string) $lldrule['query']['metric_point_type'];
+					$lldrule['query']['filter']['evaltype'] = (string) $lldrule['query']['filter']['evaltype'];
+
+					foreach ($lldrule['query']['aggregated_columns'] as &$column) {
+						$column['function'] = (string) $column['function'];
+					}
+					unset($column);
+
+					foreach ($lldrule['query']['filter']['conditions'] as &$condition) {
+						$condition['operator'] = (string) $condition['operator'];
+					}
+					unset($condition);
+
+					$lldrule['query'] = CItemTypeTelemetryQuery::resolveFilterFormulaFields($lldrule['query']);
+				}
+
+				// Make telemetry query field storage_mode inaccessible.
+				unset($lldrule['storage_mode']);
+			}
+			unset($lldrule);
+
 			$result = $this->addRelatedObjects($options, $result);
 			$result = $this->unsetExtraFields($result, ['formula', 'evaltype']);
 			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
@@ -431,7 +455,7 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 		self::checkHostInterfaces($items);
 		self::checkDependentItems($items);
 		self::checkNestedItems($items);
-		self::checkFilterFormula($items);
+		CConditionHelper::checkFilterFormula($items);
 		self::checkOverridesFilterFormula($items);
 		self::checkOverridesOperationTemplates($items);
 	}
@@ -582,7 +606,7 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 		self::checkHostInterfaces($items, $db_items);
 		self::checkDependentItems($items, $db_items);
 		self::checkNestedItems($items, $db_items);
-		self::checkFilterFormula($items);
+		CConditionHelper::checkFilterFormula($items);
 		self::checkOverridesFilterFormula($items);
 		self::checkOverridesOperationTemplates($items);
 	}
@@ -994,6 +1018,7 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 			$_upd_items = self::getUpdChildObjectsUsingTemplateid($items_to_update, $_upd_db_items);
 
 			self::checkDuplicates($_upd_items, $_upd_db_items);
+			self::validateInheritedTelemetryQueryItems($_upd_items, $_upd_db_items);
 
 			$upd_items = array_merge($upd_items, $_upd_items);
 			$upd_db_items += $_upd_db_items;

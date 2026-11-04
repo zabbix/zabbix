@@ -212,8 +212,6 @@ func TestConnManager_setConn(t *testing.T) {
 
 	opt := Options{
 		KeepAlive:            10 * time.Second,
-		ConnectTimeout:       30 * time.Second,
-		CallTimeout:          30 * time.Second,
 		CustomQueriesEnabled: false,
 		CustomQueriesPath:    "",
 	}
@@ -312,8 +310,6 @@ func TestConnManager_getConn(t *testing.T) {
 
 	opt := Options{
 		KeepAlive:            10 * time.Second,
-		ConnectTimeout:       30 * time.Second,
-		CallTimeout:          30 * time.Second,
 		CustomQueriesEnabled: false,
 		CustomQueriesPath:    "",
 	}
@@ -420,8 +416,6 @@ func TestConnManager_closeUnused(t *testing.T) {
 
 			opt := Options{
 				KeepAlive:            tt.fields.keepAlive,
-				ConnectTimeout:       30 * time.Second,
-				CallTimeout:          30 * time.Second,
 				CustomQueriesEnabled: false,
 				CustomQueriesPath:    "",
 			}
@@ -432,6 +426,7 @@ func TestConnManager_closeUnused(t *testing.T) {
 
 			conn, err := connMgr.GetConnection(
 				newConnDet(t, "zabbix_mon", ""),
+				30,
 			)
 			if err != nil || conn == nil {
 				t.Fatalf(
@@ -456,8 +451,6 @@ func TestConnManager_closeAll(t *testing.T) { //nolint:tparallel
 
 	opt := Options{
 		KeepAlive:            10 * time.Second,
-		ConnectTimeout:       30 * time.Second,
-		CallTimeout:          30 * time.Second,
 		CustomQueriesEnabled: false,
 		CustomQueriesPath:    "",
 	}
@@ -491,7 +484,7 @@ func TestConnManager_closeAll(t *testing.T) { //nolint:tparallel
 	for _, tt := range tests { //nolint:paralleltest
 		t.Run(tt.name, func(t *testing.T) {
 			for _, v := range tt.fields.conDet {
-				conn, err := connMgr.GetConnection(v)
+				conn, err := connMgr.GetConnection(v, 30)
 				if err != nil || conn == nil {
 					t.Fatalf(
 						"ConnManager.closeUnused(): ConnManager.createConn() should create a connection, but "+
@@ -516,8 +509,6 @@ func TestConnManager_GetConnection(t *testing.T) {
 
 	opt := Options{
 		KeepAlive:            10 * time.Second,
-		ConnectTimeout:       30 * time.Second,
-		CallTimeout:          30 * time.Second,
 		CustomQueriesEnabled: false,
 		CustomQueriesPath:    "",
 	}
@@ -576,7 +567,7 @@ func TestConnManager_GetConnection(t *testing.T) {
 			defer connMgr.Destroy()
 
 			for _, v := range tt.fields.conDet {
-				conn, err := connMgr.GetConnection(v)
+				conn, err := connMgr.GetConnection(v, 30)
 				if (err != nil || conn == nil) && !tt.wantErr {
 					t.Fatalf(
 						"ConnManager.GetConnection(): should create a connection, but got error: %s",
@@ -592,7 +583,7 @@ func TestConnManager_GetConnection(t *testing.T) {
 				)
 			}
 
-			gotOraConn, err := connMgr.GetConnection(tt.args.conDet)
+			gotOraConn, err := connMgr.GetConnection(tt.args.conDet, 30)
 			if err != nil {
 				if !tt.wantErr {
 					t.Fatalf("ConnManager.GetConnection(): error = %v", err)

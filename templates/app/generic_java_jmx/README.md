@@ -71,13 +71,13 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Generic Java JMX: Compilation: {HOST.NAME} uses suboptimal JIT compiler||`find(/Generic Java JMX/jmx["java.lang:type=Compilation","Name"],,"like","Client")=1`|Info|**Manual close**: Yes|
-|Generic Java JMX: Memory: Heap memory usage is high||`min(/Generic Java JMX/jmx["java.lang:type=Memory","HeapMemoryUsage.used"],{$JMX.HEAP.MEM.USAGE.TIME})>(last(/Generic Java JMX/jmx["java.lang:type=Memory","HeapMemoryUsage.max"])*{$JMX.HEAP.MEM.USAGE.MAX}/100) and last(/Generic Java JMX/jmx["java.lang:type=Memory","HeapMemoryUsage.max"])>0`|Warning||
-|Generic Java JMX: Memory: Non-Heap memory usage is high||`min(/Generic Java JMX/jmx["java.lang:type=Memory","NonHeapMemoryUsage.used"],{$JMX.NONHEAP.MEM.USAGE.TIME})>(last(/Generic Java JMX/jmx["java.lang:type=Memory","NonHeapMemoryUsage.max"])*{$JMX.NONHEAP.MEM.USAGE.MAX}/100) and last(/Generic Java JMX/jmx["java.lang:type=Memory","NonHeapMemoryUsage.max"])>0`|Warning||
-|Generic Java JMX: OperatingSystem: Opened file descriptor count is high||`min(/Generic Java JMX/jmx["java.lang:type=OperatingSystem","OpenFileDescriptorCount"],{$JMX.FILE.DESCRIPTORS.TIME})>(last(/Generic Java JMX/jmx["java.lang:type=OperatingSystem","MaxFileDescriptorCount"])*{$JMX.FILE.DESCRIPTORS.MAX}/100)`|Warning||
-|Generic Java JMX: OperatingSystem: Process CPU Load is high||`min(/Generic Java JMX/jmx["java.lang:type=OperatingSystem","ProcessCpuLoad"],{$JMX.CPU.LOAD.TIME})>{$JMX.CPU.LOAD.MAX}`|Average||
-|Generic Java JMX: Runtime: JVM is not reachable||`nodata(/Generic Java JMX/jmx["java.lang:type=Runtime","Uptime"],5m)=1`|Average|**Manual close**: Yes|
-|Generic Java JMX: Runtime: {HOST.NAME} runs suboptimal VM type||`find(/Generic Java JMX/jmx["java.lang:type=Runtime","VmName"],,"like","Server")<>1`|Info|**Manual close**: Yes|
+|Generic Java JMX: Compilation: {HOST.NAME} uses suboptimal JIT compiler|<p>JVM is running with the Client JIT compiler.</p>|`find(/Generic Java JMX/jmx["java.lang:type=Compilation","Name"],,"like","Client")=1`|Info|**Manual close**: Yes|
+|Generic Java JMX: Memory: Heap memory usage is high|<p>Heap memory utilization exceeds `{$JMX.HEAP.MEM.USAGE.MAX}`%.</p>|`min(/Generic Java JMX/jmx["java.lang:type=Memory","HeapMemoryUsage.used"],{$JMX.HEAP.MEM.USAGE.TIME})>(last(/Generic Java JMX/jmx["java.lang:type=Memory","HeapMemoryUsage.max"])*{$JMX.HEAP.MEM.USAGE.MAX}/100) and last(/Generic Java JMX/jmx["java.lang:type=Memory","HeapMemoryUsage.max"])>0`|Warning||
+|Generic Java JMX: Memory: Non-Heap memory usage is high|<p>Non-heap memory utilization exceeds `{$JMX.NONHEAP.MEM.USAGE.MAX}`%.</p>|`min(/Generic Java JMX/jmx["java.lang:type=Memory","NonHeapMemoryUsage.used"],{$JMX.NONHEAP.MEM.USAGE.TIME})>(last(/Generic Java JMX/jmx["java.lang:type=Memory","NonHeapMemoryUsage.max"])*{$JMX.NONHEAP.MEM.USAGE.MAX}/100) and last(/Generic Java JMX/jmx["java.lang:type=Memory","NonHeapMemoryUsage.max"])>0`|Warning||
+|Generic Java JMX: OperatingSystem: Opened file descriptor count is high|<p>Opened file descriptor count exceeds `{$JMX.FILE.DESCRIPTORS.MAX}`%.</p>|`min(/Generic Java JMX/jmx["java.lang:type=OperatingSystem","OpenFileDescriptorCount"],{$JMX.FILE.DESCRIPTORS.TIME})>(last(/Generic Java JMX/jmx["java.lang:type=OperatingSystem","MaxFileDescriptorCount"])*{$JMX.FILE.DESCRIPTORS.MAX}/100)`|Warning||
+|Generic Java JMX: OperatingSystem: Process CPU Load is high|<p>Process CPU load exceeds `{$JMX.CPU.LOAD.MAX}`%.</p>|`min(/Generic Java JMX/jmx["java.lang:type=OperatingSystem","ProcessCpuLoad"],{$JMX.CPU.LOAD.TIME})>{$JMX.CPU.LOAD.MAX}`|Average||
+|Generic Java JMX: Runtime: JVM is not reachable|<p>JVM is not reachable for the last 5 minutes.</p>|`nodata(/Generic Java JMX/jmx["java.lang:type=Runtime","Uptime"],5m)=1`|Average|**Manual close**: Yes|
+|Generic Java JMX: Runtime: {HOST.NAME} runs suboptimal VM type|<p>JVM is not running with the Server VM type.</p>|`find(/Generic Java JMX/jmx["java.lang:type=Runtime","VmName"],,"like","Server")<>1`|Info|**Manual close**: Yes|
 
 ### LLD rule Garbage collector discovery
 
@@ -110,7 +110,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Generic Java JMX: Memory pool: {#JMXNAME} memory usage is high||`min(/Generic Java JMX/jmx["java.lang:name={#JMXNAME},type=MemoryPool","Usage.used"],{$JMX.MP.USAGE.TIME:"{#JMXNAME}"})>(last(/Generic Java JMX/jmx["java.lang:name={#JMXNAME},type=MemoryPool","Usage.max"])*{$JMX.MP.USAGE.MAX:"{#JMXNAME}"}/100) and last(/Generic Java JMX/jmx["java.lang:name={#JMXNAME},type=MemoryPool","Usage.max"])>0`|Warning||
+|Generic Java JMX: Memory pool: {#JMXNAME} memory usage is high|<p>Memory pool utilization exceeds `{$JMX.MP.USAGE.MAX:"{#JMXNAME}"}`%.</p>|`min(/Generic Java JMX/jmx["java.lang:name={#JMXNAME},type=MemoryPool","Usage.used"],{$JMX.MP.USAGE.TIME:"{#JMXNAME}"})>(last(/Generic Java JMX/jmx["java.lang:name={#JMXNAME},type=MemoryPool","Usage.max"])*{$JMX.MP.USAGE.MAX:"{#JMXNAME}"}/100) and last(/Generic Java JMX/jmx["java.lang:name={#JMXNAME},type=MemoryPool","Usage.max"])>0`|Warning||
 
 ## Feedback
 

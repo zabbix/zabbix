@@ -215,7 +215,7 @@
 		<property name="cmocka-2-agent-only" value="CONFIG_SITE='share/config.site.d/gcc-debug' -q --enable-agent"/>
 		<property name="cmocka-3-server-only" value="CONFIG_SITE='share/config.site.d/gcc-debug' -q --enable-server --with-mysql --with-libcurl"/>
 		<property name="cmocka-4-proxy-only" value="CONFIG_SITE='share/config.site.d/gcc-debug' -q --enable-proxy --with-sqlite3 --with-libcurl"/>
-		<property name="cmocka-5-sanitizer" value="CONFIG_SITE='share/config.site.d/clang-debug-sanitize' -q ${ZBX_BASE_FLAGS} --with-openssl --with-openipmi --enable-ipv6 --with-mysql --with-iconv"/>
+		<property name="cmocka-5-sanitizer" value="CONFIG_SITE='share/config.site.d/clang-debug-sanitize' -q ${ZBX_BASE_FLAGS} --with-openssl --with-openipmi --enable-ipv6 --with-mysql --with-libmodbus --with-iconv --with-zlib"/>
 
 	</target>
 
@@ -249,26 +249,33 @@
 
 		<exec executable="lcov" failonerror="on">
 			<arg line="--directory"/>
-			<arg line="src"/>
+			<arg line="."/>
 			<arg line="-zerocounters"/>
 		</exec>
 		<exec executable="./bootstrap.sh" failonerror="on">
 			<arg line="tests"/>
 		</exec>
-		<make-tests conf="CFLAGS='--coverage' -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql" conf-name="gen-test-coverage-report"/>
+		<make-tests conf="CFLAGS='--coverage' -q ${ZBX_BASE_FLAGS} --with-openssl --with-openipmi --enable-ipv6 --with-mysql --with-libmodbus --with-iconv --with-zlib" conf-name="gen-test-coverage-report"/>
 		<exec executable="lcov" failonerror="on">
 			<arg line="--directory"/>
-			<arg line="src"/>
+			<arg line="."/>
 			<arg line="--capture"/>
 			<arg line="--output-file"/>
 			<arg line="tests_results/html/app.info"/>
+		</exec>
+		<exec executable="lcov" failonerror="on">
+			<arg line="--extract"/>
+			<arg line="tests_results/html/app.info"/>
+			<arg line="*/src/*"/>
+			<arg line="--output-file"/>
+			<arg line="tests_results/html/app_filtered.info"/>
 		</exec>
 		<exec executable="genhtml" failonerror="on">
 			<arg line="-p"/>
 			<arg line="${user.dir}"/>
 			<arg line="-o"/>
 			<arg line="tests_results/html"/>
-			<arg line="tests_results/html/app.info"/>
+			<arg line="tests_results/html/app_filtered.info"/>
 		</exec>
 		<antcall target="clean-tests"/>
 	</target>
@@ -292,6 +299,7 @@
 		<exec executable="./configure" failonerror="on">
 			<env key="CONFIG_SITE" value="share/config.site.d/gcc-release"/>
 			<arg line="--quiet"/>
+			<arg line="--enable-java"/>
 		</exec>
 		<exec executable="make" failonerror="on">
 			<arg line="-s"/>
@@ -327,5 +335,13 @@
 		</exec>
 	</target>
 
-	<target name="build" depends="make-dist"/>
+	<target name="java-tests" depends="make-dist">
+		<exec executable="make" failonerror="on">
+			<arg line="-C"/>
+			<arg line="src/zabbix_java"/>
+			<arg line="test"/>
+		</exec>
+	</target>
+
+	<target name="build" depends="make-dist,java-tests"/>
 </project>

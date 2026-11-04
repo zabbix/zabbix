@@ -90,6 +90,32 @@ class CWebUser {
 		}
 	}
 
+	/**
+	 * Returns the appropriate redirect URL based on the user's profile settings in User role or User settings.
+	 *
+	 * @return array
+	 *
+	 * @throws APIException
+	 */
+	public static function getRedirectUrl(): array {
+		$validator = new CFrontendActionValidator();
+
+		$user_url = self::$data['url'];
+
+		if ($user_url === '' || self::checkAccess(CRoleHelper::PROFILE_REDIRECT_ENFORCE)) {
+			$role_url = self::checkAccess(CRoleHelper::PROFILE_REDIRECT_URL) ?: '';
+
+			if ($role_url === '' || $validator->validate($role_url)) {
+				return ['url' => $role_url, 'error' => false];
+			}
+		}
+		elseif ($validator->validate($user_url)) {
+			return ['url' => $user_url, 'error' => false];
+		}
+
+		return ['url' => '', 'error' => true];
+	}
+
 	public static function checkAuthentication(string $sessionid): bool {
 		self::$data = API::User()->checkAuthentication([
 			'sessionid' => $sessionid,
@@ -104,11 +130,11 @@ class CWebUser {
 	 *
 	 * @param string $rule_name  Rule name.
 	 *
-	 * @return bool  Returns true if user has access to specified rule, false - otherwise.
+	 * @return mixed  Returns value if user has access to specified rule, false - otherwise.
 	 *
 	 * @throws Exception
 	 */
-	public static function checkAccess(string $rule_name): bool {
+	public static function checkAccess(string $rule_name): mixed {
 		if (empty(self::$data) || self::$data['roleid'] == 0) {
 			return false;
 		}

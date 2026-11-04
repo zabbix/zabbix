@@ -438,6 +438,10 @@ class CFormElement extends CElement {
 					$this->setFieldValue($field, $values);
 				}
 				catch (\Exception $e1) {
+					if ($values instanceof \Closure) {
+						throw $e1;
+					}
+
 					sleep(1);
 
 					try {

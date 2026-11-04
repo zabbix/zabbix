@@ -149,36 +149,8 @@ class ColumnEdit extends CController {
 			$this->setResponse(new CControllerResponseData($data));
 		}
 		else {
-			$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
-
-			$thresholds = [];
-
 			if (array_key_exists('thresholds', $input)) {
-				foreach ($input['thresholds'] as $threshold) {
-					$order_threshold = trim($threshold['threshold']);
-
-					if ($order_threshold !== '' && $number_parser->parse($order_threshold) == CParser::PARSE_SUCCESS) {
-						$thresholds[] = $threshold + ['order_threshold' => $number_parser->calcValue()];
-					}
-				}
-
-				unset($input['thresholds']);
-			}
-
-			if ($thresholds) {
-				uasort($thresholds,
-					static function (array $threshold_1, array $threshold_2): int {
-						return $threshold_1['order_threshold'] <=> $threshold_2['order_threshold'];
-					}
-				);
-
-				$input['thresholds'] = [];
-
-				foreach ($thresholds as $threshold) {
-					unset($threshold['order_threshold']);
-
-					$input['thresholds'][] = $threshold;
-				}
+				$input['thresholds'] = array_values(filterAndSortThresholds($input['thresholds']));
 			}
 
 			$this->setResponse(

@@ -413,9 +413,19 @@ ZBX_Notifications.prototype.handleTabFocusIn = function() {
  * Close the notification box.
  */
 ZBX_Notifications.prototype.handleCloseClicked = function() {
-	const data = {ids: this.getEventIds()};
+	if (this._closing) {
+		return;
+	}
 
-	data[CSRF_TOKEN_NAME] = this._csrf_token;
+	const ids = this.getEventIds();
+
+	if (!ids.length) {
+		return;
+	}
+
+	this._closing = true;
+
+	const data = {ids, [CSRF_TOKEN_NAME]: this._csrf_token};
 
 	this
 		.fetch('notifications.read', data)
@@ -443,6 +453,9 @@ ZBX_Notifications.prototype.handleCloseClicked = function() {
 			else {
 				console.log('Could not read notifications:', exception);
 			}
+		})
+		.finally(() => {
+			this._closing = false;
 		});
 };
 
@@ -1062,7 +1075,7 @@ $(function() {
 	ntf_node.style.top = pos_top + 'px';
 	ntf_node.style[side] = pos_side + 'px';
 
-	$(ntf_node).draggable({handle: '>.overlay-dialogue-header',
+	$(ntf_node).draggable({handle: `>.${ZBX_STYLE_OVERLAY_DIALOGUE_HEADER}`,
 		start: function(event, ui) {
 			ui.helper.data('containment', {
 				min_top: -main.offsetTop,

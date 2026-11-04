@@ -292,6 +292,21 @@ $item_form_list
 			->setId('timeout-field')
 			->addClass('wrap-multiple-controls')
 	)
+	// Append Time shift (Telemetry query) to form list.
+	->addRow(
+		(new CVisibilityBox('visible[time_shift]', 'time_shift', _('Original')))->setLabel(_('Time shift')),
+		(new CTextBox('time_shift', DB::getDefault('items', 'time_shift')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	)
+	// Append Lookback limit (Telemetry query) to form list.
+	->addRow(
+		(new CVisibilityBox('visible[lookback_limit]', 'lookback_limit', _('Original')))->setLabel(_('Lookback limit')),
+		(new CTextBox('lookback_limit', DB::getDefault('items', 'lookback_limit')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	)
+	// Append Granularity (Telemetry query) to form list.
+	->addRow(
+		(new CVisibilityBox('visible[granularity]', 'granularity', _('Original')))->setLabel(_('Granularity')),
+		(new CTextBox('granularity', DB::getDefault('items', 'granularity')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	)
 	// Append history to form list.
 	->addRow(
 		(new CVisibilityBox('visible[history]', 'history-field', _('Original')))
@@ -385,7 +400,7 @@ $item_form_list->addRow(
 	)
 	->addRow(
 		(new CVisibilityBox('visible[trapper_hosts]', 'trapper_hosts', _('Original')))->setLabel(_('Allowed hosts')),
-		(new CTextBox('trapper_hosts', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextBox('trapper_hosts', ZBX_DEFAULT_TRAPPER_HOSTS))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
 // Append master item select to form list.

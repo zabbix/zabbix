@@ -524,11 +524,11 @@ class CScript extends CApiService {
 					}
 				}
 				elseif ($script['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_LIST) {
-					$manualinput_validator = array_map('trim', explode(',', $script['manualinput_validator']));
+					$unique_value_validator = new CUniqueValuesValidator();
 
-					if (array_unique($manualinput_validator) !== $manualinput_validator) {
+					if (!$unique_value_validator->validate($script['manualinput_validator'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-							'/'.($index + 1).'/manualinput_validator', _('values must be unique')
+							'/'.($index + 1).'/manualinput_validator', $unique_value_validator->getError()
 						));
 					}
 				}
@@ -901,7 +901,7 @@ class CScript extends CApiService {
 		if (array_key_exists('eventid', $data)) {
 			$db_events = API::Event()->get([
 				'output' => [],
-				'selectHosts' => ['hostid', 'proxyid'],
+				'selectHosts' => ['hostid', 'proxyid', 'monitored_by'],
 				'eventids' => $data['eventid']
 			]);
 			if (!$db_events) {
@@ -920,7 +920,7 @@ class CScript extends CApiService {
 			$is_event = false;
 
 			$db_hosts = API::Host()->get([
-				'output' => ['proxyid'],
+				'output' => ['proxyid', 'monitored_by'],
 				'hostids' => $hostids
 			]);
 			if (!$db_hosts) {
@@ -943,8 +943,10 @@ class CScript extends CApiService {
 		$db_script = $db_scripts[0];
 
 		if (!CSettingsHelper::isGlobalScriptsEnabled() && $db_script['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
-				&& ($db_script['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_SERVER
-					|| ($db_script['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_PROXY && $db_hosts[0]['proxyid'] == 0))) {
+			&& ($db_script['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_SERVER
+				|| ($db_script['execute_on'] == ZBX_SCRIPT_EXECUTE_ON_PROXY
+					&& $db_hosts[0]['monitored_by'] == ZBX_MONITORED_BY_SERVER))
+		) {
 			self::exception(ZBX_API_ERROR_INTERNAL,
 				_('Global script execution on Zabbix server is disabled by server configuration.')
 			);

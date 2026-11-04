@@ -11,12 +11,11 @@
 ** You should have received a copy of the GNU Affero General Public License along with this program.
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
-
-#include "zbxdiag.h"
 #include "diag_server.h"
+#include "zbxdiag.h"
 
-#include "../lld/lld_protocol.h"
-
+#include "zabbix_server/lld/lld_protocol.h"
+#include "zbx_cep_client.h"
 #include "zbxcachevalue.h"
 #include "zbxalerter.h"
 #include "zbxtime.h"
@@ -509,6 +508,48 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: add requested CEP diagnostic information to json data             *
+ *                                                                            *
+ * Parameters: jp    - [IN] request                                           *
+ *             json  - [IN/OUT] json to update                                *
+ *             error - [OUT] error message                                    *
+ *                                                                            *
+ * Return value: SUCCEED - the information was added successfully             *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	diag_add_cep_info(const struct zbx_json_parse *jp, struct zbx_json *json, char **error)
+{
+	int			ret;
+	zbx_cep_diaginfo_t	stats;
+
+	ZBX_UNUSED(jp);
+
+	if (SUCCEED == (ret = zbx_cep_get_diaginfo(&stats, error)))
+	{
+		zbx_json_addobject(json, ZBX_DIAG_CEP);
+		zbx_json_addobject(json, "startup");
+		zbx_json_addint64(json, "events_num", stats.startup.events_num);
+		zbx_json_addfloat(json, "events_time", stats.startup.events_time);
+		zbx_json_addint64(json, "tags_num", stats.startup.tags_num);
+		zbx_json_addfloat(json, "tags_time", stats.startup.tags_time);
+		zbx_json_addint64(json, "suppress_num", stats.startup.suppress_num);
+		zbx_json_addfloat(json, "suppress_time", stats.startup.suppress_time);
+		zbx_json_close(json);
+		zbx_json_addobject(json, "stats");
+		zbx_json_addint64(json, "blocked_commits", stats.blocked_commit_num);
+		zbx_json_addint64(json, "commits_num", stats.commits_num);
+		zbx_json_addint64(json, "commit_task_num", stats.commit_task_num);
+		zbx_json_addint64(json, "workers_num", stats.workers_num);
+		zbx_json_close(json);
+		zbx_json_close(json);
+	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: add requested section diagnostic information                      *
  *                                                                            *
  * Parameters: section - [IN] section name                                    *
@@ -535,6 +576,8 @@ int	diag_add_section_info_server(const char *section, const struct zbx_json_pars
 		ret = diag_add_lld_info(jp, json, error);
 	else if (0 == strcmp(section, ZBX_DIAG_ALERTING))
 		ret = diag_add_alerting_info(jp, json, error);
+	else if (0 == strcmp(section, ZBX_DIAG_CEP))
+		ret = diag_add_cep_info(jp, json, error);
 	else if (0 == strcmp(section, ZBX_DIAG_LOCKS))
 	{
 		zbx_diag_add_locks_info(json);

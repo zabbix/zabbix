@@ -144,13 +144,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			return null;
 		}
 
-		$now = new DateTime();
+		$zone = $time_zone === ZBX_DEFAULT_TIMEZONE ? CTimezoneHelper::getSystemTimezone() : $time_zone;
 
-		if ($time_zone !== ZBX_DEFAULT_TIMEZONE) {
-			$now->setTimezone(new DateTimeZone($time_zone));
-		}
-
-		return $now;
+		return new DateTime('now', new DateTimeZone($zone));
 	}
 
 	private function configureHostTime(): array {

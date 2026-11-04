@@ -24,7 +24,7 @@ zabbix_export:
         Learn more about the Ciena 3906 Platform here: https://www.ciena.com/products/3906
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -1352,7 +1352,7 @@ zabbix_export:
           description: 'Warning threshold of ICMP packet loss in %.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '6'
             section_name: Thresholds
             label: 'Threshold of ICMP packet loss'
             description: 'Warning threshold of ICMP packet loss in %. In the range from 0 to 100 inclusive.'
@@ -1362,7 +1362,7 @@ zabbix_export:
           description: 'Warning threshold of the average ICMP response time in seconds.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             section_name: Thresholds
             label: 'Threshold of the average ICMP response'
             description: 'Warning threshold of the average ICMP response time in seconds. No less than 0.'
@@ -1372,7 +1372,7 @@ zabbix_export:
           description: 'Warning threshold of error packet rate. Can be used with interface name as context.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Thresholds
             label: 'Threshold of error packet rate'
             description: 'Warning threshold of error packet rate. No less than 0.'
@@ -1382,7 +1382,7 @@ zabbix_export:
           description: 'Used as a threshold in the interface utilization trigger.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '9'
             section_name: Thresholds
             label: 'The threshold in the interface utilization'
             description: 'Used as a threshold in the interface utilization trigger. In the range from 0 to 100 inclusive.'
@@ -1392,7 +1392,7 @@ zabbix_export:
           description: 'Link status trigger will be fired only for interfaces where the context macro equals "1".'
           config:
             type: CHECKBOX
-            priority: '7'
+            priority: '8'
             label: 'Interfaces control'
             description: 'Fire a trigger when the interface operational status changes to "Link down".'
             options:
@@ -1403,7 +1403,7 @@ zabbix_export:
           description: 'Used in network interface discovery rule filters.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Filters
             label: 'Filter network interface by adminstatus'
             description: 'Regex string to include discovered interface by adminstatus.'
@@ -1412,7 +1412,7 @@ zabbix_export:
           description: 'Ignore `down(2)` administrative status'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Filters
             label: 'Filter network interface by adminstatus (exclude)'
             description: 'Regex string to exclude discovered interface by adminstatus.'
@@ -1421,7 +1421,7 @@ zabbix_export:
           description: 'Used in network interface discovery rule filters.'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: Filters
             label: 'Filter network interface by alias'
             description: 'Regex string to include discovered interface by alias.'
@@ -1430,7 +1430,7 @@ zabbix_export:
           description: 'Used in network interface discovery rule filters.'
           config:
             type: TEXT
-            priority: '19'
+            priority: '20'
             section_name: Filters
             label: 'Filter network interface by alias (exclude)'
             description: 'Regex string to exclude discovered interface by alias.'
@@ -1439,7 +1439,7 @@ zabbix_export:
           description: 'Used in network interface discovery rule filters.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Filters
             label: 'Filter network interface by description'
             description: 'Regex string to include discovered interface by description.'
@@ -1448,7 +1448,7 @@ zabbix_export:
           description: 'Used in network interface discovery rule filters.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: Filters
             label: 'Filter network interface by description (exclude)'
             description: 'Regex string to exclude discovered interface by description.'
@@ -1457,7 +1457,7 @@ zabbix_export:
           description: 'Used for network interface discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Filters
             label: 'Filter for network interface by name'
             description: 'Regex string to include discovered interface by name.'
@@ -1466,7 +1466,7 @@ zabbix_export:
           description: 'Filters out `loopbacks`, `nulls`, docker `veth` links and `docker0 bridge` by default.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Filters
             label: 'Filter for network interface by name (exclude)'
             description: 'Filters out `loopbacks`, `nulls`, docker `veth` links and `docker0` bridge by default.'
@@ -1475,7 +1475,7 @@ zabbix_export:
           description: 'Used for network interface discovery. Can be overridden on the host or linked template level.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Filters
             label: 'Filter network interface by status'
             description: 'Regex string to include discovered interface by status.'
@@ -1484,7 +1484,7 @@ zabbix_export:
           description: 'Ignore `notPresent(6)`'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Filters
             label: 'Filter network interface by status (exclude)'
             description: 'Regex string to exclude discovered interface by status.'
@@ -1493,7 +1493,7 @@ zabbix_export:
           description: 'Used in network interface discovery rule filters.'
           config:
             type: TEXT
-            priority: '20'
+            priority: '21'
             section_name: Filters
             label: 'Filter network interface by type'
             description: 'Regex string to include discovered interface by type.'
@@ -1502,7 +1502,7 @@ zabbix_export:
           description: 'Used in network interface discovery rule filters.'
           config:
             type: TEXT
-            priority: '21'
+            priority: '22'
             section_name: Filters
             label: 'Filter network interface by type (exclude)'
             description: 'Regex string to exclude discovered interface by type.'
@@ -1515,6 +1515,15 @@ zabbix_export:
             section_name: Other
             label: 'Time interval'
             description: 'Time interval for the SNMP availability trigger.'
+        - macro: '{$SNMP.UPTIME.WARN}'
+          value: 10m
+          description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
+          config:
+            type: TEXT
+            priority: '5'
+            section_name: Other
+            label: 'Uptime recovery threshold'
+            description: 'Uptime threshold above which the "Host has been restarted" problem auto-resolves.'
       dashboards:
         - uuid: e860ca516823426e9f2383f9bb7df112
           name: 'Ciena: Overview'
@@ -2586,11 +2595,20 @@ zabbix_export:
               newvalue: unknown
   triggers:
     - uuid: d883855527e148ab97eb47db682116ea
-      expression: '(last(/Ciena 3906 by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Ciena 3906 by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Ciena 3906 by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Ciena 3906 by SNMP/system.net.uptime[sysUpTime.0])<10m)'
+      expression: |
+        (last(/Ciena 3906 by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and change(/Ciena 3906 by SNMP/system.hw.uptime[hrSystemUptime.0])<0 and last(/Ciena 3906 by SNMP/system.hw.uptime[hrSystemUptime.0],#2)<42949672.96-(lastclock(/Ciena 3906 by SNMP/system.hw.uptime[hrSystemUptime.0])-lastclock(/Ciena 3906 by SNMP/system.hw.uptime[hrSystemUptime.0],#2)))
+        or (last(/Ciena 3906 by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and change(/Ciena 3906 by SNMP/system.net.uptime[sysUpTime.0])<0 and last(/Ciena 3906 by SNMP/system.net.uptime[sysUpTime.0],#2)<42949672.96-(lastclock(/Ciena 3906 by SNMP/system.net.uptime[sysUpTime.0])-lastclock(/Ciena 3906 by SNMP/system.net.uptime[sysUpTime.0],#2)))
+      recovery_mode: RECOVERY_EXPRESSION
+      recovery_expression: |
+        last(/Ciena 3906 by SNMP/system.hw.uptime[hrSystemUptime.0])>{$SNMP.UPTIME.WARN}
+        or last(/Ciena 3906 by SNMP/system.net.uptime[sysUpTime.0])>{$SNMP.UPTIME.WARN}
       name: 'Ciena: Host has been restarted'
-      event_name: 'Ciena: {HOST.NAME} has been restarted (uptime < 10m)'
+      event_name: 'Ciena: {HOST.NAME} has been restarted'
       priority: WARNING
-      description: 'Uptime is less than 10 minutes.'
+      description: |
+        The uptime counter has decreased, which indicates that the host has been restarted.
+        A decrease is ignored if the previous value was close enough to the 32-bit SNMP counter limit (2^32 hundredths of a second, about 497 days) for the counter to have wrapped between the two readings.
+        The problem is resolved automatically once uptime exceeds {$SNMP.UPTIME.WARN}.
       manual_close: 'YES'
       dependencies:
         - name: 'Ciena: No SNMP data collection'

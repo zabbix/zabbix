@@ -23,6 +23,7 @@ div.dashboard-widget-geomap {
 		margin-right: -2px;
 		background-color: $ui-bg-color;
 		border: 1px solid $overlay-border-color;
+		border-radius: var(--overlay-border-radius);
 
 		&.collapsed {
 			display: block;
@@ -68,15 +69,21 @@ div.dashboard-widget-geomap {
 		}
 	}
 
+	.leaflet-touch .leaflet-bar {
+		border-radius: var(--button-border-radius);
+		overflow: clip;
+	}
+
 	.leaflet-marker-icon:focus {
 		box-shadow: 0 0 0 2px $btn-focus-outline-color;
-		border-radius: 2px;
+		border-radius: var(--button-border-radius);
 		outline: none;
 	}
 
 	.leaflet-control {
 		.navigate-home-button,
 		.geomap-filter-button {
+			border: 0;
 			cursor: pointer;
 
 			&::before {

@@ -76,7 +76,7 @@ zabbix_export:
         5. Set the password that you specified in step 1 in the `PostgreSQL user password` field.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Databases
       items:
@@ -4595,31 +4595,6 @@ zabbix_export:
                 operator: NOT_MATCHES_REGEX
           description: 'Logical replication subscription metrics discovery.'
           item_prototypes:
-            - uuid: 7b7773c3f17049a398515150918ee816
-              name: 'Subscription stats [{#SUBNAME}]: Get data'
-              type: DEPENDENT
-              key: 'gsql.subscription.data.preprocessing.get[{#SUBNAME}]'
-              history: '0'
-              value_type: TEXT
-              description: 'Preprocessed data for each subscription object array.'
-              preprocessing:
-                - type: CHECK_NOT_SUPPORTED
-                  parameters:
-                    - '-1'
-                - type: JSONPATH
-                  parameters:
-                    - '$[?(@.subname=="{#SUBNAME}")].first()'
-              master_item:
-                key: 'db.odbc.select[pgsql.subscription.inventory.get{,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
-              tags:
-                - tag: component
-                  value: raw
-                - tag: component
-                  value: subscription
-                - tag: subid
-                  value: '{#SUBID}'
-                - tag: subname
-                  value: '{#SUBNAME}'
             - uuid: 121250b72b08438c874cf780a2517549
               name: 'Subscription stats [{#SUBNAME}]: Apply errors'
               type: DEPENDENT
@@ -4634,7 +4609,7 @@ zabbix_export:
                   parameters:
                     - $.apply_error_count
               master_item:
-                key: 'gsql.subscription.data.preprocessing.get[{#SUBNAME}]'
+                key: 'pgsql.subscription.data.preprocessing.data.get[{#SUBNAME}]'
               tags:
                 - tag: component
                   value: subscription
@@ -4666,6 +4641,31 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: performance
+            - uuid: 7b7773c3f17049a398515150918ee816
+              name: 'Subscription stats [{#SUBNAME}]: Get data'
+              type: DEPENDENT
+              key: 'pgsql.subscription.data.preprocessing.data.get[{#SUBNAME}]'
+              history: '0'
+              value_type: TEXT
+              description: 'Preprocessed data for each subscription object array.'
+              preprocessing:
+                - type: CHECK_NOT_SUPPORTED
+                  parameters:
+                    - '-1'
+                - type: JSONPATH
+                  parameters:
+                    - '$[?(@.subname=="{#SUBNAME}")].first()'
+              master_item:
+                key: 'db.odbc.select[pgsql.subscription.inventory.get{,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+              tags:
+                - tag: component
+                  value: raw
+                - tag: component
+                  value: subscription
+                - tag: subid
+                  value: '{#SUBID}'
+                - tag: subname
+                  value: '{#SUBNAME}'
             - uuid: 66f432b2196140f8885d4e9ef9147138
               name: 'Subscription stats [{#SUBNAME}]: Time since last reset'
               type: CALCULATED
@@ -4698,7 +4698,7 @@ zabbix_export:
                   parameters:
                     - $.stats_reset
               master_item:
-                key: 'gsql.subscription.data.preprocessing.get[{#SUBNAME}]'
+                key: 'pgsql.subscription.data.preprocessing.data.get[{#SUBNAME}]'
               tags:
                 - tag: component
                   value: subscription
@@ -4720,7 +4720,7 @@ zabbix_export:
                   parameters:
                     - $.sync_error_count
               master_item:
-                key: 'gsql.subscription.data.preprocessing.get[{#SUBNAME}]'
+                key: 'pgsql.subscription.data.preprocessing.data.get[{#SUBNAME}]'
               tags:
                 - tag: component
                   value: subscription
@@ -4830,6 +4830,7 @@ zabbix_export:
               key: 'pgsql.tablespace.inventory.preprocessing.data.get[{#TABLESPACE.NAME}]'
               history: '0'
               value_type: TEXT
+              description: 'Collects tablespace metrics.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -4915,6 +4916,9 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - $.size_bytes
+                - type: JAVASCRIPT
+                  parameters:
+                    - 'return value === "null" ? 0 : value;'
               master_item:
                 key: 'pgsql.tablespace.inventory.preprocessing.data.get[{#TABLESPACE.NAME}]'
               tags:
@@ -8067,9 +8071,6 @@ zabbix_export:
                   hide_header: 'YES'
                   fields:
                     - type: STRING
-                      name: bg_color
-                      value: '000000'
-                    - type: STRING
                       name: description
                       value: CONNECTIONS
                     - type: INTEGER
@@ -8354,9 +8355,6 @@ zabbix_export:
                   height: '4'
                   hide_header: 'YES'
                   fields:
-                    - type: STRING
-                      name: bg_color
-                      value: '000000'
                     - type: STRING
                       name: description
                       value: AGE

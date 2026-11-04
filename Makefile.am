@@ -101,6 +101,9 @@ css_theme_blue_classic:
 css_theme_dark:
 	sass --no-cache --sourcemap=none sass/stylesheets/sass/dark-theme.scss ui/assets/styles/dark-theme.css
 
+css_theme_dark_blue:
+	sass --no-cache --sourcemap=none sass/stylesheets/sass/dark-blue-theme.scss ui/assets/styles/dark-blue-theme.css
+
 css_theme_dark_classic:
 	sass --no-cache --sourcemap=none sass/stylesheets/sass/dark-classic-theme.scss ui/assets/styles/dark-classic-theme.css
 
@@ -133,7 +136,7 @@ icons_cleanup:
 	cd sass/icons && \
 	npm run cleanup
 
-css: css_theme_blue css_theme_blue_classic css_theme_dark css_theme_dark_classic css_hc_light css_hc_dark css_images
+css: css_theme_blue css_theme_blue_classic css_theme_dark css_theme_dark_blue css_theme_dark_classic css_hc_light css_hc_dark css_images
 
 icons: icons_build css icons_cleanup
 

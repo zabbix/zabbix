@@ -32,6 +32,7 @@
 #include "zbxdbhigh.h"
 #include "zbxexpr.h"
 #include "zbxstr.h"
+#include "zbxresolver.h"
 
 #include <event2/event.h>
 #include <event2/util.h>
@@ -41,6 +42,7 @@
 #include <net-snmp/library/large_fd_set.h>
 #include <net-snmp/library/snmpusm.h>
 #include "zbxself.h"
+
 
 #ifndef EVDNS_BASE_INITIALIZE_NAMESERVERS
 #	define EVDNS_BASE_INITIALIZE_NAMESERVERS	1
@@ -1042,7 +1044,7 @@ static zbx_snmp_sess_t	zbx_snmp_open_session(unsigned char snmp_version, const c
 		unsigned char snmpv3_privprotocol, char *snmpv3_privpassphrase, unsigned char *securityEngineID,
 		size_t securityEngineIDLen, unsigned char *securityAuthKey, size_t securityAuthKeyLen,
 		unsigned char *securityPrivKey, size_t securityPrivKeyLen, char *error,
-		size_t max_error_len, int timeout, const char *config_source_ip, zbx_uint64_t itemid)
+		size_t max_error_len, int timeout, int retries, const char *config_source_ip, zbx_uint64_t itemid)
 {
 /* item snmpv3 privacy protocol */
 /* SYNC WITH PHP!               */
@@ -1087,6 +1089,7 @@ static zbx_snmp_sess_t	zbx_snmp_open_session(unsigned char snmp_version, const c
 
 	session.timeout = timeout * 1000 * 1000;	/* timeout of one attempt in microseconds */
 							/* (net-snmp default = 1 second) */
+	session.retries = retries;
 	if (SUCCEED == zbx_is_ip4(ip))
 		zbx_snprintf(addr, sizeof(addr), "%s:%hu", ip, port);
 	else
@@ -3397,6 +3400,8 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 		poller_config->state = ZBX_PROCESS_STATE_BUSY;
 	}
 
+	SNMP_MT_INITLOCK;
+
 	if (ZABBIX_ASYNC_STEP_REVERSE_DNS == snmp_context->step)
 	{
 		if (NULL != reverse_dns)
@@ -3448,6 +3453,8 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 
 					if (1 == engineid_cache_initialized)
 						snmp_identity_remove(addresses->values[0].ip);
+
+					SNMP_MT_UNLOCK;
 
 					return async_task_process_task_snmp_cb(0, data, fd, addresses, reverse_dns,
 							dnserr, timeout_event);
@@ -3666,7 +3673,7 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 				snmp_context->snmpv3_privprotocol, snmp_context->snmpv3_privpassphrase,
 				securityEngineID, securityEngineIDLen, securityAuthKey, securityAuthKeyLen,
 				securityPrivKey, securityPrivKeyLen, error, sizeof(error), 0,
-				snmp_context->config_source_ip, snmp_context->item.itemid)))
+				snmp_context->retries, snmp_context->config_source_ip, snmp_context->item.itemid)))
 		{
 			snmp_context->item.ret = NOTSUPPORTED;
 			SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL,
@@ -3712,6 +3719,8 @@ stop:
 			snmp_sess_close(snmp_context->ssp);
 			zbx_free_agent_result(&snmp_context->item.result);
 
+			SNMP_MT_UNLOCK;
+
 			return async_task_process_task_snmp_cb(0, data, fd, addresses, reverse_dns,
 					dnserr, timeout_event);
 		}
@@ -3729,6 +3738,8 @@ stop:
 				__func__, snmp_context->item.itemid, zbx_get_event_string(event), event, *fd,
 				(zbx_fs_size_t)snmp_context->results_offset, zbx_task_state_to_str(task_ret));
 	}
+
+	SNMP_MT_UNLOCK;
 
 	return task_ret;
 #undef ZBX_SNMP_TIMEOUT_WATERMARK
@@ -3774,14 +3785,13 @@ void	zbx_async_check_snmp_clean(zbx_snmp_context_t *snmp_context)
 }
 
 static void	async_check_snmp_init_context(zbx_snmp_context_t *snmp_context, void *arg, void *arg_action,
-		const char *config_source_ip, zbx_async_resolve_reverse_dns_t resolve_reverse_dns, int retries)
+		const char *config_source_ip, zbx_async_resolve_reverse_dns_t resolve_reverse_dns)
 {
 	snmp_context->resolve_reverse_dns = resolve_reverse_dns;
 	snmp_context->step = ZABBIX_ASYNC_STEP_DEFAULT;
 	snmp_context->reverse_dns = NULL;
 	snmp_context->ssp = NULL;
 	zbx_init_agent_result(&snmp_context->item.result);
-	snmp_context->retries = retries;
 	snmp_context->arg = arg;
 	snmp_context->arg_action = arg_action;
 	snmp_context->results = NULL;
@@ -3794,8 +3804,8 @@ static void	async_check_snmp_init_context(zbx_snmp_context_t *snmp_context, void
 
 static int 	async_check_snmp_context(zbx_snmp_context_t *snmp_context, AGENT_RESULT *result,
 		zbx_async_task_process_result_cb_t async_task_process_result_snmp_cb, struct event_base *base,
-		zbx_channel_t *channel, struct evdns_base *dnsbase, zbx_async_resolve_reverse_dns_t resolve_reverse_dns,
-		char *snmp_oid)
+		zbx_ares_channel_t *channel, struct evdns_base *dnsbase,
+		zbx_async_resolve_reverse_dns_t resolve_reverse_dns, char *snmp_oid)
 {
 #define ZBX_VECTOR_ARRAY_RESERVE	3
 	int			ret = SUCCEED, pdu_type, is_oid_plain = 0;
@@ -3903,15 +3913,15 @@ out:
 
 int	zbx_async_check_snmp(zbx_dc_snmp_item_t *item, AGENT_RESULT *result,
 		zbx_async_task_process_result_cb_t async_task_process_result_snmp_cb, void *arg, void *arg_action,
-		struct event_base *base, zbx_channel_t *channel, struct evdns_base *dnsbase,
-		const char *config_source_ip, zbx_async_resolve_reverse_dns_t resolve_reverse_dns, int retries)
+		struct event_base *base, zbx_ares_channel_t *channel, struct evdns_base *dnsbase,
+		const char *config_source_ip, zbx_async_resolve_reverse_dns_t resolve_reverse_dns)
 {
 	int 			ret;
 	zbx_snmp_context_t	*snmp_context;
 
 	snmp_context = zbx_malloc(NULL, sizeof(zbx_snmp_context_t));
 
-	async_check_snmp_init_context(snmp_context, arg, arg_action, config_source_ip, resolve_reverse_dns, retries);
+	async_check_snmp_init_context(snmp_context, arg, arg_action, config_source_ip, resolve_reverse_dns);
 
 	snmp_context->item.interface = item->interface;
 	snmp_context->item.interface.addr = (item->interface.addr == item->interface.dns_orig ?
@@ -3945,6 +3955,7 @@ int	zbx_async_check_snmp(zbx_dc_snmp_item_t *item, AGENT_RESULT *result,
 	snmp_context->snmpv3_privprotocol = item->snmpv3_privprotocol;
 	snmp_context->snmpv3_privpassphrase = item->snmpv3_privpassphrase;
 	item->snmpv3_privpassphrase = NULL;
+	snmp_context->retries = item->snmp_retries;
 
 	snmp_context->probe = ZBX_IF_SNMP_VERSION_3 == item->snmp_version ? 1 : 0;
 
@@ -3959,15 +3970,15 @@ int	zbx_async_check_snmp(zbx_dc_snmp_item_t *item, AGENT_RESULT *result,
 
 int	zbx_async_check_snmp_dc_item(zbx_dc_item_t *item, AGENT_RESULT *result,
 		zbx_async_task_process_result_cb_t async_task_process_result_snmp_cb, void *arg, void *arg_action,
-		struct event_base *base, zbx_channel_t *channel, struct evdns_base *dnsbase,
-		const char *config_source_ip, zbx_async_resolve_reverse_dns_t resolve_reverse_dns, int retries)
+		struct event_base *base, zbx_ares_channel_t *channel, struct evdns_base *dnsbase,
+		const char *config_source_ip, zbx_async_resolve_reverse_dns_t resolve_reverse_dns)
 {
 	int 			ret;
 	zbx_snmp_context_t	*snmp_context;
 
 	snmp_context = zbx_malloc(NULL, sizeof(zbx_snmp_context_t));
 
-	async_check_snmp_init_context(snmp_context, arg, arg_action, config_source_ip, resolve_reverse_dns, retries);
+	async_check_snmp_init_context(snmp_context, arg, arg_action, config_source_ip, resolve_reverse_dns);
 
 	snmp_context->item.interface = item->interface;
 	snmp_context->item.interface.addr = (item->interface.addr == item->interface.dns_orig ?
@@ -4005,6 +4016,7 @@ int	zbx_async_check_snmp_dc_item(zbx_dc_item_t *item, AGENT_RESULT *result,
 	snmp_context->snmpv3_privprotocol = item->snmpv3_privprotocol;
 	snmp_context->snmpv3_privpassphrase = item->snmpv3_privpassphrase;
 	item->snmpv3_privpassphrase = NULL;
+	snmp_context->retries = item->snmp_retries;
 
 	snmp_context->probe = ZBX_IF_SNMP_VERSION_3 == item->snmp_version ? 1 : 0;
 
@@ -4421,7 +4433,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 
 		if (SUCCEED == (errcodes[j] = zbx_async_check_snmp_dc_item(&items[j], &results[j], process_snmp_result,
 				&snmp_result, NULL, snmp_result.base, NULL, dnsbase, config_source_ip,
-				ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_NO, ZBX_SNMP_DEFAULT_NUMBER_OF_RETRIES)))
+				ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_NO)))
 		{
 			if (1 == snmp_result.finished || -1 != event_base_dispatch(snmp_result.base))
 			{
@@ -4452,7 +4464,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 			item->snmp_community, item->snmpv3_securityname, item->snmpv3_contextname,
 			item->snmpv3_securitylevel, item->snmpv3_authprotocol, item->snmpv3_authpassphrase,
 			item->snmpv3_privprotocol, item->snmpv3_privpassphrase, NULL, 0, NULL, 0, NULL, 0,
-			error, sizeof(error), config_timeout, config_source_ip, item->itemid)))
+			error, sizeof(error), config_timeout, item->snmp_retries, config_source_ip, item->itemid)))
 		{
 			err = NETWORK_ERROR;
 			goto exit;
@@ -4476,7 +4488,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 			item->snmp_community, item->snmpv3_securityname, item->snmpv3_contextname,
 			item->snmpv3_securitylevel, item->snmpv3_authprotocol, item->snmpv3_authpassphrase,
 			item->snmpv3_privprotocol, item->snmpv3_privpassphrase, NULL, 0, NULL, 0, NULL, 0,
-			error, sizeof(error), config_timeout, config_source_ip, item->itemid)))
+			error, sizeof(error), config_timeout, item->snmp_retries, config_source_ip, item->itemid)))
 		{
 			err = NETWORK_ERROR;
 			goto exit;
@@ -4500,7 +4512,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 			item->snmp_community, item->snmpv3_securityname, item->snmpv3_contextname,
 			item->snmpv3_securitylevel, item->snmpv3_authprotocol, item->snmpv3_authpassphrase,
 			item->snmpv3_privprotocol, item->snmpv3_privpassphrase, NULL, 0, NULL, 0,  NULL, 0, error,
-			sizeof(error), config_timeout, config_source_ip, item->itemid)))
+			sizeof(error), config_timeout, item->snmp_retries, config_source_ip, item->itemid)))
 		{
 			err = NETWORK_ERROR;
 			goto exit;

@@ -64,6 +64,24 @@ class testSidebarMenu extends CWebTest {
 			],
 			[
 				[
+					'section' => 'APM',
+					'page' => 'Traces'
+				]
+			],
+			[
+				[
+					'section' => 'APM',
+					'page' => 'Metrics'
+				]
+			],
+			[
+				[
+					'section' => 'APM',
+					'page' => 'Logs'
+				]
+			],
+			[
+				[
 					'section' => 'Services',
 					'page' => 'Services'
 				]
@@ -171,7 +189,7 @@ class testSidebarMenu extends CWebTest {
 			[
 				[
 					'section' => 'Data collection',
-					'page' => 'Event correlation'
+					'page' => 'Event processing'
 				]
 			],
 			[
@@ -235,6 +253,22 @@ class testSidebarMenu extends CWebTest {
 				[
 					'section' => 'Users',
 					'page' => 'Authentication'
+				]
+			],
+			[
+				[
+					'section' => 'Users',
+					'page' => 'Devices'
+				]
+			],
+			[
+				[
+					'section' => 'Administration',
+					'page' => 'Data source',
+					'third_level' =>
+					[
+						"APM"
+					]
 				]
 			],
 			[
@@ -307,6 +341,12 @@ class testSidebarMenu extends CWebTest {
 				[
 					'section' => 'User settings',
 					'page' => 'API tokens'
+				]
+			],
+			[
+				[
+					'section' => 'User settings',
+					'page' => 'Devices'
 				]
 			]
 		];
@@ -387,8 +427,8 @@ class testSidebarMenu extends CWebTest {
 				$this->query('xpath://aside[@class="sidebar is-hidden"]')->one(false)->waitUntilNotVisible();
 			}
 
-			$this->query('id', $id)->one()->click();
-			$this->assertTrue($this->query('xpath://aside[@class="sidebar is-'.$view.' is-opened"]')->waitUntilReady()->exists());
+			$this->query('id', $id)->waitUntilClickable()->one()->click();
+			$this->assertTrue($this->query('xpath://aside[@class="sidebar is-'.$view.' is-opened"]')->waitUntilPresent()->exists());
 
 			// Checking that collapsed, hidden sidemenu appears on clicking.
 			$this->query('xpath://aside[@class="sidebar is-'.$view.' is-opened"]')->one()->waitUntilVisible();
@@ -403,8 +443,8 @@ class testSidebarMenu extends CWebTest {
 		return [
 			[
 				[
-					'section' => 'Support',
-					'link' => 'https://www.zabbix.com/support'
+					'section' => 'Subscriptions',
+					'link' => 'https://www.zabbix.com/subscriptions'
 				]
 			],
 			[
@@ -416,7 +456,7 @@ class testSidebarMenu extends CWebTest {
 			[
 				[
 					'section' => 'Help',
-					'link' => 'https://www.zabbix.com/documentation/'.ZABBIX_EXPORT_VERSION.'/'
+					'link' => 'https://www.zabbix.com/documentation/'.ZABBIX_EXPORT_VERSION.'/en/manual'
 				]
 			],
 			[

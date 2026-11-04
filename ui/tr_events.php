@@ -56,10 +56,10 @@ $trigger = reset($triggers);
 
 $events = API::Event()->get([
 	'output' => ['eventid', 'r_eventid', 'clock', 'ns', 'objectid', 'name', 'acknowledged', 'severity',
-		'cause_eventid'
+		'cause_eventid', 'cep_ruleid', 'flags'
 	],
 	'selectAcknowledges' => ['clock', 'message', 'action', 'userid', 'old_severity', 'new_severity',
-		'suppress_until'
+		'suppress_until', 'maintenanceid', 'details', 'cep_ruleid'
 	],
 	'selectTags' => ['tag', 'value'],
 	'source' => EVENT_SOURCE_TRIGGERS,
@@ -75,21 +75,20 @@ if (!$events) {
 $event = reset($events);
 
 $event['comments'] = ($trigger['comments'] !== '')
-	? CMacrosResolverHelper::resolveTriggerDescription(
-		[
+	? CMacrosResolverHelper::resolveEventDescriptions(
+		[$event['eventid'] => [
 			'triggerid' => $trigger['triggerid'],
 			'expression' => $trigger['expression'],
 			'comments' => $trigger['comments'],
 			'clock' => $event['clock'],
 			'ns' => $event['ns']
-		],
-		['events' => true]
-	)
+		]]
+	)[$event['eventid']]['comments']
 	: '';
 
 if ($event['r_eventid'] != 0) {
 	$r_events = API::Event()->get([
-		'output' => ['correlationid', 'userid'],
+		'output' => ['correlationid', 'userid', 'cep_ruleid'],
 		'source' => EVENT_SOURCE_TRIGGERS,
 		'object' => EVENT_OBJECT_TRIGGER,
 		'eventids' => [$event['r_eventid']],
@@ -99,25 +98,23 @@ if ($event['r_eventid'] != 0) {
 	if ($r_events) {
 		$r_event = reset($r_events);
 
+		$event['cep_ruleid'] = $r_event['cep_ruleid'];
 		$event['correlationid'] = $r_event['correlationid'];
 		$event['userid'] = $r_event['userid'];
 	}
 }
 
 if ($trigger['opdata'] !== '') {
-	$event['opdata'] = (new CCol(CMacrosResolverHelper::resolveTriggerOpdata(
-		[
+	$event['opdata'] = (new CCol(CMacrosResolverHelper::resolveEventOpdatas(
+		[$event['eventid'] => [
 			'triggerid' => $trigger['triggerid'],
 			'expression' => $trigger['expression'],
 			'opdata' => $trigger['opdata'],
 			'clock' => $event['clock'],
 			'ns' => $event['ns']
-		],
-		[
-			'events' => true,
-			'html' => true
-		]
-	)))->addClass('opdata');
+		]],
+		['html' => true]
+	)[$event['eventid']]['opdata']))->addClass('opdata');
 }
 else {
 	$db_items = API::Item()->get([
@@ -129,6 +126,7 @@ else {
 }
 
 $actions = getEventDetailsActions($event);
+
 $users = API::User()->get([
 	'output' => ['username', 'name', 'surname'],
 	'userids' => array_keys($actions['userids']),
@@ -139,9 +137,21 @@ $mediatypes = API::Mediatype()->get([
 	'mediatypeids' => array_keys($actions['mediatypeids']),
 	'preservekeys' => true
 ]);
+$maintenances = API::Maintenance()->get([
+	'output' => ['name'],
+	'maintenanceids' => array_keys($actions['maintenanceids']),
+	'preservekeys' => true
+]);
+
+$ceprule_actions = array_filter($actions['actions'], fn (array $action) => $action['action_type'] == ZBX_EVENT_HISTORY_CEP_UPDATE);
+$ceprules = $ceprule_actions ? API::CepRule()->get([
+	'output' => ['name'],
+	'cep_ruleids' => array_column($ceprule_actions, 'cep_ruleid'),
+	'preservekeys' => true
+]) : [];
 
 $allowed = [
-	'ui_correlation' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION),
+	'event_processing' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_CEPRULES),
 	'add_comments' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
 	'change_severity' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY),
 	'acknowledge' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
@@ -152,31 +162,32 @@ $allowed = [
 	'rank_change' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_PROBLEM_RANKING)
 ];
 
-/*
- * Display
- */
 require_once dirname(__FILE__).'/include/views/js/tr_events.js.php';
 
 $event_tab = (new CDiv([
 	new CDiv([
 		(new CSection(make_trigger_details($trigger, $event['eventid'])))
 			->setId(SECTION_HAT_TRIGGERDETAILS)
-			->setHeader(new CTag('h4', true, _('Trigger details'))),
+			->setHeader(new CTag('h4', true, _('Trigger details')))
+			->addClass(ZBX_STYLE_ROUNDED_SURFACE),
 		(new CSection(make_event_details($event, $allowed)))
 			->setId(SECTION_HAT_EVENTDETAILS)
 			->setHeader(new CTag('h4', true, _('Event details')))
+			->addClass(ZBX_STYLE_ROUNDED_SURFACE)
 	]),
 	new CDiv([
-		(new CSectionCollapsible(makeEventDetailsActionsTable($actions, $users, $mediatypes)))
+		(new CSectionCollapsible(makeEventDetailsActionsTable($actions, $users, $mediatypes, $maintenances, $ceprules)))
 			->setId(SECTION_HAT_EVENTACTIONS)
 			->setHeader(new CTag('h4', true, _('Actions')))
 			->setProfileIdx('web.tr_events.hats.'.SECTION_HAT_EVENTACTIONS.'.state')
-			->setExpanded((bool) CProfile::get('web.tr_events.hats.'.SECTION_HAT_EVENTACTIONS.'.state', true)),
+			->setExpanded((bool) CProfile::get('web.tr_events.hats.'.SECTION_HAT_EVENTACTIONS.'.state', true))
+			->addClass(ZBX_STYLE_ROUNDED_SURFACE),
 		(new CSectionCollapsible(make_small_eventlist($event, $allowed)))
 			->setId(SECTION_HAT_EVENTLIST)
 			->setHeader(new CTag('h4', true, _('Event list [previous 20]')))
 			->setProfileIdx('web.tr_events.hats.'.SECTION_HAT_EVENTLIST.'.state')
 			->setExpanded((bool) CProfile::get('web.tr_events.hats.'.SECTION_HAT_EVENTLIST.'.state', true))
+			->addClass(ZBX_STYLE_ROUNDED_SURFACE)
 	])
 ]))
 	->addClass(ZBX_STYLE_COLUMNS)

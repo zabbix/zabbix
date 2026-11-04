@@ -34,13 +34,17 @@ if (array_key_exists('problems', $data)) {
 	}
 
 	if ($data['trigger']['url'] !== '') {
-		$trigger_url = CHtmlUrlValidator::validate($data['trigger']['url'], ['allow_user_macro' => false])
-			? $data['trigger']['url']
-			: 'javascript: alert('.json_encode(_s('Provided URL "%1$s" is invalid.', $data['trigger']['url'])).');';
+		$url_validator = new CUrlValidator(['schemes' => CSettingsHelper::getAllowedUriSchemes()]);
+
+		$link = $url_validator->validate($data['trigger']['url'])
+			? new CLink($data['trigger']['url'], $data['trigger']['url'])
+			: (new CLink($data['trigger']['url']))
+				->setAttribute('data-error', _s('Provided URL "%1$s" is invalid.', $data['trigger']['url']))
+				->onClick('alert(event.target.dataset.error);');
 
 		$div->addItem(
 			(new CDiv())
-				->addItem(new CLink($data['trigger']['url'], $trigger_url))
+				->addItem($link)
 				->addClass(ZBX_STYLE_OVERLAY_DESCR_URL)
 				->addStyle('max-width: 500px')
 		);
@@ -196,7 +200,7 @@ if (array_key_exists('problems', $data)) {
 			))
 				->addClass(ZBX_STYLE_NOWRAP),
 			$problem_update_link,
-			($data['show_tags'] != SHOW_TAGS_NONE) ? $tags[$problem['eventid']] : null
+			($data['show_tags'] != SHOW_TAGS_NONE) ? (new CDiv($tags[$problem['eventid']]))->addClass(ZBX_STYLE_TAGS_WRAPPER) : null
 		]));
 	}
 

@@ -28,9 +28,10 @@ window.maintenance_timeperiod_edit = new class {
 	form;
 
 	init({rules}) {
-		this._overlay = overlays_stack.getById('maintenance-timeperiod-edit');
-		this._dialogue = this._overlay.$dialogue[0];
-		this.form_element = this._overlay.$dialogue.$body[0].querySelector('form');
+		this.overlay = overlays_stack.getById('maintenance-timeperiod-edit');
+		this.dialogue = this.overlay.$dialogue[0];
+		this.footer = this.overlay.$dialogue.$footer[0];
+		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.form = new CForm(this.form_element, rules);
 
 		// Update form field state according to the form data.
@@ -52,6 +53,8 @@ window.maintenance_timeperiod_edit = new class {
 			this.form.findFieldByName('period_minutes').setChanged();
 			this.form.validateChanges(['period_minutes']);
 		};
+
+		this.footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
 	}
 
 	#update() {
@@ -91,13 +94,14 @@ window.maintenance_timeperiod_edit = new class {
 		);
 	}
 
-	submit() {
+	#submit() {
+		this.#removePopupMessages();
 		const fields = this.form.getAllValues();
 
 		this.form.validateSubmit(fields)
 			.then((result) => {
 				if (!result) {
-					this._overlay.unsetLoading();
+					this.overlay.unsetLoading();
 
 					return;
 				}
@@ -107,25 +111,13 @@ window.maintenance_timeperiod_edit = new class {
 				curl.setArgument('action', 'maintenance.timeperiod.check');
 
 				this.#post(curl.getUrl(), fields, (response) => {
-					if ('form_errors' in response) {
-						this.form.setErrors(response.form_errors, true, true);
-						this.form.renderErrors();
-					}
-					else if ('error' in response) {
-						throw {error: response.error};
-					}
-					else {
-						overlayDialogueDestroy(this._overlay.dialogueid);
-						this._dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.body}));
-					}
+					overlayDialogueDestroy(this.overlay.dialogueid);
+					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.body}));
 				});
 			});
 	}
 
 	#post(url, data, success_callback) {
-		this._overlay.setLoading();
-		this.#clearMessages();
-
 		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
@@ -137,17 +129,23 @@ window.maintenance_timeperiod_edit = new class {
 					throw {error: response.error};
 				}
 
-				return response;
+				if ('form_errors' in response) {
+					this.form.setErrors(response.form_errors, true, true);
+					this.form.renderErrors();
+
+					return;
+				}
+
+				success_callback(response);
 			})
-			.then(success_callback)
 			.catch((exception) => this.#ajaxExceptionHandler(exception))
-			.finally(() => this._overlay.unsetLoading());
+			.finally(() => this.overlay.unsetLoading());
 	}
 
-	#clearMessages() {
-		for (const element of this.form_element.parentNode.children) {
-			if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-				element.parentNode.removeChild(element);
+	#removePopupMessages() {
+		for (const el of this.form_element.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
 			}
 		}
 	}
@@ -160,7 +158,7 @@ window.maintenance_timeperiod_edit = new class {
 			messages = exception.error.messages;
 		}
 		else {
-			messages = t('Unexpected server error.');
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 		}
 
 		const message_box = makeMessageBox('bad', messages, title)[0];

@@ -456,6 +456,61 @@ out:
     - metric: 'system.localtime'
       result: ZBX_KEY_ACCESS_DENY
 ---
+test case: No rules after AllowKeyRegexp=.*
+in:
+  rules:
+    - pattern: 'vfs.file.*[*]'
+      type: ZBX_KEY_ACCESS_DENY
+    - pattern: '.*'
+      type: ZBX_KEY_ACCESS_ALLOW_REGEXP
+    - pattern: 'system.run[*]'
+      type: ZBX_KEY_ACCESS_DENY
+out:
+  number_of_rules: 1
+  metrics:
+    - metric: 'vfs.file.contents[/etc/passwd]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'vfs.file.size[/etc/systemd.conf]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'system.run[echo 1]'
+      result: ZBX_KEY_ACCESS_ALLOW
+---
+test case: No rules after DenyKeyRegexp=.*
+in:
+  rules:
+    - pattern: 'vfs.file.*[*]'
+      type: ZBX_KEY_ACCESS_ALLOW
+    - pattern: '.*'
+      type: ZBX_KEY_ACCESS_DENY_REGEXP
+    - pattern: 'system.run[*]'
+      type: ZBX_KEY_ACCESS_ALLOW
+out:
+  number_of_rules: 2
+  metrics:
+    - metric: 'vfs.file.contents[/etc/passwd]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'vfs.file.size[/etc/systemd.conf]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.run[echo 1]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'system.localtime'
+      result: ZBX_KEY_ACCESS_DENY
+---
+test case: Non-canonical regexp match-all is not trimmed
+in:
+  rules:
+    - pattern: '^.*$'
+      type: ZBX_KEY_ACCESS_ALLOW_REGEXP
+    - pattern: 'vfs.file.*[*]'
+      type: ZBX_KEY_ACCESS_DENY
+out:
+  number_of_rules: 3
+  metrics:
+    - metric: 'vfs.file.contents[/etc/passwd]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.run[echo 1]'
+      result: ZBX_KEY_ACCESS_ALLOW
+---
 test case: Incomplete whitelist (no deny all at the end)
 in:
   rules:
@@ -486,6 +541,23 @@ out:
     - metric: 'system.localtime'
       result: ZBX_KEY_ACCESS_ALLOW
 ---
+test case: Trailing AllowKey system.* trimmed after system.run allow
+in:
+  rules:
+    - pattern: 'system.*'
+      type: ZBX_KEY_ACCESS_ALLOW
+    - pattern: 'system.run[*]'
+      type: ZBX_KEY_ACCESS_ALLOW
+out:
+  number_of_rules: 1
+  metrics:
+    - metric: 'system.run[/usr/bin/hostname -f]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.localtime'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'vfs.file.contents[/etc/passwd]'
+      result: ZBX_KEY_ACCESS_ALLOW
+---
 test case: Empty parameters match
 in:
   rules:
@@ -506,4 +578,194 @@ out:
       result: ZBX_KEY_ACCESS_DENY
     - metric: 'web.page.get[127.0.0.1]'
       result: ZBX_KEY_ACCESS_ALLOW
+---
+test case: Regexp example 1 - hostname variants condensed
+in:
+  rules:
+    - pattern: 'system\.run\[(?:/usr)?/bin/hostname(?: -[fsd])?\]'
+      type: ZBX_KEY_ACCESS_ALLOW_REGEXP
+out:
+  number_of_rules: 2
+  metrics:
+    - metric: 'system.run[/bin/hostname]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.run[/bin/hostname -f]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.run[/bin/hostname -s]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.run[/bin/hostname -d]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.run[/usr/bin/hostname]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.run[/usr/bin/hostname -f]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.run[/usr/bin/hostname -s]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.run[/usr/bin/hostname -d]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.run[/bin/hostname -x]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'system.run[echo 1]'
+      result: ZBX_KEY_ACCESS_DENY
+---
+test case: Regexp example 2 - service start/restart ABC1-4 condensed
+in:
+  rules:
+    - pattern: 'system\.run\[sc (?:re)?start ABC[1-4]\]'
+      type: ZBX_KEY_ACCESS_ALLOW_REGEXP
+out:
+  number_of_rules: 2
+  metrics:
+    - metric: 'system.run[sc start ABC1]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.run[sc start ABC2]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.run[sc start ABC3]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.run[sc start ABC4]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.run[sc restart ABC1]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.run[sc restart ABC2]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.run[sc restart ABC3]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.run[sc restart ABC4]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.run[sc stop ABC1]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'system.run[sc start ABC5]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'system.run[echo 1]'
+      result: ZBX_KEY_ACCESS_DENY
+---
+test case: Mixed wildcard and regexp rules - first match wins
+in:
+  rules:
+    - pattern: 'vfs.file.*[*]'
+      type: ZBX_KEY_ACCESS_ALLOW
+    - pattern: 'system\.run\[/bin/hostname\]'
+      type: ZBX_KEY_ACCESS_ALLOW_REGEXP
+    - pattern: '*'
+      type: ZBX_KEY_ACCESS_DENY
+out:
+  number_of_rules: 3
+  metrics:
+    - metric: 'vfs.file.size[/tmp/x]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'vfs.file.contents[/etc/passwd]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.run[/bin/hostname]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.run[echo 1]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'system.localtime'
+      result: ZBX_KEY_ACCESS_DENY
+---
+test case: Regexp deny before wildcard allow
+in:
+  rules:
+    - pattern: 'vfs\.file\.contents\[/etc/passwd\]'
+      type: ZBX_KEY_ACCESS_DENY_REGEXP
+    - pattern: 'vfs.file.*[*]'
+      type: ZBX_KEY_ACCESS_ALLOW
+    - pattern: '*'
+      type: ZBX_KEY_ACCESS_DENY
+out:
+  number_of_rules: 3
+  metrics:
+    - metric: 'vfs.file.contents[/etc/passwd]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'vfs.file.contents[/tmp/test]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'vfs.file.size[/tmp/x]'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.localtime'
+      result: ZBX_KEY_ACCESS_DENY
+---
+test case: Regexp full-string match enforced - substring pattern does not match key with params
+in:
+  rules:
+    - pattern: '^system\.run$'
+      type: ZBX_KEY_ACCESS_ALLOW_REGEXP
+    - pattern: '*'
+      type: ZBX_KEY_ACCESS_DENY
+out:
+  number_of_rules: 2
+  metrics:
+    - metric: 'system.run'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.run[echo 1]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'system.run[/bin/hostname]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'vfs.file.size[/tmp/x]'
+      result: ZBX_KEY_ACCESS_DENY
+---
+test case: Regexp invalid pattern fails on rule add
+in:
+  rule_add_failure: yes
+  rules:
+    - pattern: 'system\.run\[(?:'
+      type: ZBX_KEY_ACCESS_ALLOW_REGEXP
+---
+test case: Regexp empty pattern fails on rule add
+in:
+  rule_add_failure: yes
+  rules:
+    - pattern: ''
+      type: ZBX_KEY_ACCESS_DENY_REGEXP
+---
+test case: Regexp duplicate pattern dropped
+in:
+  rules:
+    - pattern: 'system\.run\[.*\]'
+      type: ZBX_KEY_ACCESS_DENY_REGEXP
+    - pattern: 'system\.run\[.*\]'
+      type: ZBX_KEY_ACCESS_DENY_REGEXP
+    - pattern: '*'
+      type: ZBX_KEY_ACCESS_DENY
+out:
+  number_of_rules: 2
+  metrics:
+    - metric: 'system.run[echo 1]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'system.localtime'
+      result: ZBX_KEY_ACCESS_DENY
+---
+test case: Regexp conflicting pattern dropped
+in:
+  rules:
+    - pattern: 'system\.run\[.*\]'
+      type: ZBX_KEY_ACCESS_DENY_REGEXP
+    - pattern: 'system\.run\[.*\]'
+      type: ZBX_KEY_ACCESS_ALLOW_REGEXP
+    - pattern: '*'
+      type: ZBX_KEY_ACCESS_DENY
+out:
+  number_of_rules: 2
+  metrics:
+    - metric: 'system.run[echo 1]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'system.run[/bin/hostname]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'system.localtime'
+      result: ZBX_KEY_ACCESS_DENY
+---
+test case: Trailing AllowKeyRegexp is not stripped
+in:
+  rules:
+    - pattern: 'vfs.file.*[*]'
+      type: ZBX_KEY_ACCESS_DENY
+    - pattern: 'system\.localtime'
+      type: ZBX_KEY_ACCESS_ALLOW_REGEXP
+out:
+  number_of_rules: 3
+  metrics:
+    - metric: 'vfs.file.contents[/etc/passwd]'
+      result: ZBX_KEY_ACCESS_DENY
+    - metric: 'system.localtime'
+      result: ZBX_KEY_ACCESS_ALLOW
+    - metric: 'system.run[echo 1]'
+      result: ZBX_KEY_ACCESS_DENY
 ...

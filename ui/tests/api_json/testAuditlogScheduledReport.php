@@ -36,6 +36,11 @@ class testAuditlogScheduledReport extends testAuditlogCommon {
 	 */
 	protected static $before_user;
 
+	/**
+	 * Resource type Scheduled report
+	 */
+	const RESOURCE_TYPE = 46;
+
 	public function testAuditlogScheduledReport_Create() {
 		$create = $this->call('report.create', [
 			[
@@ -101,7 +106,7 @@ class testAuditlogScheduledReport extends testAuditlogCommon {
 			'report.reportid' => ['add', self::$resourceid]
 		]);
 
-		$this->getAuditDetails('details', $this->add_actionid, $created, self::$resourceid);
+		$this->getAuditDetails('details', self::ACTION_ADD, $created, self::$resourceid, self::RESOURCE_TYPE);
 	}
 
 	/**
@@ -168,7 +173,7 @@ class testAuditlogScheduledReport extends testAuditlogCommon {
 			'report.user_groups['.$usrgrp['reportusrgrpid'].'].reportusrgrpid' => ['add', $usrgrp['reportusrgrpid']]
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, self::$resourceid);
+		$this->getAuditDetails('details', self::ACTION_UPDATE, $updated, self::$resourceid, self::RESOURCE_TYPE);
 	}
 
 	/**
@@ -176,6 +181,6 @@ class testAuditlogScheduledReport extends testAuditlogCommon {
 	 */
 	public function testAuditlogScheduledReport_Delete() {
 		$this->call('report.delete', [self::$resourceid]);
-		$this->getAuditDetails('resourcename', $this->delete_actionid, 'Updated report for audit', self::$resourceid);
+		$this->getAuditDetails('resourcename', self::ACTION_DELETE, 'Updated report for audit', self::$resourceid, self::RESOURCE_TYPE);
 	}
 }

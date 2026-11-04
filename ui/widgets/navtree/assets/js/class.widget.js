@@ -522,9 +522,11 @@ class CWidgetNavTree extends CWidget {
 	}
 
 	#broadcast() {
-		this.broadcast({
-			[CWidgetsData.DATA_TYPE_MAP_ID]: [this.#navtree[this.#navtree_item_selected].sysmapid]
-		});
+		if (this.#navtree[this.#navtree_item_selected] !== undefined) {
+			this.broadcast({
+				[CWidgetsData.DATA_TYPE_MAP_ID]: [this.#navtree[this.#navtree_item_selected].sysmapid]
+			});
+		}
 	}
 
 	#updateUserProfileItemSelected() {
@@ -752,9 +754,9 @@ class CWidgetNavTree extends CWidget {
 					content += response.debug;
 				}
 
-				overlayDialogue({
+				const overlay = overlayDialogue({
 					title: t('Edit tree element'),
-					class: 'modal-popup',
+					class: 'modal-popup modal-popup-small',
 					content,
 					buttons: [
 						{
@@ -912,6 +914,9 @@ class CWidgetNavTree extends CWidget {
 					dialogueid: 'navtreeitem',
 					trigger_element
 				});
+
+				// Display the close button after the screen reader announces the dialog title.
+				overlay.$dialogue.$head.$close_button.show();
 			}
 		});
 	}

@@ -36,7 +36,6 @@ $filter = (new CFilter())
 				new CFormField(
 					(new CTextBox('filter_name', $data['filter']['name']))
 						->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-						->setAttribute('autofocus', 'autofocus')
 				)
 			]),
 		(new CFormGrid())
@@ -100,7 +99,7 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 			->setArgument('proxy_groupid', $proxy['proxy_groupid'])
 			->getUrl();
 
-		$proxy_name_prefix[] = $data['user']['can_edit_proxy_groups']
+		$proxy_name_prefix[] = CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXY_GROUPS)
 			? (new CLink($proxy['proxyGroup']['name'], $proxy_group_url))
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(ZBX_STYLE_GREY)
@@ -187,7 +186,7 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 				->setArgument('hostid', $host['hostid'])
 				->getUrl();
 
-			$hosts[] = $data['user']['can_edit_hosts']
+			$hosts[] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 				? (new CLink($host['name'], $host_url))
 					->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_LINK : null)
 					->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null)
@@ -269,9 +268,15 @@ $form->addItem([
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_PROXY_LIST))
 	->setControls(
 		(new CTag('nav', true,
-			(new CList())->addItem(
-				(new CSimpleButton(_('Create proxy')))->addClass('js-create-proxy')
-			)
+			(new CList())
+				->addItem(
+					(new CLink(_('Create proxy in Cloud'), ZBX_CLOUD_URL . '/create-proxy'))
+						->addClass(ZBX_STYLE_BTN)
+						->addClass(ZBX_STYLE_BTN_ALT)
+						->addClass(ZBX_STYLE_LINK_EXTERNAL)
+						->setTarget('_blank')
+				)
+				->addItem((new CSimpleButton(_('Create proxy')))->addClass('js-create-proxy'))
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem($filter)

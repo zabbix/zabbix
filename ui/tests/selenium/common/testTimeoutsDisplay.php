@@ -233,16 +233,8 @@ class testTimeoutsDisplay extends CWebTest {
 		foreach ($values as $item_type => $timeout) {
 			$this->query('button', $button_name)->one()->click();
 
-			// Discovery rule doesn't have overlay.
-			if ($button_name === 'Create discovery rule') {
-				$this->page->waitUntilReady();
-				$selector = 'id:inherited_timeout';
-			}
-			else {
-				COverlayDialogElement::find()->waitUntilReady()->one();
-				$selector = 'id:inherited_timeout';
-			}
-
+			COverlayDialogElement::find()->waitUntilReady()->one();
+			$selector = 'id:inherited_timeout';
 			$form = $this->query('name:itemForm')->asForm()->one();
 
 			// Timeout field for SNMP agent appears after adding walk[1] to SNMP OID field.

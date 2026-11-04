@@ -32,6 +32,12 @@
 #	include <zbxmutexs.h>
 #endif
 
+#if defined(HAVE_MYSQL)
+/* same server error code has different meaning in MySQL and MariaDB */
+#	define ZBX_MYSQL_ER_CLIENT_INTERACTION_TIMEOUT		4031
+#	define ZBX_MARIADB_ER_REFERENCED_TRG_DOES_NOT_EXIST	4031
+#endif
+
 ZBX_PTR_VECTOR_DECL(dbconn_ptr, zbx_dbconn_t *)
 
 typedef enum
@@ -72,8 +78,10 @@ struct zbx_dbconn
 	MYSQL			*conn;
 	int			error_count;
 	int			txn_begin;		/* transaction begin statement is executed */
+	int			mariadb_fork;		/* connected to MariaDB server */
 #elif defined(HAVE_POSTGRESQL)
 	PGconn			*conn;
+	char			pg_escape_backslash;
 #elif defined(HAVE_SQLITE3)
 	sqlite3			*conn;
 	zbx_mutex_t		*sqlite_access;
@@ -88,9 +96,11 @@ int	dbconn_is_open(zbx_dbconn_t *db);
 int	dbconn_open_retry(zbx_dbconn_t *db);
 void	dbconn_close(zbx_dbconn_t *db);
 
-char	*db_dyn_escape_string(const char *src, size_t max_bytes, size_t max_chars, zbx_escape_sequence_t flag);
-char	*db_dyn_escape_field_len(const zbx_db_field_t *field, const char *src, zbx_escape_sequence_t flag);
-int	db_is_escape_sequence(char c);
+char	*dbconn_dyn_escape_string(const zbx_dbconn_t *db, const char *src, size_t max_bytes, size_t max_chars,
+		zbx_escape_sequence_t flag);
+char	*dbconn_dyn_escape_field_len(const zbx_dbconn_t *db, const zbx_db_field_t *field, const char *src,
+		zbx_escape_sequence_t flag);
+int	dbconn_is_escape_sequence(const zbx_dbconn_t *db, char c);
 
 zbx_uint32_t	db_get_server_version(void);
 

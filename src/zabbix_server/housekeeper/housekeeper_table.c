@@ -14,10 +14,12 @@
 
 #include "housekeeper_table.h"
 
+#include "zbxcommon.h"
 #include "zbxdb.h"
 #include "zbxcacheconfig.h"
 #include "zbxalgo.h"
 #include "zbxnum.h"
+#include "zbxhistory.h"
 
 #include "trigger_housekeeper.h"
 
@@ -386,4 +388,69 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() deleted_history:" ZBX_FS_I64 " deleted_events:" ZBX_FS_I64
 			" deleted_problems:" ZBX_FS_I64, __func__, *deleted_history, *deleted_events,
 			*deleted_problems);
+}
+
+static int	hk_cfg_disabled(void)
+{
+	return ZBX_HK_MODE_DISABLED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: disable housekeeping for a specific table                         *
+ *                                                                            *
+ * Parameters:                                                                *
+ *      table_name - [IN] name of the table to disable housekeeping for       *
+ *                                                                            *
+ ******************************************************************************/
+static void	hk_disable_table_housekeeping(const char *table_name)
+{
+	for (size_t i = 0; i < ARRSIZE(hk_item_cleanup_order); i++)
+	{
+		hk_cleanup_table_t	*table = &hk_item_cleanup_order[i];
+
+		if (0 == strcmp(table->name, table_name))
+		{
+			table->get_hk_mode = hk_cfg_disabled;
+			break;
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: disable housekeeping rules based on history provider capabilities *
+ *                                                                            *
+ ******************************************************************************/
+void	housekeeping_disable_unsupported_types(void)
+{
+	zbx_uint64_t	hk_history = zbx_history_get_housekeep_flags();
+	zbx_uint64_t	hk_trends = zbx_history_get_trends_flags();
+
+	if (SUCCEED != ZBX_HISTORY_CHECK_TYPE_FLAGS(hk_history, ITEM_VALUE_TYPE_FLOAT))
+		hk_disable_table_housekeeping("history");
+
+	if (SUCCEED != ZBX_HISTORY_CHECK_TYPE_FLAGS(hk_history, ITEM_VALUE_TYPE_STR))
+		hk_disable_table_housekeeping("history_str");
+
+	if (SUCCEED != ZBX_HISTORY_CHECK_TYPE_FLAGS(hk_history, ITEM_VALUE_TYPE_LOG))
+		hk_disable_table_housekeeping("history_log");
+
+	if (SUCCEED != ZBX_HISTORY_CHECK_TYPE_FLAGS(hk_history, ITEM_VALUE_TYPE_UINT64))
+		hk_disable_table_housekeeping("history_uint");
+
+	if (SUCCEED != ZBX_HISTORY_CHECK_TYPE_FLAGS(hk_history, ITEM_VALUE_TYPE_TEXT))
+		hk_disable_table_housekeeping("history_text");
+
+	if (SUCCEED != ZBX_HISTORY_CHECK_TYPE_FLAGS(hk_history, ITEM_VALUE_TYPE_BIN))
+		hk_disable_table_housekeeping("history_bin");
+
+	if (SUCCEED != ZBX_HISTORY_CHECK_TYPE_FLAGS(hk_history, ITEM_VALUE_TYPE_JSON))
+		hk_disable_table_housekeeping("history_json");
+
+	if (SUCCEED != ZBX_HISTORY_CHECK_TYPE_FLAGS(hk_trends, ITEM_VALUE_TYPE_FLOAT))
+		hk_disable_table_housekeeping("trends");
+
+	if (SUCCEED != ZBX_HISTORY_CHECK_TYPE_FLAGS(hk_trends, ITEM_VALUE_TYPE_UINT64))
+		hk_disable_table_housekeeping("trends_uint");
 }

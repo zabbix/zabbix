@@ -27,14 +27,14 @@ class JWK
     private const EC_CURVES = [
         'P-256' => '1.2.840.10045.3.1.7', // Len: 64
         'secp256k1' => '1.3.132.0.10', // Len: 64
-        'P-384' => '1.3.132.0.34' // Len: 96
+        'P-384' => '1.3.132.0.34', // Len: 96
         // 'P-521' => '1.3.132.0.35', // Len: 132 (not supported)
     ];
 
     // For keys with "kty" equal to "OKP" (Octet Key Pair), the "crv" parameter must contain the key subtype.
     // This library supports the following subtypes:
     private const OKP_SUBTYPES = [
-        'Ed25519' => true // RFC 8037
+        'Ed25519' => true, // RFC 8037
     ];
 
     /**
@@ -52,7 +52,7 @@ class JWK
      *
      * @uses parseKey
      */
-    public static function parseKeySet(array $jwks, ?string $defaultAlg = null): array
+    public static function parseKeySet(#[\SensitiveParameter] array $jwks, ?string $defaultAlg = null): array
     {
         $keys = [];
 
@@ -93,7 +93,7 @@ class JWK
      *
      * @uses createPemFromModulusAndExponent
      */
-    public static function parseKey(array $jwk, ?string $defaultAlg = null): ?Key
+    public static function parseKey(#[\SensitiveParameter] array $jwk, ?string $defaultAlg = null): ?Key
     {
         if (empty($jwk)) {
             throw new InvalidArgumentException('JWK must not be empty');
@@ -172,6 +172,12 @@ class JWK
                 // This library works internally with EdDSA keys (Ed25519) encoded in standard base64.
                 $publicKey = JWT::convertBase64urlToBase64($jwk['x']);
                 return new Key($publicKey, $jwk['alg']);
+            case 'oct':
+                if (!isset($jwk['k'])) {
+                    throw new UnexpectedValueException('k not set');
+                }
+
+                return new Key(JWT::urlsafeB64Decode($jwk['k']), $jwk['alg']);
             default:
                 break;
         }
@@ -212,7 +218,7 @@ class JWK
                 )
             );
 
-        return sprintf(
+        return \sprintf(
             "-----BEGIN PUBLIC KEY-----\n%s\n-----END PUBLIC KEY-----\n",
             wordwrap(base64_encode($pem), 64, "\n", true)
         );

@@ -43,15 +43,19 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 				'sendto' => [
 					[
 						'db media.sendto', 'required', 'not_empty',
-						'when' => ['mediatype_type', 'not_in' => [MEDIA_TYPE_EMAIL]]
+						'when' => ['mediatype_type', 'in' => [MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK]]
 					],
 					[
 						'array', 'required', 'not_empty',
-						'field' => ['db media.sendto', 'required'
-							// TODO: uncomment with DEV-4644
-							// 'not_empty', 'use' => [CEmailValidator::class, []]
-						],
+						'field' => ['db media.sendto', 'required', 'not_empty', 'use' => [CEmailValidator::class]],
 						'when' => ['mediatype_type', 'in' => [MEDIA_TYPE_EMAIL]]
+					],
+					[
+						'array', 'required', 'not_empty',
+						'field' => ['db media.sendto', 'required',
+							'use' => [CPushNotificationRecipientValidator::class]
+						],
+						'when' => ['mediatype_type', 'in' => [MEDIA_TYPE_PUSH]]
 					]
 				],
 				'period' => ['string', 'required', 'not_empty',
@@ -80,13 +84,17 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 					['autologout_visible', 'in' => [1]]
 				]
 			],
+			'default_maintenance_period' => ['db users.default_maintenance_period', 'not_empty',
+				'use' => [CTimeUnitValidator::class, [
+					'min' => 5 * SEC_PER_MIN,
+					'max' => CMaintenanceHelper::MAX_TIMEPERIOD
+				]]
+			],
 			'refresh' => ['db users.refresh', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 0, 'max' => SEC_PER_HOUR]]
 			],
 			'rows_per_page' => ['db users.rows_per_page', 'required', 'min' => 1, 'max' => 999999],
-			'url' => ['db users.url'
-				// 'use' => [CHtmlUrlValidator::class, ['allow_user_macro' => false]]
-			],
+			'url' => ['db users.url', 'use' => [CFrontendActionValidator::class]],
 			'roleid' => ['db users.roleid', 'required']
 		]];
 	}
@@ -123,8 +131,8 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 	protected function doAction(): void {
 		$user = [];
 
-		$this->getInputs($user, ['username', 'name', 'surname', 'url', 'autologin', 'autologout', 'theme', 'refresh',
-			'rows_per_page', 'lang', 'timezone', 'roleid'
+		$this->getInputs($user, ['username', 'name', 'surname', 'autologin', 'autologout', 'theme',
+			'default_maintenance_period', 'refresh', 'rows_per_page', 'lang', 'timezone', 'roleid'
 		]);
 
 		if ($this->hasInput('autologout_visible') && $this->getInput('autologout_visible') == 0) {
@@ -135,6 +143,11 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 
 		if ($this->getInput('password1', '') !== '' || !$this->allow_empty_password) {
 			$user['passwd'] = $this->getInput('password1');
+		}
+
+		if ($this->hasInput('url')
+				&& !CRoleHelper::checkAccess(CRoleHelper::PROFILE_REDIRECT_ENFORCE, $user['roleid'])) {
+			$user['url'] = $this->getInput('url');
 		}
 
 		if ($this->checkAccess(CRoleHelper::ACTIONS_EDIT_USER_MEDIA)) {

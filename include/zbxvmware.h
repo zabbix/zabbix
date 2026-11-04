@@ -214,11 +214,13 @@ ZBX_PTR_VECTOR_DECL(vmware_dvswitch_ptr, zbx_vmware_dvswitch_t *)
 #define ZBX_VMWARE_DEV_PROPS_IFCONNECTED		1
 #define ZBX_VMWARE_DEV_PROPS_IFTYPE			2
 #define ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE		3
-#define ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_UUID		4
-#define ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORTGROUP	5
-#define ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORT		6
-#define ZBX_VMWARE_DEV_PROPS_IFIPS			7
-#define ZBX_VMWARE_DEV_PROPS_NUM			8
+#define ZBX_VMWARE_DEV_PROPS_IFBACKINGNAME		4
+#define ZBX_VMWARE_DEV_PROPS_IFBACKINGNETWORK		5
+#define ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_UUID		6
+#define ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORTGROUP	7
+#define ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORT		8
+#define ZBX_VMWARE_DEV_PROPS_IFIPS			9
+#define ZBX_VMWARE_DEV_PROPS_NUM			10
 
 typedef struct
 {
@@ -259,6 +261,10 @@ typedef struct
 	char	*time;
 	int	enabled;
 	int	acknowledged;
+	char	*entity_id;
+	char	*entity_uuid;
+	char	*entity_type;
+	char	*entity_name;
 }
 zbx_vmware_alarm_t;
 ZBX_PTR_VECTOR_DECL(vmware_alarm_ptr, zbx_vmware_alarm_t *)
@@ -560,16 +566,33 @@ typedef struct
 	int				jobs_num;
 
 	/* linked jobs types */
-#define ZBX_VMWARE_REQ				(8)
+#define ZBX_VMWARE_REQ_OFFSET			(8)
 #define ZBX_VMWARE_REQ_MASK			(0xFF00)
-#define ZBX_VMWARE_REQ_UPDATE_CONF		(ZBX_VMWARE_UPDATE_CONF		<< ZBX_VMWARE_REQ)
-#define ZBX_VMWARE_REQ_UPDATE_PERFCOUNTERS	(ZBX_VMWARE_UPDATE_PERFCOUNTERS	<< ZBX_VMWARE_REQ)
-#define ZBX_VMWARE_REQ_UPDATE_REST_TAGS		(ZBX_VMWARE_UPDATE_REST_TAGS	<< ZBX_VMWARE_REQ)
-#define ZBX_VMWARE_REQ_UPDATE_EVENTLOG		(ZBX_VMWARE_UPDATE_EVENTLOG	<< ZBX_VMWARE_REQ)
+#define ZBX_VMWARE_TO_REQ(t)			((t) << ZBX_VMWARE_REQ_OFFSET)
+#define ZBX_VMWARE_FOM_REQ(t)			(((t) & ZBX_VMWARE_REQ_MASK) >> ZBX_VMWARE_REQ_OFFSET)
+#define ZBX_VMWARE_REQ_UPDATE_CONF		ZBX_VMWARE_TO_REQ(ZBX_VMWARE_UPDATE_CONF)
+#define ZBX_VMWARE_REQ_UPDATE_PERFCOUNTERS	ZBX_VMWARE_TO_REQ(ZBX_VMWARE_UPDATE_PERFCOUNTERS)
+#define ZBX_VMWARE_REQ_UPDATE_REST_TAGS		ZBX_VMWARE_TO_REQ(ZBX_VMWARE_UPDATE_REST_TAGS)
+#define ZBX_VMWARE_REQ_UPDATE_EVENTLOG		ZBX_VMWARE_TO_REQ(ZBX_VMWARE_UPDATE_EVENTLOG)
 #define ZBX_VMWARE_REQ_UPDATE_ALL										\
 					(ZBX_VMWARE_REQ_UPDATE_CONF | ZBX_VMWARE_REQ_UPDATE_PERFCOUNTERS |	\
 					ZBX_VMWARE_REQ_UPDATE_REST_TAGS | ZBX_VMWARE_REQ_UPDATE_EVENTLOG)
-#define ZBX_VMWARE_JOB_RUN			(8*2)
+
+#define ZBX_VMWARE_JOB_RUN_OFFSET		(16)
+#define ZBX_VMWARE_JOB_RUN_MASK			(0xFF0000)
+#define ZBX_VMWARE_TO_JOB_RUN(t)		((t) << ZBX_VMWARE_JOB_RUN_OFFSET)
+	/* CPT stands for CONF, PERFCOUNTERS, REST_TAGS */
+#define ZBX_VMWARE_JOBSET_CPT		(ZBX_VMWARE_UPDATE_CONF | ZBX_VMWARE_UPDATE_PERFCOUNTERS |		\
+					ZBX_VMWARE_UPDATE_REST_TAGS)
+/*******************************************************************************
+ *                                                                             *
+ * +----------------------+----------------------+----------------------+      *
+ * |     bits[23:16]      |      bits[15:8]      |      bits[7:0]       |      *
+ * +----------------------+----------------------+----------------------+      *
+ * |    JOB_RUN_STATUS    |       JOB_REQ        | service capabilities |      *
+ * +----------------------+----------------------+----------------------+      *
+ *                                                                             *
+ ******************************************************************************/
 	int				jobs_flag;
 
 	/* vmware entity (vm, hv etc) and linked tags */
@@ -706,16 +729,17 @@ void	zbx_vmware_eventlog_job_create(zbx_vmware_service_t *service);
 #define ZBX_VMWARE_TYPE_VSPHERE	1
 #define ZBX_VMWARE_TYPE_VCENTER	2
 
-#define ZBX_VMWARE_SOAP_DATACENTER	"Datacenter"
 #define ZBX_VMWARE_SOAP_FOLDER		"Folder"
 #define ZBX_VMWARE_SOAP_CLUSTER		"ClusterComputeResource"
 #define ZBX_VMWARE_SOAP_DEFAULT		"VMware"
+#define ZBX_VMWARE_SOAP_DC		"Datacenter"
 #define ZBX_VMWARE_SOAP_DS		"Datastore"
 #define ZBX_VMWARE_SOAP_HV		"HostSystem"
 #define ZBX_VMWARE_SOAP_VM		"VirtualMachine"
-#define ZBX_VMWARE_SOAP_DC		"Datacenter"
 #define ZBX_VMWARE_SOAP_RESOURCEPOOL	"ResourcePool"
 #define ZBX_VMWARE_SOAP_DVS		"VmwareDistributedVirtualSwitch"
+#define ZBX_VMWARE_SOAP_DVPG		"DistributedVirtualPortgroup"
+#define ZBX_VMWARE_SOAP_NETWORK		"Network"
 
 /* Indicates the unit of measure represented by a counter or statistical value. */
 #define ZBX_VMWARE_UNIT_UNDEFINED		0

@@ -18,6 +18,7 @@ require_once dirname(__FILE__).'/APITest.php';
 require_once dirname(__FILE__).'/function_DBconnect.php';
 require_once dirname(__FILE__).'/function_DBclose.php';
 require_once dirname(__FILE__).'/function_DBselect.php';
+require_once dirname(__FILE__).'/function_generateUuidV7.php';
 require_once dirname(__FILE__).'/zbx_dbcast_2bigintTest.php';
 require_once dirname(__FILE__).'/makeSqlTest.php';
 require_once dirname(__FILE__).'/dbConditionIntTest.php';
@@ -38,6 +39,7 @@ class GeneralTests {
 		$suite->addTestSuite('function_DBconnect');
 		$suite->addTestSuite('function_DBclose');
 		$suite->addTestSuite('function_DBselect');
+		$suite->addTestSuite('function_generateUuidV7');
 		$suite->addTestSuite('zbx_dbcast_2bigintTest');
 		$suite->addTestSuite('makeSqlTest');
 		$suite->addTestSuite('dbConditionIntTest');

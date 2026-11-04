@@ -68,12 +68,8 @@ class CProxyGroup extends CApiService {
 		}
 
 		// editable + PERMISSION CHECK
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-
-			if ($permission == PERM_READ_WRITE) {
-				return $options['countOutput'] ? '0' : [];
-			}
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions'] && $options['editable']) {
+			return $options['countOutput'] ? '0' : [];
 		}
 
 		if ($options['output'] === API_OUTPUT_EXTEND) {
@@ -106,6 +102,10 @@ class CProxyGroup extends CApiService {
 
 	protected function applyQueryFilterOptions($table_name, $table_alias, array $options, array $sql_parts): array {
 		$sql_parts = parent::applyQueryFilterOptions($table_name, $table_alias, $options, $sql_parts);
+
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+			$sql_parts['where'][] = CApiUserGroupHelper::getProxyGroupPermissionsCondition('pg');
+		}
 
 		// proxyids
 		if ($options['proxyids'] !== null) {
@@ -370,6 +370,8 @@ class CProxyGroup extends CApiService {
 
 		self::validateDelete($proxy_groupids, $db_proxy_groups);
 
+		self::unlinkFromUserGroups($proxy_groupids);
+
 		DB::delete('proxy_group', ['proxy_groupid' => $proxy_groupids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_PROXY_GROUP, $db_proxy_groups);
@@ -402,6 +404,82 @@ class CProxyGroup extends CApiService {
 
 		self::checkUsedInProxies($db_proxy_groups);
 		self::checkUsedInHosts($db_proxy_groups);
+		self::checkUsedInActions($db_proxy_groups);
+	}
+
+	private static function checkUsedInActions(array $db_proxy_groups): void {
+		$proxy_groupids = array_keys($db_proxy_groups);
+
+		$row = DBfetch(DBselect(
+			'SELECT a.name,c.value AS proxy_groupid'.
+			' FROM conditions c'.
+			' JOIN actions a ON c.actionid=a.actionid'.
+			' WHERE c.conditiontype='.ZBX_CONDITION_TYPE_PROXY_GROUP.
+				' AND '.dbConditionString('c.value', $proxy_groupids),
+			1
+		));
+
+		if ($row) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Proxy group "%1$s" is used by action "%2$s".',
+				$db_proxy_groups[$row['proxy_groupid']]['name'], $row['name']
+			));
+		}
+	}
+
+	private static function unlinkFromUserGroups(array $proxy_groupids): void {
+		$db_usrgrps = [];
+
+		$resource = DBselect(
+			'SELECT ugpg.usrgrpid,ugpg.proxy_groupid,ugpg.usrgrp_proxy_groupid,ug.name'.
+			' FROM usrgrp_proxy_group ugpg'.
+			' JOIN usrgrp ug ON ug.usrgrpid=ugpg.usrgrpid'.
+			' WHERE EXISTS ('.
+				'SELECT NULL'.
+				' FROM usrgrp_proxy_group ugpg2'.
+				' WHERE ugpg.usrgrpid=ugpg2.usrgrpid'.
+					' AND '.dbConditionId('ugpg2.proxy_groupid', $proxy_groupids).
+			')'
+		);
+
+		while ($row = DBfetch($resource)) {
+			if (!array_key_exists($row['usrgrpid'], $db_usrgrps)) {
+				$db_usrgrps[$row['usrgrpid']] = [
+					'name' => $row['name'],
+					'usrgrpid' => $row['usrgrpid'],
+					'proxy_groups' => []
+				];
+			}
+
+			$db_usrgrps[$row['usrgrpid']]['proxy_groups'][$row['usrgrp_proxy_groupid']] = [
+				'usrgrp_proxy_groupid' => $row['usrgrp_proxy_groupid'],
+				'proxy_groupid' => $row['proxy_groupid']
+			];
+		}
+
+		if ($db_usrgrps) {
+			$usrgrps = [];
+			$indexes = [];
+
+			foreach ($db_usrgrps as $db_usrgrpid => $db_usrgrp) {
+				$usrgrps[] = [
+					'name' => $db_usrgrp['name'],
+					'usrgrpid' => $db_usrgrp['usrgrpid'],
+					'proxy_groups' => []
+				];
+
+				$indexes[$db_usrgrpid] = array_key_last($usrgrps);
+
+				foreach ($db_usrgrp['proxy_groups'] as $proxy_group) {
+					if (!in_array($proxy_group['proxy_groupid'], $proxy_groupids)) {
+						$usrgrps[$indexes[$db_usrgrpid]]['proxy_groups'][] = [
+							'proxy_groupid' => $proxy_group['proxy_groupid']
+						];
+					}
+				}
+			}
+
+			CUserGroup::updateForce($usrgrps, $db_usrgrps);
+		}
 	}
 
 	/**
