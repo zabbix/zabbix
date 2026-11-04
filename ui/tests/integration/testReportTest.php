@@ -51,7 +51,6 @@ class testReportTest extends CIntegrationTest {
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 4,
 				'StartReportWriters' => 1,
-				'FrontendAllowedIP' => '127.0.0.1',
 				'WebServiceURL' => 'http://127.0.0.1:1/report'
 			]
 		];

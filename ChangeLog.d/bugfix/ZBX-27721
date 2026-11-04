@@ -1,1 +1,0 @@
-A......... [ZBX-27721] fixed Elasticsearch query construction in CTrend::getFromElasticsearch() (vskalbins)
