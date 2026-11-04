@@ -1339,7 +1339,7 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 
 	if (NULL != zbx_threads)
 	{
-		/* wait for all child processes to exit, do not touch database if they had to be killed */
+		/* wait for all child processes to exit, do not touch database if processes had to be killed */
 		if (SUCCEED != zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num,
 				SUCCEED == ret ? ZBX_THREADS_STOP_TIMEOUT : SEC_PER_MIN, zbx_hc_get_unsynced_num))
 		{
