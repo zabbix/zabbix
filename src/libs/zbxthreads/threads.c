@@ -419,7 +419,7 @@ void	zbx_thread_exec_and_wait(void (*func)(void), zbx_threads_progress_f progres
 		zbx_sigmask(SIG_UNBLOCK, &mask, NULL);
 
 		func();
-		exit(EXIT_SUCCESS);
+		zbx_thread_exit(EXIT_SUCCESS);
 	}
 
 	if (-1 == pid)
