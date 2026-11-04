@@ -1164,7 +1164,7 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 
 	if (NULL != zbx_threads)
 	{
-		/* wait for all child processes to exit, do not touch database if they had to be killed */
+		/* wait for all child processes to exit, do not touch database if processes had to be killed */
 		if (SUCCEED != zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num, ret,
 				zbx_hc_get_unsynced_num))
 		{
@@ -1190,7 +1190,6 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 	zbx_free_database_cache(ZBX_SYNC_NONE, &events_cbs, config_history_storage_pipelines);
 	zbx_pb_destroy();
 	zbx_free_configuration_cache();
-	zbx_db_close();
 
 	zbx_db_deinit();
 
