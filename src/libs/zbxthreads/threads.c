@@ -399,7 +399,7 @@ int	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_fla
  *                                                                            *
  * Comments: Used on shutdown to write cached data to database without risk   *
  *           of hanging on unavailable database. If child process cannot be   *
- *           created, function is executed by calling process.                *
+ *           created, function is not executed.                               *
  *                                                                            *
  ******************************************************************************/
 void	zbx_thread_exec_and_wait(void (*func)(void), zbx_threads_progress_f progress_cb)
@@ -419,13 +419,15 @@ void	zbx_thread_exec_and_wait(void (*func)(void), zbx_threads_progress_f progres
 		zbx_sigmask(SIG_UNBLOCK, &mask, NULL);
 
 		func();
-		zbx_thread_exit(EXIT_SUCCESS);
+		_exit(EXIT_SUCCESS);
 	}
 
 	if (-1 == pid)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot create process: %s", zbx_strerror(errno));
-		func();
+		/* func() is not called in the parent process - it could hang shutdown if database is unavailable */
+		zabbix_log(LOG_LEVEL_WARNING, "cannot create process: %s, cached data will not be synced to database",
+				zbx_strerror(errno));
+
 		return;
 	}
 
