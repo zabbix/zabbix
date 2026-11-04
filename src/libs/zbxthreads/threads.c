@@ -596,7 +596,7 @@ void	zbx_thread_exec_and_wait(void (*func)(void), int timeout, zbx_threads_progr
 	if (0 == pid)
 	{
 		func();
-		exit(EXIT_SUCCESS);
+		zbx_thread_exit(EXIT_SUCCESS);
 	}
 
 	if (-1 == pid)
