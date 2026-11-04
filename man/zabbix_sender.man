@@ -385,7 +385,7 @@ Note that incoming values will only be accepted from hosts specified in \fBAllow
 Use \fIconfig\-file\fR.
 \fBZabbix sender\fR reads server details from the agentd configuration file.
 Agent does not need to be running for \fBzabbix_sender\fR to send data.
-By default
+By default,
 .B Zabbix sender
 does not read any configuration file.
 Only parameters \fBHostname\fR, \fBServerActive\fR, \fBSourceIP\fR, \fBTLSConnect\fR, \fBTLSCAFile\fR, \fBTLSCRLFile\fR,
@@ -571,13 +571,13 @@ Send empty value of an item to the Zabbix server with IP address \fB192.168.1.11
 Empty values must be indicated by empty double quotes.
 .RE
 
-\fBzabbix_sender \-z 192.168.1.113  \-s "Monitored Host" \-k zabbix.trapper \-o 342.45 \-\-tls\-connect cert \-\-tls\-ca\-file /home/zabbix/zabbix_ca_file \-\-tls\-cert\-file /home/zabbix/zabbix_agentd.crt \-\-tls\-key\-file /home/zabbix/zabbix_agentd.key\fR
+\fBzabbix_sender \-z 192.168.1.113 \-s "Monitored Host" \-k zabbix.trapper \-o 342.45 \-\-tls\-connect cert \-\-tls\-ca\-file /home/zabbix/zabbix_ca_file \-\-tls\-cert\-file /home/zabbix/zabbix_agentd.crt \-\-tls\-key\-file /home/zabbix/zabbix_agentd.key\fR
 .br
 .RS
 Send \fB342.45\fR as the value for \fBzabbix.trapper\fR item in \fBMonitored Host\fR host to server with IP \fB192.168.1.113\fR using TLS with certificate.
 .RE
 
-\fBzabbix_sender \-z 192.168.1.113  \-s "Monitored Host" \-k zabbix.trapper \-o 342.45 \-\-tls\-connect psk \-\-tls\-psk\-identity "PSK ID Zabbix agentd" \-\-tls\-psk\-file /home/zabbix/zabbix_agentd.psk\fR
+\fBzabbix_sender \-z 192.168.1.113 \-s "Monitored Host" \-k zabbix.trapper \-o 342.45 \-\-tls\-connect psk \-\-tls\-psk\-identity "PSK ID Zabbix agentd" \-\-tls\-psk\-file /home/zabbix/zabbix_agentd.psk\fR
 .br
 .RS
 Send \fB342.45\fR as the value for \fBzabbix.trapper\fR item in \fBMonitored Host\fR host to server with IP \fB192.168.1.113\fR using TLS with pre-shared key (PSK).
