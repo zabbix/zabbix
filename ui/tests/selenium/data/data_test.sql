@@ -1359,7 +1359,3 @@ INSERT INTO lld_override_optemplate (lld_override_optemplateid, lld_override_ope
 INSERT INTO lld_override_optrends (lld_override_operationid, trends) values (40000, 0);
 
 UPDATE settings SET value_str='caf1c06dcf802728c4cfc24d645e1e73' WHERE name='session_key';
-
--- testPageHostPrototypes
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (9450, 90002, 'host_proto_tag_1', 'value1');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (9451, 90002, 'host_proto_tag_2', 'value2');
