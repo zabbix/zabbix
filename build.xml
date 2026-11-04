@@ -163,6 +163,7 @@
 			<arg line="--with-libpcre2"/>
 			<arg line="--prefix=${basedir}"/>
 			<arg line="--with-libcurl"/>
+			<arg line="--enable-java"/>
 		</exec>
 		<exec executable="make" failonerror="on">
 			<arg line="-j12"/>
@@ -535,6 +536,7 @@
 			<arg line="--with-libpcre2"/>
 			<arg line="--prefix=${basedir}"/>
 			<arg line="--with-libcurl"/>
+			<arg line="--enable-java"/>
 		</exec>
 		<exec executable="make" failonerror="on">
 			<arg line="-j12"/>
