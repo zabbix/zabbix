@@ -17813,7 +17813,7 @@ msgstr "Не обновлять"
 #: app/controllers/CControllerApmTraceListData.php:215
 #: app/controllers/CControllerApmTraceListData.php:219
 msgid "No root span found"
-msgstr "Корневой спан не найден"
+msgstr "Корневая операция в трассировке не найдена"
 
 #: include/classes/api/services/CUser.php:3489
 msgid "No saved state, please login again."
@@ -19176,7 +19176,7 @@ msgstr "Родительские услуги"
 
 #: app/views/js/apm.trace.list.js.php:586
 msgid "Parent span ID"
-msgstr "ID родительского спана"
+msgstr "Идентификатор родительской операции в трассировке"
 
 #: app/partials/configuration.tags.tab.php:46
 msgid "Parent templates"
@@ -19929,7 +19929,7 @@ msgstr "Протокол"
 #: include/classes/vaults/CVaultHashiCorp.php:55
 #, c-format
 msgid "Provided API endpoint \"%1$s\" is invalid."
-msgstr "Указанная конечная точка API \"%1$s\" некорректна."
+msgstr "Указанный адрес API \"%1$s\" некорректен."
 
 #: app/controllers/CControllerMenuPopup.php:282
 #: app/controllers/CControllerMenuPopup.php:422
@@ -23036,24 +23036,24 @@ msgstr "Интервал между секторами"
 #: app/views/js/apm.trace.list.js.php:149
 #: app/views/js/apm.trace.list.js.php:590
 msgid "Span ID"
-msgstr "ID спана"
+msgstr "Идентификатор операции в трассировке"
 
 #: app/views/apm.trace.list.php:114 app/views/js/apm.trace.list.js.php:207
 #: app/views/js/apm.trace.list.js.php:649
 msgid "Span attributes"
-msgstr "Атрибуты спана"
+msgstr "Атрибуты операции в трассировке"
 
 #: app/views/js/apm.trace.list.js.php:557
 msgid "Span details"
-msgstr "Сведения о спане"
+msgstr "Сведения об операции в трассировке"
 
 #: app/views/js/apm.trace.list.js.php:171
 msgid "Span kind"
-msgstr "Тип спана"
+msgstr "Тип операции в трассировке"
 
 #: app/partials/apm.trace.list.split.view.php:87
 msgid "Span tree"
-msgstr "Дерево спанов"
+msgstr "Дерево операций в трассировке"
 
 #: include/locales.inc.php:62
 msgid "Spanish (es_ES)"
@@ -27381,7 +27381,7 @@ msgstr "Различная информация о указанном проце
 #: include/classes/setup/CSetupWizard.php:791
 #: include/classes/setup/CSetupWizard.php:807
 msgid "Vault API endpoint"
-msgstr "Конечная точка API хранилища"
+msgstr "Адрес API хранилища"
 
 #: include/classes/vaults/CVaultHashiCorp.php:117
 msgid "Vault AppRole login connection failed"
@@ -27691,11 +27691,11 @@ msgstr "Веб-сценарии"
 #: app/views/administration.script.list.php:185
 #: include/classes/helpers/CMediatypeHelper.php:137
 msgid "Webhook"
-msgstr "Вебхук"
+msgstr "Сценарий интеграции (webhook)"
 
 #: app/views/mediatype.test.edit.php:87
 msgid "Webhook does not have parameters."
-msgstr "Вебхук не содержит параметров."
+msgstr "Сценарий интеграции (webhook) не содержит параметров."
 
 #: include/func.inc.php:215
 msgid "Wed"
