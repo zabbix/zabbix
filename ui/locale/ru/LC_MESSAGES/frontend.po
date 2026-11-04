@@ -2225,7 +2225,7 @@ msgstr "Код авторизации"
 
 #: app/views/oauth.edit.php:136
 msgid "Authorization endpoint"
-msgstr "Точка авторизации"
+msgstr "Конечная точка авторизации"
 
 #: app/views/oauth.edit.php:148
 msgid "Authorization parameters"
@@ -2704,7 +2704,7 @@ msgstr "Календарь"
 
 #: include/hosts.inc.php:60
 msgid "Callback"
-msgstr "Callback"
+msgstr "Обратный вызов"
 
 #: app/partials/scheduledreport.formgrid.html.php:215
 #: app/views/administration.iconmap.edit.php:147
@@ -5370,7 +5370,7 @@ msgstr "Изменение в секунду"
 
 #: app/views/host.wizard.edit.php:386
 msgid "Change pre-shared key"
-msgstr "Изменить PSK (pre-shared key)"
+msgstr "Изменить ключ PSK"
 
 #: include/classes/helpers/CRoleHelper.php:561
 msgid "Change problem ranking"
@@ -5860,7 +5860,7 @@ msgstr "Обмен данными"
 
 #: app/views/host.wizard.edit.php:375
 msgid "Communication between Zabbix agent and server/proxy is secured with a unique user-defined pre-shared key identity and a secret pre-shared key linked to it."
-msgstr "Соединение между Zabbix агентом и сервером/прокси защищено с помощью уникального заданного пользователем идентификатора (PSK identity) и связанного с ним секретного PSK."
+msgstr "Связь между агентом Zabbix и сервером/прокси защищена уникальным идентификатором PSK, заданным пользователем, и связанным с ним секретным ключом PSK."
 
 #: app/views/host.wizard.edit.php:414
 msgid "Communication between Zabbix agent and server/proxy is secured with the pre-shared key (PSK) encryption method."
@@ -5869,7 +5869,7 @@ msgstr "Соединение между Zabbix агентом и серверо�
 #: include/items.inc.php:946
 msgctxt "SNMP Community"
 msgid "Community"
-msgstr "Community"
+msgstr "Сообщество"
 
 #: app/partials/monitoring.problem.filter.php:291
 msgid "Compact view"
@@ -7037,7 +7037,7 @@ msgstr "Чешский (cs_CZ)"
 #: jsLoader.php:403
 msgctxt "Default color option"
 msgid "D"
-msgstr "D"
+msgstr "П"
 
 #: widgets/geomap/Widget.php:46
 msgctxt "abbreviation of severity level"
@@ -9216,12 +9216,12 @@ msgstr "Эллипс"
 #: app/views/mediatype.edit.php:88
 #: include/classes/helpers/CMediatypeHelper.php:134
 msgid "Email"
-msgstr "Email"
+msgstr "Электронная почта"
 
 #: app/views/js/administration.mediatype.edit.js.php:386
 #: app/views/js/mediatype.edit.js.php:680
 msgid "Email and password"
-msgstr "Email и пароль"
+msgstr "Электронная почта и пароль"
 
 #: app/views/administration.mediatype.edit.php:68
 #: app/views/mediatype.edit.php:60
@@ -9612,11 +9612,11 @@ msgstr "Английский (en_US)"
 
 #: app/views/host.wizard.edit.php:399
 msgid "Enter a non-secret pre-shared key identity string. Avoid including sensitive data."
-msgstr "Введите строку идентификатора PSK (pre-shared key). Это не секретная строка, избегайте использование личных или конфиденциальных данных."
+msgstr "Введите строку идентификатора ключа PSK. Она не является секретной; не включайте в неё конфиденциальные данные."
 
 #: app/views/host.wizard.edit.php:470
 msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
-msgstr "Введите уникальное имя, которое компоненты Zabbix будут использовать для распознавания pre-shared ключа."
+msgstr "Введите уникальное имя, по которому компоненты Zabbix будут распознавать ключ PSK."
 
 #: include/html.inc.php:201
 msgid "Enter full screen mode"
@@ -10764,7 +10764,7 @@ msgstr "Общие"
 
 #: app/views/host.wizard.edit.php:417
 msgid "Generate a secret pre-shared key hexadecimal string."
-msgstr "Сгенерируйте секретную шестнадцатеричную строку PSK (pre-shared key)."
+msgstr "Сгенерируйте секретный ключ PSK в виде шестнадцатеричной строки."
 
 #: app/views/host.wizard.edit.php:411
 msgid "Generate new"
@@ -12254,7 +12254,7 @@ msgstr "Сертификат IdP"
 
 #: app/views/administration.authentication.edit.php:291
 msgid "IdP entity ID"
-msgstr "IdP entity ID"
+msgstr "ID объекта IdP"
 
 #: include/classes/core/CModuleManager.php:318
 #, c-format
@@ -12707,7 +12707,7 @@ msgstr "Некорректный SNMP OID."
 
 #: include/classes/api/services/CDRule.php:596
 msgid "Incorrect SNMP community."
-msgstr "Некорректное SNMP community."
+msgstr "Некорректное сообщество SNMP."
 
 #: include/classes/validators/CActionCondValidator.php:122
 msgid "Incorrect action condition discovery check."
@@ -13836,12 +13836,12 @@ msgstr "Ошибочная дата."
 #: include/classes/validators/CEmailValidator.php:39
 #, c-format
 msgid "Invalid email address \"%1$s\"."
-msgstr "Ошибочный email адрес \"%1$s\"."
+msgstr "Некорректный адрес электронной почты \"%1$s\"."
 
 #: include/classes/api/services/CUser.php:948
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
-msgstr "Ошибочный email адрес у способа оповещения с ID \"%1$s\"."
+msgstr "Некорректный адрес электронной почты у способа оповещения с ID \"%1$s\"."
 
 #: app/controllers/CControllerPopupTriggerExprCheck.php:61
 msgid "Invalid function"
@@ -14618,7 +14618,7 @@ msgstr "JMX агент"
 #: include/views/configuration.item.edit.php:684
 #: include/views/configuration.item.prototype.edit.php:656
 msgid "JMX endpoint"
-msgstr "JMX endpoint"
+msgstr "Конечная точка JMX"
 
 #: include/views/inventory.host.view.php:66
 msgid "JMX interfaces"
@@ -15446,7 +15446,7 @@ msgstr "Пн"
 #: include/func.inc.php:566 jsLoader.php:209
 msgctxt "month short"
 msgid "M"
-msgstr "M"
+msgstr "мес"
 
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:93
 msgid "MAC address A"
@@ -15767,11 +15767,11 @@ msgstr "Ошибка при обновлении карты сети."
 
 #: app/views/popup.ldap.edit.php:259
 msgid "Map user's LDAP media attributes (e.g. email) to Zabbix user media for sending notifications."
-msgstr "Сопоставление LDAP атрибутов оповещения пользователя (напр., email) оповещению пользователя Zabbix для отправки оповещений."
+msgstr "Сопоставление атрибутов оповещений пользователя LDAP (например, адреса электронной почты) с оповещениями пользователя Zabbix для отправки уведомлений."
 
 #: app/views/administration.authentication.edit.php:512
 msgid "Map user's SAML media attributes (e.g. email) to Zabbix user media for sending notifications."
-msgstr "Сопоставление SAML атрибутов оповещения пользователя (напр., email) оповещению пользователя Zabbix для отправки оповещений."
+msgstr "Сопоставление атрибутов оповещений пользователя SAML (например, адреса электронной почты) с оповещениями пользователя Zabbix для отправки уведомлений."
 
 #: include/classes/api/services/CDashboardGeneral.php:600
 #, c-format
@@ -16004,7 +16004,7 @@ msgstr[2] "Максимальный период времени отображе
 #: include/classes/api/services/CUser.php:955
 #, c-format
 msgid "Maximum total length of email address exceeded for media type with ID \"%1$s\"."
-msgstr "Превышена максимальная длина email адреса у способа оповещения с ID \"%1$s\"."
+msgstr "Превышена максимальная суммарная длина адреса электронной почты у способа оповещения с ID \"%1$s\"."
 
 #: app/views/administration.geomaps.edit.php:59
 msgid "Maximum zoom level of the map."
@@ -19575,11 +19575,11 @@ msgstr "Предварительный обзор инсталляции"
 
 #: app/views/host.wizard.edit.php:405
 msgid "Pre-shared key"
-msgstr "PSK (pre-shared key)"
+msgstr "Предварительно согласованный ключ (PSK)"
 
 #: app/views/host.wizard.edit.php:394
 msgid "Pre-shared key identity"
-msgstr "Идентификатор PSK (pre-shared key)"
+msgstr "Идентификатор ключа PSK"
 
 #: app/views/popup.triggerexpr.php:132
 msgid "Prediction functions"
@@ -19665,31 +19665,31 @@ msgstr "Предыдущий год"
 
 #: include/hosts.inc.php:399
 msgid "Primary POC cell"
-msgstr "Первичный мобильный для контакта"
+msgstr "Мобильный телефон основного контактного лица"
 
 #: include/hosts.inc.php:384
 msgid "Primary POC email"
-msgstr "Первичный email для контакта"
+msgstr "Электронная почта основного контактного лица"
 
 #: include/hosts.inc.php:379
 msgid "Primary POC name"
-msgstr "Первичное имя для контакта"
+msgstr "Имя основного контактного лица"
 
 #: include/hosts.inc.php:409
 msgid "Primary POC notes"
-msgstr "Первичные примечания для контакта"
+msgstr "Примечания основного контактного лица"
 
 #: include/hosts.inc.php:389
 msgid "Primary POC phone A"
-msgstr "Первичный телефон A для контакта"
+msgstr "Телефон A основного контактного лица"
 
 #: include/hosts.inc.php:394
 msgid "Primary POC phone B"
-msgstr "Первичный телефон B для контакта"
+msgstr "Телефон B основного контактного лица"
 
 #: include/hosts.inc.php:404
 msgid "Primary POC screen name"
-msgstr "Первичное ник-имя для контакта"
+msgstr "Псевдоним основного контактного лица"
 
 #: widgets/honeycomb/includes/WidgetForm.php:109
 #: widgets/honeycomb/includes/WidgetForm.php:125
@@ -19929,7 +19929,7 @@ msgstr "Протокол"
 #: include/classes/vaults/CVaultHashiCorp.php:55
 #, c-format
 msgid "Provided API endpoint \"%1$s\" is invalid."
-msgstr "Указанный API endpoint \"%1$s\" ошибочен."
+msgstr "Указанная конечная точка API \"%1$s\" некорректна."
 
 #: app/controllers/CControllerMenuPopup.php:282
 #: app/controllers/CControllerMenuPopup.php:422
@@ -21403,7 +21403,7 @@ msgstr "SMTP"
 #: app/views/administration.mediatype.edit.php:87
 #: app/views/mediatype.edit.php:98 app/views/mediatype.list.php:111
 msgid "SMTP helo"
-msgstr "SMTP helo"
+msgstr "Имя для SMTP HELO"
 
 #: app/views/administration.mediatype.edit.php:74
 #: app/views/mediatype.edit.php:70 app/views/mediatype.list.php:110
@@ -21448,7 +21448,7 @@ msgstr "SNMP агент"
 #: app/views/discovery.check.edit.php:79 app/views/popup.discovery.check.php:71
 #: app/views/popup.itemtestedit.view.php:141
 msgid "SNMP community"
-msgstr "SNMP community"
+msgstr "Сообщество SNMP"
 
 #: include/items.inc.php:1570
 msgid "SNMP get value"
@@ -21464,7 +21464,7 @@ msgstr "Порт SNMP"
 
 #: include/items.inc.php:90
 msgid "SNMP trap"
-msgstr "SNMP trap"
+msgstr "SNMP-трап"
 
 #: app/partials/configuration.host.interface.row.php:91
 #: app/views/popup.itemtestedit.view.php:125
@@ -21521,7 +21521,7 @@ msgstr "ID объекта SP"
 
 #: app/views/administration.authentication.edit.php:345
 msgid "SP name ID format"
-msgstr "Формат ID объекта SP"
+msgstr "Формат NameID SP"
 
 #: app/views/administration.authentication.edit.php:338
 msgid "SP private key"
@@ -21627,7 +21627,7 @@ msgstr "Выбрано"
 
 #: include/views/js/monitoring.sysmaps.js.php:60
 msgid "Sans-Serif"
-msgstr "Sans-Serif"
+msgstr "Без засечек"
 
 #: include/func.inc.php:218
 msgid "Sat"
@@ -21915,31 +21915,31 @@ msgstr "Окно отклонения от сезона"
 
 #: include/hosts.inc.php:434
 msgid "Secondary POC cell"
-msgstr "Вторичный мобильный для контакта"
+msgstr "Мобильный телефон дополнительного контактного лица"
 
 #: include/hosts.inc.php:419
 msgid "Secondary POC email"
-msgstr "Вторичный email для контакта"
+msgstr "Электронная почта дополнительного контактного лица"
 
 #: include/hosts.inc.php:414
 msgid "Secondary POC name"
-msgstr "Вторичное имя для контакта"
+msgstr "Имя дополнительного контактного лица"
 
 #: include/hosts.inc.php:444
 msgid "Secondary POC notes"
-msgstr "Вторичные примечания для контакта"
+msgstr "Примечания дополнительного контактного лица"
 
 #: include/hosts.inc.php:424
 msgid "Secondary POC phone A"
-msgstr "Вторичный телефон A для контакта"
+msgstr "Телефон A дополнительного контактного лица"
 
 #: include/hosts.inc.php:429
 msgid "Secondary POC phone B"
-msgstr "Вторичный телефон B для контакта"
+msgstr "Телефон B дополнительного контактного лица"
 
 #: include/hosts.inc.php:439
 msgid "Secondary POC screen name"
-msgstr "Вторичное ник-имя для контакта"
+msgstr "Псевдоним дополнительного контактного лица"
 
 #: widgets/honeycomb/includes/WidgetForm.php:110
 #: widgets/honeycomb/includes/WidgetForm.php:172
@@ -22148,7 +22148,7 @@ msgstr "Серийный номер B"
 
 #: include/views/js/monitoring.sysmaps.js.php:55
 msgid "Serif"
-msgstr "Serif"
+msgstr "С засечками"
 
 #: app/controllers/CControllerQueueOverviewProxy.php:61
 #: app/views/administration.script.list.php:200
@@ -23420,7 +23420,7 @@ msgstr "Хранится в Хранилище секретов"
 
 #: include/hosts.inc.php:35
 msgid "Straight"
-msgstr "Straight"
+msgstr "Пароль открытым текстом"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:528
 #: include/triggers.inc.php:1216
@@ -24917,7 +24917,7 @@ msgstr "Редактировать токен"
 
 #: app/views/oauth.edit.php:188
 msgid "Token endpoint"
-msgstr "Точка получения токена"
+msgstr "Конечная точка получения токена"
 
 #: app/views/user.device.list.php:143
 msgid "Token expired"
@@ -27381,7 +27381,7 @@ msgstr "Различная информация о указанном проце
 #: include/classes/setup/CSetupWizard.php:791
 #: include/classes/setup/CSetupWizard.php:807
 msgid "Vault API endpoint"
-msgstr "API endpoint Хранилища"
+msgstr "Конечная точка API хранилища"
 
 #: include/classes/vaults/CVaultHashiCorp.php:117
 msgid "Vault AppRole login connection failed"
@@ -27691,11 +27691,11 @@ msgstr "Веб-сценарии"
 #: app/views/administration.script.list.php:185
 #: include/classes/helpers/CMediatypeHelper.php:137
 msgid "Webhook"
-msgstr "Webhook"
+msgstr "Вебхук"
 
 #: app/views/mediatype.test.edit.php:87
 msgid "Webhook does not have parameters."
-msgstr "Webhook не содержит параметров."
+msgstr "Вебхук не содержит параметров."
 
 #: include/func.inc.php:215
 msgid "Wed"
@@ -28065,7 +28065,7 @@ msgstr "ГГГГ-ММ-ДД"
 #: app/views/maintenance.timeperiod.edit.php:184
 #: app/views/popup.sla.excludeddowntime.edit.php:53
 msgid "YYYY-MM-DD hh:mm"
-msgstr "YYYY-MM-DD hh:mm"
+msgstr "ГГГГ-ММ-ДД чч:мм"
 
 #: app/views/popup.token.edit.php:103
 #: widgets/actionlog/views/widget.edit.php:48
@@ -28675,7 +28675,7 @@ msgstr "ожидается массив или объект"
 
 #: include/classes/api/services/CUser.php:990
 msgid "an email address is expected"
-msgstr "ожидается email адрес"
+msgstr "ожидается адрес электронной почты"
 
 #: include/classes/import/validators/C10XmlValidator.php:363
 #: include/classes/import/validators/C10XmlValidator.php:386
@@ -29373,7 +29373,7 @@ msgstr "e() - Возвращает число Эйлера"
 
 #: app/views/mediatype.list.php:112 app/views/mediatype.list.php:117
 msgid "email"
-msgstr "email"
+msgstr "электронная почта"
 
 #: app/views/popup.lldoperation.php:62 app/views/popup.valuemap.edit.php:74
 #: include/actions.inc.php:24 include/classes/helpers/CCorrelationHelper.php:34
@@ -31350,7 +31350,7 @@ msgstr "отображаемое имя"
 #: include/func.inc.php:633
 msgctxt "week short"
 msgid "w"
-msgstr "w"
+msgstr "нед"
 
 #: include/classes/api/services/CHttpTest.php:440
 msgid "web scenario with the same UUID already exists"
@@ -31450,4 +31450,4 @@ msgstr "уровень масштабирования должен быть в �
 #: include/func.inc.php:545
 msgctxt "microsecond short"
 msgid "μs"
-msgstr "μs"
+msgstr "мкс"
