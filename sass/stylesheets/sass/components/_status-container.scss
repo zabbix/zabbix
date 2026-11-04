@@ -123,3 +123,10 @@
 		border-color: $border-color;
 	}
 }
+
+.status-amp-severity-unspecified {
+	@extend %status;
+
+	background-color: transparent;
+	border-color: transparent;
+}

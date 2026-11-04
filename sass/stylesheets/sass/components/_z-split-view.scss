@@ -172,4 +172,13 @@ z-split-view {
 			cursor: row-resize;
 		}
 	}
+
+	&:has(> z-split-view-pane.closed) {
+		grid-template-columns: none;
+
+		> .closed,
+		> z-split-view-handle {
+			display: none;
+		}
+	}
 }

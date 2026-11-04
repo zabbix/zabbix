@@ -1274,3 +1274,19 @@ int	lld_text_has_lld_macro(const char *text)
 
 	return FAIL;
 }
+
+int	lld_is_lld_macro(const char *str)
+{
+	zbx_token_t	token;
+
+	if (FAIL == zbx_token_find(str, 0, &token, ZBX_TOKEN_SEARCH_BASIC))
+		return FAIL;
+
+	if (0 == (token.type & (ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_FUNC_MACRO)))
+		return FAIL;
+
+	if (0 != token.loc.l || '\0' != str[token.loc.r + 1])
+		return FAIL;
+
+	return SUCCEED;
+}

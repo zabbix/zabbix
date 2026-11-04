@@ -707,7 +707,7 @@ JAVASCRIPT;
 
 		return [
 			'signal_type' => (int) $input['signal_type'],
-			'metric_point_type' => (int) $input['metric_point_type'],
+			'metric_point_type' => (int) ($input['metric_point_type'] ?? CItemTypeTelemetryQuery::METRICS_POINT_SUM),
 			'columns' => $columns,
 			'aggregated_columns' => $aggregated_columns,
 			'filter' => [

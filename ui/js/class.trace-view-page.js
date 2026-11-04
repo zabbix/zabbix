@@ -233,14 +233,35 @@ class TraceViewPage {
 
 		this.#tree.items = Array.from(this.#spans.values())
 			.filter(span => visible_ids.has(span.id))
-			.map(span => ({
-				id: span.id,
-				parent_id: span.parent_id,
-				label: span.name || span.id,
-				subtitle: span.operation || '',
-				meta: span.count ?? '',
-				span
-			}));
+			.map(span => {
+				const label_text = span.name || span.id;
+				let label = label_text;
+
+				if (span.status_code === 'Error') {
+					label = document.createElement('div');
+					label.classList.add('trace-tree-title-content');
+
+					const title_element = document.createElement('div');
+					title_element.classList.add('title')
+					title_element.append(label_text);
+					title_element.title = label_text;
+					label.appendChild(title_element);
+
+					const error_element = document.createElement('div');
+					error_element.classList.add(ZBX_STYLE_ICON);
+					error_element.classList.add(ZBX_ICON_CIRCLE_WARNING);
+					label.append(error_element);
+				}
+
+				return {
+					id: span.id,
+					parent_id: span.parent_id,
+					label: label,
+					subtitle: span.operation || '',
+					meta: span.count ?? '',
+					span
+				}
+			});
 
 		this.#tree.expandToDepth(this.#spans.size);
 	}
@@ -292,6 +313,11 @@ class TraceViewPage {
 		row_element.classList.add('trace-waterfall-row');
 		row_element.dataset.spanId = span.id;
 
+		let bar_start = 0;
+		let bar_width = 0;
+
+		const span_color = span.color || this.#getColor(span.index || 0);
+
 		if (this.#spanIntersectsSelectedRange(span)) {
 			const value = Number(span.end) - Number(span.start);
 
@@ -299,20 +325,30 @@ class TraceViewPage {
 			label.classList.add('trace-span-label');
 			label.textContent = this.#formatTime(value, this.#getTimeUnit(value));
 
+			bar_start = this.#getClampedStartRatio(span) * 100;
+			bar_width = this.#getClampedWidthRatio(span) * 100;
+
 			const bar = document.createElement('div');
 			bar.classList.add('trace-span-bar');
-			bar.style.setProperty('--trace-span-start', `${this.#getClampedStartRatio(span) * 100}%`);
-			bar.style.setProperty('--trace-span-width', `${this.#getClampedWidthRatio(span) * 100}%`);
-			bar.style.setProperty('--trace-span-color', span.color || this.#getColor(span.index || 0));
+			bar.style.setProperty('--trace-span-start', `${bar_start}%`);
+			bar.style.setProperty('--trace-span-width', `${bar_width}%`);
+			bar.style.setProperty('--trace-span-color', span_color);
 			bar.appendChild(label);
 
 			row_element.appendChild(bar);
 		}
 
 		for (const group of this.#getMarkerGroups(span.events)) {
+			const marker_position = group.ratio * 100;
+
 			const marker = document.createElement('span');
 			marker.classList.add('trace-event-marker');
-			marker.style.setProperty('--trace-event-position', `${group.ratio * 100}%`);
+			marker.style.setProperty('--trace-event-position', `${marker_position}%`);
+			marker.style.setProperty('--trace-marker-border-color', span_color);
+
+			if (bar_width === 0 || bar_start > marker_position || marker_position > bar_start + bar_width) {
+				marker.style.setProperty('--trace-marker-bg-color', span_color);
+			}
 
 			if (group.events.length > 1) {
 				marker.dataset.count = String(group.events.length);
@@ -335,10 +371,6 @@ class TraceViewPage {
 		const ids = new Set();
 
 		for (const span of this.#spans.values()) {
-			if (!this.#spanIntersectsSelectedRange(span)) {
-				continue;
-			}
-
 			let current = span;
 
 			while (current !== undefined) {
@@ -382,27 +414,27 @@ class TraceViewPage {
 	}
 
 	#getTimeUnit(value) {
-		if (value < 1e-6) {
+		if (value < 1e3) {
 			return 'ns';
 		}
 
-		if (value < 1e-3) {
+		if (value < 1e6) {
 			return 'µs';
 		}
 
-		if (value < 1) {
+		if (value < 1e9) {
 			return 'ms';
 		}
 
-		if (value < 60) {
+		if (value < 60e9) {
 			return 's';
 		}
 
-		if (value < 3600) {
+		if (value < 3600e9) {
 			return 'm';
 		}
 
-		if (value < 86400) {
+		if (value < 86400e9) {
 			return 'h';
 		}
 
@@ -418,17 +450,21 @@ class TraceViewPage {
 		}
 
 		const label_gap = this.#getPixelCustomProperty('--trace-label-gap', TraceViewPage.SCALE_LABEL_GAP);
+
 		const num_segments = Math.max(1, Math.floor(width / label_gap));
 		const step = range / num_segments;
 		const padding_ratio = TraceViewPage.SCALE_OFFSET / width;
 		const span_ratio = 1 - 2 * padding_ratio;
 
+		const unit = this.#getTimeUnit(step);
 		const ticks = [];
+
 		for (let i = 0; i <= num_segments; i++) {
 			const ratio = i / num_segments;
 			const value = this.#selected_start + range * ratio;
 
 			let position;
+
 			if (i === 0) {
 				position = `${TraceViewPage.SCALE_OFFSET}px`;
 			}
@@ -437,12 +473,6 @@ class TraceViewPage {
 			}
 			else {
 				position = `${(padding_ratio + ratio * span_ratio) * 100}%`;
-			}
-
-			const unit = this.#getTimeUnit(value);
-
-			if (i === 1) {
-				ticks[0].unit = unit;
 			}
 
 			ticks.push({value, step, ratio, position, unit});
@@ -566,32 +596,33 @@ class TraceViewPage {
 
 		switch (unit) {
 			case 'ns': {
-				const precision = this.#getPrecision(range * 1e9);
+				const precision = this.#getPrecision(range);
 
-				return `${+(value * 1e9).toFixed(precision)}ns`;
+				return `${+value.toFixed(precision)}ns`;
 			}
 
 			case 'µs': {
-				const precision = this.#getPrecision(range * 1e6);
+				const precision = this.#getPrecision(range / 1e3);
 
-				return `${+(value * 1e6).toFixed(precision)}µs`;
+				return `${+(value / 1e3).toFixed(precision)}µs`;
 			}
 
 			case 'ms': {
-				const precision = this.#getPrecision(range * 1e3);
+				const precision = this.#getPrecision(range / 1e6);
 
-				return `${+(value * 1e3).toFixed(precision)}ms`;
+				return `${+(value / 1e6).toFixed(precision)}ms`;
 			}
 
 			case 's': {
-				const precision = this.#getPrecision(range);
+				const precision = this.#getPrecision(range / 1e9);
 
-				return `${+value.toFixed(precision)}s`;
+				return `${+(value / 1e9).toFixed(precision)}s`;
 			}
 
 			case 'm': {
-				const mins = Math.floor(value / 60);
-				const secs = Math.round(value % 60);
+				const total_seconds = value / 1e9;
+				const mins = Math.floor(total_seconds / 60);
+				const secs = Math.round(total_seconds % 60);
 
 				if (secs === 0 || secs === 60) {
 					const final_mins = secs === 60 ? mins + 1 : mins;
@@ -603,19 +634,23 @@ class TraceViewPage {
 			}
 
 			case 'h': {
-				const hours = Math.floor(value / 3600);
-				const mins = Math.round((value % 3600) / 60);
+				const total_seconds = value / 1e9;
+				const hours = Math.floor(total_seconds / 3600);
+				const mins = Math.round((total_seconds % 3600) / 60);
 
-				if (mins === 0) {
-					return `${hours}h`;
+				if (mins === 0 || mins === 60) {
+					const final_hours = mins === 60 ? hours + 1 : hours;
+
+					return `${final_hours}h`;
 				}
 
 				return `${hours}h ${mins}m`;
 			}
 
 			case 'd': {
-				const days = Math.floor(value / 86400);
-				const hours = Math.round((value % 86400) / 3600);
+				const total_seconds = value / 1e9;
+				const days = Math.floor(total_seconds / 86400);
+				const hours = Math.round((total_seconds % 86400) / 3600);
 
 				if (hours === 0 || hours === 24) {
 					const final_days = hours === 24 ? days + 1 : days;
@@ -626,6 +661,8 @@ class TraceViewPage {
 				return `${days}d ${hours}h`;
 			}
 		}
+
+		return `${value}ns`;
 	}
 
 	#getPrecision(scaled_range) {
@@ -641,16 +678,21 @@ class TraceViewPage {
 
 		return 1;
 	}
+
 	#formatDuration(value) {
-		if (value < 1e-6) {
-			return `${Math.round(value * 1e9)}ns`;
+		if (value < 1e3) {
+			return `${Math.round(value)}ns`;
 		}
 
-		if (value < 1e-3) {
-			return `${Math.round(value * 1e6)}µs`;
+		if (value < 1e6) {
+			return `${+(value / 1e3).toFixed(2)}µs`;
 		}
 
-		return `${Math.round(value * 1e6) / 1000}ms`;
+		if (value < 1e9) {
+			return `${+(value / 1e6).toFixed(2)}ms`;
+		}
+
+		return `${+(value / 1e9).toFixed(3)}s`;
 	}
 
 	#valueToRatio(value, start, end) {

@@ -50,7 +50,7 @@ abstract class CControllerDataTable extends CController {
 	}
 
 	protected function checkInput(): bool {
-		$ret = $this->validateInput($this->validation_rules);
+		$ret = $this->validateInput($this->validation_rules, true);
 
 		if ($ret) {
 			$options = $this->getInput('options');
@@ -62,9 +62,9 @@ abstract class CControllerDataTable extends CController {
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
-						'messages' => _('Invalid request')
+						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
-				])])
+				], JSON_THROW_ON_ERROR)])
 			);
 		}
 
@@ -151,13 +151,14 @@ abstract class CControllerDataTable extends CController {
 			}
 
 			unset($data['rows']);
-		} catch (Throwable) {
+		}
+		catch (Throwable) {
 			$this->setResponse(new CControllerResponseData([
 				'main_block' => json_encode([
 					'error' => [
-						'title' => _('Invalid request')
+						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
-				])
+				], JSON_THROW_ON_ERROR)
 			]));
 
 			return;

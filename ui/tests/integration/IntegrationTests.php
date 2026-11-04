@@ -78,6 +78,10 @@ require_once dirname(__FILE__).'/testCalculatedExpression.php';
 require_once dirname(__FILE__).'/testDiagInfo.php';
 require_once dirname(__FILE__).'/testLLDHistorySyncAtScale.php';
 require_once dirname(__FILE__).'/testLLDProxyHistorySyncAtScale.php';
+require_once dirname(__FILE__).'/testLLDTelemetrySyncAtScale.php';
+require_once dirname(__FILE__).'/testLLDTelemetrySyncAtScaleJsonPathTrigger.php';
+/* require_once dirname(__FILE__).'/testLLDTelemetrySyncAtScaleClickHouseCollector.php'; */
+
 /* require_once dirname(__FILE__).'/testLLDHistorySyncAtScaleSingleSyncer.php'; can be enabled to test with single history syncer */
 require_once dirname(__FILE__).'/testHousekeepingConfSync.php';
 require_once dirname(__FILE__).'/testBridgeAdapter.php';
@@ -86,7 +90,7 @@ require_once dirname(__FILE__).'/testHashicorpVault.php';
 require_once dirname(__FILE__).'/testScheduledReports.php';
 require_once dirname(__FILE__).'/testReportTest.php';
 /* require_once dirname(__FILE__).'/testTelemetryQueryItems.php'; */
-/* require_once dirname(__FILE__).'/testTelemetryQueryItemsWithProxyInput.php'; */
+require_once dirname(__FILE__).'/testTelemetryQueryItemsWithProxyInput.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -167,10 +171,14 @@ class IntegrationTests {
 		$suite->addTestSuite('testTriggerCEPRestart');
 		$suite->addTestSuite('testLLDHistorySyncAtScale');
 		$suite->addTestSuite('testLLDProxyHistorySyncAtScale');
+		$suite->addTestSuite('testLLDTelemetrySyncAtScale');
+		$suite->addTestSuite('testLLDTelemetrySyncAtScaleJsonPathTrigger');
+		$suite->addTestSuite('testTelemetryQueryItemsWithProxyInput');
+		/* $suite->addTestSuite('testLLDTelemetrySyncAtScaleClickHouseCollector'); */
+
 		/* $suite->addTestSuite('testTriggerCEPAtScale'); */
 		/* $suite->addTestSuite('testLLDHistorySyncAtScaleSingleSyncer'); */
 		/* $suite->addTestSuite('testTelemetryQueryItems'); */
-		/* $suite->addTestSuite('testTelemetryQueryItemsWithProxyInput'); */
 		return $suite;
 	}
 }

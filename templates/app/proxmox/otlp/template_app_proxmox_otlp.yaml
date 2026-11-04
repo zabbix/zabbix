@@ -27,7 +27,7 @@ zabbix_export:
         4. Link the template to a host.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Applications
       items:
@@ -41,13 +41,14 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           time_shift: '{$PROXMOX.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$PROXMOX.OTLP.INTERVAL}'
+          granularity: '{$PROXMOX.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             metric_point_type: GAUGE
@@ -76,14 +77,15 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
             - type: SIMPLE_CHANGE
             - type: MULTIPLIER
               parameters:
                 - '0.00016666666667'
           time_shift: '{$PROXMOX.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$PROXMOX.OTLP.INTERVAL}'
+          granularity: '{$PROXMOX.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             aggregated_columns:
@@ -111,14 +113,15 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
             - type: SIMPLE_CHANGE
             - type: MULTIPLIER
               parameters:
                 - '0.00016666666667'
           time_shift: '{$PROXMOX.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$PROXMOX.OTLP.INTERVAL}'
+          granularity: '{$PROXMOX.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             aggregated_columns:
@@ -145,10 +148,11 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
           time_shift: '{$PROXMOX.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$PROXMOX.OTLP.INTERVAL}'
+          granularity: '{$PROXMOX.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             metric_point_type: GAUGE
@@ -176,10 +180,11 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
           time_shift: '{$PROXMOX.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$PROXMOX.OTLP.INTERVAL}'
+          granularity: '{$PROXMOX.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             metric_point_type: GAUGE
@@ -207,10 +212,11 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
           time_shift: '{$PROXMOX.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$PROXMOX.OTLP.INTERVAL}'
+          granularity: '{$PROXMOX.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             metric_point_type: GAUGE
@@ -239,14 +245,15 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
             - type: SIMPLE_CHANGE
             - type: MULTIPLIER
               parameters:
                 - '0.00016666666667'
           time_shift: '{$PROXMOX.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$PROXMOX.OTLP.INTERVAL}'
+          granularity: '{$PROXMOX.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             aggregated_columns:
@@ -274,14 +281,15 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
             - type: SIMPLE_CHANGE
             - type: MULTIPLIER
               parameters:
                 - '0.00016666666667'
           time_shift: '{$PROXMOX.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$PROXMOX.OTLP.INTERVAL}'
+          granularity: '{$PROXMOX.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             aggregated_columns:
@@ -309,13 +317,14 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
             - type: MULTIPLIER
               parameters:
                 - '100'
           time_shift: '{$PROXMOX.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$PROXMOX.OTLP.INTERVAL}'
+          granularity: '{$PROXMOX.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             metric_point_type: GAUGE
@@ -439,13 +448,14 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           time_shift: '{$PROXMOX.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$PROXMOX.OTLP.INTERVAL}'
+          granularity: '{$PROXMOX.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             metric_point_type: GAUGE
@@ -473,10 +483,11 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
           time_shift: '{$PROXMOX.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$PROXMOX.OTLP.INTERVAL}'
+          granularity: '{$PROXMOX.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             metric_point_type: GAUGE
@@ -529,13 +540,14 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           time_shift: '{$PROXMOX.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$PROXMOX.OTLP.INTERVAL}'
+          granularity: '{$PROXMOX.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             metric_point_type: GAUGE
@@ -564,10 +576,11 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
           time_shift: '{$PROXMOX.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$PROXMOX.OTLP.INTERVAL}'
+          granularity: '{$PROXMOX.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             metric_point_type: GAUGE
@@ -596,10 +609,11 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
           time_shift: '{$PROXMOX.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$PROXMOX.OTLP.INTERVAL}'
+          granularity: '{$PROXMOX.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             metric_point_type: GAUGE
@@ -628,10 +642,11 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
           time_shift: '{$PROXMOX.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$PROXMOX.OTLP.INTERVAL}'
+          granularity: '{$PROXMOX.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             metric_point_type: GAUGE
@@ -684,13 +699,14 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           time_shift: '{$PROXMOX.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$PROXMOX.OTLP.INTERVAL}'
+          granularity: '{$PROXMOX.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             metric_point_type: GAUGE
@@ -719,10 +735,11 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
           time_shift: '{$PROXMOX.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$PROXMOX.OTLP.INTERVAL}'
+          granularity: '{$PROXMOX.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             metric_point_type: GAUGE
@@ -778,13 +795,14 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           time_shift: '{$PROXMOX.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$PROXMOX.OTLP.INTERVAL}'
+          granularity: '{$PROXMOX.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             metric_point_type: GAUGE
@@ -813,10 +831,11 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
           time_shift: '{$PROXMOX.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$PROXMOX.OTLP.INTERVAL}'
+          granularity: '{$PROXMOX.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             metric_point_type: GAUGE
@@ -844,10 +863,11 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
           time_shift: '{$PROXMOX.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$PROXMOX.OTLP.INTERVAL}'
+          granularity: '{$PROXMOX.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             metric_point_type: GAUGE

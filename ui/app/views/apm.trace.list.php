@@ -98,25 +98,31 @@ $filter = (new CFilter())
 			->addItem([
 				(new CLabel(_('Resource attributes'), 'filter_resource_attributes')),
 				new CFormField(
-					CApmAttrFilterFieldHelper::getFilterField([
+					CTagFilterFieldHelper::getTagFilterField([
 						'evaltype' => $data['filter']['resource_attributes_evaltype'],
-						'attributes' => $data['filter']['resource_attributes']
+						'tags' => $data['filter']['resource_attributes'] ?: [
+							['key' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]
+						]
 					], [
-						'attribute_field_name' => 'filter_resource_attributes',
-						'evaltype_field_name' => 'filter_resource_attributes_evaltype'
-					])
+						'tag_field_name' => 'filter_resource_attributes',
+						'evaltype_field_name' => 'filter_resource_attributes_evaltype',
+						'filter_type' => CTagFilterFieldHelper::FILTER_TYPE_APM_ATTRIBUTE
+					])->setId('filter-resource-attributes')
 				)
 			])
 			->addItem([
 				(new CLabel(_('Span attributes'), 'filter_span_attributes')),
 				new CFormField(
-					CApmAttrFilterFieldHelper::getFilterField([
+					CTagFilterFieldHelper::getTagFilterField([
 						'evaltype' => $data['filter']['span_attributes_evaltype'],
-						'attributes' => $data['filter']['span_attributes']
+						'tags' => $data['filter']['span_attributes'] ?: [
+							['key' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]
+						]
 					], [
-						'attribute_field_name' => 'filter_span_attributes',
-						'evaltype_field_name' => 'filter_span_attributes_evaltype'
-					])
+						'tag_field_name' => 'filter_span_attributes',
+						'evaltype_field_name' => 'filter_span_attributes_evaltype',
+						'filter_type' => CTagFilterFieldHelper::FILTER_TYPE_APM_ATTRIBUTE
+					])->setId('filter-span-attributes')
 				)
 			])
 			->addItem([
@@ -162,15 +168,16 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 
 $html_page->show();
 
-(new CTemplateTag('filter-attributes-row-tmpl'))
-	->addItem(
-		CApmAttrFilterFieldHelper::getFilterFieldRow('#{rowNum}', [
-			'key' => '#{key}',
-			'value' => '#{value}',
-			'operator' => 0
-		])
-	)
-	->show();
+foreach (['resource', 'span'] as $key) {
+	(new CTemplateTag('filter-'.$key.'-attributes-row-tmpl'))
+		->addItem(
+			CTagFilterFieldHelper::getTemplate([
+				'tag_field_name' => 'filter_'.$key.'_attributes',
+				'filter_type' => CTagFilterFieldHelper::FILTER_TYPE_APM_ATTRIBUTE
+			])
+		)
+		->show();
+}
 
 (new CScriptTag('
 	view.init('.json_encode([
