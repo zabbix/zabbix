@@ -270,13 +270,6 @@ static void	threads_kill_fatal(ZBX_THREAD_HANDLE *threads, int threads_num)
 static void	threads_kill(ZBX_THREAD_HANDLE *threads, int threads_num, const int *threads_flags, int priority,
 		int ret)
 {
-#if !defined(_WINDOWS) && !defined(__MINGW32__)
-	if (SUCCEED != ret)
-	{
-		threads_kill_fatal(threads, threads_num);
-		return;
-	}
-#endif
 	for (int i = 0; i < threads_num; i++)
 	{
 		if (ZBX_THREAD_HANDLE_NULL == threads[i])
@@ -513,8 +506,7 @@ int	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_fla
 	if (TIMEOUT_ERROR == threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_COLLECTOR,
 			SUCCEED, timeout, progress_cb, &progress))
 	{
-		threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_COLLECTOR, FAIL, 0, NULL,
-				&progress);
+		threads_kill_fatal(threads, threads_num);
 		ret = FAIL;
 	}
 
@@ -525,23 +517,20 @@ int	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_fla
 	if (TIMEOUT_ERROR == threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_SYNCER,
 			SUCCEED, timeout, progress_cb, &progress))
 	{
-		threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_SYNCER, FAIL, 0, NULL,
-				&progress);
+		threads_kill_fatal(threads, threads_num);
 		ret = FAIL;
 	}
 
 	if (TIMEOUT_ERROR == threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_WORKER,
 			SUCCEED, timeout, progress_cb, &progress))
 	{
-		threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_WORKER, FAIL, 0, NULL,
-				&progress);
+		threads_kill_fatal(threads, threads_num);
 		ret = FAIL;
 	}
 
 	if (SUCCEED != supervisor_ret)
 	{
-		threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_SUPERVISOR, FAIL, 0,
-				NULL, &progress);
+		threads_kill_fatal(threads, threads_num);
 		ret = FAIL;
 	}
 
@@ -609,7 +598,7 @@ void	zbx_thread_exec_and_wait(void (*func)(void), int timeout, zbx_threads_progr
 	}
 
 	if (TIMEOUT_ERROR == threads_wait(&pid, &flag, 1, flag, SUCCEED, timeout, progress_cb, &progress))
-		threads_kill_and_wait(&pid, &flag, 1, flag, FAIL, 0, NULL, &progress);
+		threads_kill_fatal(&pid, 1);
 }
 
 void	zbx_pthread_init_attr(pthread_attr_t *attr)
