@@ -240,6 +240,7 @@
 			<arg line="--with-ares"/>
 			<arg line="--with-net-snmp"/>
 			<arg line="--with-ssh2"/>
+			<arg line="--with-apm"/>
 		</exec>
 		<exec executable="make" failonerror="on">
 			<arg line="-j12"/>
@@ -427,18 +428,18 @@
 		</exec>
 	</target>
 
-	<target name="create-frontend-elasticsearch-configs" if="elasticsearch">
-		<property name="elasticsearch_url" value="${ELASTICSEARCH_URL}"/>
+	<target name="create-frontend-hp-elasticsearch-configs" if="hp-elasticsearch">
+		<property name="hp_elasticsearch_url" value="${HP_ELASTICSEARCH_URL}"/>
 
 		<echo file="ui/conf/zabbix.conf.php" append="true">${line.separator}</echo>
 		<echo file="ui/conf/zabbix.conf.php" append="true">$HISTORY_PROVIDERS[] = [${line.separator}</echo>
 		<echo file="ui/conf/zabbix.conf.php" append="true">     'types' =&gt; ['dbl', 'str', 'log', 'uint', 'text', 'json'],${line.separator}</echo>
 		<echo file="ui/conf/zabbix.conf.php" append="true">     'provider' =&gt; 'elasticsearch',${line.separator}</echo>
-		<echo file="ui/conf/zabbix.conf.php" append="true">     'url' =&gt; '${elasticsearch_url}'${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'url' =&gt; '${hp_elasticsearch_url}'${line.separator}</echo>
 		<echo file="ui/conf/zabbix.conf.php" append="true">];${line.separator}</echo>
 	</target>
 
-	<target name="apply-elasticsearch-patches" if="elasticsearch">
+	<target name="apply-hp-elasticsearch-patches" if="hp-elasticsearch">
 		<exec executable="git" failonerror="on">
 			<arg line="apply"/>
 			<arg line="ui/tests/integration/patches/elasticsearch.patch"/>
@@ -447,33 +448,33 @@
 		<replace file="src/libs/zbxhistory/history_elastic.c" token="{DBNAME}" value="${dbname}"/>
 	</target>
 
-	<target name="drop-db-elasticsearch" if="elasticsearch">
+	<target name="drop-db-hp-elasticsearch" if="hp-elasticsearch">
 		<property name="drop-db-args" value="--silent --request DELETE"/>
 
 		<exec executable="curl" failonerror="on">
-			<arg line="${drop-db-args} ${elasticsearch_url}/${dbname}_dbl"/>
+			<arg line="${drop-db-args} ${hp_elasticsearch_url}/${dbname}_dbl"/>
 		</exec>
 		<exec executable="curl" failonerror="on">
-			<arg line="${drop-db-args} ${elasticsearch_url}/${dbname}_str"/>
+			<arg line="${drop-db-args} ${hp_elasticsearch_url}/${dbname}_str"/>
 		</exec>
 		<exec executable="curl" failonerror="on">
-			<arg line="${drop-db-args} ${elasticsearch_url}/${dbname}_log"/>
+			<arg line="${drop-db-args} ${hp_elasticsearch_url}/${dbname}_log"/>
 		</exec>
 		<exec executable="curl" failonerror="on">
-			<arg line="${drop-db-args} ${elasticsearch_url}/${dbname}_uint"/>
+			<arg line="${drop-db-args} ${hp_elasticsearch_url}/${dbname}_uint"/>
 		</exec>
 		<exec executable="curl" failonerror="on">
-			<arg line="${drop-db-args} ${elasticsearch_url}/${dbname}_text"/>
+			<arg line="${drop-db-args} ${hp_elasticsearch_url}/${dbname}_text"/>
 		</exec>
 		<exec executable="curl" failonerror="on">
-			<arg line="${drop-db-args} ${elasticsearch_url}/${dbname}_json"/>
+			<arg line="${drop-db-args} ${hp_elasticsearch_url}/${dbname}_json"/>
 		</exec>
 		<exec executable="curl" failonerror="on">
-			<arg line="${drop-db-args} ${elasticsearch_url}/_ingest/pipeline/${dbname}_json"/>
+			<arg line="${drop-db-args} ${hp_elasticsearch_url}/_ingest/pipeline/${dbname}_json"/>
 		</exec>
 	</target>
 
-	<target name="create-db-elasticsearch" depends="drop-db-elasticsearch" if="elasticsearch">
+	<target name="create-db-hp-elasticsearch" depends="drop-db-hp-elasticsearch" if="hp-elasticsearch">
 		<property name="create-db-args" value="--silent --request PUT --header 'Content-Type: application/json'"/>
 		<property name="index-dbl"><![CDATA[
 {
@@ -648,90 +649,140 @@
 		]]></property>
 
 		<exec executable="curl" failonerror="on">
-			<arg line="${create-db-args} ${elasticsearch_url}/${dbname}_dbl --data '${index-dbl}'"/>
+			<arg line="${create-db-args} ${hp_elasticsearch_url}/${dbname}_dbl --data '${index-dbl}'"/>
 		</exec>
 		<exec executable="curl" failonerror="on">
-			<arg line="${create-db-args} ${elasticsearch_url}/${dbname}_str --data '${index-str}'"/>
+			<arg line="${create-db-args} ${hp_elasticsearch_url}/${dbname}_str --data '${index-str}'"/>
 		</exec>
 		<exec executable="curl" failonerror="on">
-			<arg line="${create-db-args} ${elasticsearch_url}/${dbname}_log --data '${index-log}'"/>
+			<arg line="${create-db-args} ${hp_elasticsearch_url}/${dbname}_log --data '${index-log}'"/>
 		</exec>
 		<exec executable="curl" failonerror="on">
-			<arg line="${create-db-args} ${elasticsearch_url}/${dbname}_uint --data '${index-uint}'"/>
+			<arg line="${create-db-args} ${hp_elasticsearch_url}/${dbname}_uint --data '${index-uint}'"/>
 		</exec>
 		<exec executable="curl" failonerror="on">
-			<arg line="${create-db-args} ${elasticsearch_url}/${dbname}_text --data '${index-text}'"/>
+			<arg line="${create-db-args} ${hp_elasticsearch_url}/${dbname}_text --data '${index-text}'"/>
 		</exec>
 		<exec executable="curl" failonerror="on">
-			<arg line="${create-db-args} ${elasticsearch_url}/${dbname}_json --data '${index-json}'"/>
+			<arg line="${create-db-args} ${hp_elasticsearch_url}/${dbname}_json --data '${index-json}'"/>
 		</exec>
 		<exec executable="curl" failonerror="on">
-			<arg line="${create-db-args} ${elasticsearch_url}/_ingest/pipeline/${dbname}_json --data '${pipeline-json}'"/>
+			<arg line="${create-db-args} ${hp_elasticsearch_url}/_ingest/pipeline/${dbname}_json --data '${pipeline-json}'"/>
 		</exec>
 	</target>
 
-	<condition property="elasticsearch">
+	<condition property="hp-elasticsearch">
 		<and>
-			<isset property="HISTORY_STORAGE"/>
-			<equals arg1="${HISTORY_STORAGE}" arg2="ES"/>
+			<isset property="HISTORY_PROVIDER"/>
+			<equals arg1="${HISTORY_PROVIDER}" arg2="ES"/>
 		</and>
 	</condition>
 
-	<target name="create-frontend-clickhouse-configs" if="clickhouse">
-		<property name="clickhouse_url" value="${CLICKHOUSE_URL}"/>
-		<property name="clickhouse_user" value="${CLICKHOUSE_USER}"/>
-		<property name="clickhouse_password" value="${CLICKHOUSE_PASSWORD}"/>
-		<property name="clickhouse_dbname" value="${CLICKHOUSE_DBNAME}"/>
+	<target name="create-frontend-hp-clickhouse-configs" if="hp-clickhouse">
+		<property name="hp_clickhouse_url" value="${HP_CLICKHOUSE_URL}"/>
+		<property name="hp_clickhouse_user" value="${HP_CLICKHOUSE_USER}"/>
+		<property name="hp_clickhouse_password" value="${HP_CLICKHOUSE_PASSWORD}"/>
+		<property name="hp_clickhouse_dbname" value="${HP_CLICKHOUSE_DBNAME}"/>
 
 		<echo file="ui/conf/zabbix.conf.php" append="true">${line.separator}</echo>
 		<echo file="ui/conf/zabbix.conf.php" append="true">$HISTORY_PROVIDERS[] = [${line.separator}</echo>
 		<echo file="ui/conf/zabbix.conf.php" append="true">     'types' =&gt; ['dbl', 'str', 'log', 'uint', 'text', 'json'],${line.separator}</echo>
 		<echo file="ui/conf/zabbix.conf.php" append="true">     'provider' =&gt; 'clickhouse',${line.separator}</echo>
-		<echo file="ui/conf/zabbix.conf.php" append="true">     'url' =&gt; '${clickhouse_url}',${line.separator}</echo>
-		<echo file="ui/conf/zabbix.conf.php" append="true">     'username' =&gt; '${clickhouse_user}',${line.separator}</echo>
-		<echo file="ui/conf/zabbix.conf.php" append="true">     'password' =&gt; '${clickhouse_password}',${line.separator}</echo>
-		<echo file="ui/conf/zabbix.conf.php" append="true">     'db' =&gt; '${clickhouse_dbname}'${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'url' =&gt; '${hp_clickhouse_url}',${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'username' =&gt; '${hp_clickhouse_user}',${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'password' =&gt; '${hp_clickhouse_password}',${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'db' =&gt; '${hp_clickhouse_dbname}'${line.separator}</echo>
 		<echo file="ui/conf/zabbix.conf.php" append="true">];${line.separator}</echo>
 	</target>
 
-	<target name="drop-db-clickhouse" if="clickhouse">
+	<target name="drop-db-hp-clickhouse" if="hp-clickhouse">
 		<exec executable="curl" failonerror="on">
 			<arg line="--silent"/>
-			<arg line="${clickhouse_url}"/>
-			<arg line="--user ${clickhouse_user}:${clickhouse_password}"/>
-			<arg line="--data 'DROP DATABASE IF EXISTS ${clickhouse_dbname}'"/>
+			<arg line="${hp_clickhouse_url}"/>
+			<arg line="--user ${hp_clickhouse_user}:${hp_clickhouse_password}"/>
+			<arg line="--data 'DROP DATABASE IF EXISTS ${hp_clickhouse_dbname}'"/>
 		</exec>
 	</target>
 
-	<target name="create-db-clickhouse" depends="drop-db-clickhouse" if="clickhouse">
+	<target name="create-db-hp-clickhouse" depends="drop-db-hp-clickhouse" if="hp-clickhouse">
 		<exec executable="date" outputproperty="now">
 			<arg value="+%s"/>
 		</exec>
 		<exec executable="curl" failonerror="on">
 			<arg line="--silent"/>
-			<arg line="${clickhouse_url}"/>
-			<arg line="--user ${clickhouse_user}:${clickhouse_password}"/>
-			<arg line="--data &quot;CREATE DATABASE ${clickhouse_dbname} COMMENT '${now}'&quot;"/>
+			<arg line="${hp_clickhouse_url}"/>
+			<arg line="--user ${hp_clickhouse_user}:${hp_clickhouse_password}"/>
+			<arg line="--data &quot;CREATE DATABASE ${hp_clickhouse_dbname} COMMENT '${now}'&quot;"/>
 		</exec>
 		<exec executable="./history_all.sh" dir="database/clickhouse" failonerror="on">
-			<arg line="--server ${clickhouse_url}"/>
-			<arg line="--db ${clickhouse_dbname}"/>
-			<arg line="--user ${clickhouse_user}"/>
-			<arg line="--password ${clickhouse_password}"/>
+			<arg line="--server ${hp_clickhouse_url}"/>
+			<arg line="--db ${hp_clickhouse_dbname}"/>
+			<arg line="--user ${hp_clickhouse_user}"/>
+			<arg line="--password ${hp_clickhouse_password}"/>
 		</exec>
 	</target>
 
-	<condition property="clickhouse">
+	<condition property="hp-clickhouse">
 		<and>
-			<isset property="HISTORY_STORAGE"/>
-			<equals arg1="${HISTORY_STORAGE}" arg2="CH"/>
+			<isset property="HISTORY_PROVIDER"/>
+			<equals arg1="${HISTORY_PROVIDER}" arg2="CH"/>
 		</and>
 	</condition>
 
-	<target name="create-frontend-nosql-configs" depends="create-frontend-elasticsearch-configs,create-frontend-clickhouse-configs"/>
-	<target name="create-db-nosql" depends="create-db-elasticsearch,create-db-clickhouse"/>
+	<target name="create-frontend-tp-clickhouse-configs" if="tp-clickhouse">
+		<property name="tp_clickhouse_url" value="${TP_CLICKHOUSE_URL}"/>
+		<property name="tp_clickhouse_user" value="${TP_CLICKHOUSE_USER}"/>
+		<property name="tp_clickhouse_password" value="${TP_CLICKHOUSE_PASSWORD}"/>
+		<property name="tp_clickhouse_dbname" value="${TP_CLICKHOUSE_DBNAME}"/>
 
-	<target name="init-integration-postgresql" depends="create-configs,create-hashicorp-configs,create-frontend-nosql-configs,init-integration,make-binary-agent-3.0,apply-elasticsearch-patches,make-binaries-postgresql,create-db-postgresql,create-db-nosql,init-proxy-postgresql">
+		<echo file="ui/conf/zabbix.conf.php" append="true">${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">$TELEMETRY_PROVIDERS[] = [${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'provider' =&gt; 'clickhouse',${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'url' =&gt; '${tp_clickhouse_url}',${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'username' =&gt; '${tp_clickhouse_user}',${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'password' =&gt; '${tp_clickhouse_password}',${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'db' =&gt; '${tp_clickhouse_dbname}'${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">];${line.separator}</echo>
+	</target>
+
+	<target name="drop-db-tp-clickhouse" if="tp-clickhouse">
+		<exec executable="curl" failonerror="on">
+			<arg line="--silent"/>
+			<arg line="${tp_clickhouse_url}"/>
+			<arg line="--user ${tp_clickhouse_user}:${tp_clickhouse_password}"/>
+			<arg line="--data 'DROP DATABASE IF EXISTS ${tp_clickhouse_dbname}'"/>
+		</exec>
+	</target>
+
+	<target name="create-db-tp-clickhouse" depends="drop-db-tp-clickhouse" if="tp-clickhouse">
+		<exec executable="date" outputproperty="now">
+			<arg value="+%s"/>
+		</exec>
+		<exec executable="curl" failonerror="on">
+			<arg line="--silent"/>
+			<arg line="${tp_clickhouse_url}"/>
+			<arg line="--user ${tp_clickhouse_user}:${tp_clickhouse_password}"/>
+			<arg line="--data &quot;CREATE DATABASE ${tp_clickhouse_dbname} COMMENT '${now}'&quot;"/>
+		</exec>
+		<exec executable="./otel_all.sh" dir="database/clickhouse" failonerror="on">
+			<arg line="--server ${tp_clickhouse_url}"/>
+			<arg line="--db ${tp_clickhouse_dbname}"/>
+			<arg line="--user ${tp_clickhouse_user}"/>
+			<arg line="--password ${tp_clickhouse_password}"/>
+		</exec>
+	</target>
+
+	<condition property="tp-clickhouse">
+		<and>
+			<isset property="TELEMETRY_PROVIDER"/>
+			<equals arg1="${TELEMETRY_PROVIDER}" arg2="CH"/>
+		</and>
+	</condition>
+
+	<target name="create-frontend-nosql-configs" depends="create-frontend-hp-elasticsearch-configs,create-frontend-hp-clickhouse-configs,create-frontend-tp-clickhouse-configs"/>
+	<target name="create-db-nosql" depends="create-db-hp-elasticsearch,create-db-hp-clickhouse,create-db-tp-clickhouse"/>
+
+	<target name="init-integration-postgresql" depends="create-configs,create-hashicorp-configs,create-frontend-nosql-configs,init-integration,make-binary-agent-3.0,apply-hp-elasticsearch-patches,make-binaries-postgresql,create-db-postgresql,create-db-nosql,init-proxy-postgresql">
 		<exec executable="psql" input="ui/tests/integration/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-q"/>
@@ -744,7 +795,7 @@
 		</exec>
 	</target>
 
-	<target name="init-integration-tsdb" depends="create-configs,create-hashicorp-configs,create-frontend-nosql-configs,init-integration,make-binary-agent-3.0,apply-elasticsearch-patches,make-binaries-postgresql,create-db-tsdb,create-db-nosql,init-proxy-postgresql"/>
+	<target name="init-integration-tsdb" depends="create-configs,create-hashicorp-configs,create-frontend-nosql-configs,init-integration,make-binary-agent-3.0,apply-hp-elasticsearch-patches,make-binaries-postgresql,create-db-tsdb,create-db-nosql,init-proxy-postgresql"/>
 
 	<target name="init-dast-postgresql" depends="create-frontend-configs,make-dbschema,create-db-postgresql"/>
 
@@ -768,6 +819,7 @@
 			<arg line="${with.encryption}"/>
 			<arg line="--with-net-snmp"/>
 			<arg line="--with-ssh2"/>
+			<arg line="--with-apm"/>
 		</exec>
 		<exec executable="make" failonerror="on">
 			<arg line="-j12"/>
@@ -913,7 +965,7 @@
 		</exec>
 	</target>
 
-	<target name="init-integration-mysql" depends="create-configs,create-hashicorp-configs,create-frontend-nosql-configs,init-integration,make-binary-agent-3.0,apply-elasticsearch-patches,make-binaries-mysql,create-db-mysql,create-db-nosql,init-proxy-mysql">
+	<target name="init-integration-mysql" depends="create-configs,create-hashicorp-configs,create-frontend-nosql-configs,init-integration,make-binary-agent-3.0,apply-hp-elasticsearch-patches,make-binaries-mysql,create-db-mysql,create-db-nosql,init-proxy-mysql">
 		<exec executable="mysql" input="ui/tests/integration/data/data_test.sql" failonerror="on">
 			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--host=${dbhost}"/>

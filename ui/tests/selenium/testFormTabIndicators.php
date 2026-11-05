@@ -427,7 +427,7 @@ class testFormTabIndicators extends CWebTest {
 									'macro' => ' '
 								]
 							],
-							'table_selector' => 'id:conditions',
+							'table_selector' => 'id:filters_conditions',
 							'field_type' => 'multifield_table',
 							'count' => 2
 						],
@@ -497,7 +497,7 @@ class testFormTabIndicators extends CWebTest {
 									'macro' => ' '
 								]
 							],
-							'table_selector' => 'id:conditions',
+							'table_selector' => 'id:filters_conditions',
 							'field_type' => 'multifield_table',
 							'count' => 2
 						],
