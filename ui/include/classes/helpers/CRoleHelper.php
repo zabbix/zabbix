@@ -119,21 +119,21 @@ class CRoleHelper {
 	 *
 	 * @var array
 	 */
-	private static $roles = [];
+	private static array $roles = [];
 
 	/**
 	 * Array for storing all API methods by user type.
 	 *
 	 * @var array
 	 */
-	private static $api_methods = [];
+	private static array $api_methods = [];
 
 	/**
 	 * Array for storing all API methods with masks by user type.
 	 *
 	 * @var array
 	 */
-	private static $api_method_masks = [];
+	private static array $api_method_masks = [];
 
 	/**
 	 * Checks the access of specific role to specific rule.
@@ -569,6 +569,7 @@ class CRoleHelper {
 				}
 
 				return $labels;
+
 			default:
 				return [];
 		}
