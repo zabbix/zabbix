@@ -38,8 +38,14 @@ class testVfsDevGet extends CIntegrationTest {
 		['key' => 'vfs.dev.get[disk_stats]'],
 		['key' => 'vfs.dev.get[devices]'],
 		['key' => 'vfs.dev.get[device_stats]'],
-		['key' => 'vfs.dev.get[bogus_mode]']
+		['key' => 'vfs.dev.get[bogus_mode]'],
+		['key' => 'vfs.dev.get[disks,"("]'],
+		['key' => 'vfs.dev.get[disks,,extra]'],
+		['key' => 'vfs.dev.get[disks,"^zbx_no_such_device$"]']
 	];
+
+	// Key filtering vfs.dev.get by the name of a discovered disk, built in prepareData().
+	private static $devnames_key;
 
 	/**
 	 * Discover the real block devices to test vfs.dev.get against. This suite never creates,
@@ -61,6 +67,9 @@ class testVfsDevGet extends CIntegrationTest {
 	 * @inheritdoc
 	 */
 	public function prepareData() {
+		self::$devnames_key = 'vfs.dev.get[disks,"^'.preg_quote(array_key_first(self::$disks)).'$"]';
+		self::$items[] = ['key' => self::$devnames_key];
+
 		$ports = [self::COMPONENT_AGENT => self::AGENT_PORT_SUFFIX, self::COMPONENT_AGENT2 => self::AGENT2_PORT_SUFFIX];
 
 		foreach ($ports as $component => $port) {
@@ -152,17 +161,12 @@ class testVfsDevGet extends CIntegrationTest {
 				continue;
 			}
 
+			// Same source as the agents: lsblk also reports device-mapper children (kpartx) as "part".
 			$partitions = [];
-			$partition_names = trim((string) shell_exec('lsblk --all -nlo NAME,TYPE '.escapeshellarg('/dev/'.$name).
-					" | awk 'NR > 1 && \$2 == \"part\" {print \$1}'"
-			));
 
-			foreach (($partition_names === '') ? [] : explode("\n", $partition_names) as $partition) {
-				$partition = trim($partition);
-
-				if ($partition !== '') {
-					$partitions[$partition] = self::readSysfsSizeBytes($partition);
-				}
+			foreach (glob('/sys/class/block/'.$name.'/*/partition') ?: [] as $path) {
+				$partition = basename(dirname($path));
+				$partitions[$partition] = self::readSysfsSizeBytes($partition);
 			}
 
 			$disks[$name] = [
@@ -301,15 +305,15 @@ class testVfsDevGet extends CIntegrationTest {
 	}
 
 	/**
-	 * Find the config entry for a device inside a vfs.dev.get "config" array.
+	 * Find the entry for a device inside a vfs.dev.get "config" or "values" array.
 	 *
-	 * @param array  $config
+	 * @param array  $entries
 	 * @param string $name
 	 *
 	 * @return array|null
 	 */
-	private static function findConfigEntry(array $config, $name) {
-		foreach ($config as $entry) {
+	private static function findEntryByName(array $entries, $name) {
+		foreach ($entries as $entry) {
 			if (array_key_exists('name', $entry) && $entry['name'] === $name) {
 				return $entry;
 			}
@@ -329,7 +333,7 @@ class testVfsDevGet extends CIntegrationTest {
 			$this->assertArrayHasKey('config', $json, $component.':'.$key);
 
 			foreach (self::$disks as $name => $disk) {
-				$found = self::findConfigEntry($json['config'], $name);
+				$found = self::findEntryByName($json['config'], $name);
 				$this->assertIsArray($found, 'Device "'.$name.'" is missing from '.$component.':'.$key);
 
 				$this->assertEquals($disk['type'], $found['type'], $component.':'.$key.' type for "'.$name.'"');
@@ -367,7 +371,7 @@ class testVfsDevGet extends CIntegrationTest {
 		$this->assertArrayHasKey('config', $json, $component.':'.$key);
 
 		foreach (self::$disks as $name => $disk) {
-			$found = self::findConfigEntry($json['config'], $name);
+			$found = self::findEntryByName($json['config'], $name);
 			$this->assertIsArray($found, 'Device "'.$name.'" is missing from '.$component.':'.$key);
 			$this->assertArrayHasKey('partitions', $found, $component.':'.$key.' for "'.$name.'"');
 
@@ -393,49 +397,119 @@ class testVfsDevGet extends CIntegrationTest {
 		foreach (['vfs.dev.get[disk_stats]', 'vfs.dev.get[device_stats]'] as $key) {
 			$json = $this->decodeItemValue($this->getItemResult($component, $key), $component, $key);
 
+			$this->assertArrayHasKey('config', $json, $component.':'.$key);
 			$this->assertArrayHasKey('values', $json, $component.':'.$key);
 
-			foreach (array_keys(self::$disks) as $name) {
-				$found = null;
-				foreach ($json['values'] as $value) {
-					if (array_key_exists('name', $value) && $value['name'] === $name) {
-						$found = $value;
-						break;
+			foreach (self::$disks as $name => $disk) {
+				$this->checkStatsEntries($json, $component, $key, $name, 'disk', $disk['size_bytes']);
+
+				foreach ($disk['partitions'] as $partition => $size) {
+					if ($key === 'vfs.dev.get[disk_stats]') {
+						foreach (['config', 'values'] as $section) {
+							$this->assertNull(self::findEntryByName($json[$section], $partition),
+									'Partition "'.$partition.'" must not be in '.$section.' of '.$component.':'.$key
+							);
+						}
 					}
-				}
-
-				$this->assertIsArray($found, 'Device "'.$name.'" is missing from '.$component.':'.$key);
-				$this->assertArrayHasKey('stats', $found, $component.':'.$key);
-
-				foreach (['reads_completed', 'bytes_read', 'writes_completed', 'bytes_written'] as $field) {
-					$this->assertArrayHasKey($field, $found['stats'],
-							'Field "'.$field.'" is missing from '.$component.':'.$key
-					);
-					$this->assertIsNumeric($found['stats'][$field],
-							'Field "'.$field.'" is not numeric for '.$component.':'.$key
-					);
-					$this->assertGreaterThanOrEqual(0, $found['stats'][$field],
-							'Field "'.$field.'" is negative for '.$component.':'.$key
-					);
+					// The agents discover stats devices in /dev, unlike the partitions of "devices" mode.
+					elseif (file_exists('/dev/'.$partition)) {
+						$this->checkStatsEntries($json, $component, $key, $partition, 'partition', $size);
+					}
 				}
 			}
 		}
 	}
 
 	/**
-	 * An unknown mode must be reported as an unsupported item, on both agent and agent2.
+	 * Check the "config" and "values" entries of a device in a stats mode result.
+	 *
+	 * @param array    $json
+	 * @param string   $component
+	 * @param string   $key
+	 * @param string   $name
+	 * @param string   $type
+	 * @param int|null $size_bytes  expected size, null if it could not be read from sysfs
+	 */
+	private function checkStatsEntries(array $json, $component, $key, $name, $type, $size_bytes) {
+		$config = self::findEntryByName($json['config'], $name);
+		$this->assertIsArray($config, 'Device "'.$name.'" is missing from config of '.$component.':'.$key);
+		$this->assertEquals($type, $config['type'], $component.':'.$key.' type for "'.$name.'"');
+
+		if ($size_bytes !== null) {
+			$this->assertEquals($size_bytes, $config['size_bytes'],
+					$component.':'.$key.' size_bytes for "'.$name.'"'
+			);
+		}
+
+		$value = self::findEntryByName($json['values'], $name);
+		$this->assertIsArray($value, 'Device "'.$name.'" is missing from values of '.$component.':'.$key);
+		$this->assertArrayHasKey('stats', $value, $component.':'.$key);
+
+		foreach (['reads_completed', 'bytes_read', 'writes_completed', 'bytes_written', 'io_time_ms'] as $field) {
+			$this->assertArrayHasKey($field, $value['stats'],
+					'Field "'.$field.'" is missing from '.$component.':'.$key
+			);
+			$this->assertIsNumeric($value['stats'][$field],
+					'Field "'.$field.'" is not numeric for '.$component.':'.$key
+			);
+			$this->assertGreaterThanOrEqual(0, $value['stats'][$field],
+					'Field "'.$field.'" is negative for '.$component.':'.$key
+			);
+		}
+	}
+
+	/**
+	 * The second parameter must limit the result to the devices with a matching name.
 	 *
 	 * @depends testVfsDevGet_checkDataCollection
 	 * @dataProvider componentsDataProvider
 	 */
-	public function testVfsDevGet_invalidMode($component) {
-		$key = 'vfs.dev.get[bogus_mode]';
+	public function testVfsDevGet_devnames($component) {
+		$key = self::$devnames_key;
+		$json = $this->decodeItemValue($this->getItemResult($component, $key), $component, $key);
+
+		$this->assertArrayHasKey('config', $json, $component.':'.$key);
+		$this->assertEquals([array_key_first(self::$disks)], array_column($json['config'], 'name'),
+				$component.':'.$key
+		);
+
+		$key = 'vfs.dev.get[disks,"^zbx_no_such_device$"]';
+		$json = $this->decodeItemValue($this->getItemResult($component, $key), $component, $key);
+
+		$this->assertArrayHasKey('config', $json, $component.':'.$key);
+		$this->assertEmpty($json['config'], $component.':'.$key);
+	}
+
+	/**
+	 * Data provider of invalid parameters for the two components under test.
+	 *
+	 * @return array
+	 */
+	public function invalidParametersDataProvider() {
+		$data = [];
+
+		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
+			$data[] = [$component, 'vfs.dev.get[bogus_mode]', 'invalid first parameter'];
+			$data[] = [$component, 'vfs.dev.get[disks,"("]', 'invalid regular expression in second parameter'];
+			$data[] = [$component, 'vfs.dev.get[disks,,extra]', 'too many parameters'];
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Invalid parameters must be reported as an unsupported item, on both agent and agent2.
+	 *
+	 * @depends testVfsDevGet_checkDataCollection
+	 * @dataProvider invalidParametersDataProvider
+	 */
+	public function testVfsDevGet_invalidParameters($component, $key, $error) {
 		$item = $this->getItemResult($component, $key);
 
 		$this->assertEquals(ITEM_STATE_NOTSUPPORTED, $item['state'], $component.':'.$key.
 				' should be unsupported, got value: '.$item['lastvalue']
 		);
-		$this->assertStringContainsStringIgnoringCase('invalid first parameter', $item['error'],
+		$this->assertStringContainsStringIgnoringCase($error, $item['error'],
 				$component.':'.$key.' failed for an unexpected reason: '.$item['error']
 		);
 	}
