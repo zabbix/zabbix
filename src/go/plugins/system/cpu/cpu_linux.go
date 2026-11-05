@@ -39,11 +39,11 @@ const (
 type Plugin struct {
 	plugin.Base
 	cpus             []*cpuUnit
-	findProcStatLine func(prefix string) (string, error)
+	findStatLineFunc func(prefix string) (string, error)
 }
 
 func init() {
-	impl.findProcStatLine = findProcStatLine
+	impl.findStatLineFunc = findProcStatLine
 
 	err := plugin.RegisterMetrics(
 		&impl, pluginName,

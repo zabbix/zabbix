@@ -18,6 +18,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/zbxerr"
@@ -89,7 +90,7 @@ func TestPlugin_getCPUIntr(t *testing.T) {
 			p := &Plugin{
 				Base: plugin.Base{Logger: log.New("test")},
 				cpus: nil,
-				findProcStatLine: func(prefix string) (string, error) {
+				findStatLineFunc: func(prefix string) (string, error) {
 					gotPrefix = prefix
 
 					return tt.line, tt.readErr
@@ -106,8 +107,9 @@ func TestPlugin_getCPUIntr(t *testing.T) {
 				t.Fatalf("getCPUIntr() error = %v, want %v", err, tt.errIs)
 			}
 
-			if got != tt.want {
-				t.Fatalf("getCPUIntr() = %v, want %v", got, tt.want)
+			diff := cmp.Diff(tt.want, got)
+			if diff != "" {
+				t.Fatalf("getCPUIntr() mismatch (-want +got):\n%s", diff)
 			}
 
 			wasRead := gotPrefix != ""
@@ -202,8 +204,9 @@ func Test_parseIntrTotal(t *testing.T) {
 				t.Fatalf("parseIntrTotal() error = %v, wantErr %t", err, tt.wantErr)
 			}
 
-			if got != tt.want {
-				t.Fatalf("parseIntrTotal() = %d, want %d", got, tt.want)
+			diff := cmp.Diff(tt.want, got)
+			if diff != "" {
+				t.Fatalf("parseIntrTotal() mismatch (-want +got):\n%s", diff)
 			}
 		})
 	}

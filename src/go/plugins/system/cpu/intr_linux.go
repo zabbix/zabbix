@@ -30,7 +30,7 @@ func (p *Plugin) getCPUIntr(params []string) (any, error) {
 		return nil, zbxerr.ErrorTooManyParameters
 	}
 
-	line, err := p.findProcStatLine(intrPrefix)
+	line, err := p.findStatLineFunc(intrPrefix)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func findProcStatLine(prefix string) (string, error) {
 	}
 
 	if len(lines) == 0 {
-		return "", errs.Errorf("Cannot find a line with %q in %s.", strings.TrimSpace(prefix), procStatLocation)
+		return "", errs.Errorf("cannot find a line with %q in %s", strings.TrimSpace(prefix), procStatLocation)
 	}
 
 	return lines[0], nil
@@ -67,7 +67,7 @@ func findProcStatLine(prefix string) (string, error) {
 func parseIntrTotal(line string) (uint64, error) {
 	fields := strings.Fields(line)
 	if len(fields) < 2 {
-		return 0, errs.Errorf("Cannot find total interrupt count in line %q.", line)
+		return 0, errs.Errorf("cannot find total interrupt count in line %q", line)
 	}
 
 	total, err := strconv.ParseUint(fields[1], 10, 64)
