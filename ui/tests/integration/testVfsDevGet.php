@@ -435,5 +435,8 @@ class testVfsDevGet extends CIntegrationTest {
 		$this->assertEquals(ITEM_STATE_NOTSUPPORTED, $item['state'], $component.':'.$key.
 				' should be unsupported, got value: '.$item['lastvalue']
 		);
+		$this->assertStringContainsStringIgnoringCase('invalid first parameter', $item['error'],
+				$component.':'.$key.' failed for an unexpected reason: '.$item['error']
+		);
 	}
 }
