@@ -22,7 +22,7 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 class CAgentCommandsClient extends CZabbixClient {
 	private $raw_response = null;
 
-	protected function normalizeResponse(array &$response): bool {
+	protected function normalizeResponse(array &$response) {
 		$this->raw_response = $response;
 
 		return parent::normalizeResponse($response);
@@ -30,6 +30,7 @@ class CAgentCommandsClient extends CZabbixClient {
 
 	public function requestRaw(array $params) {
 		$this->raw_response = null;
+		$this->socket = null;
 		parent::request($params);
 
 		return $this->raw_response;
@@ -511,7 +512,7 @@ class testAgentJsonProtocol extends CIntegrationTest {
 			};
 
 			$client = new CAgentCommandsClient('localhost', $this->getConfigurationValue(self::COMPONENT_SERVER,
-				'ListenPort'), 10, 10, ZBX_SOCKET_BYTES_LIMIT, tls_config: ['ACTIVE' => false]
+				'ListenPort'), 10, 10, ZBX_SOCKET_BYTES_LIMIT
 			);
 
 			$commandid = null;
