@@ -121,7 +121,7 @@
 					}
 				}
 
-				location.href = location.href;
+				location.reload();
 			},
 
 			groupSuccess(e) {
@@ -131,7 +131,7 @@
 					postMessageDetails('success', e.detail.messages);
 				}
 
-				location.href = location.href;
+				location.reload();
 			}
 		}
 	};

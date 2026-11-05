@@ -110,7 +110,7 @@
 						uncheckTableRows('token');
 					}
 
-					location.href = location.href;
+					location.reload();
 				})
 				.catch(() => {
 					clearMessages();
@@ -137,7 +137,7 @@
 				}
 
 				uncheckTableRows('token');
-				location.href = location.href;
+				location.reload();
 			}
 		}
 	};
