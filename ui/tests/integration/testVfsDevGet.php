@@ -234,6 +234,13 @@ class testVfsDevGet extends CIntegrationTest {
 				'enabling Zabbix agent checks on host "'.$component.'": interface became available', false
 			);
 		}
+
+		// Stored values are read by later tests after the components stop.
+		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
+			foreach (self::$items as $item) {
+				$this->getItemResult($component, $item['key']);
+			}
+		}
 	}
 
 	/**
@@ -254,13 +261,13 @@ class testVfsDevGet extends CIntegrationTest {
 	 * @param string $component
 	 * @param string $key
 	 *
-	 * @return array  item.get result row (lastvalue, lastclock, state)
+	 * @return array  item.get result row (lastvalue, lastclock, state, error)
 	 */
 	private function getItemResult($component, $key) {
 		$itemid = self::$itemids[$component.':'.$key];
 
 		$response = $this->callUntilDataIsPresent('item.get', [
-			'output' => ['lastvalue', 'lastclock', 'state'],
+			'output' => ['lastvalue', 'lastclock', 'state', 'error'],
 			'itemids' => [$itemid]
 		], 10, 2, function(array $response) {
 			$item = $response['result'][0];
@@ -284,7 +291,7 @@ class testVfsDevGet extends CIntegrationTest {
 	 */
 	private function decodeItemValue(array $item, $component, $key) {
 		$this->assertEquals(ITEM_STATE_NORMAL, $item['state'],
-			$component.':'.$key.' is unexpectedly unsupported: '.$item['lastvalue']
+			$component.':'.$key.' is unexpectedly unsupported: '.$item['error']
 		);
 
 		$json = json_decode($item['lastvalue'], true);
