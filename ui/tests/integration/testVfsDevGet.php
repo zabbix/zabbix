@@ -28,7 +28,7 @@ class testVfsDevGet extends CIntegrationTest {
 	private static $itemids = [];
 
 	// Real disk-type block devices on the host (and their partitions), discovered in
-	// onBeforeTestSuite() and used as expected values - see listBlockDevices(). Keyed by device name.
+	// prepareData() and used as expected values - see listBlockDevices(). Keyed by device name.
 	private static $disks = [];
 
 	// List of items to check.
@@ -48,12 +48,15 @@ class testVfsDevGet extends CIntegrationTest {
 	private static $devnames_key;
 
 	/**
-	 * Discover the real block devices to test vfs.dev.get against. This suite never creates,
-	 * attaches, or otherwise mocks a device of its own - if the host genuinely has none, that is a
-	 * real gap in coverage, not an environment quirk to route around, so the suite fails outright
-	 * rather than being skipped.
+	 * Discover the real block devices to test vfs.dev.get against and create the items to check.
+	 *
+	 * This suite never creates, attaches, or otherwise mocks a device of its own - if the host genuinely
+	 * has none, that is a real gap in coverage, not an environment quirk to route around, so the first
+	 * test case fails with an error instead of the whole suite being silently skipped.
+	 *
+	 * @inheritdoc
 	 */
-	protected function onBeforeTestSuite() {
+	public function prepareData() {
 		if (trim((string) shell_exec('command -v lsblk')) === '') {
 			throw new Exception('lsblk is required to discover block devices for vfs.dev.get, but was not found.');
 		}
@@ -64,13 +67,6 @@ class testVfsDevGet extends CIntegrationTest {
 			throw new Exception('No block devices found on this host to test vfs.dev.get against.');
 		}
 
-		parent::onBeforeTestSuite();
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function prepareData() {
 		self::$devnames_key = 'vfs.dev.get[disks,"^'.preg_quote(array_key_first(self::$disks)).'$"]';
 		self::$items[] = ['key' => self::$devnames_key];
 
