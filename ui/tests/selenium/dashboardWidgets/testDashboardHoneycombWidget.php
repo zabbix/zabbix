@@ -58,7 +58,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 	 */
 	protected static $disposable_dashboard_id;
 
-	protected static $dependent_items;
+	protected static $dependent_itemids;
 
 	const DASHBOARD_FOR_MACRO_FUNCTIONS = 'Dashboard for testing macro functions';
 	const WIDGET_FOR_MACRO_FUNCTIONS = 'Widget for testing macro functions';
@@ -181,6 +181,24 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'key_' => 'honey_non_numeric_4',
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_LOG
+					],
+					[
+						'name' => 'Non-numeric XSS - Text',
+						'key_' => 'honey_non_numeric_5',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_TEXT
+					],
+					[
+						'name' => 'Non-numeric XSS - Log',
+						'key_' => 'honey_non_numeric_6',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_LOG
+					],
+					[
+						'name' => 'Non-numeric XSS - Char',
+						'key_' => 'honey_non_numeric_7',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_STR
 					]
 				]
 			],
@@ -308,7 +326,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 		];
 
 		CDataHelper::createItems('item', $dependent, $response['hostids']);
-		self::$dependent_items = CDataHelper::getIds('name');
+		self::$dependent_itemids = CDataHelper::getIds('name');
 
 		foreach ([100, 200, 300, 400, 500] as $i => $value) {
 			CDataHelper::addItemData($itemids[self::HOST_DISPLAY.':honey_display_'.($i + 1)], $value);
@@ -318,7 +336,10 @@ class testDashboardHoneycombWidget extends testWidgets {
 			'{"test": "json1", "users": {"name1": "test1", "name2": "🙂"}}',
 			'Text test 🙂',
 			'Char test 🙂',
-			'Log test 🙂'
+			'Log test 🙂',
+			'\'"><img src=x onerror=alert(1)>',
+			'"><svg/onload=alert(1)>',
+			' " autofocus onfocus=alert(1) x="'
 		];
 		// Generate data for non-numeric items.
 		foreach ($non_numeric_data as $i => $value) {
@@ -326,7 +347,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 		}
 
 		// Generate data for binary data type.
-		CDataHelper::addItemData(self::$dependent_items['Non-numeric BINARY'], 'Test for binary item value 🙂');
+		CDataHelper::addItemData(self::$dependent_itemids['Non-numeric BINARY'], 'Test for binary item value 🙂');
 
 		// Items ids that used in filtering scenario.
 		$filtered_items = [
@@ -2049,7 +2070,37 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'result' => '100 {$TEXT} {HOST.NAME}'
 				]
 			],
-			// #13 Non-numeric value JSON.
+			// #13.
+			[
+				[
+					'fields' => [
+						'Name' => 'Only primary label displayed',
+						'Item patterns' => 'Display item 1',
+						'id:show_2' => false,
+						'id:primary_label_type' => 'Text',
+						'id:primary_label' => 'Only primary'
+					],
+					'check_label' => 'svg-honeycomb-label-primary',
+					'turned_off_label' => 'svg-honeycomb-label-secondary',
+					'result' => 'Only primary'
+				]
+			],
+			// #14.
+			[
+				[
+					'fields' => [
+						'Name' => 'Only secondary label displayed',
+						'Item patterns' => 'Display item 1',
+						'id:show_1' => false,
+						'id:secondary_label_type' => 'Text',
+						'id:secondary_label' => 'Only secondary'
+					],
+					'check_label' => 'svg-honeycomb-label-secondary',
+					'turned_off_label' => 'svg-honeycomb-label-primary',
+					'result' => 'Only secondary'
+				]
+			],
+			// #14 Non-numeric value JSON.
 			[
 				[
 					'fields' => [
@@ -2061,7 +2112,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'result' => '{"test": "json1", "users": {"name1": "test1", "name2": "🙂"}}'
 				]
 			],
-			// #14 Non-numeric value BINARY.
+			// #15 Non-numeric value BINARY.
 			[
 				[
 					'fields' => [
@@ -2073,7 +2124,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'result' => 'binary value'
 				]
 			],
-			// #15 Non-numeric value TEXT.
+			// #16 Non-numeric value TEXT.
 			[
 				[
 					'fields' => [
@@ -2085,7 +2136,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'result' => 'Text test 🙂'
 				]
 			],
-			// #16 Non-numeric value CHAR.
+			// #17 Non-numeric value CHAR.
 			[
 				[
 					'fields' => [
@@ -2097,7 +2148,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'result' => 'Char test 🙂'
 				]
 			],
-			// #17 Non-numeric value LOG.
+			// #18 Non-numeric value LOG.
 			[
 				[
 					'fields' => [
@@ -2109,7 +2160,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'result' => 'Log test 🙂'
 				]
 			],
-			// #18 Non-numeric value with units (no units should be displayed).
+			// #19 Non-numeric value with units (no units should be displayed).
 			[
 				[
 					'fields' => [
@@ -2125,7 +2176,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'result' => '{"test": "json1", "users": {"name1": "test1", "name2": "🙂"}}'
 				]
 			],
-			// #19 Macros with JSON data type.
+			// #20 Macros with JSON data type.
 			[
 				[
 					'fields' => [
@@ -2139,7 +2190,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'result' => 'Display honey_non_numeric_1 {"test": "json1", "u...'
 				]
 			],
-			// #20 Macros with Binary data type.
+			// #21 Macros with Binary data type.
 			[
 				[
 					'fields' => [
@@ -2150,10 +2201,10 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'id:primary_label' => '{HOST.NAME} {ITEM.KEY} {ITEM.LASTVALUE}',
 						'id:secondary_label' => '{HOST.NAME} {ITEM.KEY} {ITEM.LASTVALUE}'
 					],
-					'result' => 'Display display_bin binary value'
+					'result' => 'Display display_bin *UNKNOWN*'
 				]
 			],
-			// #21 Item value macro with regsub to display full value (JSON).
+			// #22 Item value macro with regsub to display full value (JSON).
 			[
 				[
 					'fields' => [
@@ -2167,7 +2218,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'result' => '{"test": "json1", "users": {"name1": "test1", "name2": "🙂"}}'
 				]
 			],
-			// #22 Item value macro with regsub to display full value (BIN).
+			// #23 Item value macro with macro function - should resolve UNKNOWN for binary item.
 			[
 				[
 					'fields' => [
@@ -2178,14 +2229,14 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'id:primary_label' => '{{ITEM.LASTVALUE}.regsub("(.*)", \1)}',
 						'id:secondary_label' => '{{ITEM.LASTVALUE}.regsub("(.*)", \1)}'
 					],
-					'result' => 'Test for binary item value 🙂'
+					'result' => '*UNKNOWN*'
 				]
 			],
-			// #23 Macros with Text data type.
+			// #24 Macros with Text data type.
 			[
 				[
 					'fields' => [
-						'Name' => 'Resolved macros with regsub TEXT',
+						'Name' => 'Resolved macros TEXT',
 						'Item patterns' => 'Non-numeric TEXT',
 						'id:primary_label_type' => 'Text',
 						'id:secondary_label_type' => 'Text',
@@ -2195,11 +2246,11 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'result' => 'Display honey_non_numeric_2 Text test 🙂'
 				]
 			],
-			// #24 Macros with Char data type.
+			// #25 Macros with Char data type.
 			[
 				[
 					'fields' => [
-						'Name' => 'Resolved macros with regsub CHAR',
+						'Name' => 'Resolved macros CHAR',
 						'Item patterns' => 'Non-numeric CHAR',
 						'id:primary_label_type' => 'Text',
 						'id:secondary_label_type' => 'Text',
@@ -2209,11 +2260,11 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'result' => 'Display honey_non_numeric_3 Char test 🙂'
 				]
 			],
-			// #25 Macros with Log data type.
+			// #26 Macros with Log data type.
 			[
 				[
 					'fields' => [
-						'Name' => 'Resolved macros with regsub Log',
+						'Name' => 'Resolved macros LOG',
 						'Item patterns' => 'Non-numeric Log',
 						'id:primary_label_type' => 'Text',
 						'id:secondary_label_type' => 'Text',
@@ -2223,22 +2274,99 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'result' => 'Display honey_non_numeric_4 Log test 🙂'
 				]
 			],
-			// #26.
+			// #27 Non-numeric with XSS in item value macro #1.
 			[
 				[
 					'fields' => [
-						'Name' => 'Only secondary label displayed',
-						'Item patterns' => 'Display item 1',
-						'id:show_1' => false,
+						'Name' => 'Resolved macros XSS #1',
+						'Item patterns' => 'Non-numeric XSS - Text',
+						'id:primary_label_type' => 'Text',
 						'id:secondary_label_type' => 'Text',
-						'id:secondary_label' => 'Only secondary'
+						'id:primary_label' => '{ITEM.LASTVALUE}',
+						'id:secondary_label' => '{ITEM.LASTVALUE}'
 					],
-					'check_label' => 'svg-honeycomb-label-secondary',
-					'turned_off_label' => 'svg-honeycomb-label-primary',
-					'result' => 'Only secondary'
+					'result' => '\'"><img src=x onerro...'
 				]
 			],
-			// #27.
+			// #28 Non-numeric with XSS in item value macro #2.
+			[
+				[
+					'fields' => [
+						'Name' => 'Resolved macros XSS #2',
+						'Item patterns' => 'Non-numeric XSS - Log',
+						'id:primary_label_type' => 'Text',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label' => '{ITEM.LASTVALUE}',
+						'id:secondary_label' => '{ITEM.LASTVALUE}'
+					],
+					'result' => '"><svg/onload=alert(...'
+				]
+			],
+			// #29 Non-numeric with XSS in item value macro #3.
+			[
+				[
+					'fields' => [
+						'Name' => 'Resolved macros XSS #3',
+						'Item patterns' => 'Non-numeric XSS - Char',
+						'id:primary_label_type' => 'Text',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label' => '{ITEM.LASTVALUE}',
+						'id:secondary_label' => '{ITEM.LASTVALUE}'
+					],
+					'result' => '" autofocus onfocus...'
+				]
+			],
+			// #30 Non-numeric with XSS in item value #1.
+			[
+				[
+					'fields' => [
+						'Name' => 'Value XSS #1',
+						'Item patterns' => 'Non-numeric XSS - Text',
+						'id:primary_label_type' => 'Value',
+						'id:secondary_label_type' => 'Value'
+					],
+					'result' => '\'"><img src=x onerror=alert(1)>'
+				]
+			],
+			// #31 Non-numeric with XSS in item value #2.
+			[
+				[
+					'fields' => [
+						'Name' => 'Value XSS #2',
+						'Item patterns' => 'Non-numeric XSS - Log',
+						'id:primary_label_type' => 'Value',
+						'id:secondary_label_type' => 'Value'
+					],
+					'result' => '"><svg/onload=alert(1)>'
+				]
+			],
+			// #32 Non-numeric with XSS in item value #3.
+			[
+				[
+					'fields' => [
+						'Name' => 'Value XSS #3',
+						'Item patterns' => 'Non-numeric XSS - Char',
+						'id:primary_label_type' => 'Value',
+						'id:secondary_label_type' => 'Value'
+					],
+					'result' => '" autofocus onfocus=alert(1) x="'
+				]
+			],
+			// #33 XSS used as label.
+			[
+				[
+					'fields' => [
+						'Name' => 'Label XSS',
+						'Item patterns' => 'Non-numeric XSS - Char',
+						'id:primary_label_type' => 'Text',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label' => '<script>alert(\'xss\');</alert>',
+						'id:secondary_label' => '<script>alert(\'xss\');</alert>'
+					],
+					'result' => '<script>alert(\'xss\');</alert>'
+				]
+			],
+			// #34.
 			[
 				[
 					'fields' => [
@@ -2295,6 +2423,9 @@ class testDashboardHoneycombWidget extends testWidgets {
 				$this->assertEquals($data['result'], $displayed);
 			}
 		}
+
+		// Check that no alerts appeared in XSS test cases.
+		$this->assertFalse($this->page->isAlertPresent());
 
 		// Check that correct colors displayed.
 		if (array_key_exists('colors', $data)) {
