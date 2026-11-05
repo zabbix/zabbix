@@ -73,6 +73,10 @@ static int		db_auto_increment;
 static zbx_db_query_mask_t	db_log_masked_values = ZBX_DB_DONT_MASK_QUERIES;
 
 #if defined(HAVE_MYSQL)
+/* same server error code has different meaning in MySQL and MariaDB */
+#	define ZBX_MYSQL_ER_CLIENT_INTERACTION_TIMEOUT		4031
+#	define ZBX_MARIADB_ER_REFERENCED_TRG_DOES_NOT_EXIST	4031
+
 static MYSQL			*conn = NULL;
 static int			mysql_err_cnt = 0;
 static zbx_uint32_t		ZBX_MYSQL_SVERSION = ZBX_DBVERSION_UNDEFINED;
@@ -328,6 +332,9 @@ static int	is_recoverable_mysql_error(int err_no)
 	if (0 == err_no)
 		err_no = (int)mysql_errno(conn);
 
+	if (OFF == ZBX_MARIADB_SFORK && ZBX_MYSQL_ER_CLIENT_INTERACTION_TIMEOUT == err_no)
+		return SUCCEED;
+
 	switch (err_no)
 	{
 		case CR_CONN_HOST_ERROR:
@@ -344,9 +351,6 @@ static int	is_recoverable_mysql_error(int err_no)
 		case ER_UNKNOWN_COM_ERROR:
 		case ER_LOCK_DEADLOCK:
 		case ER_LOCK_WAIT_TIMEOUT:
-#ifdef ER_CLIENT_INTERACTION_TIMEOUT
-		case ER_CLIENT_INTERACTION_TIMEOUT:
-#endif
 #ifdef CR_SSL_CONNECTION_ERROR
 		case CR_SSL_CONNECTION_ERROR:
 #endif
@@ -367,13 +371,13 @@ static int	is_inhibited_mysql_error(int err_no)
 	if (0 < txn_level && 0 == txn_begin)
 		return FAIL;
 
+	if (OFF == ZBX_MARIADB_SFORK && ZBX_MYSQL_ER_CLIENT_INTERACTION_TIMEOUT == err_no)
+		return SUCCEED;
+
 	switch (err_no)
 	{
 		case CR_SERVER_GONE_ERROR:
 		case CR_SERVER_LOST:
-#ifdef ER_CLIENT_INTERACTION_TIMEOUT
-		case ER_CLIENT_INTERACTION_TIMEOUT:
-#endif
 			return SUCCEED;
 	}
 
