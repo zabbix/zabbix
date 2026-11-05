@@ -30,7 +30,7 @@ class CTagFilterFieldHelper {
 	 * @param array  $options
 	 * @param string $options['tag_field_name']       (optional)
 	 * @param string $options['evaltype_field_name']  (optional)
-	 * @param string $options['filter_type']          (optional)
+	 * @param int    $options['filter_type']          (optional)
 	 *
 	 * @return CTable
 	 */
@@ -78,19 +78,10 @@ class CTagFilterFieldHelper {
 	 * @param array      $options
 	 * @param string     $options['tag_field_name']  (optional)
 	 * @param int        $options['filter_type']     (optional)
-	 * @param string|int $index
-	 * @param string     $data['tags'][]['tag']      if filter_type set to FILTER_TYPE_TAG
-	 * @param string     $data['tags'][]['key']      if filter_type set to FILTER_TYPE_APM_ATTRIBUTE
-	 * @param int        $data['tags'][]['operator']
-	 * @param string     $data['tags'][]['value']
 	 *
 	 * @return CRow
 	 */
 	public static function getTemplate(array $options = []): CRow {
-		$options += [
-			'filter_type' => self::FILTER_TYPE_TAG
-		];
-
 		return self::getFilterRow($options, ['tag' => '', 'operator' => TAG_OPERATOR_LIKE, 'value' => '']);
 	}
 
@@ -117,7 +108,6 @@ class CTagFilterFieldHelper {
 				->setAttribute('placeholder', $name_placeholder)
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 			(new CSelect($options['tag_field_name'].'['.$index.'][operator]'))
-				->setId($options['tag_field_name'].'_'.$index.'_operator')
 				->addOptions(CSelect::createOptionsFromArray([
 					TAG_OPERATOR_EXISTS => _('Exists'),
 					TAG_OPERATOR_EQUAL => _('Equals'),
