@@ -1527,7 +1527,8 @@ function getMenuPopupURLData(urls, trigger_element, hostid, eventid) {
 				manualinput_default_value: url.manualinput_default_value,
 				scriptid: url.scriptid,
 				hostid,
-				eventid
+				eventid,
+				error: 'error' in url ? url.error : null
 			});
 		}
 	}
@@ -1585,7 +1586,11 @@ function getMenuPopupURLItems(tree, trigger_elm) {
 			}
 
 			if (data.params !== undefined) {
-				if (data.params.scriptid !== undefined) {
+
+				if (data.params.error !== null) {
+					item.error = data.params.error;
+				}
+				else if (data.params.scriptid !== undefined) {
 					item.clickCallback = function(e) {
 						jQuery(this)
 							.closest('.menu-popup-top')
@@ -1753,6 +1758,7 @@ jQuery(function($) {
 				if (sections.length > 1 && section_label !== null) {
 					item.ariaLabel = section_label + ', ' + item['label'];
 				}
+
 				$menu_popup.append(createMenuItem(item));
 			});
 		});
@@ -2274,20 +2280,31 @@ jQuery(function($) {
 			link.addClass('disabled');
 		}
 		else {
-			if (options.url !== undefined) {
-				link.attr('href', options.url);
-
-				if ('target' in options) {
-					link.attr('target', options.target);
+			if ('error' in options && options.error) {
+				if (options.dataAttributes === undefined) {
+					options.dataAttributes = {};
 				}
 
-				if ('rel' in options) {
-					link.attr('rel', options.rel);
-				}
+				options.dataAttributes.error = options.error;
+
+				link.on('click', (e) => alert(e.target.dataset.error));
 			}
+			else {
+				if (options.url !== undefined) {
+					link.attr('href', options.url);
 
-			if (options.clickCallback !== undefined) {
-				link.on('click', options.clickCallback);
+					if ('target' in options) {
+						link.attr('target', options.target);
+					}
+
+					if ('rel' in options) {
+						link.attr('rel', options.rel);
+					}
+				}
+
+				if (options.clickCallback !== undefined) {
+					link.on('click', options.clickCallback);
+				}
 			}
 		}
 

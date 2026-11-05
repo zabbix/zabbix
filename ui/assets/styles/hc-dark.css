@@ -4754,6 +4754,8 @@ div.dashboard-widget-geomap {
   white-space: normal; }
   .geomap-hintbox tr[data-hostid] {
     cursor: pointer; }
+  .geomap-hintbox .widget-info-maintenance {
+    display: inline-block; }
 
 form.dashboard-widget-honeycomb .fields-group.fields-group-primary-label, form.dashboard-widget-honeycomb .fields-group.fields-group-secondary-label {
   display: grid;
@@ -5140,11 +5142,16 @@ div.dashboard-widget-itemcard .item-card {
     div.dashboard-widget-itemcard .item-card .sections-header .section-path {
       display: flex;
       gap: 5px;
-      height: 17px;
-      line-height: 17px; }
+      height: 20px;
+      line-height: 20px; }
       div.dashboard-widget-itemcard .item-card .sections-header .section-path .path-element {
         flex: 1 1 0;
         max-width: fit-content; }
+      div.dashboard-widget-itemcard .item-card .sections-header .section-path .zi-wrench-alt-small {
+        min-width: 18px;
+        height: 18px;
+        margin-top: 1px;
+        margin-left: -5px; }
   div.dashboard-widget-itemcard .item-card .sections {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -7366,7 +7373,7 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
       overflow-y: auto;
       overflow-x: hidden;
       width: 100%;
-      max-height: calc(100vh - 220px);
+      max-height: calc(100vh - 216px);
       max-width: inherit;
       margin: 0 -10px 8px;
       padding: 0 10px;
@@ -8480,12 +8487,15 @@ svg {
   .macro-input-group .btn-change[disabled] {
     display: none; }
   .macro-input-group .btn-undo {
-    display: none;
+    display: flex;
+    align-items: start;
+    height: auto;
     color: #dddddd;
     background-color: #383838;
     border-width: 1px 0;
     border-color: #666666; }
     .macro-input-group .btn-undo::before {
+      margin-top: 2px;
       font-size: 16px; }
     .macro-input-group .btn-undo:focus, .macro-input-group .btn-undo:hover {
       color: #333333;
@@ -8493,6 +8503,8 @@ svg {
       border-color: #bbbbbb; }
     .macro-input-group .btn-undo.is-focused {
       border-color: #bbbbbb; }
+    .macro-input-group .btn-undo[hidden] {
+      display: none; }
 
 .input-secret {
   position: relative;

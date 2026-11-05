@@ -261,7 +261,9 @@ window.host_wizard_edit = new class {
 
 			if (this.#pending_form_update) {
 				this.#pending_form_update = false;
-				this.#updateForm(this.#last_input_changed ?? this.#inputNameToInputPath(this.#last_input_changed));
+				this.#updateForm(
+					this.#last_input_changed ? this.#inputNameToInputPath(this.#last_input_changed) : null
+				);
 				this.#last_input_changed = null;
 			}
 		});
@@ -766,7 +768,7 @@ window.host_wizard_edit = new class {
 				$undo_button.on('click', () => this.#data.macros[row_index].value = undefined);
 
 				if (macro.value === undefined) {
-					$undo_button.hide();
+					$undo_button.attr('hidden', true);
 				}
 			}
 		});

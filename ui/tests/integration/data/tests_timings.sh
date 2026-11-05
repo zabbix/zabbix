@@ -19,6 +19,7 @@ declare -A BASELINE_TIMES=(
   [testActiveAvailability]=100
   [testHostConnMacroValidation]=99
   [testItemState]=98
+  [testInternalJavaItem]=95
   [testHistoryPush]=92
   [testValuemaps]=89
   [testAutoregistrationPSK]=85
@@ -58,4 +59,5 @@ declare -A BASELINE_TIMES=(
   [testUserMacrosWithContext]=10
   [testScheduledReports]=10
   [testGraphLinking]=8
+  [testReportTest]=5
 )
