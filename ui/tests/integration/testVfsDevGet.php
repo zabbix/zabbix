@@ -54,6 +54,10 @@ class testVfsDevGet extends CIntegrationTest {
 	 * rather than being skipped.
 	 */
 	protected function onBeforeTestSuite() {
+		if (trim((string) shell_exec('command -v lsblk')) === '') {
+			throw new Exception('lsblk is required to discover block devices for vfs.dev.get, but was not found.');
+		}
+
 		self::$disks = self::listBlockDevices();
 
 		if (!self::$disks) {
