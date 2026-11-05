@@ -484,7 +484,7 @@ class CMenuHelper {
 				->setTarget('_blank')
 		);
 
-		$user = array_intersect_key(CWebUser::$data, array_flip(['username', 'name', 'surname'])) + [
+		$user = array_intersect_key((array) CWebUser::$data, array_flip(['username', 'name', 'surname'])) + [
 			'name' => null,
 			'surname' => null
 		];
