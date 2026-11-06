@@ -1936,9 +1936,7 @@ class testDashboardItemCardWidget extends testWidgets {
 							'Triggers' => '',
 							'Create trigger' => '',
 							'Create dependent item' => 'menu-popup-item',
-							'Create dependent discovery rule' => 'host_discovery.php?form=create&hostid={hostid}&type=18'.
-									'&master_itemid={itemid}&backurl=zabbix.php%3Faction%3Dlatest.view%26context%3Dhost'.
-									'&context=host'
+							'Create dependent discovery rule' => 'menu-popup-item'
 						],
 						'ACTIONS' => [
 							'Execute now' => 'menu-popup-item'

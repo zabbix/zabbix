@@ -2414,7 +2414,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 		$content = $widget->getContent();
 		if (array_key_exists('check_label', $data)) {
 			$displayed = $content->query('class', $data['check_label'])->one()->getText();
-			$this->assertEquals($displayed, $data['result']);
+			$this->assertEquals($data['result'], $displayed);
 			$this->assertFalse($content->query('class', $data['turned_off_label'])->exists());
 		}
 		else {
