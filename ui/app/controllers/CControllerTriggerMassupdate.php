@@ -52,6 +52,7 @@ class CControllerTriggerMassupdate extends CController {
 
 	protected function checkPermissions(): bool {
 		$ids = array_keys(array_flip($this->getInput('ids')));
+
 		if (!$ids) {
 			return false;
 		}
