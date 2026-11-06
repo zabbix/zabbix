@@ -196,12 +196,15 @@
 						.setWidth('auto'),
 					new CDataTableColumn('interval', <?= json_encode(_('Interval')); ?>)
 						.setFields(['interval'])
+						.setRenderer('interval')
 						.setVisible(false),
 					new CDataTableColumn('history', <?= json_encode(_('History')); ?>)
 						.setFields(['history'])
+						.setRenderer('history')
 						.setVisible(false),
 					new CDataTableColumn('trends', <?= json_encode(_('Trends')); ?>)
 						.setFields(['trends'])
+						.setRenderer('trends')
 						.setVisible(false),
 					new CDataTableColumn('type', <?= json_encode(_('Type')); ?>)
 						.setFields(['type', 'state'])
@@ -340,19 +343,51 @@
 						cell.appendChild(item_key);
 					}
 				})
+				.setCellRenderer('interval', ({cell_data, cell}) => {
+					const [interval] = cell_data;
+
+					const wordbreak = document.createElement('div');
+					wordbreak.classList.add(ZBX_STYLE_WORDBREAK);
+					wordbreak.textContent = interval;
+
+					cell.appendChild(wordbreak);
+				})
+				.setCellRenderer('history', ({cell_data, cell}) => {
+					const [history] = cell_data;
+
+					const wordbreak = document.createElement('div');
+					wordbreak.classList.add(ZBX_STYLE_WORDBREAK);
+					wordbreak.textContent = history;
+
+					cell.appendChild(wordbreak);
+				})
+				.setCellRenderer('trends', ({cell_data, cell}) => {
+					const [trends] = cell_data;
+
+					const wordbreak = document.createElement('div');
+					wordbreak.classList.add(ZBX_STYLE_WORDBREAK);
+					wordbreak.textContent = trends;
+
+					cell.appendChild(wordbreak);
+				})
 				.setCellRenderer('type', ({cell_data, cell}) => {
 					const [type, state] = cell_data;
+
+					const wordbreak = document.createElement('div');
+					wordbreak.classList.add(ZBX_STYLE_WORDBREAK);
 
 					if (state == ITEM_STATE_NOTSUPPORTED) {
 						const type_container = document.createElement('span');
 						type_container.textContent = type;
 						type_container.classList.add(ZBX_STYLE_GREY);
 
-						cell.appendChild(type_container);
+						wordbreak.appendChild(type_container);
 					}
 					else {
-						cell.textContent = type;
+						wordbreak.textContent = type;
 					}
+
+					cell.appendChild(wordbreak);
 				})
 				.setCellRenderer('last_value', ({cell_data, cell}) => {
 					const [value_type, last_value, last_history_value] = cell_data;
