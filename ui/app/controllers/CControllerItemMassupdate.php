@@ -115,16 +115,23 @@ class CControllerItemMassupdate extends CController {
 		}
 
 		$has_template_access = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+		$has_host_access = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
 
 		foreach ($items as $item) {
+			if (!array_key_exists('hosts', $item) || !$item['hosts']) {
+				return false;
+			}
+
 			foreach ($item['hosts'] as $host) {
-				if ($host['status'] == HOST_STATUS_TEMPLATE && !$has_template_access) {
+				$is_template = $host['status'] == HOST_STATUS_TEMPLATE;
+
+				if (($is_template && !$has_template_access) || (!$is_template && !$has_host_access)) {
 					return false;
 				}
 			}
 		}
 
-		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
+		return $has_template_access || $has_host_access;
 	}
 
 	protected function doAction(): void {
