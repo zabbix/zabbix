@@ -2882,12 +2882,11 @@ class testDashboardItemHistoryWidget extends testWidgets {
 	public function testDashboardItemHistoryWidget_TableData($data) {
 		foreach ($data['item_data'] as $params) {
 			if ($params['itemid'] === 'dependent') {
-				$itemid = (array_key_exists('binary', $params))
+				$params['itemid'] = (array_key_exists('binary', $params))
 					? self::$depend_items[self::ITEM_BIN]
 					: self::$depend_items[self::ITEM_JSON];
-				$params['itemid'] = $itemid;
 			}
-				CDataHelper::addItemData($params['itemid'], $params['values'], $params['time']);
+			CDataHelper::addItemData($params['itemid'], $params['values'], $params['time']);
 		}
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_data)->waitUntilReady();
@@ -2902,11 +2901,20 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		foreach ($data['item_data'] as $params) {
 			if (array_key_exists('binary', $params)) {
 				$button = $widget->query('button:Show')->one();
+
+				// Wait until the button is ready to open the hintbox.
+				$button->waitUntilAttributesPresent('data-hintbox-preload')->waitUntilClassesNotPresent('is-loading');
 				$this->assertTrue($button->isClickable());
 				$button->click();
-				$this->query('xpath://div[@class="hintbox-container dashboard-widget-itemhistory-hintbox nowrap"]')
-					->waitUntilReady();
-				$this->assertEquals($params['encoded_value'], $button->getAttribute('data-hintbox-contents'));
+
+				// Wait until the hintbox content is loaded.
+				$hint = $this->query('class:hintbox-static')->asOverlayDialog()->waitUntilVisible()->one();
+				$hint->query('id:hintbox-preloader')->waitUntilNotPresent();
+
+				// Check that binary data is displayed in the hintbox.
+				$this->assertEquals($params['encoded_value'], $button->getAttribute('data-hintbox-html'));
+				$this->assertEquals($params['encoded_value'], $hint->getText());
+				$hint->close();
 			}
 		}
 
