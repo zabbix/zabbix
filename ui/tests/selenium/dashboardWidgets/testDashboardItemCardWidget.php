@@ -277,7 +277,7 @@ class testDashboardItemCardWidget extends testWidgets {
 					'master_itemid' => self::$itemids['Item for item card widget'],
 					'type' => ITEM_TYPE_DEPENDENT,
 					'value_type' => ITEM_VALUE_TYPE_BINARY,
-					'history' => '0d'
+					'history' => '30d'
 				]
 			]
 		];
@@ -414,7 +414,7 @@ class testDashboardItemCardWidget extends testWidgets {
 		}
 
 		// Add metrics to binary item.
-		CDataHelper::addItemData(self::$depend_items['Dependent item 2'], 'Binary test', time() - 8640000);
+		CDataHelper::addItemData(self::$depend_items['Dependent item 2'], 'Test binary item', time() - 8640000);
 
 		$trigger_names = ['Not classified trigger', 'Information trigger', 'Warning trigger', 'Average trigger',
 				'High trigger', 'Disaster trigger', 'Disaster trigger', 'Trigger 1', 'Trigger 2'
@@ -1955,7 +1955,7 @@ class testDashboardItemCardWidget extends testWidgets {
 					'Depended entity' => 'Item for item card widget',
 					'Interval and storage' => [
 						'column' => '',
-						'center-column' => '0d',
+						'center-column' => '30d',
 						'right-column' => ''
 					],
 					'Type of information' => 'Binary',
@@ -1964,7 +1964,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						'center-column' => 'binary value',
 						'right-column' => ''
 					],
-					'bin_value' => 'QmluYXJ5IHRlc3Q=',
+					'bin_value' => 'VGVzdCBiaW5hcnkgaXRlbQ==',
 					'Context menu' => [
 						'VIEW' => [
 							'Latest data' => 'zabbix.php?action=latest.view&hostids%5B%5D={hostid}&'.
@@ -1979,9 +1979,7 @@ class testDashboardItemCardWidget extends testWidgets {
 							'Triggers' => '',
 							'Create trigger' => '',
 							'Create dependent item' => 'menu-popup-item',
-							'Create dependent discovery rule' => 'host_discovery.php?form=create&hostid={hostid}&type=18'.
-									'&master_itemid={itemid}&backurl=zabbix.php%3Faction%3Dlatest.view%26context%3Dhost'.
-									'&context=host'
+							'Create dependent discovery rule' => 'menu-popup-item'
 						],
 						'ACTIONS' => [
 							'Execute now' => 'menu-popup-item'
@@ -2111,11 +2109,19 @@ class testDashboardItemCardWidget extends testWidgets {
 					if ($data['Type of information'] === 'Binary') {
 						$button = $widget->query('class:section-latest-data')->query('class', $section)
 								->query('button:Show')->one();
-						$this->assertTrue($button->isClickable());
+						// Wait until the button is ready to open the hintbox.
+						$button->waitUntilAttributesPresent('data-hintbox-preload')->waitUntilClassesNotPresent('is-loading');
 						$button->click();
-						$this->query('xpath:.//div[@class="hintbox-draggable-handle"]')->waitUntilReady();
+
+						// Wait until the hintbox content is loaded.
+						$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()
+								->waitUntilReady()->one();
+						$hint->query('id:hintbox-preloader')->waitUntilNotPresent();
+
 						// Check that binary data is displayed in the hintbox.
-						$this->assertEquals($data['bin_value'], $button->getAttribute('data-hintbox-contents'));
+						$this->assertEquals($data['bin_value'], $button->getAttribute('data-hintbox-html'));
+						$this->assertEquals($data['bin_value'], $hint->getText());
+						$hint->close();
 					}
 					else {
 						$section_xpath = ($data['Latest data']['right-column'] === '')
