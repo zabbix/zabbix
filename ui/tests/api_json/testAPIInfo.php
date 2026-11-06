@@ -20,7 +20,7 @@ class testAPIInfo extends CAPITest {
 	public function testAPIInfo_VersionWithAuth() {
 		$result = $this->call('apiinfo.version', []);
 
-		$this->assertSame('8.0.0', $result['result']);
+		$this->assertSame('8.2.0', $result['result']);
 	}
 
 	public function testAPIInfo_VersionWithInvalidToken() {
@@ -37,6 +37,6 @@ class testAPIInfo extends CAPITest {
 
 		$result = $this->call('apiinfo.version', []);
 
-		$this->assertSame('8.0.0', $result['result']);
+		$this->assertSame('8.2.0', $result['result']);
 	}
 }
