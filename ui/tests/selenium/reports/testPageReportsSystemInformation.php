@@ -27,14 +27,12 @@ class testPageReportsSystemInformation extends testSystemInformation {
 
 	public static function getUserData() {
 		return [
-			'Super admin role' =>
-			[
+			'Super admin role' => [
 				[
 					'username' => 'Admin'
 				]
 			],
-			'Admin role' =>
-			[
+			'Admin role' => [
 				[
 					'username' => 'admin-zabbix'
 				]
