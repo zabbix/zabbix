@@ -1054,8 +1054,8 @@ class testFormItem extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Checksum of $1',
-					'key' => 'vfs.file.cksum[/sbin/shutdown]',
+					'name' => 'Duplicate - testFromItem',
+					'key' => 'test-item-reuse',
 					'inline_errors' => [
 						'Key' => 'This object already exists.'
 					]
@@ -2015,7 +2015,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #75.
+			// #74.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2027,7 +2027,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// #76 Default.
+			// #75 Default.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2038,7 +2038,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// #77 Default.
+			// #76 Default.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2050,7 +2050,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// #78 Default.
+			// #77 Default.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2063,7 +2063,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// #79 Default.
+			// #78 Default.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2076,7 +2076,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// #80 Default.
+			// #79 Default.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2086,6 +2086,31 @@ class testFormItem extends CLegacyWebTest {
 					'inline_errors' => [
 						'Key' => 'This field cannot be empty.'
 					]
+				]
+			],
+			// #80 Item with JSON type of information.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'Item with JSON value type',
+					'type' => 'Zabbix trapper',
+					'key' => 'json_test',
+					'value_type' => 'JSON',
+					'dbCheck' => true,
+					'formCheck' => true
+				]
+			],
+			// #81 Item with Binary type of information.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'type' => 'Dependent item',
+					'name' => 'Value type - Binary',
+					'value_type' => 'Binary',
+					'key' => 'item-dependent-binary-value',
+					'master_item' => 'testFormItem',
+					'dbCheck' => true,
+					'formCheck' => true
 				]
 			]
 		];
@@ -2111,6 +2136,10 @@ class testFormItem extends CLegacyWebTest {
 		}
 		else {
 			$type = $this->zbxTestGetSelectedLabel('type');
+		}
+
+		if (isset($data['value_type'])) {
+			$form->getField('Type of information')->select($data['value_type']);
 		}
 
 		if (isset($data['name'])) {
@@ -2292,6 +2321,12 @@ class testFormItem extends CLegacyWebTest {
 						break;
 					case ITEM_VALUE_TYPE_TEXT:
 						$value_typeDB = 'Text';
+						break;
+					case ITEM_VALUE_TYPE_BINARY:
+						$value_typeDB = 'Binary';
+						break;
+					case ITEM_VALUE_TYPE_JSON:
+						$value_typeDB = 'JSON';
 						break;
 				}
 				$this->assertEquals($value_typeDB, $value_type);
