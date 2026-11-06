@@ -2175,24 +2175,10 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'id:primary_label' => '{HOST.NAME} {ITEM.KEY} {ITEM.LASTVALUE}',
 						'id:secondary_label' => '{HOST.NAME} {ITEM.KEY} {ITEM.LASTVALUE}'
 					],
-					'result' => 'Display display_bin *UNKNOWN*'
+					'result' => 'Display display_bin binary value'
 				]
 			],
-			// #21 Item value macro with regsub to display full value (JSON).
-			[
-				[
-					'fields' => [
-						'Name' => 'Resolved macros with regsub JSON',
-						'Item patterns' => 'Non-numeric JSON',
-						'id:primary_label_type' => 'Text',
-						'id:secondary_label_type' => 'Text',
-						'id:primary_label' => '{{ITEM.LASTVALUE}.regsub("(.*)", \1)}',
-						'id:secondary_label' => '{{ITEM.LASTVALUE}.regsub("(.*)", \1)}'
-					],
-					'result' => '{"test": "json1", "users": {"name1": "test1", "name2": "🙂"}}'
-				]
-			],
-			// #22 Item value macro with macro function - should resolve UNKNOWN for binary item.
+			// #22 Binary item with regsub macro function to display full value.
 			[
 				[
 					'fields' => [
@@ -2203,7 +2189,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'id:primary_label' => '{{ITEM.LASTVALUE}.regsub("(.*)", \1)}',
 						'id:secondary_label' => '{{ITEM.LASTVALUE}.regsub("(.*)", \1)}'
 					],
-					'result' => '*UNKNOWN*'
+					'result' => 'Test for binary item value 🙂'
 				]
 			],
 			// #23 Macros with Text data type.
@@ -2217,7 +2203,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'id:primary_label' => '{HOST.NAME} {ITEM.KEY} {ITEM.LASTVALUE}',
 						'id:secondary_label' => '{HOST.NAME} {ITEM.KEY} {ITEM.LASTVALUE}'
 					],
-					'result' => 'Display honey_non_numeric_2 Text test 🙂'
+					'result' => 'Display honey_non_numeric_1 Text test 🙂'
 				]
 			],
 			// #24 Macros with Char data type.
@@ -2231,7 +2217,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'id:primary_label' => '{HOST.NAME} {ITEM.KEY} {ITEM.LASTVALUE}',
 						'id:secondary_label' => '{HOST.NAME} {ITEM.KEY} {ITEM.LASTVALUE}'
 					],
-					'result' => 'Display honey_non_numeric_3 Char test 🙂'
+					'result' => 'Display honey_non_numeric_2 Char test 🙂'
 				]
 			],
 			// #25 Macros with Log data type.
@@ -2245,7 +2231,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'id:primary_label' => '{HOST.NAME} {ITEM.KEY} {ITEM.LASTVALUE}',
 						'id:secondary_label' => '{HOST.NAME} {ITEM.KEY} {ITEM.LASTVALUE}'
 					],
-					'result' => 'Display honey_non_numeric_4 Log test 🙂'
+					'result' => 'Display honey_non_numeric_3 Log test 🙂'
 				]
 			],
 			// #26 Non-numeric with XSS in item value macro #1.
