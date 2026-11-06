@@ -628,6 +628,11 @@ New features:
 A......PS. [ZBXNEXT-10796] updated maximum supported MariaDB version to 13.0 (mprihodko)
 
 Bug fixes:
+.......PS. [ZBX-28117] fixed web scenario checks stopping permanently after failed database query (arimdjonoks, jburlakovs)
+.D........ [ZBX-25451] clarified zabbix_sender man page options (rtrizna)
+A......... [ZBX-27613] fixed the mandatory script parameter not being required when changing media type to webhook (vskalbins)
+.......PS. [ZBX-27224] fixed SNMP agent walk[] 'only partial data received' error by resetting retries between requests (vso)
+..F....... [ZBX-26870] fixed macro reset value button sizing (gberzina)
 ..F....... [ZBX-28107] fixed maintenance icon not being shown for hosts in some widgets (aluchko)
 ..F....... [ZBX-27726] fixed layout change in 'Inherited and host macros' host form after adding template to host (aluchko)
 ..F....... [ZBX-27489] fixed utf-8 error for binary item in honeycomb widget (gklavins)
@@ -2301,6 +2306,9 @@ New features:
 A......PS. [ZBXNEXT-10796] updated maximum supported MariaDB version to 13.0 (mprihodko)
 
 Bug fixes:
+.......PS. [ZBX-28117] fixed web scenario checks stopping permanently after failed database query (arimdjonoks, jburlakovs)
+.D........ [ZBX-25451] clarified zabbix_sender man page options (rtrizna)
+.......PS. [ZBX-27224] fixed SNMP agent walk[] 'only partial data received' error by resetting retries between requests (vso)
 ..F....... [ZBX-28107] fixed maintenance icon not being shown for hosts in some widgets (aluchko)
 ..F....... [ZBX-27726] fixed layout change in 'Inherited and host macros' host form after adding template to host (aluchko)
 ..F....... [ZBX-27489] fixed utf-8 error for binary item in honeycomb widget (gklavins)
