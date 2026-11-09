@@ -46,7 +46,7 @@ int	zbx_check_script_user_permissions(zbx_uint64_t userid, zbx_uint64_t hostid, 
 int	zbx_db_fetch_webhook_params(zbx_uint64_t scriptid, zbx_vector_ptr_pair_t *params, char *error,
 		size_t error_len);
 void	zbx_webhook_params_pack_json(const zbx_vector_ptr_pair_t *params, char **params_json);
-int	zbx_script_prepare(zbx_script_t *script, const zbx_uint64_t *hostid, char *error, size_t max_error_len);
+int	zbx_script_prepare(zbx_script_t *script, const zbx_dc_host_t *host, char *error, size_t max_error_len);
 int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, const char *params,
 		int config_timeout, int config_trapper_timeout, const char *config_source_ip,
 		const char *config_ssh_key_location, int config_enable_global_scripts,
@@ -56,7 +56,7 @@ zbx_uint64_t	zbx_script_create_task(const zbx_script_t *script, const zbx_dc_hos
 		int now);
 int	zbx_init_remote_commands_cache(char **error);
 void	zbx_deinit_remote_commands_cache(void);
-void	zbx_process_command_results(struct zbx_json_parse *jp);
+void	zbx_process_command_results(struct zbx_json_parse *jp_commands, zbx_uint64_t hostid);
 void	zbx_remote_commands_prepare_to_send(struct zbx_json *json, zbx_uint64_t hostid, int config_timeout);
 
 #endif

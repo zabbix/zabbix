@@ -62,7 +62,7 @@
 					}
 				}
 
-				location.href = location.href;
+				location.reload();
 			});
 		},
 
@@ -121,7 +121,7 @@
 						uncheckTableRows('templategroup');
 					}
 
-					location.href = location.href;
+					location.reload();
 				})
 				.catch(() => {
 					clearMessages();
@@ -144,7 +144,7 @@
 			}
 
 			uncheckTableRows('templategroup');
-			location.href = location.href;
+			location.reload();
 		}
 	}
 </script>

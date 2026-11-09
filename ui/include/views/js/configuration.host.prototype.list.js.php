@@ -98,7 +98,7 @@
 					location.href = curl.getUrl();
 				}
 				else {
-					location.href = location.href;
+					location.reload();
 				}
 			}
 		}

@@ -271,11 +271,12 @@ class CTrend extends CApiService {
 				continue;
 			}
 
-			$query['query']['bool']['must'] = [
+			$query['query']['bool']['must'] = $query_must;
+			$query['query']['bool']['must'][] = [
 				'terms' => [
 					'itemid' => $itemids
 				]
-			] + $query_must;
+			];
 
 			$query['aggs']['group_by_itemid']['terms']['size'] = count($itemids);
 
