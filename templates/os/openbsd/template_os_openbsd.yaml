@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '8.0'
+  version: '8.2'
   template_groups:
     - uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
@@ -8,7 +8,7 @@ zabbix_export:
       template: 'OpenBSD by Zabbix agent'
       name: 'OpenBSD by Zabbix agent'
       description: |
-        This is an Official OpenBSD template. It requires Zabbix agent 8.0 or newer.
+        This is an Official OpenBSD template. It requires Zabbix agent 8.2 or newer.
         
         Notes on filesystem (FS) discovery:
           - The ext4/3/2 FS reserves space for privileged usage, typically set at 5% by default.
@@ -24,7 +24,7 @@ zabbix_export:
       readme: |
         ## Overview
         
-        This is an Official OpenBSD template. It requires Zabbix agent 8.0 or newer.
+        This is an Official OpenBSD template. It requires Zabbix agent 8.2 or newer.
         
         #### Notes on filesystem (FS) discovery:
         - The ext4/3/2 FS reserves space for privileged usage, typically set at 5% by default.
@@ -39,7 +39,7 @@ zabbix_export:
         Install Zabbix agent on OpenBSD according to Zabbix documentation.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.2-0
       groups:
         - name: 'Templates/Operating systems'
       items:
