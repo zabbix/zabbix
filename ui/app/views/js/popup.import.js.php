@@ -222,7 +222,7 @@ window.popup_import = new class {
 
 				overlayDialogueDestroy(this.overlay.dialogueid);
 
-				location.href = location.href.split('#')[0];
+				location.reload();
 			})
 			.catch((exception) => {
 				document.getElementById('import_file').value = '';

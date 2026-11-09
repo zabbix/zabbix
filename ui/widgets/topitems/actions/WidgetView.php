@@ -144,7 +144,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				: $table,
 			'db_hosts' => $db_hosts,
 			'db_items' => $db_items,
-			'db_item_problem_triggers' => $db_item_problem_triggers
+			'db_item_problem_triggers' => $db_item_problem_triggers,
+			'db_maintenances' => $this->getMaintenances($db_hosts)
 		];
 
 		return $data;
@@ -171,7 +172,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			: null;
 
 		$options = [
-			'output' => ['name', 'hostid'],
+			'output' => ['name', 'hostid', 'maintenanceid', 'maintenance_status', 'maintenance_type'],
 			'groupids' => $groupids,
 			'hostids' => $hostids,
 			'tags' => $tags,
@@ -479,6 +480,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$row = array_slice($row, 0, $this->fields_values['item_ordering_limit']);
 		}
 		unset($row);
+	}
+
+	private function getMaintenances(array $db_hosts): array {
+		$maintenanceids = array_fill_keys(array_column($db_hosts, 'maintenanceid'), true);
+
+		return API::Maintenance()->get([
+			'output' => ['name', 'description'],
+			'maintenanceids' => array_keys($maintenanceids),
+			'preservekeys' => true
+		]);
 	}
 
 	private static function concatenateTables(array $tables): array {

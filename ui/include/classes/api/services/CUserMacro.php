@@ -126,6 +126,7 @@ class CUserMacro extends CApiService {
 				$sqlParts['from'][] = 'permission p';
 				$sqlParts['where'][] = 'hm.hostid=hh.hostid';
 				$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
+				$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 				if ($options['editable']) {
 					$sqlParts['where'][] = 'p.permission='.PERM_READ_WRITE;
@@ -217,7 +218,6 @@ class CUserMacro extends CApiService {
 		}
 		// init HOSTS
 		else {
-			$options['output'] = $this->outputExtend($options['output'], ['hostid']);
 			$sqlParts = $this->applyQueryFilterOptions('hostmacro', 'hm', $options, $sqlParts);
 			$sqlParts = $this->applyQueryOutputOptions('hostmacro', 'hm', $options, $sqlParts);
 			$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
