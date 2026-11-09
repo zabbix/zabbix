@@ -44,7 +44,7 @@ zabbix_export:
         https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Applications
       items:
@@ -57,18 +57,17 @@ zabbix_export:
           valuemap:
             name: 'Envoy circuit breaker state'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
-              error_handler: CUSTOM_VALUE
-              error_handler_params: '{"columns":{"value":0}}'
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             metric_point_type: GAUGE
@@ -90,7 +89,7 @@ zabbix_export:
               value: cluster
           triggers:
             - uuid: 097b71ee16794e89b4509f8c62126494
-              expression: 'min(/Envoy Proxy by OTLP/envoy.otlp.cluster.cb.cx_pool_open,5m) > {$ENVOY.OTLP.CIRCUIT_BREAKER.WARN}'
+              expression: 'last(/Envoy Proxy by OTLP/envoy.otlp.cluster.cb.cx_pool_open) > {$ENVOY.OTLP.CIRCUIT_BREAKER.WARN}'
               name: 'Envoy Proxy: Connection pool circuit breaker open'
               event_name: 'Envoy Proxy: A cluster''s connection-pool circuit breaker is open — new upstream connections are being rejected'
               priority: WARNING
@@ -106,18 +105,17 @@ zabbix_export:
           valuemap:
             name: 'Envoy circuit breaker state'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
-              error_handler: CUSTOM_VALUE
-              error_handler_params: '{"columns":{"value":0}}'
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             metric_point_type: GAUGE
@@ -139,7 +137,7 @@ zabbix_export:
               value: cluster
           triggers:
             - uuid: 9d822812408744408613df7358d04559
-              expression: 'min(/Envoy Proxy by OTLP/envoy.otlp.cluster.cb.rq_open,5m) > {$ENVOY.OTLP.CIRCUIT_BREAKER.WARN}'
+              expression: 'last(/Envoy Proxy by OTLP/envoy.otlp.cluster.cb.rq_open) > {$ENVOY.OTLP.CIRCUIT_BREAKER.WARN}'
               name: 'Envoy Proxy: Request circuit breaker open'
               event_name: 'Envoy Proxy: A cluster''s request circuit breaker is open — the maximum number of concurrent upstream requests has been reached'
               priority: WARNING
@@ -155,18 +153,17 @@ zabbix_export:
           valuemap:
             name: 'Envoy circuit breaker state'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
-              error_handler: CUSTOM_VALUE
-              error_handler_params: '{"columns":{"value":0}}'
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             metric_point_type: GAUGE
@@ -188,7 +185,7 @@ zabbix_export:
               value: cluster
           triggers:
             - uuid: cad95d12586042c79e405d6faf9a5c5f
-              expression: 'min(/Envoy Proxy by OTLP/envoy.otlp.cluster.cb.rq_pending_open,5m) > {$ENVOY.OTLP.CIRCUIT_BREAKER.WARN}'
+              expression: 'last(/Envoy Proxy by OTLP/envoy.otlp.cluster.cb.rq_pending_open) > {$ENVOY.OTLP.CIRCUIT_BREAKER.WARN}'
               name: 'Envoy Proxy: Request queue circuit breaker open'
               event_name: 'Envoy Proxy: A cluster''s pending-request circuit breaker is open — queued requests are being rejected'
               priority: WARNING
@@ -204,18 +201,17 @@ zabbix_export:
           valuemap:
             name: 'Envoy circuit breaker state'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
-              error_handler: CUSTOM_VALUE
-              error_handler_params: '{"columns":{"value":0}}'
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             metric_point_type: GAUGE
@@ -237,7 +233,7 @@ zabbix_export:
               value: cluster
           triggers:
             - uuid: a8de1a836f294c5fbb4e61b1702951c0
-              expression: 'min(/Envoy Proxy by OTLP/envoy.otlp.cluster.cb.rq_retry_open,5m) > {$ENVOY.OTLP.CIRCUIT_BREAKER.WARN}'
+              expression: 'last(/Envoy Proxy by OTLP/envoy.otlp.cluster.cb.rq_retry_open) > {$ENVOY.OTLP.CIRCUIT_BREAKER.WARN}'
               name: 'Envoy Proxy: Retry circuit breaker open'
               event_name: 'Envoy Proxy: A cluster''s retry circuit breaker is open — the retry budget has been exhausted'
               priority: WARNING
@@ -252,17 +248,17 @@ zabbix_export:
           value_type: FLOAT
           description: 'Number of failed upstream connection attempts (envoy_cluster_upstream_cx_connect_fail) per aggregation window, across all clusters.'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
             - type: SIMPLE_CHANGE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             aggregated_columns:
@@ -289,17 +285,17 @@ zabbix_export:
           value_type: FLOAT
           description: 'Number of times load balancing entered panic mode (envoy_cluster_lb_healthy_panic — no healthy upstream hosts, routing to all hosts regardless of health) per aggregation window.'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
             - type: SIMPLE_CHANGE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             aggregated_columns:
@@ -320,7 +316,7 @@ zabbix_export:
               value: cluster
           triggers:
             - uuid: 14b0aa7da00a4270848f7a212a527198
-              expression: 'min(/Envoy Proxy by OTLP/envoy.otlp.cluster.lb.healthy_panic.rate,5m) > {$ENVOY.OTLP.LB.PANIC.WARN}'
+              expression: 'last(/Envoy Proxy by OTLP/envoy.otlp.cluster.lb.healthy_panic.rate) > {$ENVOY.OTLP.LB.PANIC.WARN}'
               name: 'Envoy Proxy: Load balancer entered panic mode'
               event_name: 'Envoy Proxy: No healthy upstream hosts in at least one cluster — load balancer is in panic mode'
               priority: HIGH
@@ -334,16 +330,16 @@ zabbix_export:
           delay: '{$ENVOY.OTLP.INTERVAL}'
           description: 'Number of degraded upstream hosts (envoy_cluster_membership_degraded), summed across all clusters, at the highest point of the aggregation window.'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             metric_point_type: GAUGE
@@ -370,16 +366,16 @@ zabbix_export:
           delay: '{$ENVOY.OTLP.INTERVAL}'
           description: 'Number of excluded upstream hosts (envoy_cluster_membership_excluded), summed across all clusters, at the highest point of the aggregation window.'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             metric_point_type: GAUGE
@@ -406,16 +402,16 @@ zabbix_export:
           delay: '{$ENVOY.OTLP.INTERVAL}'
           description: 'Number of healthy upstream hosts (envoy_cluster_membership_healthy), summed across all clusters, at the lowest point of the aggregation window.'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             metric_point_type: GAUGE
@@ -469,19 +465,16 @@ zabbix_export:
           delay: '{$ENVOY.OTLP.INTERVAL}'
           description: 'Total number of configured upstream hosts (envoy_cluster_membership_total), summed across all clusters.'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             metric_point_type: GAUGE
@@ -509,17 +502,17 @@ zabbix_export:
           value_type: FLOAT
           description: 'Number of upstream requests that timed out (envoy_cluster_upstream_rq_timeout) per aggregation window, across all clusters.'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
             - type: SIMPLE_CHANGE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             aggregated_columns:
@@ -546,16 +539,9 @@ zabbix_export:
           history: '0'
           value_type: JSON
           description: 'Collect Envoy Proxy OpenTelemetry log counts grouped by severity.'
-          preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
-              error_handler: CUSTOM_ERROR
-              error_handler_params: 'No logs received for Envoy Proxy.'
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             signal_type: LOGS
             columns:
@@ -580,18 +566,17 @@ zabbix_export:
           delay: '{$ENVOY.OTLP.INTERVAL}'
           description: 'Number of currently active downstream HTTP connections (envoy_http_downstream_cx_active), across all listeners.'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
-              error_handler: CUSTOM_VALUE
-              error_handler_params: '{"columns":{"value":0}}'
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             metric_point_type: GAUGE
@@ -619,17 +604,17 @@ zabbix_export:
           value_type: FLOAT
           description: 'Number of downstream responses with a 2xx status class (envoy_http_downstream_rq_xx, envoy_response_code_class=2) per aggregation window.'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
             - type: SIMPLE_CHANGE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             aggregated_columns:
@@ -659,17 +644,17 @@ zabbix_export:
           value_type: FLOAT
           description: 'Number of downstream responses with a 3xx status class (envoy_http_downstream_rq_xx, envoy_response_code_class=3) per aggregation window.'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
             - type: SIMPLE_CHANGE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             aggregated_columns:
@@ -699,17 +684,17 @@ zabbix_export:
           value_type: FLOAT
           description: 'Number of downstream responses with a 4xx status class (envoy_http_downstream_rq_xx, envoy_response_code_class=4) per aggregation window.'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
             - type: SIMPLE_CHANGE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             aggregated_columns:
@@ -739,17 +724,17 @@ zabbix_export:
           value_type: FLOAT
           description: 'Number of downstream responses with a 5xx status class (envoy_http_downstream_rq_xx, envoy_response_code_class=5) per aggregation window.'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
             - type: SIMPLE_CHANGE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             aggregated_columns:
@@ -778,18 +763,17 @@ zabbix_export:
           delay: '{$ENVOY.OTLP.INTERVAL}'
           description: 'Number of currently active (in-flight) downstream HTTP requests (envoy_http_downstream_rq_active), across all listeners.'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
-              error_handler: CUSTOM_VALUE
-              error_handler_params: '{"columns":{"value":0}}'
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             metric_point_type: GAUGE
@@ -844,17 +828,17 @@ zabbix_export:
           value_type: FLOAT
           description: 'Number of downstream requests closed because Envoy itself is overloaded (envoy_http_downstream_rq_overload_close — one of Envoy''s own overload-protection actions triggered) per aggregation window.'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
             - type: SIMPLE_CHANGE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             aggregated_columns:
@@ -875,7 +859,7 @@ zabbix_export:
               value: http
           triggers:
             - uuid: 20d245d0b5044e3eacf1d0744a51fc9c
-              expression: 'min(/Envoy Proxy by OTLP/envoy.otlp.http.rq.overload_close.rate,5m) > {$ENVOY.OTLP.OVERLOAD.CLOSE.WARN}'
+              expression: 'last(/Envoy Proxy by OTLP/envoy.otlp.http.rq.overload_close.rate) > {$ENVOY.OTLP.OVERLOAD.CLOSE.WARN}'
               name: 'Envoy Proxy: Envoy shedding requests due to overload'
               event_name: 'Envoy Proxy: Envoy is closing downstream requests because an overload-protection action triggered — the process is under resource pressure (memory, CPU, or file descriptors)'
               priority: HIGH
@@ -890,17 +874,17 @@ zabbix_export:
           value_type: FLOAT
           description: 'Number of connections closed for sending too many premature stream resets (envoy_http_downstream_rq_too_many_premature_resets) per aggregation window — Envoy''s built-in mitigation for the HTTP/2 rapid-reset abuse pattern (CVE-2023-44487).'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
             - type: SIMPLE_CHANGE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             aggregated_columns:
@@ -927,17 +911,17 @@ zabbix_export:
           value_type: FLOAT
           description: 'Number of downstream requests closed due to a timeout (envoy_http_downstream_rq_timeout) per aggregation window. Distinct from cluster.rq.timeout.rate, which counts upstream timeouts.'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
             - type: SIMPLE_CHANGE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             aggregated_columns:
@@ -964,17 +948,17 @@ zabbix_export:
           value_type: FLOAT
           description: 'Number of new downstream HTTP requests (envoy_http_downstream_rq_total) per aggregation window, across all listeners.'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
             - type: SIMPLE_CHANGE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             aggregated_columns:
@@ -1001,17 +985,17 @@ zabbix_export:
           value_type: FLOAT
           description: 'Number of connections rejected because a listener''s connection limit was reached (envoy_listener_downstream_cx_overflow) per aggregation window.'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
             - type: SIMPLE_CHANGE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             aggregated_columns:
@@ -1032,7 +1016,7 @@ zabbix_export:
               value: listener
           triggers:
             - uuid: 1a32e9e6fdea4731a2c183b717361aa8
-              expression: 'min(/Envoy Proxy by OTLP/envoy.otlp.listener.cx.overflow.rate,5m) > {$ENVOY.OTLP.LISTENER.CX_OVERFLOW.WARN}'
+              expression: 'last(/Envoy Proxy by OTLP/envoy.otlp.listener.cx.overflow.rate) > {$ENVOY.OTLP.LISTENER.CX_OVERFLOW.WARN}'
               name: 'Envoy Proxy: Listener rejecting connections (overflow)'
               event_name: 'Envoy Proxy: Listener connection-limit overflow exceeded {$ENVOY.OTLP.LISTENER.CX_OVERFLOW.WARN} rejected connections'
               priority: WARNING
@@ -1047,8 +1031,9 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$[?(@.SeverityNumber >= 17 && @.SeverityNumber <= 20)].count.first()'
-              error_handler: DISCARD_VALUE
+                - '$[?(@.SeverityNumber >= 17 && @.SeverityNumber <= 20)].count.sum()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
           master_item:
             key: envoy.otlp.get.logs
           tags:
@@ -1071,8 +1056,9 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$[?(@.SeverityNumber >= 21 && @.SeverityNumber <= 24)].count.first()'
-              error_handler: DISCARD_VALUE
+                - '$[?(@.SeverityNumber >= 21 && @.SeverityNumber <= 24)].count.sum()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
           master_item:
             key: envoy.otlp.get.logs
           tags:
@@ -1095,8 +1081,9 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$[?(@.SeverityNumber >= 1 && @.SeverityNumber <= 12)].count.first()'
-              error_handler: DISCARD_VALUE
+                - '$[?(@.SeverityNumber >= 1 && @.SeverityNumber <= 12)].count.sum()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
           master_item:
             key: envoy.otlp.get.logs
           tags:
@@ -1110,8 +1097,9 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$[?(@.SeverityNumber >= 13 && @.SeverityNumber <= 16)].count.first()'
-              error_handler: DISCARD_VALUE
+                - '$[?(@.SeverityNumber >= 13 && @.SeverityNumber <= 16)].count.sum()'
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
           master_item:
             key: envoy.otlp.get.logs
           tags:
@@ -1137,13 +1125,14 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.columns.avg
+                - $..avg.first()
+              error_handler: DISCARD_VALUE
             - type: MULTIPLIER
               parameters:
                 - '1.0E-9'
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             aggregated_columns:
               - function: AVG
@@ -1172,13 +1161,14 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.columns.max
+                - $..max.first()
+              error_handler: DISCARD_VALUE
             - type: MULTIPLIER
               parameters:
                 - '1.0E-9'
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             aggregated_columns:
               - function: MAX
@@ -1207,13 +1197,14 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.columns.min
+                - $..min.first()
+              error_handler: DISCARD_VALUE
             - type: MULTIPLIER
               parameters:
                 - '1.0E-9'
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             aggregated_columns:
               - function: MIN
@@ -1242,13 +1233,14 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.columns.p95
+                - $..p95.first()
+              error_handler: DISCARD_VALUE
             - type: MULTIPLIER
               parameters:
                 - '1.0E-9'
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             aggregated_columns:
               - function: PERCENTILE
@@ -1284,18 +1276,14 @@ zabbix_export:
           delay: '{$ENVOY.OTLP.INTERVAL}'
           description: 'Number of downstream (SpanKind Server, ingress) spans with status code "Error" over the aggregation window.'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
-              error_handler: CUSTOM_VALUE
-              error_handler_params: '{"columns":{"count":0}}'
             - type: JSONPATH
               parameters:
-                - $.columns.count
+                - $..count.first()
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             aggregated_columns:
               - alias: count
@@ -1347,18 +1335,14 @@ zabbix_export:
           delay: '{$ENVOY.OTLP.INTERVAL}'
           description: 'Total number of downstream (SpanKind Server, ingress) spans over the aggregation window.'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
-              error_handler: CUSTOM_VALUE
-              error_handler_params: '{"columns":{"count":0}}'
             - type: JSONPATH
               parameters:
-                - $.columns.count
+                - $..count.first()
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             aggregated_columns:
               - alias: count
@@ -1397,13 +1381,14 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.columns.avg
+                - $..avg.first()
+              error_handler: DISCARD_VALUE
             - type: MULTIPLIER
               parameters:
                 - '1.0E-9'
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             aggregated_columns:
               - function: AVG
@@ -1432,13 +1417,14 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.columns.max
+                - $..max.first()
+              error_handler: DISCARD_VALUE
             - type: MULTIPLIER
               parameters:
                 - '1.0E-9'
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             aggregated_columns:
               - function: MAX
@@ -1467,13 +1453,14 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.columns.min
+                - $..min.first()
+              error_handler: DISCARD_VALUE
             - type: MULTIPLIER
               parameters:
                 - '1.0E-9'
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             aggregated_columns:
               - function: MIN
@@ -1502,13 +1489,14 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.columns.p95
+                - $..p95.first()
+              error_handler: DISCARD_VALUE
             - type: MULTIPLIER
               parameters:
                 - '1.0E-9'
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             aggregated_columns:
               - function: PERCENTILE
@@ -1544,18 +1532,14 @@ zabbix_export:
           delay: '{$ENVOY.OTLP.INTERVAL}'
           description: 'Number of upstream (SpanKind Client, egress) spans with status code "Error" over the aggregation window.'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
-              error_handler: CUSTOM_VALUE
-              error_handler_params: '{"columns":{"count":0}}'
             - type: JSONPATH
               parameters:
-                - $.columns.count
+                - $..count.first()
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             aggregated_columns:
               - alias: count
@@ -1607,18 +1591,14 @@ zabbix_export:
           delay: '{$ENVOY.OTLP.INTERVAL}'
           description: 'Total number of upstream (SpanKind Client, egress) spans over the aggregation window.'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
-              error_handler: CUSTOM_VALUE
-              error_handler_params: '{"columns":{"count":0}}'
             - type: JSONPATH
               parameters:
-                - $.columns.count
+                - $..count.first()
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             aggregated_columns:
               - alias: count
@@ -1642,17 +1622,17 @@ zabbix_export:
           value_type: FLOAT
           description: 'Number of worker-thread event-loop watchdog "mega miss" events (envoy_server_worker_watchdog_mega_miss — a severe, prolonged event-loop stall) per aggregation window.'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
             - type: SIMPLE_CHANGE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             aggregated_columns:
@@ -1673,7 +1653,7 @@ zabbix_export:
               value: worker
           triggers:
             - uuid: 6e5fce53ad1145e0b670c272ab84c3ad
-              expression: 'min(/Envoy Proxy by OTLP/envoy.otlp.worker.watchdog.mega_miss.rate,5m) > {$ENVOY.OTLP.WATCHDOG.MEGA_MISS.WARN}'
+              expression: 'last(/Envoy Proxy by OTLP/envoy.otlp.worker.watchdog.mega_miss.rate) > {$ENVOY.OTLP.WATCHDOG.MEGA_MISS.WARN}'
               name: 'Envoy Proxy: Worker thread severely stalled (watchdog mega miss)'
               event_name: 'Envoy Proxy: A worker thread''s event loop stalled severely (mega miss) — Envoy may be overloaded or blocked'
               priority: HIGH
@@ -1688,17 +1668,17 @@ zabbix_export:
           value_type: FLOAT
           description: 'Number of worker-thread event-loop watchdog misses (envoy_server_worker_watchdog_miss — the thread was unresponsive longer than expected) per aggregation window.'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
             - type: JSONPATH
               parameters:
-                - $.columns.value
+                - $..value.first()
+              error_handler: DISCARD_VALUE
             - type: SIMPLE_CHANGE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           time_shift: '{$ENVOY.OTLP.TIME_SHIFT}'
-          lookback_limit: 10m
-          granularity: 1m
+          lookback_limit: '{$ENVOY.OTLP.INTERVAL}'
+          granularity: '{$ENVOY.OTLP.INTERVAL}'
           query:
             signal_type: METRICS
             aggregated_columns:

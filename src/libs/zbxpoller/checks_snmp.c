@@ -154,6 +154,7 @@ typedef struct
 	char			*error;
 	netsnmp_large_fd_set	fdset;
 	char			*error_msgget;
+	int			retries;
 }
 zbx_bulkwalk_context_t;
 
@@ -3208,6 +3209,7 @@ static zbx_bulkwalk_context_t	*snmp_bulkwalk_context_create(zbx_snmp_context_t *
 	bulkwalk_context->arg = snmp_context;
 	bulkwalk_context->error = NULL;
 	bulkwalk_context->error_msgget = NULL;
+	bulkwalk_context->retries = 0;	/* must be reset before each request */
 
 	netsnmp_large_fd_set_init(&bulkwalk_context->fdset, FD_SETSIZE);
 
@@ -3227,16 +3229,17 @@ static int	snmp_bulkwalk_add(zbx_snmp_context_t *snmp_context, int *fd, char *er
 	struct snmp_pdu			*pdu;
 	zbx_bulkwalk_context_t		*bulkwalk_context = snmp_context->bulkwalk_contexts.values[snmp_context->i];
 	struct netsnmp_transport_s	*transport;
+	netsnmp_session			*session;
 	int				ret, numfds = 0, block = 0;
 	struct timeval			timeout = {0};
 	fd_set				fdset;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " fd:%d", __func__, snmp_context->item.itemid, *fd);
 
+	session = snmp_sess_session(snmp_context->ssp);
+
 	if (1 == snmp_context->probe)
 	{
-		netsnmp_session	*session = snmp_sess_session(snmp_context->ssp);
-
 		session->flags |= SNMP_FLAGS_DONT_PROBE;
 
 		if (NULL == (pdu = usm_probe_pdu_create()))
@@ -3285,6 +3288,9 @@ static int	snmp_bulkwalk_add(zbx_snmp_context_t *snmp_context, int *fd, char *er
 
 	bulkwalk_context->reqid = -1;
 	bulkwalk_context->operation = 0;
+	/* make sure snmp library keeps resending */
+	session->retries = snmp_context->retries;
+	bulkwalk_context->retries = snmp_context->retries;
 
 	if (0 == (bulkwalk_context->reqid = snmp_sess_async_send(snmp_context->ssp, pdu, asynch_response,
 			bulkwalk_context)))
@@ -3427,12 +3433,12 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 		if (ZBX_SNMP_TIMEOUT_WATERMARK < snmp_context->config_timeout)
 			high_timeout_msg = " (timeout value may be too high)";
 
-		if (0 < snmp_context->retries--)
+		if (0 < bulkwalk_context->retries--)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " cannot receive response from [[%s]:%hu]:"
-					" timed out%s, retrying", snmp_context->item.itemid,
+					" timed out%s, retrying, %d retries left", snmp_context->item.itemid,
 					snmp_context->item.interface.addr, snmp_context->item.interface.port,
-					high_timeout_msg);
+					high_timeout_msg, bulkwalk_context->retries);
 
 			snmp_sess_timeout(snmp_context->ssp);
 

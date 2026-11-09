@@ -70,11 +70,12 @@ class CControllerPopupTelemetryAggregatedColumnEdit extends CController {
 	}
 
 	private static function getFormValidationRules(array $existing_aliases): array {
-		$alias_rules = ['string', 'required', 'length' => 255, 'not_empty'];
+		$alias_rules = [['string', 'required', 'length' => 255, 'not_empty', 'not_in' => ['clock']]];
 
 		if ($existing_aliases) {
-			$alias_rules['not_in'] = $existing_aliases;
-			$alias_rules['messages'] = ['not_in' => _('Alias is not unique.')];
+			$alias_rules[] = ['string', 'not_in' => $existing_aliases,
+				'messages' => ['not_in' => _('Alias is not unique.')]
+			];
 		}
 
 		return ['object', 'fields' => [

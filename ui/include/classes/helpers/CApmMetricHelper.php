@@ -19,7 +19,7 @@ class CApmMetricHelper {
 	public static function getName(int $type): string {
 		return match ($type) {
 			APM_METRIC_TYPE_GAUGE => _('Gauge'),
-			APM_METRIC_TYPE_SUM => _('Summary'),
+			APM_METRIC_TYPE_SUM => _('Sum'),
 			APM_METRIC_TYPE_HISTOGRAM => _('Histogram'),
 			APM_METRIC_TYPE_EXPONENTIAL_HISTOGRAM => _('Exponential histogram'),
 			default => _('Unknown')

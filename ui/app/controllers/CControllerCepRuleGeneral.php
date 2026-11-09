@@ -67,6 +67,20 @@ abstract class CControllerCepRuleGeneral extends CController {
 				}
 				unset($condition);
 
+				if (array_key_exists('scope_filter', $operation)) {
+					if (!array_key_exists('conditions', $operation['scope_filter'])) {
+						$operation['scope_filter']['conditions'] = [];
+					}
+
+					foreach ($operation['scope_filter']['conditions'] as &$condition) {
+						if ($condition['type'] == CCepRuleHelper::CONDITION_TAG_VALUE) {
+							$condition['tag'] = $condition['tag_name'];
+							unset($condition['tag_name']);
+						}
+					}
+					unset($condition);
+				}
+
 				switch ($operation['type']) {
 					case CCepRuleHelper::OP_SUPPRESS:
 						if ($operation['suppress_time_option'] === ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE) {
@@ -160,6 +174,24 @@ abstract class CControllerCepRuleGeneral extends CController {
 				'use' => [CTimeUnitValidator::class, ['max' => 5 * SEC_PER_YEAR, 'min' => 1, 'with_year' => true]],
 				'when' => ['suppress_time_option', 'in' => [ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE]]
 			],
+			'scope' => [
+				['db cep_operation.scope', 'required',
+					'in' => [CCepRuleHelper::SCOPE_CURRENT_EVENT, CCepRuleHelper::SCOPE_OTHER_EVENTS,
+						CCepRuleHelper::SCOPE_ALL_EVENTS]
+				],
+				['db cep_operation.scope',
+					'in' => [CCepRuleHelper::SCOPE_CURRENT_EVENT],
+					'when' => ['execute_when', 'in' => [CCepRuleHelper::WHEN_EVENT_OCCURRED]]
+				],
+				['db cep_operation.scope',
+					'in' => [CCepRuleHelper::SCOPE_ALL_EVENTS],
+					'when' => ['execute_when', 'in' => [CCepRuleHelper::WHEN_WINDOW_CLOSED,
+						CCepRuleHelper::WHEN_PATTERN_MATCHED]]
+				]
+			],
+			'scope_filter' => ['object', 'fields' => self::getOperationFilterValidationFields(),
+				'when' => ['scope', 'not_in' => [CCepRuleHelper::SCOPE_CURRENT_EVENT]]
+			],
 			'sortorder' => ['db cep_operation.sortorder', 'required']
 		];
 	}
@@ -178,21 +210,17 @@ abstract class CControllerCepRuleGeneral extends CController {
 				'type' => [
 					[
 						'integer', 'required', 'in' => [
-							ZBX_CONDITION_TYPE_EVENT_TAG, ZBX_CONDITION_TYPE_EVENT_TAG_VALUE, ZBX_CONDITION_TYPE_EVENT_OPEN,
-							ZBX_CONDITION_TYPE_EVENT_SYMPTOM, ZBX_CONDITION_TYPE_EVENT_COPIED,
-							ZBX_CONDITION_TYPE_EVENT_SUPPRESSED
+							ZBX_CONDITION_TYPE_EVENT_TAG, ZBX_CONDITION_TYPE_EVENT_TAG_VALUE,
+							ZBX_CONDITION_TYPE_EVENT_OPEN, ZBX_CONDITION_TYPE_EVENT_FIRST,
+							ZBX_CONDITION_TYPE_EVENT_LAST, ZBX_CONDITION_TYPE_EVENT_SYMPTOM,
+							ZBX_CONDITION_TYPE_EVENT_COPIED, ZBX_CONDITION_TYPE_EVENT_SUPPRESSED
 						],
-						'when' => ['../../execute_when', 'in' => [CCepRuleHelper::WHEN_EVENT_OCCURRED]],
 						'messages' => ['in' => _('Invalid value.')]
 					],
 					[
-						'integer', 'required', 'in' => [
-							ZBX_CONDITION_TYPE_EVENT_TAG, ZBX_CONDITION_TYPE_EVENT_TAG_VALUE, ZBX_CONDITION_TYPE_EVENT_OPEN,
-							ZBX_CONDITION_TYPE_EVENT_FIRST, ZBX_CONDITION_TYPE_EVENT_LAST, ZBX_CONDITION_TYPE_EVENT_SYMPTOM,
-							ZBX_CONDITION_TYPE_EVENT_COPIED, ZBX_CONDITION_TYPE_EVENT_SUPPRESSED
-						],
-						'when' => ['../../execute_when', 'not_in' => [CCepRuleHelper::WHEN_EVENT_OCCURRED]],
-						'messages' => ['in' => _('Invalid value.')]
+						'integer', 'not_in' => [ZBX_CONDITION_TYPE_EVENT_FIRST, ZBX_CONDITION_TYPE_EVENT_LAST],
+						'when' => ['../../execute_when', 'in' => [CCepRuleHelper::WHEN_EVENT_OCCURRED]],
+						'messages' => ['not_in' => _('Invalid value.')]
 					]
 				],
 				'operator' => [

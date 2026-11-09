@@ -181,6 +181,7 @@ void	apm_config_init(zbx_apm_config_t *cfg)
 	cfg->enabled = APM_STATUS_DISABLED;
 	cfg->quota = 0;
 	cfg->state = ZBX_APM_CONFIG_DEFAULT;
+	cfg->revision = 0;
 }
 
 /******************************************************************************
@@ -225,6 +226,8 @@ int	apm_config_set(zbx_apm_config_t *cfg, char *apm_config, zbx_uint64_t revisio
 	char			buf[ZBX_MAX_UINT64_LEN];
 	struct zbx_json_parse	jp, jp_attrs;
 	zbx_apm_config_attrs_t	*attrs;
+	int			enabled;
+	zbx_uint64_t		quota;
 
 	if (cfg->revision == revision)
 		return SUCCEED;
@@ -232,20 +235,17 @@ int	apm_config_set(zbx_apm_config_t *cfg, char *apm_config, zbx_uint64_t revisio
 	if (NULL == apm_config)
 		return FAIL;
 
-	if (0 == cfg->revision && NULL == cfg->attrs)
-		apm_config_init(cfg);
-
 	if (SUCCEED != zbx_json_open(apm_config, &jp))
 		return FAIL;
 
 	if (SUCCEED != zbx_json_value_by_name(&jp, APM_STATUS, buf, sizeof(buf), NULL) ||
-			SUCCEED != zbx_is_uint31(buf, &cfg->enabled))
+			SUCCEED != zbx_is_uint31(buf, &enabled))
 	{
 		return FAIL;
 	}
 
 	if (SUCCEED != zbx_json_value_by_name(&jp, APM_QUOTA, buf, sizeof(buf), NULL) ||
-			SUCCEED != zbx_is_uint64(buf, &cfg->quota))
+			SUCCEED != zbx_is_uint64(buf, &quota))
 	{
 		return FAIL;
 	}
@@ -258,6 +258,8 @@ int	apm_config_set(zbx_apm_config_t *cfg, char *apm_config, zbx_uint64_t revisio
 
 	apm_config_attrs_release(cfg->attrs);
 	cfg->attrs = attrs;
+	cfg->enabled = enabled;
+	cfg->quota = quota;
 	cfg->revision = revision;
 	cfg->state = ZBX_APM_CONFIG_SET;
 
