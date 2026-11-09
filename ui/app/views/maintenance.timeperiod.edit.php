@@ -189,13 +189,13 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('At (hour:minute)'), 'hour'))->addClass('js-hour-minute')->setAsteriskMark(),
 		(new CFormField([
-			(new CNumericBox('hour', $data['form']['hour'], 2, false, false, false))
+			(new CNumericBox('hour', $data['form']['hour'], 2, false, false))
 				->padWithZeroes(2)
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 				->setErrorContainer('hour-minute-error-container')
 				->setErrorLabel(_('Hour')),
 			' : ',
-			(new CNumericBox('minute', $data['form']['minute'], 2, false, false, false))
+			(new CNumericBox('minute', $data['form']['minute'], 2, false, false))
 				->padWithZeroes(2)
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 				->setErrorContainer('hour-minute-error-container')
