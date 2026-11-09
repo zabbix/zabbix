@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '8.0'
+  version: '8.2'
   template_groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -125,7 +125,7 @@ zabbix_export:
         If you use another web server port or scheme for the location of the PHP-FPM status/ping pages, don't forget to change the host wizard configuration fields `Scheme` and `PHP-FPM port`.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.2-0
       groups:
         - name: Templates/Applications
       items:
