@@ -1170,11 +1170,11 @@ class testFormItemPrototype extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Checksum of $1',
-					'key' => 'vfs.file.cksum[/sbin/shutdown,{#KEY}]',
+					'name' => 'Test form item duplicate',
+					'key' => 'item-prototype-reuse[{#KEY}]',
 					'error_msg' => 'Cannot add item prototype',
 					'errors' => [
-						'An item prototype with key "vfs.file.cksum[/sbin/shutdown,{#KEY}]" already exists on the host'
+						'An item prototype with key "item-prototype-reuse[{#KEY}]" already exists on the host'
 					]
 				]
 			],
@@ -2169,6 +2169,19 @@ class testFormItemPrototype extends CLegacyWebTest {
 						'Incorrect value for field "key": cannot be empty.'
 					]
 				]
+			],
+			// #77 Prototype with Binary type of information.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'type' => 'Dependent item',
+					'value_type' => 'Binary',
+					'master_item' => 'testFormItem',
+					'name' => 'Binary value type',
+					'key' => 'binary[{#ID}]',
+					'dbCheck' => true,
+					'formCheck' => true
+				]
 			]
 		];
 	}
@@ -2198,6 +2211,14 @@ class testFormItemPrototype extends CLegacyWebTest {
 		}
 		else {
 			$type = $this->zbxTestGetSelectedLabel('type');
+		}
+
+		if (isset($data['value_type'])) {
+			$form->getField('Type of information')->select($data['value_type']);
+		}
+
+		if (array_key_exists('master_item', $data)) {
+			$form->getField('Master item')->fill($data['master_item']);
 		}
 
 		if (isset($data['name'])) {
