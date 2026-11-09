@@ -1967,7 +1967,7 @@ class CLineGraphDraw extends CGraphDraw {
 			] = $result;
 
 			$scale_values = calculateGraphScaleValues($this->m_minY[$side], $this->m_maxY[$side],
-				$calc_min, $calc_max, $this->intervals[$side], $display_units, $this->power[$side], 10
+				$this->intervals[$side], $display_units, $this->power[$side], 10, false
 			);
 
 			$shift = $side == GRAPH_YAXIS_SIDE_LEFT ? $this->shiftXleft : $this->shiftXright;
