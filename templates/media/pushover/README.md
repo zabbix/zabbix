@@ -7,7 +7,7 @@ With Pushover, a user can be notified the most convenient way — with push noti
 
 ## Requirements
 
-Zabbix version: 8.0 and higher.
+Zabbix version: 8.2 and higher.
 
 ## Parameters
 

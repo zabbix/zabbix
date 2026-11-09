@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '8.0'
+  version: '8.2'
   template_groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -60,7 +60,7 @@ zabbix_export:
         2. Set the hostname or IP address of the HAProxy stats host or container in the `Address` host wizard configuration field. You can also change the status page port in the `Port`, the status page scheme in the `Scheme` and the status page path in the `Stats page path` host wizard configuration fields if necessary.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.2-0
       groups:
         - name: Templates/Applications
       items:

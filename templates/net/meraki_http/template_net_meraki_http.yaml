@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '8.0'
+  version: '8.2'
   template_groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -31,7 +31,7 @@ zabbix_export:
         Set filters with host wizard configuration fields if you want to override default filter parameters.
       vendor:
         name: Zabbix
-        version: 8.0-4
+        version: 8.2-0
       groups:
         - name: Templates/Applications
         - name: 'Templates/Network devices'
@@ -457,13 +457,13 @@ zabbix_export:
             label: 'Filter for device by status (exclude)'
             description: 'This macro is used in devices discovery. Can be overridden on the host or linked template level.'
         - macro: '{$MERAKI.HTTP_PROXY}'
-          description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/http'
+          description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/8.2/manual/config/items/itemtypes/http'
           config:
             type: TEXT
             priority: '10'
             section_name: Other
             label: 'HTTP proxy'
-            description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/http'
+            description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/8.2/manual/config/items/itemtypes/http'
         - macro: '{$MERAKI.ORGANIZATION.NAME.MATCHES}'
           value: .+
           description: 'This macro is used in organizations discovery. Can be overridden on the host or linked template level.'
@@ -502,7 +502,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-7
+        version: 8.2-0
       groups:
         - name: Templates/Applications
         - name: 'Templates/Network devices'
@@ -1590,7 +1590,7 @@ zabbix_export:
           value: '300'
           description: 'Update interval for get status item.'
         - macro: '{$MERAKI.HTTP_PROXY}'
-          description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/http'
+          description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/8.2/manual/config/items/itemtypes/http'
         - macro: '{$MERAKI.TOKEN}'
           type: SECRET_TEXT
           description: 'Cisco Meraki dashboard API token.'
@@ -1661,7 +1661,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-5
+        version: 8.2-0
       groups:
         - name: Templates/Applications
         - name: 'Templates/Network devices'
@@ -4434,13 +4434,13 @@ zabbix_export:
             description: 'Response timeout for an API.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$MERAKI.HTTP_PROXY}'
-          description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/http'
+          description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/8.2/manual/config/items/itemtypes/http'
           config:
             type: TEXT
             priority: '20'
             section_name: Other
             label: 'HTTP proxy'
-            description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/http'
+            description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/8.2/manual/config/items/itemtypes/http'
         - macro: '{$MERAKI.LICENSE.EXPIRE}'
           value: '86400'
           description: 'Time in seconds for license to expire.'

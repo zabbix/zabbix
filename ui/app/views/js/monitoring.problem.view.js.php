@@ -864,9 +864,7 @@
 		}
 
 		#refresh({tabfilter_changed = false, loading_fadein = false} = {}) {
-			if (this.#datatable.isUserInteracting()) {
-				return;
-			}
+			closeDialogHandler({which: KEY_ESCAPE});
 
 			this.#unscheduleRefresh();
 
@@ -914,11 +912,13 @@
 			}
 
 			this.#unscheduleRefresh();
+			this.#refresh_interval_id = setInterval(() => {
+				if (this.#datatable.isUserInteracting()) {
+					return;
+				}
 
-			this.#refresh_interval_id = setInterval(
-				() => this.#refresh({loading_fadein: true}),
-				this.#refresh_interval
-			);
+				this.#refresh({loading_fadein: true});
+			}, this.#refresh_interval);
 		}
 
 		#unscheduleRefresh() {

@@ -36,7 +36,8 @@ final class CImportConverterFactory extends CRegistryFactory {
 		'6.4' => 'C64ImportConverter',
 		'7.0' => 'C70ImportConverter',
 		'7.2' => 'C72ImportConverter',
-		'7.4' => 'C74ImportConverter'
+		'7.4' => 'C74ImportConverter',
+		'8.0' => 'C80ImportConverter'
 	];
 
 	public function __construct() {
