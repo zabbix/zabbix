@@ -4128,7 +4128,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						'type' => 'JavaScript',
 						'parameters' => [
 							[
-								'selector' => 'xpath:.//div[@class="multilineinput-control"]/span',
+								'selector' => 'xpath:.//div[contains(@class, "multilineinput-control")]/span',
 								'data-placeholder' => 'script'
 							]
 						],
