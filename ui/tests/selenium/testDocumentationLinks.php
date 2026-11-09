@@ -41,7 +41,7 @@ class testDocumentationLinks extends CWebTest {
 	public function prepareData() {
 		self::$triggerids = CDataHelper::get('MonitoringOverview.triggerids');
 		self::$eventids = CDataHelper::get('MonitoringOverview.eventids');
-		self::$version = substr(ZABBIX_VERSION, 0, 3);
+		self::$version = ZABBIX_MAJOR_VERSION;
 
 		// Create a service.
 		CDataHelper::call('service.create', [
