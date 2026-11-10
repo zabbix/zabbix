@@ -181,7 +181,7 @@ static void	commands_unlock(void)
 	zbx_mutex_unlock(remote_commands_lock);
 }
 
-static int	remote_commands_insert_result(zbx_uint64_t id, char *value, char *err_msg)
+static int	remote_commands_insert_result(zbx_uint64_t id, zbx_uint64_t hostid, char *value, char *err_msg)
 {
 	int			ret = SUCCEED;
 	zbx_rc_command_t	*command, command_loc;
@@ -190,9 +190,9 @@ static int	remote_commands_insert_result(zbx_uint64_t id, char *value, char *err
 
 	commands_lock();
 	command_loc.id = id;
+	command = (zbx_rc_command_t *)zbx_hashset_search(&remote_commands->commands, &command_loc);
 
-	if (NULL != (command = (zbx_rc_command_t *)zbx_hashset_search(&remote_commands->commands,
-			&command_loc)))
+	if (NULL != command && hostid == command->hostid && 0 == (command->flag & REMOTE_COMMAND_COMPLETED))
 	{
 		if (NULL != value && NULL == (command->value = remote_commands_shared_strdup(value)))
 		{
@@ -208,6 +208,12 @@ static int	remote_commands_insert_result(zbx_uint64_t id, char *value, char *err
 
 		command->flag |= REMOTE_COMMAND_COMPLETED;
 	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "command id " ZBX_FS_UI64
+				" not found, belongs to another host or already completed", id);
+		ret = FAIL;
+	}
 
 	commands_unlock();
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(), ret %d", __func__, ret);
@@ -215,21 +221,18 @@ static int	remote_commands_insert_result(zbx_uint64_t id, char *value, char *err
 	return ret;
 }
 
-void	zbx_process_command_results(struct zbx_json_parse *jp)
+void	zbx_process_command_results(struct zbx_json_parse *jp_commands, zbx_uint64_t hostid)
 {
 	int			values_num = 0, parsed_num = 0, results_num = 0;
 	const char		*pnext = NULL;
-	struct zbx_json_parse	jp_commands, jp_command;
+	struct zbx_json_parse	jp_command;
 	char			*str = NULL;
 	size_t			str_alloc = 0;
 	zbx_uint64_t		id;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_COMMANDS, &jp_commands))
-		goto out;
-
-	while (NULL != (pnext = zbx_json_next(&jp_commands, pnext)))
+	while (NULL != (pnext = zbx_json_next(jp_commands, pnext)))
 	{
 		char	*value = NULL, *error = NULL;
 
@@ -261,10 +264,10 @@ void	zbx_process_command_results(struct zbx_json_parse *jp)
 		}
 
 		values_num++;
-		if (SUCCEED == remote_commands_insert_result(id, value, error))
+		if (SUCCEED == remote_commands_insert_result(id, hostid, value, error))
 			results_num++;
 	}
-out:
+
 	zbx_free(str);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(), parsed %d values received %d results inserted %d", __func__,
@@ -454,8 +457,8 @@ static int	passive_command_send_and_result_fetch(const zbx_dc_host_t *host, cons
 	}
 
 	port = zbx_strdup(port, item.interface.port_orig);
-	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-			&port, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL, NULL, NULL, NULL, &port,
+			ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 	if (SUCCEED != (ret = zbx_is_ushort(port, &item.interface.port)))
 	{
@@ -748,7 +751,7 @@ void	zbx_webhook_params_pack_json(const zbx_vector_ptr_pair_t *params, char **pa
  * Purpose: prepares user script                                                   *
  *                                                                                 *
  * Parameters: script        - [IN] script to prepare                              *
- *             hostid        - [IN] host the script will be executed on            *
+ *             host          - [IN] host the script will be executed on            *
  *             error         - [OUT] error message buffer                          *
  *             max_error_len - [IN] size of error message output buffer            *
  *                                                                                 *
@@ -761,7 +764,7 @@ void	zbx_webhook_params_pack_json(const zbx_vector_ptr_pair_t *params, char **pa
  *           function.                                                             *
  *                                                                                 *
  ***********************************************************************************/
-int	zbx_script_prepare(zbx_script_t *script, const zbx_uint64_t *hostid, char *error, size_t max_error_len)
+int	zbx_script_prepare(zbx_script_t *script, const zbx_dc_host_t *host, char *error, size_t max_error_len)
 {
 	int			ret = FAIL;
 	zbx_dc_um_handle_t	*um_handle;
@@ -773,13 +776,13 @@ int	zbx_script_prepare(zbx_script_t *script, const zbx_uint64_t *hostid, char *e
 	switch (script->type)
 	{
 		case ZBX_SCRIPT_TYPE_SSH:
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL, NULL, NULL,
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL, NULL, NULL,
 					NULL, &script->publickey, ZBX_MACRO_TYPE_COMMON, NULL, 0);
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL, NULL, NULL,
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL, NULL, NULL,
 					NULL, &script->privatekey, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 			ZBX_FALLTHROUGH;
 		case ZBX_SCRIPT_TYPE_TELNET:
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL, NULL, NULL,
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL, NULL, NULL,
 					NULL, &script->port, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 			if ('\0' != *script->port && SUCCEED != (ret = zbx_is_ushort(script->port, NULL)))
@@ -788,9 +791,9 @@ int	zbx_script_prepare(zbx_script_t *script, const zbx_uint64_t *hostid, char *e
 				goto out;
 			}
 
-			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL,
+			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL,
 					NULL, NULL, NULL, &script->username, ZBX_MACRO_TYPE_COMMON, NULL, 0);
-			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL,
+			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, host, NULL, NULL, NULL,
 					NULL, NULL, NULL, &script->password, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 			break;
 		case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:

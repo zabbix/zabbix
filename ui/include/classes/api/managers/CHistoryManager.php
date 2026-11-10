@@ -929,14 +929,14 @@ class CHistoryManager {
 	 *
 	 * The $item parameter must have the value_type, itemid and source properties set.
 	 *
-	 * @param array $items      Items to get aggregated values for.
-	 * @param int   $time_from  Minimal timestamp (seconds) to get data from.
-	 * @param int   $time_to    Maximum timestamp (seconds) to get data from.
-	 * @param int   $width      Graph width in pixels (is not required for pie charts).
+	 * @param array    $items      Items to get aggregated values for.
+	 * @param int      $time_from  Minimal timestamp (seconds) to get data from.
+	 * @param int      $time_to    Maximum timestamp (seconds) to get data from.
+	 * @param int|null $width      Graph width in pixels (is not required for pie charts).
 	 *
 	 * @return array  History value aggregation for graphs.
 	 */
-	public function getGraphAggregationByWidth(array $items, $time_from, $time_to, $width = null) {
+	public function getGraphAggregationByWidth(array $items, int $time_from, int $time_to, ?int $width = null): array {
 		$grouped_items = $this->getItemsGroupedByStorage($items);
 
 		$results = [];
@@ -960,7 +960,9 @@ class CHistoryManager {
 	 *
 	 * @see CHistoryManager::getGraphAggregationByWidth
 	 */
-	private function getGraphAggregationByWidthFromElasticsearch(array $items, $time_from, $time_to, $width) {
+	private function getGraphAggregationByWidthFromElasticsearch(array $items, int $time_from, int $time_to,
+			?int $width): array {
+
 		$terms = [];
 
 		foreach ($items as $item) {
@@ -1128,7 +1130,7 @@ class CHistoryManager {
 	 *
 	 * @see CHistoryManager::getGraphAggregationByWidth
 	 */
-	private function getGraphAggregationByWidthFromSql(array $items, $time_from, $time_to, $width) {
+	private function getGraphAggregationByWidthFromSql(array $items, int $time_from, int $time_to, ?int $width): array {
 		$sql_select_extra = '';
 		$group_by = 'itemid';
 		$order_by = '';

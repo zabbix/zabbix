@@ -232,6 +232,7 @@
 			<arg line="${with.encryption}"/>
 			<arg line="--with-net-snmp"/>
 			<arg line="--with-ssh2"/>
+			<arg line="--enable-java"/>
 		</exec>
 		<exec executable="make" failonerror="on">
 			<arg line="-j12"/>
@@ -419,21 +420,21 @@
 		</exec>
 	</target>
 
-	<target name="create-frontend-elasticsearch-configs" if="elasticsearch">
-		<property name="elasticsearch_url" value="${ELASTICSEARCH_URL}"/>
+	<target name="create-frontend-hp-elasticsearch-configs" if="hp-elasticsearch">
+		<property name="hp_elasticsearch_url" value="${HP_ELASTICSEARCH_URL}"/>
 
 		<echo file="ui/conf/zabbix.conf.php" append="true">${line.separator}</echo>
 		<echo file="ui/conf/zabbix.conf.php" append="true">$HISTORY['url'] = [${line.separator}</echo>
-		<echo file="ui/conf/zabbix.conf.php" append="true">     'dbl' =&gt; '${elasticsearch_url}',${line.separator}</echo>
-		<echo file="ui/conf/zabbix.conf.php" append="true">     'str' =&gt; '${elasticsearch_url}',${line.separator}</echo>
-		<echo file="ui/conf/zabbix.conf.php" append="true">     'log' =&gt; '${elasticsearch_url}',${line.separator}</echo>
-		<echo file="ui/conf/zabbix.conf.php" append="true">     'uint' =&gt; '${elasticsearch_url}',${line.separator}</echo>
-		<echo file="ui/conf/zabbix.conf.php" append="true">     'text' =&gt; '${elasticsearch_url}',${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'dbl' =&gt; '${hp_elasticsearch_url}',${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'str' =&gt; '${hp_elasticsearch_url}',${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'log' =&gt; '${hp_elasticsearch_url}',${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'uint' =&gt; '${hp_elasticsearch_url}',${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'text' =&gt; '${hp_elasticsearch_url}',${line.separator}</echo>
 		<echo file="ui/conf/zabbix.conf.php" append="true">];${line.separator}</echo>
 		<echo file="ui/conf/zabbix.conf.php" append="true">$HISTORY['types'] = ['dbl', 'str', 'log', 'uint', 'text'];${line.separator}</echo>
 	</target>
 
-	<target name="apply-elasticsearch-patches">
+	<target name="apply-hp-elasticsearch-patches" if="hp-elasticsearch">
 		<exec executable="git" failonerror="on">
 			<arg line="apply"/>
 			<arg line="ui/tests/integration/patches/elasticsearch.patch"/>
@@ -442,27 +443,27 @@
 		<replace file="src/libs/zbxhistory/history_elastic.c" token="{DBNAME}" value="${dbname}"/>
 	</target>
 
-	<target name="drop-db-elasticsearch" if="elasticsearch">
+	<target name="drop-db-hp-elasticsearch" if="hp-elasticsearch">
 		<property name="drop-db-args" value="--silent --request DELETE"/>
 
 		<exec executable="curl" failonerror="on">
-			<arg line="${drop-db-args} ${elasticsearch_url}/${dbname}_dbl"/>
+			<arg line="${drop-db-args} ${hp_elasticsearch_url}/${dbname}_dbl"/>
 		</exec>
 		<exec executable="curl" failonerror="on">
-			<arg line="${drop-db-args} ${elasticsearch_url}/${dbname}_str"/>
+			<arg line="${drop-db-args} ${hp_elasticsearch_url}/${dbname}_str"/>
 		</exec>
 		<exec executable="curl" failonerror="on">
-			<arg line="${drop-db-args} ${elasticsearch_url}/${dbname}_log"/>
+			<arg line="${drop-db-args} ${hp_elasticsearch_url}/${dbname}_log"/>
 		</exec>
 		<exec executable="curl" failonerror="on">
-			<arg line="${drop-db-args} ${elasticsearch_url}/${dbname}_uint"/>
+			<arg line="${drop-db-args} ${hp_elasticsearch_url}/${dbname}_uint"/>
 		</exec>
 		<exec executable="curl" failonerror="on">
-			<arg line="${drop-db-args} ${elasticsearch_url}/${dbname}_text"/>
+			<arg line="${drop-db-args} ${hp_elasticsearch_url}/${dbname}_text"/>
 		</exec>
 	</target>
 
-	<target name="create-db-elasticsearch" depends="drop-db-elasticsearch" if="elasticsearch">
+	<target name="create-db-hp-elasticsearch" depends="drop-db-hp-elasticsearch" if="hp-elasticsearch">
 		<property name="create-db-args" value="--silent --request PUT --header 'Content-Type: application/json'"/>
 		<property name="index-dbl"><![CDATA[
 {
@@ -579,30 +580,30 @@
 		<property name="index-text" value="${index-str}"/>
 
 		<exec executable="curl" failonerror="on">
-			<arg line="${create-db-args} ${elasticsearch_url}/${dbname}_dbl --data '${index-dbl}'"/>
+			<arg line="${create-db-args} ${hp_elasticsearch_url}/${dbname}_dbl --data '${index-dbl}'"/>
 		</exec>
 		<exec executable="curl" failonerror="on">
-			<arg line="${create-db-args} ${elasticsearch_url}/${dbname}_str --data '${index-str}'"/>
+			<arg line="${create-db-args} ${hp_elasticsearch_url}/${dbname}_str --data '${index-str}'"/>
 		</exec>
 		<exec executable="curl" failonerror="on">
-			<arg line="${create-db-args} ${elasticsearch_url}/${dbname}_log --data '${index-log}'"/>
+			<arg line="${create-db-args} ${hp_elasticsearch_url}/${dbname}_log --data '${index-log}'"/>
 		</exec>
 		<exec executable="curl" failonerror="on">
-			<arg line="${create-db-args} ${elasticsearch_url}/${dbname}_uint --data '${index-uint}'"/>
+			<arg line="${create-db-args} ${hp_elasticsearch_url}/${dbname}_uint --data '${index-uint}'"/>
 		</exec>
 		<exec executable="curl" failonerror="on">
-			<arg line="${create-db-args} ${elasticsearch_url}/${dbname}_text --data '${index-text}'"/>
+			<arg line="${create-db-args} ${hp_elasticsearch_url}/${dbname}_text --data '${index-text}'"/>
 		</exec>
 	</target>
 
-	<condition property="elasticsearch">
+	<condition property="hp-elasticsearch">
 		<and>
-			<isset property="HISTORY_STORAGE"/>
-			<equals arg1="${HISTORY_STORAGE}" arg2="ES"/>
+			<isset property="HISTORY_PROVIDER"/>
+			<equals arg1="${HISTORY_PROVIDER}" arg2="ES"/>
 		</and>
 	</condition>
 
-	<target name="init-integration-postgresql" depends="create-configs,create-frontend-elasticsearch-configs,init-integration,make-binary-agent-3.0,apply-elasticsearch-patches,make-binaries-postgresql,create-db-postgresql,create-db-elasticsearch,init-proxy-postgresql">
+	<target name="init-integration-postgresql" depends="create-configs,create-frontend-hp-elasticsearch-configs,init-integration,make-binary-agent-3.0,apply-hp-elasticsearch-patches,make-binaries-postgresql,create-db-postgresql,create-db-hp-elasticsearch,init-proxy-postgresql">
 		<exec executable="psql" input="ui/tests/integration/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-q"/>
@@ -615,7 +616,7 @@
 		</exec>
 	</target>
 
-	<target name="init-integration-tsdb" depends="create-configs,create-frontend-elasticsearch-configs,init-integration,make-binary-agent-3.0,apply-elasticsearch-patches,make-binaries-postgresql,create-db-tsdb,create-db-elasticsearch,init-proxy-postgresql"/>
+	<target name="init-integration-tsdb" depends="create-configs,create-frontend-hp-elasticsearch-configs,init-integration,make-binary-agent-3.0,apply-hp-elasticsearch-patches,make-binaries-postgresql,create-db-tsdb,create-db-hp-elasticsearch,init-proxy-postgresql"/>
 
 	<target name="init-dast-postgresql" depends="create-frontend-configs,make-dbschema,create-db-postgresql"/>
 
@@ -626,7 +627,7 @@
 
 		<!-- Binaries for integration tests -->
 		<exec executable="./configure" failonerror="on">
-			<arg line="CFLAGS='-g -std=gnu99 -Wenum-conversion -fsanitize=leak,address,undefined -fno-omit-frame-pointer '"/>
+			<arg line="CFLAGS='-g -std=gnu99 -Wenum-conversion -fsanitize=leak,address,undefined -fno-omit-frame-pointer -DZBX_DEBUG'"/>
 			<arg line="CC='clang'"/>
 			<arg line="LDFLAGS='-fsanitize=leak,address,undefined -fno-omit-frame-pointer '"/>
 			<arg line="--quiet"/>
@@ -641,6 +642,7 @@
 			<arg line="${with.encryption}"/>
 			<arg line="--with-net-snmp"/>
 			<arg line="--with-ssh2"/>
+			<arg line="--enable-java"/>
 		</exec>
 		<exec executable="make" failonerror="on">
 			<arg line="-j12"/>
@@ -786,7 +788,7 @@
 		</exec>
 	</target>
 
-	<target name="init-integration-mysql" depends="create-configs,create-frontend-elasticsearch-configs,init-integration,make-binary-agent-3.0,apply-elasticsearch-patches,make-binaries-mysql,create-db-mysql,create-db-elasticsearch,init-proxy-mysql">
+	<target name="init-integration-mysql" depends="create-configs,create-frontend-hp-elasticsearch-configs,init-integration,make-binary-agent-3.0,apply-hp-elasticsearch-patches,make-binaries-mysql,create-db-mysql,create-db-hp-elasticsearch,init-proxy-mysql">
 		<exec executable="mysql" input="ui/tests/integration/data/data_test.sql" failonerror="on">
 			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--host=${dbhost}"/>

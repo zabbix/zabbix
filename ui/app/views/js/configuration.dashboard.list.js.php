@@ -62,7 +62,7 @@
 			uncheckTableRows(this.checkbox_hash);
 
 			if (curl == null) {
-				location.href = location.href;
+				location.reload();
 			}
 			else {
 				location.href = curl.getUrl();
