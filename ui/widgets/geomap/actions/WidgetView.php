@@ -81,7 +81,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		if ($this->isTemplateDashboard()) {
 			if ($this->fields_values['override_hostid']) {
 				$hosts = API::Host()->get([
-					'output' => ['hostid', 'name'],
+					'output' => ['hostid', 'name', 'maintenanceid', 'maintenance_status', 'maintenance_type'],
 					'selectInventory' => ['location_lat', 'location_lon'],
 					'hostids' => $this->fields_values['override_hostid'],
 					'filter' => [
@@ -99,7 +99,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$filter_groupids = $this->fields_values['groupids'] ? getSubGroups($this->fields_values['groupids']) : null;
 
 			$hosts = API::Host()->get([
-				'output' => ['hostid', 'name'],
+				'output' => ['hostid', 'name', 'maintenanceid', 'maintenance_status', 'maintenance_type'],
 				'selectInventory' => ['location_lat', 'location_lon'],
 				'groupids' => $filter_groupids,
 				'hostids' => $this->fields_values['hostids'] ?: null,
@@ -138,6 +138,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'output' => ['objectid', 'severity'],
 			'objectids' => array_keys($triggers),
 			'symptom' => false
+		]);
+
+		$maintenances = API::Maintenance()->get([
+			'output' => ['name', 'description'],
+			'maintenanceids' => array_column($hosts, 'maintenanceid'),
+			'preservekeys' => true
 		]);
 
 		// Group problems by hosts.
@@ -184,7 +190,26 @@ class WidgetView extends CControllerDashboardWidgetView {
 					TRIGGER_SEVERITY_NOT_CLASSIFIED => 0
 				];
 
-			$result_hosts[] = $host + ['problems' => $problems];
+			$host_maintenance = [
+				'status' => $host['maintenance_status']
+			];
+
+			if ($host_maintenance['status'] == HOST_MAINTENANCE_STATUS_ON) {
+				$host_maintenance['type'] = $host['maintenance_type'] == MAINTENANCE_TYPE_NORMAL
+					? _('Maintenance with data collection')
+					: _('Maintenance without data collection');
+
+				if (array_key_exists($host['maintenanceid'], $maintenances)) {
+					$host_maintenance['name'] = $maintenances[$host['maintenanceid']]['name'];
+					$host_maintenance['description'] = $maintenances[$host['maintenanceid']]['description'];
+				}
+				else {
+					$host_maintenance['name'] = _('Inaccessible maintenance');
+					$host_maintenance['description'] = '';
+				}
+			}
+
+			$result_hosts[] = $host + ['maintenance' => $host_maintenance, 'problems' => $problems];
 		}
 
 		return $result_hosts;
@@ -318,6 +343,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'properties' => [
 					'hostid' => $host['hostid'],
 					'name' => $host['name'],
+					'maintenance' => $host['maintenance'],
 					'severity' => ($top_severity === false) ? -1 : $top_severity,
 					'problems' => $problems
 				]

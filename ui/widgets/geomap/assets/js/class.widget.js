@@ -539,6 +539,29 @@ class CWidgetGeoMap extends CWidget {
 			return btn;
 		};
 
+		const makeMaintenanceInfo = (host) => {
+			const maintenance = host.properties.maintenance;
+
+			if (maintenance.status == HOST_MAINTENANCE_STATUS_OFF) {
+				return null;
+			}
+
+			const maintenance_info = document.createElement('div');
+			maintenance_info.classList.add('widget-info-maintenance');
+
+			const button = document.createElement('button');
+			button.type = 'button';
+			button.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_WRENCH_ALT_SMALL,	ZBX_STYLE_COLOR_WARNING);
+			button.dataset.hintbox = '1';
+			button.dataset.hintboxStatic = '1';
+			button.dataset.hintboxContents = `${maintenance.name} [${maintenance.type}] `
+				+ (maintenance.description ? `<br>${maintenance.description}` : '');
+
+			maintenance_info.appendChild(button);
+
+			return maintenance_info;
+		};
+
 		const makeDataCell = (host, severity) => {
 			if (severity in host.properties.problems) {
 				const style = this._severity_levels.get(severity).class;
@@ -569,7 +592,10 @@ class CWidgetGeoMap extends CWidget {
 
 				rows += `
 					<tr data-hostid="${host.properties.hostid}" ${row_class}>
-						<td class="nowrap">${makeHostBtn(host).outerHTML}</td>
+						<td class="nowrap">
+							${makeHostBtn(host).outerHTML}
+							${makeMaintenanceInfo(host)?.outerHTML ?? ''}
+						</td>
 						${makeDataCell(host, CWidgetGeoMap.SEVERITY_DISASTER)}
 						${makeDataCell(host, CWidgetGeoMap.SEVERITY_HIGH)}
 						${makeDataCell(host, CWidgetGeoMap.SEVERITY_AVERAGE)}

@@ -1172,6 +1172,8 @@ int	process_httptests(int now, const char *config_source_ip, const char *config_
 						"cannot load web scenario data", httptest.httptest.name, host.name);
 				zbx_db_free_result(result);
 				THIS_SHOULD_NEVER_HAPPEN;
+
+				zbx_dc_httptest_requeue(now, httptestid);
 				continue;
 			}
 
@@ -1250,6 +1252,9 @@ int	process_httptests(int now, const char *config_source_ip, const char *config_
 
 			httptests_count++;	/* performance metric */
 		}
+		else
+			zbx_dc_httptest_requeue(now, httptestid);
+
 		zbx_db_free_result(result);
 	}
 	while (ZBX_IS_RUNNING() && SUCCEED == zbx_dc_httptest_next(now, &httptestid, nextcheck));

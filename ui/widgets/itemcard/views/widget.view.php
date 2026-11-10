@@ -92,7 +92,8 @@ elseif ($data['item']) {
 	}
 
 	$body = (new CDiv([
-		makeSectionsHeader($item, $data['context'], $data['is_context_editable'], $data['allowed_ui_conf_templates']),
+		makeSectionsHeader($item, $data['maintenances'], $data['context'], $data['is_context_editable'],
+			$data['allowed_ui_conf_templates']),
 		(new CDiv($sections))->addClass(Widget::ZBX_STYLE_SECTIONS)
 	]))->addClass(Widget::ZBX_STYLE_CLASS);
 }
@@ -107,7 +108,8 @@ else {
 	->show();
 
 
-function makeSectionsHeader(array $item, string $context, bool $show_path, bool $allowed_ui_conf_templates): CDiv {
+function makeSectionsHeader(array $item, array $maintenances, string $context, bool $show_path,
+		bool $allowed_ui_conf_templates): CDiv {
 	$item_status = '';
 	$problems_indicator = '';
 	$error_text = '';
@@ -170,9 +172,24 @@ function makeSectionsHeader(array $item, string $context, bool $show_path, bool 
 				->setArgument('hostid', $item['hostid'])
 				->getUrl();
 
-			$path[] = (new CLink($item['hosts'][0]['name'], $host_url))
-				->setTitle($item['hosts'][0]['name'])
+			$host = $item['hosts'][0];
+
+			$path[] = (new CLink($host['name'], $host_url))
+				->setTitle($host['name'])
 				->addClass('path-element');
+
+			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+				if (array_key_exists($host['maintenanceid'], $maintenances)) {
+					$path[] = makeMaintenanceIcon(
+						$host['maintenance_type'],
+						$maintenances[$host['maintenanceid']]['name'],
+						$maintenances[$host['maintenanceid']]['description']
+					);
+				}
+				else {
+					$path[] = makeMaintenanceIcon($host['maintenance_type'], _('Inaccessible maintenance'), '');
+				}
+			}
 		}
 
 		$template = makeItemTemplatePrefix($item['itemid'], $item['parent_templates'], ZBX_FLAG_DISCOVERY_NORMAL,

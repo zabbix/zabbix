@@ -1119,8 +1119,11 @@ static void	es_object_deep_ro_set(duk_context *ctx, const char *parent_key)
 
 	if (0 != duk_get_prop_string(ctx, -1, "prototype"))	/* [..., base] */
 	{
+		/* freeze prototype to protect instance methods */
 		es_object_freeze(ctx);
 		duk_pop(ctx);					/* pop prototype; [..., base, proto] */
+		/* freeze the object itself to protect its static methods */
+		es_object_freeze(ctx);
 		return;
 	}
 
