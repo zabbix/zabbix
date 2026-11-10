@@ -162,7 +162,7 @@ abstract class CControllerCharts extends CController {
 				$chart = [
 					'chartid' => 'item_'.$graph['itemid'],
 					'itemid' => $graph['itemid'],
-					'dimensions' => getGraphDims(),
+					'dimensions' => getGraphDims(null, [$graph['itemid']]),
 					'sbox' => true,
 					'src' => 'chart.php'
 				];
