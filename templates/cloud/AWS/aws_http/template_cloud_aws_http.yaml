@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '8.0'
+  version: '8.2'
   template_groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -171,7 +171,7 @@ zabbix_export:
         See the section below for a list of macros used for LLD filters.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.2-0
       groups:
         - name: Templates/Cloud
       items:
@@ -2222,7 +2222,7 @@ zabbix_export:
         * [DescribeLoadBalancers API method](https://docs.aws.amazon.com/elasticloadbalancing/latest/APIReference/API_DescribeLoadBalancers.html)
       vendor:
         name: Zabbix
-        version: 8.0-6
+        version: 8.2-0
       groups:
         - name: Templates/Cloud
       items:
@@ -5591,7 +5591,7 @@ zabbix_export:
         * [Describe AWS Cost Explore API actions](https://docs.aws.amazon.com/aws-cost-management/latest/APIReference/API_Operations.html).
       vendor:
         name: Zabbix
-        version: 8.0-6
+        version: 8.2-0
       groups:
         - name: Templates/Cloud
       items:
@@ -13115,7 +13115,7 @@ zabbix_export:
         For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
       vendor:
         name: Zabbix
-        version: 8.0-5
+        version: 8.2-0
       groups:
         - name: Templates/Cloud
       items:
@@ -16304,7 +16304,7 @@ zabbix_export:
         For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
       vendor:
         name: Zabbix
-        version: 8.0-6
+        version: 8.2-0
       groups:
         - name: Templates/Cloud
       items:
@@ -18999,7 +18999,7 @@ zabbix_export:
         For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
       vendor:
         name: Zabbix
-        version: 8.0-6
+        version: 8.2-0
       groups:
         - name: Templates/Cloud
       items:
@@ -21850,7 +21850,7 @@ zabbix_export:
         For more information about managing access keys, see [official AWS documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
       vendor:
         name: Zabbix
-        version: 8.0-5
+        version: 8.2-0
       groups:
         - name: Templates/Cloud
       items:
@@ -25061,7 +25061,7 @@ zabbix_export:
         For more information about managing access keys, see [official AWS documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
       vendor:
         name: Zabbix
-        version: 8.0-5
+        version: 8.2-0
       groups:
         - name: Templates/Cloud
       items:
@@ -27883,7 +27883,7 @@ zabbix_export:
         For more information about managing access keys, see the [official AWS documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
       vendor:
         name: Zabbix
-        version: 8.0-5
+        version: 8.2-0
       groups:
         - name: Templates/Cloud
       items:
@@ -29370,7 +29370,7 @@ zabbix_export:
         For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
       vendor:
         name: Zabbix
-        version: 8.0-5
+        version: 8.2-0
       groups:
         - name: Templates/Cloud
       items:
@@ -33130,7 +33130,7 @@ zabbix_export:
         For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
       vendor:
         name: Zabbix
-        version: 8.0-5
+        version: 8.2-0
       groups:
         - name: Templates/Cloud
       items:

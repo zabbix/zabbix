@@ -125,7 +125,7 @@
 					postMessageDetails('success', e.detail.success.messages);
 				}
 
-				location.href = location.href;
+				location.reload();
 			});
 		}
 
@@ -249,7 +249,7 @@
 						uncheckTableRows(`trigger_${this.checkbox_hash}`, [], true);
 					}
 
-					location.href = location.href;
+					location.reload();
 				})
 				.catch(() => {
 					clearMessages();

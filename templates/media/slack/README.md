@@ -7,7 +7,7 @@ This guide describes how to integrate your Zabbix installation with Slack using 
 
 ## Requirements
 
-Zabbix version: 8.0 and higher.
+Zabbix version: 8.2 and higher.
 
 ## Parameters
 
@@ -87,7 +87,7 @@ The **Send to** field can contain several variants of values:
 
 6\. Add your bot to the target channel.
 
-For more information, please see [Zabbix](https://www.zabbix.com/documentation/8.0/manual/config/notifications) and [Slack API](https://api.slack.com) documentation.
+For more information, please see [Zabbix](https://www.zabbix.com/documentation/8.2/manual/config/notifications) and [Slack API](https://api.slack.com) documentation.
 
 ## Feedback
 

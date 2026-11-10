@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '8.0'
+  version: '8.2'
   template_groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -27,16 +27,16 @@ zabbix_export:
         ```
         
         ### Setup Zabbix
-        1\. [Import](https://www.zabbix.com/documentation/8.0/manual/xml_export_import/templates) the template [template_app_squid_snmp.yaml](template_app_squid_snmp.yaml) into Zabbix.
+        1\. [Import](https://www.zabbix.com/documentation/8.2/manual/xml_export_import/templates) the template [template_app_squid_snmp.yaml](template_app_squid_snmp.yaml) into Zabbix.
         
         2\. Set values for {$SQUID.SNMP.COMMUNITY}, {$SQUID.SNMP.PORT} and {$SQUID.HTTP.PORT} as configured in squid.conf.
         
-        3\. [Link](https://www.zabbix.com/documentation/8.0/manual/config/templates/linking) the imported template to a host with Squid.
+        3\. [Link](https://www.zabbix.com/documentation/8.2/manual/config/templates/linking) the imported template to a host with Squid.
         
         4\. Add SNMPv2 interface to Squid host. Set **Port** as {$SQUID.SNMP.PORT} and **SNMP community** as {$SQUID.SNMP.COMMUNITY}.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.2-0
       groups:
         - name: Templates/Applications
       items:
