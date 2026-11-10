@@ -115,7 +115,7 @@
 				uncheckTableRows('hosts');
 			}
 
-			location.href = location.href;
+			location.reload();
 		}
 
 		#initFilter() {
