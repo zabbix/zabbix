@@ -22,15 +22,17 @@ window.telemetry_condition_popup = new class {
 	#form_element;
 	#form;
 	#complex_columns;
+	#numeric_columns;
 	#operators;
 
-	init({rules, complex_columns, condition_operators}) {
+	init({rules, complex_columns, numeric_columns, condition_operators}) {
 		this.#overlay = overlays_stack.end();
 		this.#dialogue = this.#overlay.$dialogue[0];
 		this.#form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
 		this.#form = new CForm(this.#form_element, rules);
 
 		this.#complex_columns = complex_columns;
+		this.#numeric_columns = numeric_columns;
 		this.#operators = condition_operators;
 
 		for (const name of ['column', 'operator']) {
@@ -47,8 +49,12 @@ window.telemetry_condition_popup = new class {
 	#update() {
 		const operator_field = this.#form.findFieldByName('operator');
 		const operator_element = operator_field.getField();
-		const is_complex = this.#complex_columns.includes(this.#form.findFieldByName('column').getValue());
-		const allowed_operators = is_complex ? this.#operators.complex : this.#operators.simple;
+		const column = this.#form.findFieldByName('column').getValue();
+		const is_complex = this.#complex_columns.includes(column);
+		const is_numeric = this.#numeric_columns.includes(column);
+		const allowed_operators = is_complex
+			? this.#operators.complex
+			: (is_numeric ? this.#operators.numeric : this.#operators.simple);
 
 		for (const radio of operator_element.querySelectorAll('input[type="radio"]')) {
 			radio.closest('li').hidden = true;
@@ -70,7 +76,7 @@ window.telemetry_condition_popup = new class {
 		this.#form_element.querySelector('#js-value-field').style.display = is_exists ? 'none' : '';
 		this.#form_element.querySelector('#js-value-label').style.display = is_exists ? 'none' : '';
 
-		const value_required = ['<?= CONDITION_OPERATOR_LIKE ?>', '<?= CONDITION_OPERATOR_NOT_LIKE ?>']
+		const value_required = is_numeric || ['<?= CONDITION_OPERATOR_LIKE ?>', '<?= CONDITION_OPERATOR_NOT_LIKE ?>']
 			.includes(operator_field.getValue());
 
 		this.#form_element.querySelector('#js-value-label')

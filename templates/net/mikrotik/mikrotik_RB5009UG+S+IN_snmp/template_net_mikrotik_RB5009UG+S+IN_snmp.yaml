@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '8.0'
+  version: '8.2'
   template_groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -30,7 +30,7 @@ zabbix_export:
         The ultimate heavy-duty home lab router with USB 3.0, 1G and 2.5G Ethernet and a 10G SFP+ cage. You can mount four of these new routers in a single 1U rackmount space! Unprecedented processing power in such a small form factor.
       vendor:
         name: Zabbix
-        version: 8.0-5
+        version: 8.2-0
       groups:
         - name: 'Templates/Network devices'
       items:

@@ -659,9 +659,7 @@ class testFormItem extends CLegacyWebTest {
 
 			$this->assertTrue($form->isRequired('Script'));
 			$script_field = $form->getField('Script');
-			$this->assertEquals('script', $script_field->query('xpath:.//input[@type="text"]')->one()
-					->getAttribute('placeholder')
-			);
+			$this->assertEquals('script', $script_field->query('tag:span')->one()->getAttribute('data-placeholder'));
 
 			$script_dialog = $script_field->edit();
 			$this->assertEquals('JavaScript', $script_dialog->getTitle());

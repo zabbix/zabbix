@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '8.0'
+  version: '8.2'
   template_groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -35,7 +35,7 @@ zabbix_export:
         - Change regexp in the host wizard configuration fields `Application pools filter (include)` and `Application pools filter (exclude)` used for filtering application pools discovery results.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.2-0
       groups:
         - name: Templates/Applications
       items:
@@ -766,12 +766,12 @@ zabbix_export:
             description: 'Maximum application pool''s request queue length for trigger expression.'
         - macro: '{$IIS.SERVICE}'
           value: http
-          description: 'The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information: https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/simple_checks'
+          description: 'The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information: https://www.zabbix.com/documentation/8.2/manual/config/items/itemtypes/simple_checks'
           config:
             type: TEXT
             priority: '2'
             label: 'Service type'
-            description: 'The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information: https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/simple_checks'
+            description: 'The service (http/https/etc) for port check. See "net.tcp.service" documentation page for more information: https://www.zabbix.com/documentation/8.2/manual/config/items/itemtypes/simple_checks'
             required: 'YES'
       dashboards:
         - uuid: 5fab732455514f558e99fc392a1a7e7e

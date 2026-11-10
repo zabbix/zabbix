@@ -41,7 +41,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	const TRIGGER_WARMUP_ITERATIONS = 60;
 	const LLD_ITERATIONS = 300;
 
-	private static $hostid;
+	protected static $hostid;
 	private static $proxyid;
 	private static $lld_ruleid;
 	private static $discovered_itemids = [];
@@ -1386,7 +1386,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		return $this->getClient(self::COMPONENT_SERVER)->testItem($data, CAPIHelper::getSessionId());
 	}
 
-	private function getVpsWritten(): int {
+	protected function getVpsWritten(): int {
 		$result = $this->testItemOnServer((string) self::$hostid,
 			['value_type' => ITEM_VALUE_TYPE_UINT64, 'type' => ITEM_TYPE_INTERNAL, 'key' => 'zabbix[vps,written]']
 		);
@@ -1437,7 +1437,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		}
 	}
 
-	private function assertVpsWrittenIncreasedBy(int $baseline, int $min_increase): void {
+	protected function assertVpsWrittenIncreasedBy(int $baseline, int $min_increase): void {
 		$expected = $baseline + $min_increase;
 		$timeout = self::WAIT_ITERATIONS * self::WAIT_ITERATION_DELAY;
 		$start = microtime(true);

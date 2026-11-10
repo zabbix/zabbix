@@ -25,13 +25,23 @@ z-navigation-tree {
 		grid-template-columns: 18px minmax(0, 1fr) auto;
 		column-gap: 4px;
 
+		&:focus {
+			outline: none;
+		}
+
 		&[selected] {
 			background: var(--navigation-tree-selected-bg-color);
 		}
 
-		&:not([selected]):hover {
-			background: var(--navigation-tree-hover-bg-color);
-			cursor: pointer;
+		&:not([selected]) {
+			&:hover {
+				background: var(--navigation-tree-hover-bg-color);
+				cursor: pointer;
+			}
+
+			&:focus {
+				background-color: $ui-hover-bg-color;
+			}
 		}
 	}
 
