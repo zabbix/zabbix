@@ -74,15 +74,11 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 			'theme' => ['db users.theme', 'in' => self::getAllowedThemes(),
 				'when' => ['username', 'not_in' => [ZBX_GUEST_USER]]
 			],
-			'autologin' => ['boolean'],
-			'autologout_visible' => ['boolean', 'when' => ['username', 'not_in' => [ZBX_GUEST_USER]]],
+			'autologin' => ['boolean', 'when' => ['username', 'not_in' => [ZBX_GUEST_USER]]],
+			'autologout_visible' => ['boolean'],
 			'autologout' => ['db users.autologout', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 90, 'max' => SEC_PER_DAY, 'accept_zero' => true]],
-				'when' => [
-					['username', 'not_in' => [ZBX_GUEST_USER]],
-					['autologin', 'in' => [0]],
-					['autologout_visible', 'in' => [1]]
-				]
+				'when' => ['autologout_visible', 'in' => [1]]
 			],
 			'default_maintenance_period' => ['db users.default_maintenance_period', 'not_empty',
 				'use' => [CTimeUnitValidator::class, [
