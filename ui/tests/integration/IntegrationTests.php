@@ -34,6 +34,7 @@ require_once dirname(__FILE__).'/testServiceRoles.php';
 require_once dirname(__FILE__).'/testMacros.php';
 require_once dirname(__FILE__).'/testExpressionTriggerMacros.php';
 require_once dirname(__FILE__).'/testAgentItems.php';
+require_once dirname(__FILE__).'/testVfsDevGet.php';
 require_once dirname(__FILE__).'/testVfsFsGet.php';
 require_once dirname(__FILE__).'/testScriptItems.php';
 require_once dirname(__FILE__).'/testItemRate.php';
@@ -115,6 +116,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testGoAgentDataCollection');
 		$suite->addTestSuite('testItemState');
 		$suite->addTestSuite('testVfsFsGet');
+		$suite->addTestSuite('testVfsDevGet');
 		$suite->addTestSuite('testValuemaps');
 		$suite->addTestSuite('testTriggerLinking');
 		$suite->addTestSuite('testTagInheritance');

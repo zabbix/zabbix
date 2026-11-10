@@ -127,7 +127,7 @@
 							}
 
 							postMessageOk(response.success.title);
-							location.href = location.href;
+							location.reload();
 						})
 						.catch(exception => {
 							for (const element of form_element.parentNode.children) {

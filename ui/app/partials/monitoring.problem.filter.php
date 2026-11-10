@@ -105,7 +105,7 @@ $left_column = (new CFormList())
 			->showTitles()
 	);
 
-$filter_age = (new CNumericBox('age', $data['age'], 3, false, false, false))
+$filter_age = (new CNumericBox('age', $data['age'], 3, false, false))
 	->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	->removeId();
 if ($data['age_state'] == 0) {

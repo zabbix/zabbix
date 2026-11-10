@@ -95,7 +95,7 @@
 						uncheckTableRows('proxygroup');
 					}
 
-					location.href = location.href;
+					location.reload();
 				})
 				.catch(() => {
 					clearMessages();
