@@ -10251,9 +10251,6 @@ svg {
 #preprocessing-test-form .item-test-result {
   display: inline-flex; }
 
-#proxy-form .form-field-apm-attributes {
-  width: 100%; }
-
 #token_form .btn-grey-icon {
   margin-left: 5px; }
 
@@ -10309,13 +10306,15 @@ svg {
   .macro-input-group .btn-change[disabled] {
     display: none; }
   .macro-input-group .btn-undo {
-    display: none;
+    display: flex;
+    align-items: start;
     height: auto;
     color: #69808d;
     background-color: #383838;
     border-width: 1px 0;
     border-color: #4f4f4f; }
     .macro-input-group .btn-undo::before {
+      margin-top: 2px;
       font-size: 16px; }
     .macro-input-group .btn-undo:focus, .macro-input-group .btn-undo:hover {
       color: #f2f2f2;
@@ -10323,6 +10322,8 @@ svg {
       border-color: #768d99; }
     .macro-input-group .btn-undo.is-focused {
       border-color: #768d99; }
+    .macro-input-group .btn-undo[hidden] {
+      display: none; }
   .macro-input-group z-textarea-flexible {
     flex: 1; }
     .macro-input-group z-textarea-flexible textarea {

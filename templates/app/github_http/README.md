@@ -9,7 +9,7 @@ For more details about GitHub REST API, refer to the [official documentation](ht
 
 ## Requirements
 
-Zabbix version: 8.0 and higher.
+Zabbix version: 8.2 and higher.
 
 ## Tested versions
 
@@ -18,7 +18,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.2/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -81,7 +81,7 @@ Note: Update intervals and timeouts for script items can be changed individually
 |Name|Description|Default|
 |----|-----------|-------|
 |{$GITHUB.API.URL}|<p>Set the API URL here.</p>|`https://api.github.com/`|
-|{$GITHUB.USER_AGENT}|<p>The user agent that is used in headers for HTTP requests.</p>|`Zabbix/8.0`|
+|{$GITHUB.USER_AGENT}|<p>The user agent that is used in headers for HTTP requests.</p>|`Zabbix/8.2`|
 |{$GITHUB.API_VERSION}|<p>The API version that is used in headers for HTTP requests.</p>|`2022-11-28`|
 |{$GITHUB.COPILOT.USED}|<p>The flag for gathering Copilot metrics. If set to a value other than "1", items for Copilot will not be created. If set to "1", the `{$GITHUB.ORG.NAME}` macro is required.</p>|`0`|
 |{$GITHUB.ORG.NAME}|<p>Set the organization name here.</p>||
@@ -298,7 +298,7 @@ For more details about GitHub REST API, refer to the [official documentation](ht
 
 ## Requirements
 
-Zabbix version: 8.0 and higher.
+Zabbix version: 8.2 and higher.
 
 ## Tested versions
 
@@ -307,7 +307,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.2/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -363,7 +363,7 @@ Note: Update intervals and timeouts for script items can be changed individually
 |Name|Description|Default|
 |----|-----------|-------|
 |{$GITHUB.API.URL}|<p>Set the API URL here.</p>|`https://api.github.com/`|
-|{$GITHUB.USER_AGENT}|<p>The user agent that is used in headers for HTTP requests.</p>|`Zabbix/8.0`|
+|{$GITHUB.USER_AGENT}|<p>The user agent that is used in headers for HTTP requests.</p>|`Zabbix/8.2`|
 |{$GITHUB.API_VERSION}|<p>The API version that is used in headers for HTTP requests.</p>|`2022-11-28`|
 |{$GITHUB.REPO.OWNER}|<p>Set the repository owner here.</p>||
 |{$GITHUB.REPO.NAME}|<p>Set the repository name here.</p>||

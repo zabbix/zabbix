@@ -7,7 +7,7 @@ This guide describes how to integrate your Zabbix installation with Event-Driven
 
 ## Requirements
 
-Zabbix version: 8.0 and higher.
+Zabbix version: 8.2 and higher.
 
 ## Parameters
 
@@ -128,13 +128,13 @@ To utilize the media type, you need to create a Zabbix user to represent Event-D
 
 > Note: Because each new rulebook requires a separate port, you have to create a separate user for each rulebook, specifying the ip:port.
 
-6\. Use Event-Driven Ansible user in any [actions](https://www.zabbix.com/documentation/8.0}/manual/config/notifications/action) of your choice.
+6\. Use Event-Driven Ansible user in any [actions](https://www.zabbix.com/documentation/8.2}/manual/config/notifications/action) of your choice.
 
 [![](images/thumb.4.png?raw=true)](images/4.png)
 
 7\. Start getting alerts! You have made it!
 
-For more information see [Zabbix](https://www.zabbix.com/documentation/8.0}/manual/config/notifications), [Event-Driven Ansible](https://github.com/ansible/eda-server/blob/main/README.md) and [Ansible-Rulebook](https://ansible-rulebook.readthedocs.io/en/latest/getting_started.html) documentations.
+For more information see [Zabbix](https://www.zabbix.com/documentation/8.2}/manual/config/notifications), [Event-Driven Ansible](https://github.com/ansible/eda-server/blob/main/README.md) and [Ansible-Rulebook](https://ansible-rulebook.readthedocs.io/en/latest/getting_started.html) documentations.
 
 ## Feedback
 

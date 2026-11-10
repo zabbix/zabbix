@@ -7,7 +7,7 @@ This template is designed for the effortless deployment of FortiGate monitoring 
 
 ## Requirements
 
-Zabbix version: 8.0 and higher.
+Zabbix version: 8.2 and higher.
 
 ## Tested versions
 
@@ -16,7 +16,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.2/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -31,7 +31,7 @@ This template has been tested on:
 9. If FortiGate GUI uses HTTPS, put **https** value into `{$FGATE.SCHEME}` macro and **443** into `{$FGATE.API.PORT}` macro.
 10. If FortiGate GUI port differs from the standard one, specify it in `{$FGATE.API.PORT}` macro.
 
-NOTE: Starting from template version '8.0-2', the API token is used in the request header. For older template versions (where the API token is passed in the URL query parameter), when using FortiGate v7.4.5+, you must enable the following global setting:
+NOTE: Starting from template version '8.2-2', the API token is used in the request header. For older template versions (where the API token is passed in the URL query parameter), when using FortiGate v7.4.5+, you must enable the following global setting:
 [Using APIs](https://docs.fortinet.com/document/fortigate/7.6.4/administration-guide/940602/using-apis)
 
 For added security, it is strongly recommended to use the latest template version, which passes the API token in the request header instead of the URL parameter.
@@ -47,7 +47,7 @@ For added security, it is strongly recommended to use the latest template versio
 |{$FGATE.API.TOKEN}|<p>FortiGate API token.</p>||
 |{$FGATE.API.PORT}|<p>The port of FortiGate API endpoint.</p>|`80`|
 |{$FGATE.DATA.TIMEOUT}|<p>Response timeout for an API.</p>|`15s`|
-|{$FGATE.HTTP.PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/http</p>||
+|{$FGATE.HTTP.PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/8.2/manual/config/items/itemtypes/http</p>||
 |{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "FortiGate", e.g. {$HTTP.TLS.VERIFY:"FortiGate"}.</p>|`full`|
 |{$FIRMWARE.UPDATES.CONTROL}|<p>This macro is used in "New available firmware found" trigger.</p>|`1`|
 |{$CPU.UTIL.WARN}|<p>Threshold of CPU utilization for warning trigger in %.</p>|`85`|
