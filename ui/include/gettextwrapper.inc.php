@@ -81,7 +81,7 @@ function pgettext($context, $msgId) {
 function npgettext($context, $msgId, $msgIdPlural, $num) {
 	$contextString = $context."\004".$msgId;
 	$contextStringp = $context."\004".$msgIdPlural;
-	return ngettext($contextString, $contextStringp, max(0, min(end($num), PHP_INT_MAX)));
+	return ngettext($contextString, $contextStringp, max(0, min($num, PHP_INT_MAX)));
 }
 
 /**
@@ -182,10 +182,7 @@ function _xn($message, $messagePlural, $num, $context) {
 	$arguments = array_slice(func_get_args(), 4);
 	array_unshift($arguments, $num);
 
-	return _params(
-		pgettext($context, ngettext($message, $messagePlural, max(0, min(end($num), PHP_INT_MAX)))),
-		$arguments
-	);
+	return _params(pgettext($context, ngettext($message, $messagePlural, max(0, min($num, PHP_INT_MAX)))), $arguments);
 }
 
 /**
