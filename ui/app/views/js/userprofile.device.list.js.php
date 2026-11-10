@@ -120,7 +120,7 @@ const view = new class {
 					}
 				}
 
-				location.href = location.href;
+				location.reload();
 			})
 			.catch(() => {
 				clearMessages();

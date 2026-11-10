@@ -563,7 +563,7 @@ window.ceprule_edit_popup = new class {
 				sortorder: this.#getNextSortorder(),
 				event_name: '',
 				execute_when: '<?= CCepRuleHelper::WHEN_EVENT_OCCURRED ?>',
-				type: <?= CCepRuleHelper::OP_CLOSE_EVENT ?>,
+				type: <?= CCepRuleHelper::OP_SET_NAME ?>,
 				suppress_time_option: '<?= ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE ?>',
 				suppress_duration: '',
 				severity: '<?= TRIGGER_SEVERITY_NOT_CLASSIFIED ?>',
@@ -575,13 +575,13 @@ window.ceprule_edit_popup = new class {
 				filter: {
 					evaltype: <?= CONDITION_EVAL_TYPE_AND_OR ?>,
 					formula: '',
-					conditions: [{
-						type: <?= ZBX_CONDITION_TYPE_EVENT_OPEN ?>,
-						operator: <?= CONDITION_OPERATOR_YES ?>,
-						tag: '',
-						tag_name: '',
-						tag_value: ''
-					}]
+					conditions: []
+				},
+				scope: <?= CCepRuleHelper::SCOPE_CURRENT_EVENT ?>,
+				scope_filter: {
+					evaltype: <?= CONDITION_EVAL_TYPE_AND_OR ?>,
+					formula: '',
+					conditions: []
 				}
 			};
 		}
@@ -612,6 +612,15 @@ window.ceprule_edit_popup = new class {
 								}
 
 								overlayDialogueDestroy(overlay.dialogueid);
+
+								if (fields.scope == <?= CCepRuleHelper::SCOPE_CURRENT_EVENT ?>
+										|| fields.use_scope_filter == <?= CCepRuleHelper::SCOPE_FILTER_NO ?>) {
+									fields.scope_filter = {
+										evaltype: <?= CONDITION_EVAL_TYPE_AND_OR ?>,
+										formula: '',
+										conditions: []
+									};
+								}
 
 								if (is_new) {
 									this.#addOperationRow(fields);
@@ -727,6 +736,10 @@ window.ceprule_edit_popup = new class {
 			CCepRuleHelper::getOperationLabelStrings()
 		) ?>')[operation_type];
 
+		const scope_str = JSON.parse('<?= json_encode(
+			CCepRuleHelper::getApplyToStrings()
+		) ?>')[operation.scope];
+
 		const severity_names_json = '<?= json_encode([
 			TRIGGER_SEVERITY_NOT_CLASSIFIED => _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_0)),
 			TRIGGER_SEVERITY_INFORMATION => _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_1)),
@@ -781,7 +794,7 @@ window.ceprule_edit_popup = new class {
 			arguments_str = `${operation.tag_name}:${operation.tag_value}`;
 		}
 
-		const conditions_input_html = Object.values(operation.filter.conditions)
+		let conditions_input_html = Object.values(operation.filter.conditions)
 			.map((condition, condition_index) => (new Template(`
 				<input data-field-type="hidden" name="operations[${operation.row_index}][filter][conditions][${condition_index}][type]"
 					type="hidden" value="#{type}" data-changed/>
@@ -794,6 +807,22 @@ window.ceprule_edit_popup = new class {
 				<input data-field-type="hidden" name="operations[${operation.row_index}][filter][conditions][${condition_index}][tag_value]"
 					type="hidden" value="#{tag_value}" data-changed/>
 				<input data-field-type="hidden" name="operations[${operation.row_index}][filter][conditions][${condition_index}][formulaid]"
+					type="hidden" value="#{formulaid}" data-changed/>
+			`)).evaluate(condition)).join('');
+
+		conditions_input_html += Object.values(operation.scope_filter.conditions)
+			.map((condition, condition_index) => (new Template(`
+				<input data-field-type="hidden" name="operations[${operation.row_index}][scope_filter][conditions][${condition_index}][type]"
+					type="hidden" value="#{type}" data-changed/>
+				<input data-field-type="hidden" name="operations[${operation.row_index}][scope_filter][conditions][${condition_index}][operator]"
+					type="hidden" value="#{operator}" data-changed/>
+				<input data-field-type="hidden" name="operations[${operation.row_index}][scope_filter][conditions][${condition_index}][tag]"
+					type="hidden" value="#{tag}" data-changed/>
+				<input data-field-type="hidden" name="operations[${operation.row_index}][scope_filter][conditions][${condition_index}][tag_name]"
+					type="hidden" value="#{tag_name}" data-changed/>
+				<input data-field-type="hidden" name="operations[${operation.row_index}][scope_filter][conditions][${condition_index}][tag_value]"
+					type="hidden" value="#{tag_value}" data-changed/>
+				<input data-field-type="hidden" name="operations[${operation.row_index}][scope_filter][conditions][${condition_index}][formulaid]"
 					type="hidden" value="#{formulaid}" data-changed/>
 			`)).evaluate(condition)).join('');
 
@@ -847,17 +876,14 @@ window.ceprule_edit_popup = new class {
 
 		const condition_description_html = condition_descriptions.join('<br>');
 		const template_args = {execute_when_str, label_str, arguments_str, conditions_input_html,
-			condition_description_html, ...operation};
+			condition_description_html, scope_str, ...operation};
 		const row = this.#operation_row_template.evaluateToElement(template_args);
 
-		const error_container_id = `ceprule-operations-${template_args.row_index}-error-container`;
 		const rows = new DocumentFragment();
-
-		row.querySelector('[name$="[execute_when]"]').setAttribute('data-error-container', error_container_id);
 		rows.append(row);
 		rows.append((new Template(`
-			<tr class="error-container-row"><td colspan="5" id="${error_container_id}"></td></tr>
-		`)).evaluateToElement());
+			<tr class="error-container-row"><td colspan="5" id="ceprule-operations-#{row_index}-error-container"></td></tr>
+		`)).evaluateToElement({row_index: operation.row_index}));
 
 		return rows;
 	}

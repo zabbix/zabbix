@@ -71,7 +71,7 @@
 							postMessageDetails('success', e.detail.success.messages);
 						}
 
-						location.href = location.href;
+						location.reload();
 					});
 				});
 			}
@@ -181,7 +181,7 @@
 						uncheckTableRows(`graph_prototypes_${this.checkbox_hash}`);
 					}
 
-					location.href = location.href;
+					location.reload();
 				})
 				.catch(() => {
 					clearMessages();

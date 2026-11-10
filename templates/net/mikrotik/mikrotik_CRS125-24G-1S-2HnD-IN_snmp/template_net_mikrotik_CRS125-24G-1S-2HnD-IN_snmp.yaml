@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '8.0'
+  version: '8.2'
   template_groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -29,7 +29,7 @@ zabbix_export:
         24x Gigabit Ethernet layer 3 Smart Switch, 1x SFP cage, LCD, 802.11b/g/n Dual Chain wireless, 600MHz CPU, 128MB RAM, Metal desktop case, RouterOS L5
       vendor:
         name: Zabbix
-        version: 8.0-5
+        version: 8.2-0
       groups:
         - name: 'Templates/Network devices'
       items:

@@ -20,10 +20,12 @@
 
 extern "C" {
 #include "zbxjson.h"
+#include "zbxnum.h"
 }
 
 namespace otlpm = opentelemetry::proto::metrics::v1;
 namespace otlpmc = opentelemetry::proto::collector::metrics::v1;
+namespace otlpl = opentelemetry::proto::logs::v1;
 namespace otlplc = opentelemetry::proto::collector::logs::v1;
 namespace otlpt = opentelemetry::proto::trace::v1;
 
@@ -125,7 +127,11 @@ static std::string	any_value_to_string(const opentelemetry::proto::common::v1::A
 		case AV::kIntValue:
 			return std::to_string(v.int_value());
 		case AV::kDoubleValue:
-			return std::to_string(v.double_value());
+		{
+			char	buf[ZBX_MAX_DOUBLE_LEN + 1];
+
+			return zbx_print_double(buf, sizeof(buf), v.double_value());
+		}
 		case AV::kBytesValue:
 			return bytes_to_hex(v.bytes_value());
 		case AV::kKvlistValue:
@@ -243,6 +249,25 @@ static char 	*attrs_to_json(
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: append a numeric value to a JSON array                            *
+ *                                                                            *
+ * Parameters: j - [IN/OUT] JSON array                                        *
+ *             n - [IN] value to append                                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	json_add_num(struct zbx_json *j, uint64_t n)
+{
+	zbx_json_adduint64(j, NULL, n);
+}
+
+static void	json_add_num(struct zbx_json *j, double n)
+{
+	/* NaN must be printed as "NAN" - ClickHouse JSON parser fails on lowercase "nan" */
+	zbx_json_adddouble(j, NULL, n);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: serialize a numeric array into a JSON array                       *
  *                                                                            *
  * Parameters: arr - [IN] numeric values to serialize                         *
@@ -259,9 +284,7 @@ static char	*num_array_to_json(const Repeated &arr)
 	zbx_json_initarray(&j, 1024);
 
 	for (const auto &n : arr)
-	{
-		zbx_json_addstring(&j, NULL, std::to_string(n).c_str(), ZBX_JSON_TYPE_NUMBER);
-	}
+		json_add_num(&j, n);
 
 	out = zbx_strdup(NULL, j.buffer);
 	zbx_json_free(&j);
@@ -271,9 +294,26 @@ static char	*num_array_to_json(const Repeated &arr)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: validate a unix nanosecond timestamp for ClickHouse DateTime64    *
+ *          columns                                                           *
+ *                                                                            *
+ * Parameters: nano - [IN] timestamp in unix nanoseconds                      *
+ *                                                                            *
+ * Return value: the timestamp, or 0 (unknown time) if it is out of the       *
+ *               DateTime64 range                                             *
+ *                                                                            *
+ ******************************************************************************/
+static uint64_t	unixnano_validate(uint64_t nano)
+{
+	/* DateTime64 is stored as signed 64-bit ticks, nanoseconds overflow after INT64_MAX */
+	return ((uint64_t)INT64_MAX < nano ? 0 : nano);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: convert a unix nanosecond timestamp to a "seconds.nanoseconds"    *
  *          decimal string accepted by ClickHouse DateTime64 columns          *
- *          regardless of their configured scale                             *
+ *          regardless of their configured scale                              *
  *                                                                            *
  * Parameters: nano - [IN] timestamp in unix nanoseconds                      *
  *                                                                            *
@@ -282,6 +322,8 @@ static char	*num_array_to_json(const Repeated &arr)
  ******************************************************************************/
 static std::string	unixnano_to_decimal_str(uint64_t nano)
 {
+	nano = unixnano_validate(nano);
+
 	std::string	frac = std::to_string(nano % 1000000000ULL);
 
 	frac.insert(0, 9 - frac.length(), '0');
@@ -379,8 +421,8 @@ static int	metrics_fill_common(zbx_apm_row_t &row,
 	SETS(row, 9, metric.description());				/* MetricDescription */
 	SETS(row, 10, metric.unit());					/* MetricUnit */
 	SETC(row, 11, attrs_to_json(dp_attrs));				/* Attributes */
-	SETU(row, 12, start_nano);					/* StartTimeUnix, DateTime64(9) */
-	SETU(row, 13, time_nano);					/* TimeUnix, DateTime64(9) */
+	SETU(row, 12, unixnano_validate(start_nano));			/* StartTimeUnix, DateTime64(9) */
+	SETU(row, 13, unixnano_validate(time_nano));			/* TimeUnix, DateTime64(9) */
 
 	return 14;
 }
@@ -714,12 +756,13 @@ static void	apm_request_decode_logs(zbx_apm_request_t request, zbx_apm_dataset_t
 				zbx_apm_row_t	row = apm_rowset_add(&ds->logs);
 				int		i = 0;
 
-				SETU(row, i++, lr.time_unix_nano());			/* Timestamp, DateTime64(9) */
+				SETU(row, i++, unixnano_validate(lr.time_unix_nano()));	/* Timestamp, DateTime64(9) */
 				SETS(row, i++, bytes_to_hex(lr.trace_id()));		/* TraceId */
 				SETS(row, i++, bytes_to_hex(lr.span_id()));		/* SpanId */
-				SETU(row, i++, lr.flags());				/* TraceFlags */
+				SETU(row, i++, lr.flags() & otlpl::LOG_RECORD_FLAGS_TRACE_FLAGS_MASK); /* TraceFlags */
 				SETS(row, i++, lr.severity_text());			/* SeverityText */
-				SETU(row, i++, lr.severity_number());			/* SeverityNumber */
+				SETU(row, i++, otlpl::SeverityNumber_IsValid(lr.severity_number()) ? /* SeverityNumber */
+						lr.severity_number() : otlpl::SEVERITY_NUMBER_UNSPECIFIED);
 				SETS(row, i++, service_name);				/* ServiceName */
 				SETS(row, i++, any_value_to_string(lr.body()));		/* Body (AnyValue) */
 				SETS(row, i++, res_schema_url);				/* ResourceSchemaUrl */
@@ -908,7 +951,7 @@ static void	apm_request_decode_traces(zbx_apm_request_t request, zbx_apm_dataset
 				zbx_apm_row_t	row = apm_rowset_add(&ds->traces);
 				int		i = 0;
 
-				SETU(row, i++, span.start_time_unix_nano());		/* Timestamp, DateTime64(9) */
+				SETU(row, i++, unixnano_validate(span.start_time_unix_nano())); /* Timestamp */
 				SETS(row, i++, bytes_to_hex(span.trace_id()));		/* TraceId */
 				SETS(row, i++, bytes_to_hex(span.span_id()));		/* SpanId */
 				SETS(row, i++, bytes_to_hex(span.parent_span_id()));	/* ParentSpanId */

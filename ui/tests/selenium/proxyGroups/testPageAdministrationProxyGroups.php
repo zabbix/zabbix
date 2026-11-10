@@ -20,7 +20,7 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 /**
  * Test for checking Proxy groups page.
  *
- * @dataSource Proxies
+ * @dataSource Proxies, Actions
  *
  * @backup proxy_group
  *
@@ -196,6 +196,24 @@ class testPageAdministrationProxyGroups extends CWebTest {
 						' Proxy_2 for filter'
 			],
 			[
+				'Name' => 'Proxy group \'&quot;&lt;s&gt; for Actions',
+				'State' => '',
+				'Failover period' => '1m',
+				'Online proxies' => '0',
+				'Minimum proxies' => '1',
+				'Proxies' => '',
+				7 => ''
+			],
+			[
+				'Name' => 'Proxy group абц 頑張って 😀 for Actions',
+				'State' => '',
+				'Failover period' => '1m',
+				'Online proxies' => '0',
+				'Minimum proxies' => '1',
+				'Proxies' => '',
+				7 => ''
+			],
+			[
 				'Name' => '⭐️😀⭐Smiley प्रॉक्सी 团体⭐️😀⭐ - unknown',
 				'State' => 'Unknown',
 				'Failover period' => '123s',
@@ -258,7 +276,9 @@ class testPageAdministrationProxyGroups extends CWebTest {
 						'2nd Online proxy group',
 						'Degrading proxy group',
 						'Multiple spaces in proxy group',
-						'Online proxy group'
+						'Online proxy group',
+						'Proxy group \'&quot;&lt;s&gt; for Actions',
+						'Proxy group абц 頑張って 😀 for Actions'
 					]
 				]
 			],
@@ -318,7 +338,9 @@ class testPageAdministrationProxyGroups extends CWebTest {
 						'Group without proxies with linked host',
 						'Multiple spaces in proxy group',
 						'Offline group',
-						'Online proxy group'
+						'Online proxy group',
+						'Proxy group \'&quot;&lt;s&gt; for Actions',
+						'Proxy group абц 頑張って 😀 for Actions'
 					]
 				]
 			],
@@ -446,7 +468,7 @@ class testPageAdministrationProxyGroups extends CWebTest {
 
 	public static function getDeleteData() {
 		return [
-			// Attempt to delete a proxy group that has proxies assigned.
+			// #0 Attempt to delete a proxy group that has proxies assigned.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -454,7 +476,7 @@ class testPageAdministrationProxyGroups extends CWebTest {
 					'error' => 'Proxy group "Default values - recovering" is used by proxy "passive_proxy7".'
 				]
 			],
-			// Attempt to delete a proxy group that has no proxies but has an assigned host.
+			// #1 Attempt to delete a proxy group that has no proxies but has an assigned host.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -463,7 +485,7 @@ class testPageAdministrationProxyGroups extends CWebTest {
 							' with linked host".'
 				]
 			],
-			// Attempt to delete two proxy groups one of which has a linked proxy.
+			// #2 Attempt to delete two proxy groups one of which has a linked proxy.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -471,13 +493,29 @@ class testPageAdministrationProxyGroups extends CWebTest {
 					'error' => 'Proxy group "Offline group" is used by proxy "active_proxy7".'
 				]
 			],
-			// Delete a proxy group that has nothing linked to it.
+			// #3 Attempt to delete a proxy group that is used in an Autoregistration action.
+			[
+				[
+					'expected' => TEST_BAD,
+					'groups' => ['Proxy group \'&quot;&lt;s&gt; for Actions'],
+					'error' => 'Proxy group "Proxy group \'&quot;&lt;s&gt; for Actions" is used by action "Autoregistration action 1".'
+				]
+			],
+			// #4 Attempt to delete a proxy group that is used in a Discovery action.
+			[
+				[
+					'expected' => TEST_BAD,
+					'groups' => ['Proxy group абц 頑張って 😀 for Actions'],
+					'error' => 'Proxy group "Proxy group абц 頑張って 😀 for Actions" is used by action "Discovery action with proxy groups".'
+				]
+			],
+			// #5 Delete a proxy group that has nothing linked to it.
 			[
 				[
 					'groups' => ['Group without proxies']
 				]
 			],
-			// Delete multiple proxy groups that have nothing linked to them.
+			// #6 Delete multiple proxy groups that have nothing linked to them.
 			[
 				[
 					'groups' => ['Delete me 1', 'Delete me 2']

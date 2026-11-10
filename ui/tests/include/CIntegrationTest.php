@@ -46,6 +46,7 @@ class CIntegrationTest extends CAPITest {
 	const COMPONENT_AGENT			= 'agentd';
 	const COMPONENT_AGENT2			= 'agent2';
 	const COMPONENT_AGENT_3_0		= 'agentd_3.0';
+	const COMPONENT_JAVA			= 'java';
 
 	// Zabbix component port constants.
 	const AGENT_PORT_SUFFIX = '50';
@@ -296,7 +297,9 @@ class CIntegrationTest extends CAPITest {
 			}
 
 			foreach ($components as $component) {
-				self::prepareComponentConfiguration($component, self::$case_configuration);
+				if ($component !== self::COMPONENT_JAVA) {
+					self::prepareComponentConfiguration($component, self::$case_configuration);
+				}
 				self::startComponent($component);
 			}
 			self::$suite_components_running = true;
@@ -420,7 +423,8 @@ class CIntegrationTest extends CAPITest {
 	private static function getComponents() {
 		return [
 			self::COMPONENT_SERVER, self::COMPONENT_PROXY, self::COMPONENT_AGENT, self::COMPONENT_AGENT2,
-			self::COMPONENT_SERVER_HANODE1, self::COMPONENT_AGENT_3_0, self::COMPONENT_PROXY_HANODE1
+			self::COMPONENT_SERVER_HANODE1, self::COMPONENT_AGENT_3_0, self::COMPONENT_PROXY_HANODE1,
+			self::COMPONENT_JAVA
 		];
 	}
 	/**
@@ -469,6 +473,9 @@ class CIntegrationTest extends CAPITest {
 
 					case self::COMPONENT_AGENT2:
 						self::waitForLogLineToBePresent($component, 'Zabbix Agent2 hostname', false, 5, 1);
+						break;
+					case self::COMPONENT_JAVA:
+						self::waitForLogLineToBePresent($component, 'listening on', false, 10, 3);
 						break;
 				}
 
@@ -637,7 +644,7 @@ class CIntegrationTest extends CAPITest {
 	 * @return array
 	 */
 	protected static function getDefaultComponentConfiguration() {
-		global $DB, $HISTORY_PROVIDERS;
+		global $DB, $HISTORY_PROVIDERS, $TELEMETRY_PROVIDERS;
 
 		$db = [
 			'DBName' => $DB['DATABASE'],
@@ -645,6 +652,7 @@ class CIntegrationTest extends CAPITest {
 			'DBPassword' => $DB['PASSWORD']
 		];
 		$db_history = [];
+		$db_telemetry = [];
 
 		if ($DB['SERVER'] !== 'localhost' && $DB['SERVER'] !== '127.0.0.1') {
 			$db['DBHost'] = $DB['SERVER'];
@@ -672,29 +680,46 @@ class CIntegrationTest extends CAPITest {
 			}
 		}
 
+		if (isset($TELEMETRY_PROVIDERS)) {
+			foreach ($TELEMETRY_PROVIDERS as $provider) {
+				// Server and proxy only support ClickHouse as the telemetry (APM) data store.
+				if ($provider['provider'] !== 'clickhouse') {
+					continue;
+				}
+
+				$provider_str = $provider['provider'].';url='.$provider['url'];
+				foreach (['username', 'password', 'db'] as $key) {
+					if (array_key_exists($key, $provider)) {
+						$provider_str .= ','.$key.'='.$provider[$key];
+					}
+				}
+				$db_telemetry['TelemetryProvider'][] = $provider_str;
+			}
+		}
+
 		$configuration = [
-			self::COMPONENT_SERVER => array_merge($db, $db_history, [
+			self::COMPONENT_SERVER => array_merge($db, $db_history, $db_telemetry, [
 				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server.log',
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server.pid',
 				'SocketDir' => PHPUNIT_COMPONENT_DIR,
 				'ListenPort' => PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX,
 				'AllowUnsupportedDBVersions' => '1'
 			]),
-			self::COMPONENT_SERVER_HANODE1 => array_merge($db, $db_history, [
+			self::COMPONENT_SERVER_HANODE1 => array_merge($db, $db_history, $db_telemetry, [
 				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server_ha1.log',
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server_ha1.pid',
 				'SocketDir' => PHPUNIT_COMPONENT_DIR.'ha1/',
 				'ListenPort' => PHPUNIT_PORT_PREFIX.self::SERVER_HANODE1_PORT_SUFFIX,
 				'AllowUnsupportedDBVersions' => '1'
 			]),
-			self::COMPONENT_PROXY => array_merge($db, [
+			self::COMPONENT_PROXY => array_merge($db, $db_telemetry, [
 				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_proxy.log',
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_proxy.pid',
 				'SocketDir' => PHPUNIT_COMPONENT_DIR,
 				'ListenPort' => PHPUNIT_PORT_PREFIX.self::PROXY_PORT_SUFFIX,
 				'AllowUnsupportedDBVersions' => '1'
 			]),
-			self::COMPONENT_PROXY_HANODE1 => array_merge($db, [
+			self::COMPONENT_PROXY_HANODE1 => array_merge($db, $db_telemetry, [
 				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_proxy_ha1.log',
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_proxy_ha1.pid',
 				'SocketDir' => PHPUNIT_COMPONENT_DIR.'ha1/',
@@ -778,6 +803,16 @@ class CIntegrationTest extends CAPITest {
 	 */
 	protected function startComponent($component, $waitLogLineOverride = '', $skip_pid = false) {
 		self::validateComponent($component);
+
+		if ($component === self::COMPONENT_JAVA) {
+			$script = PHPUNIT_BINARY_DIR.'/zabbix_java/startup.sh';
+
+			self::clearLog($component);
+			self::executeCommand($script, []);
+			self::waitForStartup($component, $waitLogLineOverride, $skip_pid);
+
+			return;
+		}
 
 		$config = PHPUNIT_CONFIG_DIR.'zabbix_'.$component.'.conf';
 		if (!file_exists($config)) {
