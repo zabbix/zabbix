@@ -2849,7 +2849,8 @@ button {
       z-index: 4; }
     .datatable .datatable-cell.datatable-cell-data {
       overflow: hidden;
-      align-items: flex-start; }
+      align-items: flex-start;
+      word-break: break-word; }
       .datatable .datatable-cell.datatable-cell-data.datatable-cell-sticky:not(.datatable-cell-bg-hover) {
         background-color: #000000; }
       .datatable .datatable-cell.datatable-cell-data.datatable-cell-error {

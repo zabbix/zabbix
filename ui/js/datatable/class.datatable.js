@@ -873,6 +873,10 @@ class CDataTable {
 		return this;
 	}
 
+	getCellRenderer(name) {
+		return this.#cell_renderers[name];
+	}
+
 	setCellRenderer(name, renderer) {
 		if (this.#initialized) {
 			return this;
