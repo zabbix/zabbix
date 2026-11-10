@@ -4221,9 +4221,13 @@ output {
     output.msg-warning::before {
       content: ""; }
   output.msg-global {
-    max-width: fit-content;
+    display: inline-grid;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 5dvh;
+    width: min-content;
     min-width: 475px;
-    margin: 5% auto 0; }
+    max-width: 80dvw; }
   output.msg-global-footer {
     position: fixed;
     bottom: 0;
@@ -10294,13 +10298,15 @@ svg {
   .macro-input-group .btn-change[disabled] {
     display: none; }
   .macro-input-group .btn-undo {
-    display: none;
+    display: flex;
+    align-items: start;
     height: auto;
     color: #0066d9;
     background-color: #001f42;
     border-width: 1px 0;
     border-color: #0066d9; }
     .macro-input-group .btn-undo::before {
+      margin-top: 2px;
       font-size: 16px; }
     .macro-input-group .btn-undo:focus, .macro-input-group .btn-undo:hover {
       color: #e5f1ff;
@@ -10308,6 +10314,8 @@ svg {
       border-color: #3d98ff; }
     .macro-input-group .btn-undo.is-focused {
       border-color: #3d98ff; }
+    .macro-input-group .btn-undo[hidden] {
+      display: none; }
   .macro-input-group z-textarea-flexible {
     flex: 1; }
     .macro-input-group z-textarea-flexible textarea {
