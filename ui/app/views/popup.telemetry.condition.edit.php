@@ -81,6 +81,7 @@ $output = [
 		'telemetry_condition_popup.init('.json_encode([
 			'rules' => $data['js_validation_rules'],
 			'complex_columns' => $data['complex_columns'],
+			'numeric_columns' => $data['numeric_columns'],
 			'condition_operators' => $data['condition_operators']
 		]).');',
 	'body' => $form->toString(),

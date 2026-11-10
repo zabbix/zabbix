@@ -4149,9 +4149,13 @@ output {
     output.msg-warning::before {
       content: ""; }
   output.msg-global {
-    max-width: fit-content;
+    display: inline-grid;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 5dvh;
+    width: min-content;
     min-width: 475px;
-    margin: 5% auto 0; }
+    max-width: 80dvw; }
   output.msg-global-footer {
     position: fixed;
     bottom: 0;
@@ -4503,7 +4507,7 @@ output {
       overflow-y: auto;
       overflow-x: hidden;
       width: 100%;
-      max-height: calc(100vh - 220px);
+      max-height: calc(100vh - 216px);
       max-width: inherit; }
       .overlay-dialogue.modal .overlay-dialogue-body form {
         padding: 2px 0; }
@@ -10190,9 +10194,6 @@ svg {
 #preprocessing-test-form .item-test-result {
   display: inline-flex; }
 
-#proxy-form .form-field-apm-attributes {
-  width: 100%; }
-
 #token_form .btn-grey-icon {
   margin-left: 5px; }
 
@@ -10248,13 +10249,15 @@ svg {
   .macro-input-group .btn-change[disabled] {
     display: none; }
   .macro-input-group .btn-undo {
-    display: none;
+    display: flex;
+    align-items: start;
     height: auto;
     color: #dddddd;
     background-color: #383838;
     border-width: 1px 0;
     border-color: #666666; }
     .macro-input-group .btn-undo::before {
+      margin-top: 2px;
       font-size: 16px; }
     .macro-input-group .btn-undo:focus, .macro-input-group .btn-undo:hover {
       color: #333333;
@@ -10262,6 +10265,8 @@ svg {
       border-color: #bbbbbb; }
     .macro-input-group .btn-undo.is-focused {
       border-color: #bbbbbb; }
+    .macro-input-group .btn-undo[hidden] {
+      display: none; }
   .macro-input-group z-textarea-flexible {
     flex: 1; }
     .macro-input-group z-textarea-flexible textarea {

@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '8.0'
+  version: '8.2'
   template_groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -44,7 +44,7 @@ zabbix_export:
         >Please, refer to the [vendor documentation](https://www.cisco.com/c/en/us/td/docs/routers/sdwan/configuration/sdwan-xe-gs-book/cisco-sd-wan-API-cross-site-request-forgery-prevention.html) about the Cisco SD-WAN REST API Token-Based Authentication.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.2-0
       groups:
         - name: Templates/Applications
         - name: 'Templates/Network devices'
@@ -646,13 +646,13 @@ zabbix_export:
             label: 'Device discovery macro (exclude)'
             description: 'This macro is used in device discovery. Can be overridden on the host or linked template level.'
         - macro: '{$SDWAN.HTTP_PROXY}'
-          description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/http'
+          description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/8.2/manual/config/items/itemtypes/http'
           config:
             type: TEXT
             priority: '8'
             section_name: Other
             label: 'HTTP proxy for API requests'
-            description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/http'
+            description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/8.2/manual/config/items/itemtypes/http'
       dashboards:
         - uuid: 63a5053a13114e90b104d189bea96254
           name: 'SD-WAN: Overview'
@@ -759,7 +759,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-4
+        version: 8.2-0
       groups:
         - name: Templates/Applications
         - name: 'Templates/Network devices'
@@ -2800,7 +2800,7 @@ zabbix_export:
           value: '80'
           description: 'Warning threshold of the filesystem utilization. Can be used with the filesystem name as context.'
         - macro: '{$SDWAN.HTTP_PROXY}'
-          description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/http'
+          description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/8.2/manual/config/items/itemtypes/http'
         - macro: '{$SDWAN.IF.ERRORS.WARN}'
           value: '2'
           description: 'Threshold of the error packets rate for the warning trigger. Can be used with the interface name as context.'
