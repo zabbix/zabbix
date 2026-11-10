@@ -516,7 +516,7 @@ class testPageProblems extends CWebTest {
 					[
 						'row' => 'Two trigger expressions',
 						'column' => 'Problem',
-						'locator' => 'class:overflow-ellipsis'
+						'locator' => 'xpath:.//div[contains(@class, "wordbreak")]'
 					],
 					[
 						'row' => 'Filled opdata with macros',
@@ -536,7 +536,7 @@ class testPageProblems extends CWebTest {
 					[
 						'row' => 'Two trigger expressions',
 						'column' => 'Problem',
-						'locator' => 'class:overflow-ellipsis'
+						'locator' => 'xpath:.//div[contains(@class, "wordbreak")]'
 					],
 					[
 						'row' => 'Filled opdata with macros',
