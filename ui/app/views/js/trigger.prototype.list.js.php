@@ -160,7 +160,7 @@
 						uncheckTableRows(`trigger_prototypes_${this.parent_discoveryid}`);
 					}
 
-					location.href = location.href;
+					location.reload();
 				})
 				.catch(() => {
 					clearMessages();

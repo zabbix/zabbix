@@ -936,6 +936,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, const zbx_con
 					{
 						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 								"%cmonitored_by=%d", delim, (int)new_monitored_by);
+						delim = ',';
 
 						zbx_audit_host_update_json_update_monitored_by(
 								zbx_map_db_event_to_audit_context(event), h->hostid,

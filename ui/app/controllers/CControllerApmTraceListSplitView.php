@@ -51,29 +51,55 @@ class CControllerApmTraceListSplitView extends CController {
 
 	protected function doAction(): void {
 		$traceid = $this->getInput('traceid');
-		$time_from = $this->getInput('timestamp') - 1;
-		$time_to = $this->getInput('timestamp') + 1;
+		$time_from = $this->getInput('timestamp') - APM_TRACE_MAX_DURATION;
+		$time_to = $this->getInput('timestamp') + APM_TRACE_MAX_DURATION;
 
-		$traces = API::ApmTrace()->get([
-			'time_from' => $time_from,
-			'time_till' => $time_to,
-			'traceids' => [$traceid]
-		]);
-		$trace = $traces[0] ?? null;
+		try {
+			$traces = API::ApmTrace()->get([
+				'output' => ['traceid', 'error_count', 'timestamp', 'duration'],
+				'time_from' => $time_from,
+				'time_till' => $time_to,
+				'traceids' => [$traceid]
+			]);
 
-		if (!$trace) {
-			throw new Exception(_('Trace not found.'));
+			if ($traces === false) {
+				throw new Exception();
+			}
+
+			$trace = $traces[0] ?? null;
+
+			if (!$trace) {
+				error(_('Trace not found.'));
+
+				throw new Exception();
+			}
+
+			$spans = API::ApmSpan()->get([
+				'output' => ['spanid', 'parent_spanid', 'service_name', 'span_name', 'scope_name', 'timestamp',
+					'duration', 'events', 'resource_attributes', 'span_attributes', 'status_code', 'status_message'
+				],
+				'time_from' => $time_from,
+				'time_till' => $time_to,
+				'traceids' => [$traceid],
+				'sortfield' => 'timestamp',
+				'sortorder' => ZBX_SORT_UP
+			]);
+
+			if ($spans === false) {
+				throw new Exception();
+			}
 		}
+		catch (Throwable) {
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				], JSON_THROW_ON_ERROR)]))->disableView()
+			);
 
-		$spans = API::ApmSpan()->get([
-			'output' => ['spanid', 'parent_spanid', 'service_name', 'span_name', 'scope_name', 'timestamp', 'duration',
-				'events', 'resource_attributes', 'span_attributes'],
-			'time_from' => $time_from,
-			'time_till' => $time_to,
-			'traceids' => [$traceid],
-			'sortfield' => 'timestamp',
-			'sortorder' => ZBX_SORT_UP
-		]);
+			return;
+		}
 
 		$span_counts = [];
 		foreach ($spans as $span) {
@@ -85,24 +111,23 @@ class CControllerApmTraceListSplitView extends CController {
 			$span_counts[$span['parent_spanid']]++;
 		}
 
-		$trace_timestamp = $this->formatNs($trace['timestamp']);
-		$trace_start = $trace_timestamp;
-		$trace_end = $trace['duration'] * SEC_PER_NANOSEC;
-
 		$today = strtotime('today');
-
 		$trace_view_spans = [];
+
+		$start_timestamp = min($trace['timestamp'], min(array_column($spans, 'timestamp', 'timestamp')));
+		$end = $trace['duration'];
+
+		$spanids = array_column($spans, 'spanid');
+
 		foreach ($spans as $i => $span) {
-			$span_timestamp = $this->formatNs($span['timestamp']);
+			$span_start = $span['timestamp'] - $start_timestamp;
+			$span_end = $span_start + $span['duration'];
+			$end = max($span_end, $end);
 
-			$span_start = ($span_timestamp - $trace_start) * SEC_PER_NANOSEC;
-			$span_end = ($span_start + $span['duration'] * SEC_PER_NANOSEC);
-
-			$span_events = array_map(function (array $event) use ($trace_start) {
-				$event_timestamp = $this->formatNs($event['timestamp']);
-				$event_time = ($event_timestamp - $trace_start) * SEC_PER_NANOSEC;
+			$span_events = array_map(function (array $event) use ($start_timestamp) {
+				$event_time = $event['timestamp'] - $start_timestamp;
 				$event_duration = $event_time
-					? convertSecondsToTimeUnits($event_time, ['combine_last_subsecond_parts' => true])
+					? convertSecondsToTimeUnits($event_time * SEC_PER_NANOSEC, ['combine_last_subsecond_parts' => true])
 					: '0'._x('ns', 'nanosecond short');
 
 				return [
@@ -122,7 +147,7 @@ class CControllerApmTraceListSplitView extends CController {
 			$trace_view_spans[$i] = [
 				'index' => $i,
 				'id' => $span['spanid'],
-				'parent_id' => $span['parent_spanid'] ?: null,
+				'parent_id' => in_array($span['parent_spanid'], $spanids) ? $span['parent_spanid'] : null,
 				'name' => $span['service_name'],
 				'operation' => $span['span_name'],
 				'service_name' => $span['service_name'],
@@ -134,7 +159,9 @@ class CControllerApmTraceListSplitView extends CController {
 				'count' => $span_counts[$span['spanid']] ?? null,
 				'events' => $span_events,
 				'resource_attributes' => $span['resource_attributes'],
-				'span_attributes' => $span['span_attributes']
+				'span_attributes' => $span['span_attributes'],
+				'status_code' => $span['status_code'],
+				'status_message' => $span['status_message']
 			];
 		}
 
@@ -143,12 +170,12 @@ class CControllerApmTraceListSplitView extends CController {
 			'trace_view_data' => [
 				'id' => $traceid,
 				'start' => 0,
-				'end' => $trace_end,
+				'end' => $end,
 				'selected_start' => 0,
-				'selected_end' => $trace_end,
+				'selected_end' => $end,
 				'spans' => $trace_view_spans
 			]
-		]);
+		], JSON_THROW_ON_ERROR);
 
 		$this->setResponse(
 			(new CControllerResponseData(['main_block' => $output]))
@@ -161,16 +188,12 @@ class CControllerApmTraceListSplitView extends CController {
 			$clock = floor($time_unix / 1000000000);
 		}
 
-		$ns = $this->formatNs($time_unix);
+		$ns = str_pad((string) ($time_unix % 1000000000), 9, '0', STR_PAD_LEFT);
 
 		return $clock >= $today
 			? strtr(zbx_date2str(strtr(TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock), ['!' => $ns])
 			: strtr(zbx_date2str(strtr(DATE_TIME_FORMAT_SECONDS, ['s' => 's.!']), $clock),
 				['!' => $ns]
 			);
-	}
-
-	private function formatNs($ns): int {
-		return (int) str_pad((string) ($ns % 1000000000), 9, '0', STR_PAD_LEFT);
 	}
 }

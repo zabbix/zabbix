@@ -215,9 +215,42 @@ class ApmDbClickHouse {
 	/**
 	 * @throws DBException
 	 */
-	private static function encodeParamValue(mixed $value): string {
+	private static function encodeParamValue(array $value_data): string {
+		[$type, $value] = $value_data;
+
+		switch ($type) {
+			case 'Int8':
+			case 'Int16':
+			case 'Int32':
+			case 'Int64':
+			case 'UInt8':
+			case 'UInt16':
+			case 'UInt32':
+			case 'UInt64':
+				$encode_method = static fn($item) => self::encodeIntegerParamValue($type, $item);
+				break;
+
+			case 'Float64':
+				$encode_method = static fn($item) => self::encodeFloatParamValue($type, $item);
+				break;
+
+			case 'String':
+				$encode_method = static fn($item) => self::encodeStringParamValue($item);
+				break;
+
+			case 'Bool':
+				$encode_method = static fn($item) => self::encodeBooleanParamValue($type, $item);
+				break;
+
+			default:
+				throw new DBException(
+					_s('Unsupported ClickHouse query parameter type: %1$s.', $type),
+					DB::DBEXECUTE_ERROR
+				);
+		}
+
 		if (!is_array($value)) {
-			return self::encodeScalarParamValue($value);
+			return $encode_method($value);
 		}
 
 		$values = [];
@@ -230,7 +263,9 @@ class ApmDbClickHouse {
 				);
 			}
 
-			$values[] = is_string($item) ? "'".self::escapeString($item)."'" : self::encodeScalarParamValue($item);
+			$encoded_item = $encode_method($item);
+
+			$values[] = $type === 'String' ? "'".$encoded_item."'" : $encoded_item;
 		}
 
 		return '['.implode(',', $values).']';
@@ -239,24 +274,61 @@ class ApmDbClickHouse {
 	/**
 	 * @throws DBException
 	 */
-	private static function encodeScalarParamValue(mixed $value): string {
+	private static function encodeIntegerParamValue(string $type, mixed $value): string {
+		if (!is_int($value) && (!is_string($value) || !preg_match('/^'.ZBX_PREG_INT.'$/', $value))) {
+			throw new DBException(
+				_s('Incorrect ClickHouse query parameter %1$s for type %2$s.', $value, $type),
+				DB::DBEXECUTE_ERROR
+			);
+		}
+
+		$value_min = CClickHouseHelper::getIntMin($type);
+		$value_max = CClickHouseHelper::getIntMax($type);
+
+		if ((is_int($value) && $value < $value_min)
+				|| (is_int($value) && is_int($value_max) && $value > $value_max)
+				|| bccomp((string) $value, (string) $value_min) === -1
+				|| bccomp((string) $value, (string) $value_max) === 1) {
+			throw new DBException(
+				_s('Incorrect ClickHouse query parameter %1$s for type %2$s.', $value, $type),
+				DB::DBEXECUTE_ERROR
+			);
+		}
+
+		return (string) $value;
+	}
+
+	/**
+	 * @throws DBException
+	 */
+	private static function encodeFloatParamValue(string $type, mixed $value): string {
+		if (!is_numeric($value)) {
+			throw new DBException(
+				_s('Incorrect ClickHouse query parameter %1$s for type %2$s.', $value, $type),
+				DB::DBEXECUTE_ERROR
+			);
+		}
+
+		return (string) $value;
+	}
+
+	private static function encodeStringParamValue(mixed $value): string {
 		if (is_string($value)) {
 			return self::escapeString($value);
 		}
 
-		if (is_bool($value)) {
-			return $value ? 'TRUE' : 'FALSE';
+		return (string) $value;
+	}
+
+	private static function encodeBooleanParamValue(string $type, mixed $value): string {
+		if (!is_bool($value)) {
+			throw new DBException(
+				_s('Incorrect ClickHouse query parameter %1$s for type %2$s.', $value, $type),
+				DB::DBEXECUTE_ERROR
+			);
 		}
 
-		if ($value === null) {
-			return '\N';
-		}
-
-		if (is_int($value) || is_float($value)) {
-			return (string) $value;
-		}
-
-		throw new DBException(_('Unsupported ClickHouse query parameter type.'), DB::DBEXECUTE_ERROR);
+		return $value ? 'TRUE' : 'FALSE';
 	}
 
 	private static function escapeString(string $value): string {

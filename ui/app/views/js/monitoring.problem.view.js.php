@@ -276,8 +276,9 @@
 
 							if (nested || show_symptoms) {
 								const symptom_icon = document.createElement('span');
-								symptom_icon.classList.add('icon', 'zi-arrow-top-right',
-									nested ? 'symptoms-right' : 'symptoms-left');
+								symptom_icon.classList.add(ZBX_STYLE_ICON, ZBX_ICON_ARROW_TOP_RIGHT,
+									nested ? 'symptoms-right' : 'symptoms-left'
+								);
 								symptom_icon.setAttribute('title', <?= json_encode(_('Symptom')); ?>);
 
 								symptoms.append(symptom_icon);
@@ -863,9 +864,7 @@
 		}
 
 		#refresh({tabfilter_changed = false, loading_fadein = false} = {}) {
-			if (this.#datatable.isUserInteracting()) {
-				return;
-			}
+			closeDialogHandler({which: KEY_ESCAPE});
 
 			this.#unscheduleRefresh();
 
@@ -913,11 +912,13 @@
 			}
 
 			this.#unscheduleRefresh();
+			this.#refresh_interval_id = setInterval(() => {
+				if (this.#datatable.isUserInteracting()) {
+					return;
+				}
 
-			this.#refresh_interval_id = setInterval(
-				() => this.#refresh({loading_fadein: true}),
-				this.#refresh_interval
-			);
+				this.#refresh({loading_fadein: true});
+			}, this.#refresh_interval);
 		}
 
 		#unscheduleRefresh() {

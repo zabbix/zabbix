@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '8.0'
+  version: '8.2'
   template_groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -16,7 +16,7 @@ zabbix_export:
         
           For more information, see MSSQL plugin documentation: https://git.zabbix.com/projects/AP/repos/mssql/browse
         
-          The MSSQL plugin must be updated to a version equal to or above 8.0.0
+          The MSSQL plugin must be updated to a version equal to or above 8.2.0
         
           Loadable plugin requires installation of one of the following:
         
@@ -24,7 +24,7 @@ zabbix_export:
           
           - Binary file
           
-          - Compilation from sources: https://www.zabbix.com/documentation/8.0/manual/extensions/plugins/build
+          - Compilation from sources: https://www.zabbix.com/documentation/8.2/manual/extensions/plugins/build
         
         2. Create an MSSQL user for monitoring.
         
@@ -104,7 +104,7 @@ zabbix_export:
             - Since version 7.2.0, you can also connect to the MSSQL instance using its name. To do this, set the connection string in the `MSSQL URI` host wizard configuration field as `<protocol://host/instance_name>`.
       vendor:
         name: Zabbix
-        version: 8.0-4
+        version: 8.2-0
       groups:
         - name: Templates/Databases
       items:

@@ -7,7 +7,7 @@ This template is designed for the effortless deployment of Pure Storage FlashArr
 
 ## Requirements
 
-Zabbix version: 8.0 and higher.
+Zabbix version: 8.2 and higher.
 
 ## Tested versions
 
@@ -16,7 +16,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.2/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -58,7 +58,7 @@ This template has been tested on:
 |{$PURE.FLASHARRAY.NETIF.LLD.FILTER.NAME.NOT_MATCHES}|<p>Filter to exclude discoverable network interfaces by name.</p>|`CHANGE_IF_NEEDED`|
 |{$PURE.FLASHARRAY.VOLUME.LLD.FILTER.NAME.MATCHES}|<p>Filter of discoverable storage volumes by name.</p>|`.*`|
 |{$PURE.FLASHARRAY.VOLUME.LLD.FILTER.NAME.NOT_MATCHES}|<p>Filter to exclude discoverable storage volumes by name.</p>|`CHANGE_IF_NEEDED`|
-|{$PURE.FLASHARRAY.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. For more details, see the documentation at https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/http</p>||
+|{$PURE.FLASHARRAY.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. For more details, see the documentation at https://www.zabbix.com/documentation/8.2/manual/config/items/itemtypes/http</p>||
 |{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items and JavaScript preprocessing: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Pure Storage FlashArray v1", e.g. {$HTTP.TLS.VERIFY:"Pure Storage FlashArray v1"}.</p>|`full`|
 
 ### Items
@@ -346,7 +346,7 @@ This template is designed for the effortless deployment of Pure Storage FlashArr
 
 ## Requirements
 
-Zabbix version: 8.0 and higher.
+Zabbix version: 8.2 and higher.
 
 ## Tested versions
 
@@ -355,7 +355,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.2/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -394,7 +394,7 @@ This template has been tested on:
 |{$PURE.FLASHARRAY.NETIF.LLD.FILTER.NAME.NOT_MATCHES}|<p>Filter to exclude discoverable network interfaces by name.</p>|`CHANGE_IF_NEEDED`|
 |{$PURE.FLASHARRAY.VOLUME.LLD.FILTER.NAME.MATCHES}|<p>Filter of discoverable storage volumes by name.</p>|`.*`|
 |{$PURE.FLASHARRAY.VOLUME.LLD.FILTER.NAME.NOT_MATCHES}|<p>Filter to exclude discoverable storage volumes by name.</p>|`CHANGE_IF_NEEDED`|
-|{$PURE.FLASHARRAY.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. For more details, see the documentation at https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/http</p>||
+|{$PURE.FLASHARRAY.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. For more details, see the documentation at https://www.zabbix.com/documentation/8.2/manual/config/items/itemtypes/http</p>||
 |{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items and JavaScript preprocessing: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Pure Storage FlashArray v2", e.g. {$HTTP.TLS.VERIFY:"Pure Storage FlashArray v2"}.</p>|`full`|
 
 ### Items

@@ -2006,6 +2006,10 @@ main {
 		margin: 10px;
 		color: $font-alt-color;
 	}
+
+	.ha-nodes {
+		margin-top: 10px
+	}
 }
 
 .uppercase {
@@ -2510,10 +2514,6 @@ svg {
 	}
 }
 
-#proxy-form .form-field-apm-attributes {
-	width: 100%;
-}
-
 #token_form {
 	.btn-grey-icon {
 		margin-left: 5px;
@@ -2606,7 +2606,8 @@ svg {
 	}
 
 	.btn-undo {
-		display: none;
+		display: flex;
+		align-items: start;
 		height: auto;
 		color: $icon-color;
 		background-color: $form-bg-color;
@@ -2614,6 +2615,7 @@ svg {
 		border-color: $form-border-color;
 
 		&::before {
+			margin-top: 2px;
 			font-size: $icon-medium-size;
 		}
 
@@ -2626,6 +2628,10 @@ svg {
 
 		&.is-focused {
 			border-color: $form-focus-border-color;
+		}
+
+		&[hidden] {
+			display: none;
 		}
 	}
 

@@ -183,8 +183,11 @@ int	zbx_check_frontend_conn_accept(zbx_socket_t *sock, const zbx_config_tls_t *c
 static void	recv_agenthistory(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, struct zbx_json_parse *jp,
 		zbx_timespec_t *ts, int config_timeout)
 {
-	char	*info = NULL, *ext = NULL;
-	int	ret;
+	char			*info = NULL, *ext = NULL, host[MAX_STRING_LEN], *error = NULL;
+	int			ret;
+	struct zbx_json_parse	jp_commands;
+	zbx_uint64_t		hostid = 0, revision = 0;
+	unsigned char		status = 0, monitored_by = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -214,7 +217,19 @@ static void	recv_agenthistory(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, s
 	else
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid agent history data from \"%s\": %s", sock->peer, info);
 
-	zbx_process_command_results(jp);
+	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_COMMANDS, &jp_commands) &&
+			SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, sizeof(host), NULL))
+	{
+		if (SUCCEED != zbx_dc_check_host_conn_permissions(host, sock, &hostid, &status, &monitored_by,
+				&revision, NULL, ZBX_AUTOREG_NO_CHANGES, &error))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot process command results from \"%s\": %s", sock->peer,
+					error);
+			zbx_free(error);
+		}
+		else if (0 != hostid)
+			zbx_process_command_results(&jp_commands, hostid);
+	}
 
 	zbx_send_response_json(sock, ret, info, NULL, sock->protocol, config_timeout, ext);
 

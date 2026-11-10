@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Copyright (C) 2001-2026 Zabbix SIA
 **
@@ -21,12 +21,15 @@ class CClickHouseQuery {
 	protected array $join = [];
 	protected array $where = [];
 	protected array $group = [];
+	protected array $having = [];
 	protected array $order = [];
 	protected ?int $limit = null;
 	protected ?int $offset = null;
 	protected array $param = [];
 
 	protected array $linked_queries = [];
+
+	protected array $meta_attributes = [];
 
 	public function __construct() {}
 
@@ -62,6 +65,12 @@ class CClickHouseQuery {
 		return $this;
 	}
 
+	public function having(string $having): static {
+		$this->having[] = $having;
+
+		return $this;
+	}
+
 	public function order(string $order_by, $sort_order = ZBX_SORT_UP): static {
 		$this->order[] = $order_by.($sort_order === ZBX_SORT_DOWN ? ' '.ZBX_SORT_DOWN : '');
 
@@ -80,15 +89,15 @@ class CClickHouseQuery {
 		return $this;
 	}
 
-	public function param(string $name, mixed $value): static {
-		$this->param[$name] = $value;
+	public function param(string $name, string $type, mixed $value): static {
+		$this->param[$name] = [$type, $value];
 
 		return $this;
 	}
 
 	public function params(array $params): static {
-		foreach ($params as $name => $value) {
-			$this->param($name, $value);
+		foreach ($params as $name => [$type, $value]) {
+			$this->param($name, $type, $value);
 		}
 
 		return $this;
@@ -107,6 +116,7 @@ class CClickHouseQuery {
 			($this->join ? ' '.implode(' ', $this->join) : '').
 			($this->where ? ' WHERE '.implode(' AND ', $this->where) : '').
 			($this->group ? ' GROUP BY '.implode(',', $this->group) : '').
+			($this->having ? ' HAVING '.implode(' AND ', $this->having) : '').
 			($this->order ? ' ORDER BY '.implode(',', $this->order) : '').
 			($this->limit !== null ? ' LIMIT '.$this->limit : '').
 			($this->offset !== null && $this->offset > 0 ? ' OFFSET '.$this->offset : '');
@@ -120,5 +130,23 @@ class CClickHouseQuery {
 		}
 
 		return $params;
+	}
+
+	public function setMetaAttribute(string $name, mixed $value = true): static {
+		$this->meta_attributes[$name] = $value;
+
+		return $this;
+	}
+
+	public function getMetaAttribute(string $name, mixed $default = null): mixed {
+		return array_key_exists($name, $this->meta_attributes) ? $this->meta_attributes[$name] : $default;
+	}
+
+	public function getNextFieldFilterIndex(string $field_name): int {
+		$field_filter_index = $this->getMetaAttribute($field_name, 0);
+
+		$this->setMetaAttribute($field_name, $field_filter_index + 1);
+
+		return $field_filter_index;
 	}
 }

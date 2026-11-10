@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '8.0'
+  version: '8.2'
   template_groups:
     - uuid: e960332b3f6c46a1956486d4f3f99fce
       name: 'Templates/Server hardware'
@@ -34,7 +34,7 @@ zabbix_export:
         > NOTE! If you are experiencing timeouts on some of the items that are executing requests, adjust the `{$DELL.HTTP.REQUEST.TIMEOUT}` macro accordingly.
       vendor:
         name: Zabbix
-        version: 8.0-4
+        version: 8.2-0
       groups:
         - name: 'Templates/Server hardware'
       items:

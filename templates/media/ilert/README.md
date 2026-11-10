@@ -8,7 +8,7 @@ This guide will provide instructions on setting up a media type, a user and an a
 
 ## Requirements
 
-Zabbix version: 8.0 and higher.
+Zabbix version: 8.2 and higher.
 
 ## Parameters
 
@@ -153,7 +153,7 @@ To utilize the media type, we will create a Zabbix user to represent iLert. We w
 
 8\. Use the iLert User in any Actions of your choice. The text from "Action Operations" will be sent to "iLert Alert" when a problem happens.
 
-For more information use the [Zabbix](https://www.zabbix.com/documentation/8.0/manual/config/notifications) and [iLert](https://docs.ilert.com/integrations/zabbix/native) documentations.
+For more information use the [Zabbix](https://www.zabbix.com/documentation/8.2/manual/config/notifications) and [iLert](https://docs.ilert.com/integrations/zabbix/native) documentations.
 
 ## Feedback
 
