@@ -30,7 +30,6 @@
 #include "zbxcacheconfig.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
-#include "zbxdbschema.h"
 #include "zbxjson.h"
 #include "zbxshmem.h"
 #include "zbxstr.h"
@@ -48,12 +47,9 @@ static zbx_shmem_info_t	*trend_mem = NULL;
 #define	UNLOCK_CACHE	zbx_mutex_unlock(cache_lock)
 #define	LOCK_TRENDS	zbx_mutex_lock(trends_lock)
 #define	UNLOCK_TRENDS	zbx_mutex_unlock(trends_lock)
-#define	LOCK_CACHE_IDS		zbx_mutex_lock(cache_ids_lock)
-#define	UNLOCK_CACHE_IDS	zbx_mutex_unlock(cache_ids_lock)
 
 static zbx_mutex_t	cache_lock = ZBX_MUTEX_NULL;
 static zbx_mutex_t	trends_lock = ZBX_MUTEX_NULL;
-static zbx_mutex_t	cache_ids_lock = ZBX_MUTEX_NULL;
 
 static char		*sql = NULL;
 static size_t		sql_alloc = 4 * ZBX_KIBIBYTE;
@@ -69,21 +65,6 @@ static zbx_sync_history_cache_f	sync_history_cache_cb = NULL;
 
 /* the maximum number of characters for history cache values (except binary) */
 #define ZBX_HISTORY_VALUE_LEN		(1024 * 64)
-
-typedef struct
-{
-	char		table_name[ZBX_TABLENAME_LEN_MAX];
-	zbx_uint64_t	lastid;
-}
-ZBX_DC_ID;
-
-typedef struct
-{
-	ZBX_DC_ID	id[ZBX_IDS_SIZE];
-}
-ZBX_DC_IDS;
-
-static ZBX_DC_IDS	*ids = NULL;
 
 typedef struct
 {
@@ -3586,9 +3567,6 @@ int	zbx_init_database_cache(zbx_get_program_type_f get_program_type,
 	if (SUCCEED != (ret = zbx_mutex_create(&cache_lock, ZBX_MUTEX_CACHE, error)))
 		goto out;
 
-	if (SUCCEED != (ret = zbx_mutex_create(&cache_ids_lock, ZBX_MUTEX_CACHE_IDS, error)))
-		goto out;
-
 	if (SUCCEED != (ret = zbx_shmem_create(&hc_mem, history_cache_size, "history cache",
 			"HistoryCacheSize", 1, error)))
 	{
@@ -3603,9 +3581,6 @@ int	zbx_init_database_cache(zbx_get_program_type_f get_program_type,
 
 	cache = (ZBX_DC_CACHE *)__hc_index_shmem_malloc_func(NULL, sizeof(ZBX_DC_CACHE));
 	memset(cache, 0, sizeof(ZBX_DC_CACHE));
-
-	ids = (ZBX_DC_IDS *)__hc_index_shmem_malloc_func(NULL, sizeof(ZBX_DC_IDS));
-	memset(ids, 0, sizeof(ZBX_DC_IDS));
 
 	zbx_hashset_create_ext(&cache->history_items, ZBX_HC_ITEMS_INIT_SIZE,
 			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
@@ -3683,7 +3658,6 @@ void	zbx_free_database_cache(int sync, const zbx_events_funcs_t *events_cbs, int
 	hc_index_mem = NULL;
 
 	zbx_mutex_destroy(&cache_lock);
-	zbx_mutex_destroy(&cache_ids_lock);
 
 	if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 	{
@@ -3697,6 +3671,7 @@ void	zbx_free_database_cache(int sync, const zbx_events_funcs_t *events_cbs, int
 
 /******************************************************************************
  *                                                                            *
+<<<<<<< HEAD
  * Purpose: Return next id for requested table                                *
  *                                                                            *
  ******************************************************************************/
@@ -3773,6 +3748,8 @@ zbx_uint64_t	zbx_dc_get_nextid(const char *table_name, int num)
 
 /******************************************************************************
  *                                                                            *
+=======
+>>>>>>> 448a92b5e9d (.......P.. [ZBX-27656] fixed missed history when switching to disk mode from hybrid mode)
  * Purpose: performs interface availability reset for hosts with              *
  *          availability set on interfaces without enabled items              *
  *                                                                            *
