@@ -213,22 +213,22 @@ class CTrend extends CApiService {
 						'group_by_clock' => [
 							'date_histogram' => [
 								'field' => 'clock',
-								'interval' => '1h',
+								'fixed_interval' => '1h',
 								'min_doc_count' => 1
 							],
 							'aggs' => [
-								'max_value' => [
-									'max' => [
+								'value_min' => [
+									'min' => [
 										'field' => 'value'
 									]
 								],
-								'avg_value' => [
+								'value_avg' => [
 									'avg' => [
 										'field' => 'value'
 									]
 								],
-								'min_value' => [
-									'min' => [
+								'value_max' => [
+									'max' => [
 										'field' => 'value'
 									]
 								]
@@ -247,6 +247,7 @@ class CTrend extends CApiService {
 			$query_must[] = [
 				'range' => [
 					'clock' => [
+						'format' => CElasticsearchHelper::DATE_FORMAT,
 						'gte' => $options['time_from']
 					]
 				]
@@ -258,6 +259,7 @@ class CTrend extends CApiService {
 			$query_must[] = [
 				'range' => [
 					'clock' => [
+						'format' => CElasticsearchHelper::DATE_FORMAT,
 						'lte' => $options['time_till']
 					]
 				]
@@ -265,6 +267,7 @@ class CTrend extends CApiService {
 		}
 
 		$limit = $options['limit'];
+		$output_fields = array_flip($options['output']);
 		$result = [];
 
 		if ($options['countOutput']) {
@@ -282,28 +285,37 @@ class CTrend extends CApiService {
 				continue;
 			}
 
-			$query['query']['bool']['must'] = [
+			$query['query']['bool']['must'] = $query_must;
+			$query['query']['bool']['must'][] = [
 				'terms' => [
 					'itemid' => $itemids
 				]
-			] + $query_must;
+			];
 
 			$query['aggs']['group_by_itemid']['terms']['size'] = count($itemids);
 
 			$data = CElasticsearchHelper::query('POST', $endpoint, $query);
 
+			if (!array_key_exists('group_by_itemid', $data)) {
+				continue;
+			}
+
+			$value_to_string = $type == ITEM_VALUE_TYPE_UINT64
+				? static fn (float $value): string => sprintf('%.0f', $value)
+				: static fn (float $value): string => CElasticsearchHelper::floatToString($value);
+
 			foreach ($data['group_by_itemid']['buckets'] as $item) {
 				if (!$options['countOutput']) {
 					foreach ($item['group_by_clock']['buckets'] as $histogram) {
-						$result[] = [
-							'itemid' => $item['key'],
+						$result[] = array_intersect_key([
+							'itemid' => (string) $item['key'],
 							// Field key_as_string is used to get seconds instead of milliseconds.
 							'clock' => $histogram['key_as_string'],
-							'num' => $histogram['doc_count'],
-							'min_value' => $histogram['min_value']['value'],
-							'avg_value' => $histogram['avg_value']['value'],
-							'max_value' => $histogram['max_value']['value']
-						];
+							'num' => (string) $histogram['doc_count'],
+							'value_min' => $value_to_string($histogram['value_min']['value']),
+							'value_avg' => CElasticsearchHelper::floatToString($histogram['value_avg']['value']),
+							'value_max' => $value_to_string($histogram['value_max']['value'])
+						], $output_fields);
 
 						if ($limit !== null) {
 							$limit--;

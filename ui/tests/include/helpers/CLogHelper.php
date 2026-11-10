@@ -191,11 +191,14 @@ class CLogHelper {
 		// "2022/01/12 23:23:19.550415 ..."
 		$log2_pattern = '[0-9]+\/[0-9]+\/[0-9]+ [0-9]+:[0-9]+:[0-9]+\.[0-9]+';
 
+		// "2026-09-17 10:10:39.175 ..." - java gateway pattern
+		$log3_pattern = '[0-9]+-[0-9]+-[0-9]+ [0-9]+:[0-9]+:[0-9]+\.[0-9]+';
+
 		if ($match_regex === false) {
-			$pattern = '/^('.$log_pattern.'|'.$log2_pattern.') .*'.preg_quote($line, '/').'.*$/m';
+			$pattern = '/^('.$log_pattern.'|'.$log2_pattern.'|'.$log3_pattern.') .*'.preg_quote($line, '/').'.*$/m';
 		}
 		else {
-			$pattern = '/^('.$log_pattern.'|'.$log2_pattern.') .*'.$line.'.*$/m';
+			$pattern = '/^('.$log_pattern.'|'.$log2_pattern.'|'.$log3_pattern.') .*'.$line.'.*$/m';
 		}
 
 		if (preg_match($pattern, $content, $matches, PREG_OFFSET_CAPTURE) === 1) {

@@ -40,6 +40,7 @@
 #include "zbxcachehistory.h"
 #include "zbxregexp.h"
 #include "zbxtypes.h"
+#include "zbxcacheconfig.h"
 
 #define CEP_WORKERS_MIN		2
 #define CEP_WORKERS_MAX		100
@@ -914,6 +915,7 @@ void	*zbx_cep_manager_thread(void *args)
 		zbx_exit(EXIT_FAILURE);
 	}
 
+	zbx_dc_config_local_acquire();
 	zbx_cep_api_acquire();
 
 	zbx_vector_mw_task_ptr_create(&tasks);
@@ -1085,6 +1087,7 @@ void	*zbx_cep_manager_thread(void *args)
 
 	cep_manager_free(manager);
 	zbx_cep_api_release();
+	zbx_dc_config_local_release();
 
 	zbx_deinit_regexp_env();
 	zbx_vector_mw_task_ptr_destroy(&tasks);

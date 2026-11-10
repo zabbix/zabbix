@@ -45,8 +45,11 @@
 #define ZBX_TQ_GRANULARITY_MIN		1
 #define ZBX_TQ_GRANULARITY_MAX		SEC_PER_DAY
 
-#define ZBX_TQ_MAX_RESULT_ROWS	10000	/* maximum amount of values saved by a single check, */
-					/* overflow results in partial result being saved    */
+/* SYNC WITH PHP! */
+#define ZBX_TQ_CONDITION_ATTRIBUTE_KEY_LEN	255
+#define ZBX_TQ_CONDITION_VALUE_LEN		255
+
+#define ZBX_TQ_MAX_RESULT_ROWS	1000000	/* maximum amount of rows selected by a single query */
 
 /* apm db */
 
@@ -166,6 +169,8 @@ typedef enum
 	ZBX_TQ_OPERATOR_NOT_EQUAL	= 1,
 	ZBX_TQ_OPERATOR_CONTAINS	= 2,
 	ZBX_TQ_OPERATOR_NOT_CONTAINS	= 3,
+	ZBX_TQ_OPERATOR_MORE_EQUAL	= 5,
+	ZBX_TQ_OPERATOR_LESS_EQUAL	= 6,
 	ZBX_TQ_OPERATOR_EXISTS		= 12,
 }
 zbx_tq_operator_t;
@@ -197,6 +202,7 @@ typedef struct
 	char				*column;
 	const zbx_tq_column_info_t	*col_info; /* stored here in order to not look it up every time */
 	char				*attribute_key;
+	char				*attribute_key_orig;
 	char				*value;
 	zbx_tq_operator_t		operator;
 }
@@ -219,8 +225,17 @@ zbx_tq_query_t;
 
 ZBX_PTR_VECTOR_DECL(tq_condition_ptr, zbx_tq_condition_t *)
 
+typedef int	(*zbx_tq_macro_expand_func_t)(char **text, void *ctx);
+
 int	zbx_tq_parse_query(zbx_tq_query_t *query, const char *query_json, char *error, size_t max_error_len);
+int	zbx_tq_prepare_query(zbx_tq_query_t *query, zbx_tq_macro_expand_func_t macro_expand_cb, void *macro_expand_ctx,
+		char *error, size_t max_error_len);
 void	zbx_tq_query_clean(zbx_tq_query_t *query);
+
+int	zbx_tq_expand_macros_in_query(zbx_tq_query_t *query, zbx_tq_macro_expand_func_t macro_expand_cb,
+		void *macro_expand_ctx, char *error, size_t max_error_len);
+
+char	*zbx_tq_serialize_query(const zbx_tq_query_t *query);
 
 int	zbx_tq_validate_time_shift(const char *time_shift_str, int *time_shift_out, char *error,
 		size_t max_error_len);
@@ -228,9 +243,21 @@ int	zbx_tq_validate_lookback_limit(const char *lookback_limit_str, int *lookback
 		size_t max_error_len);
 int	zbx_tq_validate_granularity(const char *granularity_str, int *granularity_out, char *error,
 		size_t max_error_len);
+int	zbx_tq_validate_lookback_limit_and_granularity(const char *lookback_limit_str, int *lookback_limit_out,
+		const char *granularity_str, int *granularity_out, char *error, size_t max_error_len);
 int	zbx_tq_validate_time_params(const char *time_shift_str, int *time_shift_out, const char *lookback_limit_str,
 		int *lookback_limit_out, const char *granularity_str, int *granularity_out, char *error,
 		size_t max_error_len);
+
+int	zbx_tq_validate_numeric_condition_value(const char *value);
+
+const zbx_tq_column_info_t	*zbx_tq_get_column_info(zbx_tq_signal_type_t signal_type,
+		zbx_tq_metric_point_type_t metric_point_type, const char *column);
+
+int			zbx_tq_column_type_is_array(zbx_tq_column_type_t type);
+int			zbx_tq_column_type_is_attributes(zbx_tq_column_type_t type);
+int			zbx_tq_column_type_requires_numeric_comparison(zbx_tq_column_type_t type);
+zbx_tq_column_type_t	zbx_tq_get_base_column_type(zbx_tq_column_type_t type);
 
 void	zbx_tq_sql_generate_clickhouse(zbx_tq_query_t *query, int time_shift, int lookback_limit, int granularity,
 		time_t now, time_t lasttimestamp, char **sql);
@@ -240,7 +267,7 @@ void	zbx_tq_get_timestamp_filter_bounds(int time_shift, int lookback_limit, int 
 void	zbx_tq_get_newlasttimestamp(int lookback_limit, int granularity, time_t now, time_t lasttimestamp,
 		time_t *newlasttimestamp);
 
-int	zbx_tq_clickhouse_parse_resp(const zbx_tq_query_t *query, char *resp, zbx_vector_str_t *values);
+int	zbx_tq_clickhouse_parse_resp(const zbx_tq_query_t *query, char *resp, char **out);
 
 void	zbx_tq_clickhouse_get_query_url(const char *base_url, const char *db, char **url);
 
