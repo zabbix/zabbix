@@ -231,6 +231,9 @@ $arrow-fill-up: #000000;
 $arrow-fill-down: #000000;
 $arrow-fill-up-down: #000000;
 
+// Trace.
+$trace-datatable-duration-bar-bg-color: #d9d9d9;
+
 // Important! @import string should come after variables
 @import 'screen';
 @import "base/icons-severity";

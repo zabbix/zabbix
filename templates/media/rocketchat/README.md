@@ -3,12 +3,12 @@
 
 ## Overview
 
-This guide describes how to integrate Zabbix 8.0 installation with Rocket.Chat using the Zabbix webhook feature. This guide provides instructions on setting up a media type, a user and an action in Zabbix.
+This guide describes how to integrate Zabbix 8.2 installation with Rocket.Chat using the Zabbix webhook feature. This guide provides instructions on setting up a media type, a user and an action in Zabbix.
 By default, all new alerts will be posted as messages with an attachment card. Event updates and resolve messages will be added to the thread of the first message.
 
 ## Requirements
 
-Zabbix version: 8.0 and higher.
+Zabbix version: 8.2 and higher.
 
 ## Parameters
 
@@ -93,7 +93,7 @@ Format explanation:
 Note, that "Send to" field cannot be empty. If the channel is already specified in the **rc_send_to** parameter, you can put any symbol in this field to comply with frontend requirements.
 Make sure this user has access to all hosts, for which you would like problem notifications to be converted into Rocket.Chat tasks.
 
-For more information see [Zabbix](https://www.zabbix.com/documentation/8.0/manual/config/notifications) and [Rocket.Chat](https://docs.rocket.chat/) documentations.
+For more information see [Zabbix](https://www.zabbix.com/documentation/8.2/manual/config/notifications) and [Rocket.Chat](https://docs.rocket.chat/) documentations.
 
 ## Feedback
 

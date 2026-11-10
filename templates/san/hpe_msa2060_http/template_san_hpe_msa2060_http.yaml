@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '8.0'
+  version: '8.2'
   template_groups:
     - uuid: 7c2cb727f85b492d88cd56e17127c64d
       name: Templates/SAN
@@ -35,7 +35,7 @@ zabbix_export:
         4. Change the `Scheme` and `Port` if needed.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.2-0
       groups:
         - name: Templates/SAN
       items:

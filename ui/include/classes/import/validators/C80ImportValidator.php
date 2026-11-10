@@ -307,7 +307,8 @@ class C80ImportValidator extends CImportValidatorGeneral {
 		CXmlConstantValue::ITEM_TYPE_SNMP => CXmlConstantName::SNMP_AGENT,
 		CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT,
 		CXmlConstantValue::ITEM_TYPE_BROWSER => CXmlConstantName::BROWSER,
-		CXmlConstantValue::ITEM_TYPE_NESTED => CXmlConstantName::NESTED
+		CXmlConstantValue::ITEM_TYPE_NESTED => CXmlConstantName::NESTED,
+		CXmlConstantValue::ITEM_TYPE_TELEMETRY_QUERY => CXmlConstantName::TELEMETRY_QUERY
 	];
 
 	private $ITEM_TYPE_DELAY_SUBSET = [
@@ -1013,6 +1014,22 @@ class C80ImportValidator extends CImportValidatorGeneral {
 																['if' => ['tag' => 'authtype', 'in' => [CXmlConstantValue::PUBLIC_KEY => CXmlConstantName::PUBLIC_KEY]], 'type' => XML_STRING, 'default' => ''],
 																['else' => true, 'type' => XML_IGNORE_TAG]
 															]],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'time_shift' =>				['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_TELEMETRY_QUERY => CXmlConstantName::TELEMETRY_QUERY]], 'type' => XML_STRING],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'lookback_limit' =>			['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_TELEMETRY_QUERY => CXmlConstantName::TELEMETRY_QUERY]], 'type' => XML_STRING],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'granularity' =>			['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_TELEMETRY_QUERY => CXmlConstantName::TELEMETRY_QUERY]], 'type' => XML_STRING],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'query' =>					['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_TELEMETRY_QUERY => CXmlConstantName::TELEMETRY_QUERY]], 'type' => XML_ARRAY | XML_REQUIRED, 'prefix' => 'query', 'rules' => self::getTelemetryQueryFieldSchema()],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'filter' =>					['type' => XML_ARRAY, 'rules' => [
@@ -2282,6 +2299,22 @@ class C80ImportValidator extends CImportValidatorGeneral {
 																['if' => ['tag' => 'authtype', 'in' => [CXmlConstantValue::PUBLIC_KEY => CXmlConstantName::PUBLIC_KEY]], 'type' => XML_STRING, 'default' => ''],
 																['else' => true, 'type' => XML_IGNORE_TAG]
 															]],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'time_shift' =>				['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_TELEMETRY_QUERY => CXmlConstantName::TELEMETRY_QUERY]], 'type' => XML_STRING],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'lookback_limit' =>			['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_TELEMETRY_QUERY => CXmlConstantName::TELEMETRY_QUERY]], 'type' => XML_STRING],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'granularity' =>			['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_TELEMETRY_QUERY => CXmlConstantName::TELEMETRY_QUERY]], 'type' => XML_STRING],
+															['else' => true, 'type' => XML_IGNORE_TAG]
+							]],
+							'query' =>					['type' => XML_MULTIPLE, 'rules' => [
+															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_TELEMETRY_QUERY => CXmlConstantName::TELEMETRY_QUERY]], 'type' => XML_ARRAY | XML_REQUIRED, 'prefix' => 'query', 'rules' => self::getTelemetryQueryFieldSchema()],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'filter' =>					['type' => XML_ARRAY, 'rules' => [
@@ -3892,13 +3925,17 @@ class C80ImportValidator extends CImportValidatorGeneral {
 			CXmlConstantValue::CONDITION_OPERATOR_NOT_EQUAL => CXmlConstantName::CONDITION_OPERATOR_NOT_EQUAL,
 			CXmlConstantValue::CONDITION_OPERATOR_LIKE => CXmlConstantName::CONDITION_OPERATOR_LIKE,
 			CXmlConstantValue::CONDITION_OPERATOR_NOT_LIKE => CXmlConstantName::CONDITION_OPERATOR_NOT_LIKE,
-			CXmlConstantValue::CONDITION_OPERATOR_EXISTS => CXmlConstantName::CONDITION_OPERATOR_EXISTS
+			CXmlConstantValue::CONDITION_OPERATOR_EXISTS => CXmlConstantName::CONDITION_OPERATOR_EXISTS,
+			CXmlConstantValue::CONDITION_OPERATOR_GREATER_EQUAL => CXmlConstantName::CONDITION_OPERATOR_GREATER_EQUAL,
+			CXmlConstantValue::CONDITION_OPERATOR_LESS_EQUAL => CXmlConstantName::CONDITION_OPERATOR_LESS_EQUAL
 		];
 		$filter_condition_operator_value = [
 			CXmlConstantValue::CONDITION_OPERATOR_EQUAL => CXmlConstantName::CONDITION_OPERATOR_EQUAL,
 			CXmlConstantValue::CONDITION_OPERATOR_NOT_EQUAL => CXmlConstantName::CONDITION_OPERATOR_NOT_EQUAL,
 			CXmlConstantValue::CONDITION_OPERATOR_LIKE => CXmlConstantName::CONDITION_OPERATOR_LIKE,
-			CXmlConstantValue::CONDITION_OPERATOR_NOT_LIKE => CXmlConstantName::CONDITION_OPERATOR_NOT_LIKE
+			CXmlConstantValue::CONDITION_OPERATOR_NOT_LIKE => CXmlConstantName::CONDITION_OPERATOR_NOT_LIKE,
+			CXmlConstantValue::CONDITION_OPERATOR_GREATER_EQUAL => CXmlConstantName::CONDITION_OPERATOR_GREATER_EQUAL,
+			CXmlConstantValue::CONDITION_OPERATOR_LESS_EQUAL => CXmlConstantName::CONDITION_OPERATOR_LESS_EQUAL
 		];
 
 		$rules_filter_condition = [
