@@ -881,7 +881,7 @@ void	cep_event_context_init_with_event(zbx_cep_event_context_t *ctx, zbx_cep_eve
 	memset(ctx, 0, sizeof(zbx_cep_event_context_t));
 	ctx->event = event;
 	ctx->db_event = db_event;
-	ctx->pos = CEP_POS_LAST;
+	ctx->pos = CEP_POS_LAST | CEP_POS_CURRENT;
 	ctx->sync_flags = CEP_SYNC_IGNORE;
 	ctx->dbpool = dbpool;
 }

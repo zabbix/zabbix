@@ -114,7 +114,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->assertEquals('Template', $modal->getTitle());
 		$modal->query('button:Update')->WaitUntilClickable()->one()->click();
 		$this->assertMessage(TEST_GOOD, 'Template updated');
-		$this->zbxTestTextPresent($name);
+		$this->assertTrue($this->query('link', $name)->one()->isClickable());
 
 		$this->assertEquals($oldHashTemplate, CDBHelper::getHash($sqlTemplate));
 		$this->assertEquals($oldHashHosts, CDBHelper::getHash($sqlHosts));

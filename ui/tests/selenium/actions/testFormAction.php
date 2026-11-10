@@ -193,6 +193,9 @@ class testFormAction extends CLegacyWebTest {
 				['eventsource' => EVENT_SOURCE_DISCOVERY, 'new_condition_conditiontype' => 'Proxy']
 			],
 			[
+				['eventsource' => EVENT_SOURCE_DISCOVERY, 'new_condition_conditiontype' => 'Proxy group']
+			],
+			[
 				[
 					'eventsource' => EVENT_SOURCE_DISCOVERY,
 					'new_operation_operationtype' => 'Send message'
@@ -243,6 +246,9 @@ class testFormAction extends CLegacyWebTest {
 			],
 			[
 				['eventsource' => EVENT_SOURCE_AUTOREGISTRATION, 'new_condition_conditiontype' => 'Proxy']
+			],
+			[
+				['eventsource' => EVENT_SOURCE_AUTOREGISTRATION, 'new_condition_conditiontype' => 'Proxy group']
 			],
 			[
 				['eventsource' => EVENT_SOURCE_AUTOREGISTRATION, 'new_condition_conditiontype' => 'Host metadata']
@@ -441,14 +447,16 @@ class testFormAction extends CLegacyWebTest {
 						'Discovery status',
 						'Uptime/Downtime',
 						'Received value',
-						'Proxy'
+						'Proxy',
+						'Proxy group'
 				]);
 				break;
 			case EVENT_SOURCE_AUTOREGISTRATION:
 				$this->zbxTestDropdownHasOptions('condition_type', [
 						'Host name',
 						'Proxy',
-						'Host metadata'
+						'Host metadata',
+						'Proxy group'
 				]);
 				break;
 			case EVENT_SOURCE_INTERNAL:
@@ -489,6 +497,7 @@ class testFormAction extends CLegacyWebTest {
 			case 'Discovery rule':
 			case 'Discovery check':
 			case 'Proxy':
+			case 'Proxy group':
 				$this->zbxTestTextPresent([
 					'equals',
 					'does not equal'
@@ -622,6 +631,7 @@ class testFormAction extends CLegacyWebTest {
 			case 'Trigger':
 			case 'Discovery rule':
 			case 'Proxy':
+			case 'Proxy group':
 				$this->zbxTestAssertElementPresentXpath('//input[@placeholder="type here to search"]');
 				break;
 			default:
@@ -1120,6 +1130,7 @@ class testFormAction extends CLegacyWebTest {
 
 	public static function create() {
 		return [
+			// #0.
 			[
 				[
 					'expected' => ACTION_GOOD,
@@ -1157,6 +1168,7 @@ class testFormAction extends CLegacyWebTest {
 					]
 				]
 			],
+			// #1.
 			[
 				[
 					'expected' => ACTION_BAD,
@@ -1168,6 +1180,7 @@ class testFormAction extends CLegacyWebTest {
 					]
 				]
 			],
+			// #2.
 			[
 				[
 					'expected' => ACTION_GOOD,
@@ -1182,11 +1195,17 @@ class testFormAction extends CLegacyWebTest {
 							'Type' => CFormElement::RELOADABLE_FILL('Received value'),
 							'Operator' => 'does not contain',
 							'Value' => 'Received value'
+						],
+						[
+							'Type' => CFormElement::RELOADABLE_FILL('Proxy group'),
+							'Operator' => 'does not equal',
+							'Proxy group' => 'Proxy group \'&quot;&lt;s&gt; for Actions'
 						]
 					],
 					'expected conditions' => [
-						'A' => 'Received value does not contain Received value',
-						'B' => 'Service type equals FTP'
+						'A' => 'Proxy group does not equal Proxy group \'&quot;&lt;s&gt; for Actions',
+						'B' => 'Received value does not contain Received value',
+						'C' => 'Service type equals FTP'
 					],
 					'operations' => [
 						[
@@ -1199,6 +1218,7 @@ class testFormAction extends CLegacyWebTest {
 					]
 				]
 			],
+			// #3.
 			[
 				[
 					'expected' => ACTION_BAD,
@@ -1209,6 +1229,7 @@ class testFormAction extends CLegacyWebTest {
 					]
 				]
 			],
+			// #4.
 			[
 				[
 					'expected' => ACTION_GOOD,
@@ -1221,13 +1242,19 @@ class testFormAction extends CLegacyWebTest {
 						],
 						[
 							'Type' => CFormElement::RELOADABLE_FILL('Host metadata'),
-							'Operator'=> 'does not contain',
+							'Operator' => 'does not contain',
 							'Value' => 'Zabbix'
+						],
+						[
+							'Type' => CFormElement::RELOADABLE_FILL('Proxy group'),
+							'Operator' => 'does not equal',
+							'Proxy group' => 'Proxy group \'&quot;&lt;s&gt; for Actions'
 						]
 					],
 					'expected conditions' => [
 						'A' => 'Host name contains Zabbix',
-						'B' => 'Host metadata does not contain Zabbix'
+						'B' => 'Host metadata does not contain Zabbix',
+						'C' => 'Proxy group does not equal Proxy group \'&quot;&lt;s&gt; for Actions'
 					],
 					'operations' => [
 						[
@@ -1240,6 +1267,7 @@ class testFormAction extends CLegacyWebTest {
 					]
 				]
 			],
+			// #5.
 			[
 				[
 					'expected' => ACTION_BAD,
@@ -1250,6 +1278,7 @@ class testFormAction extends CLegacyWebTest {
 					]
 				]
 			],
+			// #6.
 			[
 				[
 					'expected' => ACTION_GOOD,
@@ -1282,6 +1311,7 @@ class testFormAction extends CLegacyWebTest {
 					]
 				]
 			],
+			// #7.
 			[
 				[
 					'expected' => ACTION_BAD,
@@ -1293,6 +1323,7 @@ class testFormAction extends CLegacyWebTest {
 					]
 				]
 			],
+			// #8.
 			[
 				[
 					'expected' => ACTION_GOOD,
@@ -1342,6 +1373,7 @@ class testFormAction extends CLegacyWebTest {
 					]
 				]
 			],
+			// #9.
 			[
 				[
 					'expected' => ACTION_BAD,
@@ -1353,6 +1385,7 @@ class testFormAction extends CLegacyWebTest {
 					]
 				]
 			],
+			// #10.
 			[
 				[
 					'expected' => ACTION_BAD,
@@ -1362,6 +1395,22 @@ class testFormAction extends CLegacyWebTest {
 					'error_title' => 'Cannot add action',
 					'errors' => [
 						'No operations defined for action "No operations action".'
+					]
+				]
+			],
+			// #11.
+			[
+				[
+					'eventsource' => EVENT_SOURCE_DISCOVERY,
+					'name' => 'Empty proxy group condition',
+					'conditions' => [
+						[
+							'Type' => CFormElement::RELOADABLE_FILL('Proxy group'),
+							'Operator' => 'equals'
+						]
+					],
+					'condition_error' => [
+						'Incorrect value for field "value": cannot be empty.'
 					]
 				]
 			]
@@ -1378,18 +1427,28 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestClickButtonText('Create action');
 		$this->assertEquals('New action', $this->query('tag:h4')->waitUntilVisible()->one()->getText());
 
-		$dialog = $this->query('class:overlay-dialogue-body')->asOverlayDialog()->one()->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$action_form = $dialog->asForm();
 		$action_form->getField('id:name')->fill($data['name']);
 
 		if (array_key_exists('conditions', $data)) {
 			foreach ($data['conditions'] as $condition) {
 				$action_form->query('xpath:.//table[@id="conditionTable"]//button[text()="Add"]')->one()->click();
-				COverlayDialogElement::find()->waitUntilReady()->one();
-				$condition_form = $this->query('id:popup.condition')->asForm()->one();
+				$condition_dialog = COverlayDialogElement::find(1)->waitUntilReady()->one();
+				$condition_form = $condition_dialog->asForm();
 				$condition_form->fill($condition);
 				$condition_form->submit();
-				$condition_form->waitUntilNotVisible();
+
+				// In case if condition form error is expected, check the error and move on to the next case.
+				if (array_key_exists('condition_error', $data)) {
+					$this->assertMessage(TEST_BAD, null, $data['condition_error']);
+					$condition_dialog->close();
+					$dialog->close();
+
+					return;
+				}
+
+				$condition_dialog->waitUntilNotVisible();
 			}
 		}
 

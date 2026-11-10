@@ -33,7 +33,7 @@ zabbix_export:
         *Note: OpenRouter sends completions traces only.*
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Applications
       items:
@@ -44,17 +44,13 @@ zabbix_export:
           delay: '{$OPENROUTER.FREQUENCY}'
           description: 'Number of spans without your own key over the last `{$OPENROUTER.FREQUENCY}`.'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
-              error_handler: CUSTOM_VALUE
-              error_handler_params: '{"columns":{"count":0}}'
             - type: JSONPATH
               parameters:
-                - $.columns.count
+                - $..count.first()
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
           time_shift: '{$OPENROUTER.TIMESHIFT}'
-          lookback_limit: '{$OPENROUTER.LOOPBACK}'
+          lookback_limit: '{$OPENROUTER.FREQUENCY}'
           granularity: '{$OPENROUTER.FREQUENCY}'
           query:
             aggregated_columns:
@@ -109,17 +105,13 @@ zabbix_export:
           delay: '{$OPENROUTER.FREQUENCY}'
           description: 'Number of spans with your own key over the last `{$OPENROUTER.FREQUENCY}`.'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
-              error_handler: CUSTOM_VALUE
-              error_handler_params: '{"columns":{"count":0}}'
             - type: JSONPATH
               parameters:
-                - $.columns.count
+                - $..count.first()
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
           time_shift: '{$OPENROUTER.TIMESHIFT}'
-          lookback_limit: '{$OPENROUTER.LOOPBACK}'
+          lookback_limit: '{$OPENROUTER.FREQUENCY}'
           granularity: '{$OPENROUTER.FREQUENCY}'
           query:
             aggregated_columns:
@@ -153,12 +145,13 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.columns.avg
+                - $..avg.first()
+              error_handler: DISCARD_VALUE
             - type: MULTIPLIER
               parameters:
                 - '1.0E-9'
           time_shift: '{$OPENROUTER.TIMESHIFT}'
-          lookback_limit: '{$OPENROUTER.LOOPBACK}'
+          lookback_limit: '{$OPENROUTER.FREQUENCY}'
           granularity: '{$OPENROUTER.FREQUENCY}'
           query:
             aggregated_columns:
@@ -184,12 +177,13 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.columns.max
+                - $..max.first()
+              error_handler: DISCARD_VALUE
             - type: MULTIPLIER
               parameters:
                 - '1.0E-9'
           time_shift: '{$OPENROUTER.TIMESHIFT}'
-          lookback_limit: '{$OPENROUTER.LOOPBACK}'
+          lookback_limit: '{$OPENROUTER.FREQUENCY}'
           granularity: '{$OPENROUTER.FREQUENCY}'
           query:
             aggregated_columns:
@@ -215,12 +209,13 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.columns.min
+                - $..min.first()
+              error_handler: DISCARD_VALUE
             - type: MULTIPLIER
               parameters:
                 - '1.0E-9'
           time_shift: '{$OPENROUTER.TIMESHIFT}'
-          lookback_limit: '{$OPENROUTER.LOOPBACK}'
+          lookback_limit: '{$OPENROUTER.FREQUENCY}'
           granularity: '{$OPENROUTER.FREQUENCY}'
           query:
             aggregated_columns:
@@ -246,12 +241,13 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.columns.percentile
+                - $..percentile.first()
+              error_handler: DISCARD_VALUE
             - type: MULTIPLIER
               parameters:
                 - '1.0E-9'
           time_shift: '{$OPENROUTER.TIMESHIFT}'
-          lookback_limit: '{$OPENROUTER.LOOPBACK}'
+          lookback_limit: '{$OPENROUTER.FREQUENCY}'
           granularity: '{$OPENROUTER.FREQUENCY}'
           query:
             aggregated_columns:
@@ -334,17 +330,13 @@ zabbix_export:
           delay: '{$OPENROUTER.FREQUENCY}'
           description: 'Number of spans with status code "Error" over the last `{$OPENROUTER.FREQUENCY}`.'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
-              error_handler: CUSTOM_VALUE
-              error_handler_params: '{"columns":{"count":0}}'
             - type: JSONPATH
               parameters:
-                - $.columns.count
+                - $..count.first()
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
           time_shift: '{$OPENROUTER.TIMESHIFT}'
-          lookback_limit: '{$OPENROUTER.LOOPBACK}'
+          lookback_limit: '{$OPENROUTER.FREQUENCY}'
           granularity: '{$OPENROUTER.FREQUENCY}'
           query:
             aggregated_columns:
@@ -366,17 +358,13 @@ zabbix_export:
           delay: '{$OPENROUTER.FREQUENCY}'
           description: 'Number of spans stopped because of the error over the last `{$OPENROUTER.FREQUENCY}`.'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
-              error_handler: CUSTOM_VALUE
-              error_handler_params: '{"columns":{"count":0}}'
             - type: JSONPATH
               parameters:
-                - $.columns.count
+                - $..count.first()
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
           time_shift: '{$OPENROUTER.TIMESHIFT}'
-          lookback_limit: '{$OPENROUTER.LOOPBACK}'
+          lookback_limit: '{$OPENROUTER.FREQUENCY}'
           granularity: '{$OPENROUTER.FREQUENCY}'
           query:
             aggregated_columns:
@@ -399,17 +387,13 @@ zabbix_export:
           delay: '{$OPENROUTER.FREQUENCY}'
           description: 'Number of spans stopped because of limit hit over the last `{$OPENROUTER.FREQUENCY}`.'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
-              error_handler: CUSTOM_VALUE
-              error_handler_params: '{"columns":{"count":0}}'
             - type: JSONPATH
               parameters:
-                - $.columns.count
+                - $..count.first()
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
           time_shift: '{$OPENROUTER.TIMESHIFT}'
-          lookback_limit: '{$OPENROUTER.LOOPBACK}'
+          lookback_limit: '{$OPENROUTER.FREQUENCY}'
           granularity: '{$OPENROUTER.FREQUENCY}'
           query:
             aggregated_columns:
@@ -432,17 +416,13 @@ zabbix_export:
           delay: '{$OPENROUTER.FREQUENCY}'
           description: 'Number of spans normally stopped over the last `{$OPENROUTER.FREQUENCY}`.'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
-              error_handler: CUSTOM_VALUE
-              error_handler_params: '{"columns":{"count":0}}'
             - type: JSONPATH
               parameters:
-                - $.columns.count
+                - $..count.first()
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
           time_shift: '{$OPENROUTER.TIMESHIFT}'
-          lookback_limit: '{$OPENROUTER.LOOPBACK}'
+          lookback_limit: '{$OPENROUTER.FREQUENCY}'
           granularity: '{$OPENROUTER.FREQUENCY}'
           query:
             aggregated_columns:
@@ -465,17 +445,13 @@ zabbix_export:
           delay: '{$OPENROUTER.FREQUENCY}'
           description: 'Total number of spans over the last `{$OPENROUTER.FREQUENCY}`.'
           preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '0'
-                - '^No value$'
-              error_handler: CUSTOM_VALUE
-              error_handler_params: '{"columns":{"count":0}}'
             - type: JSONPATH
               parameters:
-                - $.columns.count
+                - $..count.first()
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
           time_shift: '{$OPENROUTER.TIMESHIFT}'
-          lookback_limit: '{$OPENROUTER.LOOPBACK}'
+          lookback_limit: '{$OPENROUTER.FREQUENCY}'
           granularity: '{$OPENROUTER.FREQUENCY}'
           query:
             aggregated_columns:
@@ -504,20 +480,12 @@ zabbix_export:
             priority: '1'
             label: 'Data update interval'
             description: 'The update interval for the OpenTelemetry items.'
-        - macro: '{$OPENROUTER.LOOPBACK}'
-          value: 10m
-          description: 'The loopback for OpenTelemetry items.'
-          config:
-            type: TEXT
-            priority: '2'
-            label: 'Data loopback interval'
-            description: 'The loopback for the OpenTelemetry items.'
         - macro: '{$OPENROUTER.SPAN.BYOK.WARN}'
           value: '25'
           description: 'BYOK spans rate threshold, in %.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '5'
             section_name: Thresholds
             label: 'BYOK spans rate threshold, in %'
             description: 'In the range from 0 to 100 inclusive.'
@@ -527,7 +495,7 @@ zabbix_export:
           description: 'Span error rate threshold, in %.'
           config:
             type: TEXT
-            priority: '4'
+            priority: '3'
             section_name: Thresholds
             label: 'Span error rate threshold, in %'
             description: 'In the range from 0 to 100 inclusive.'
@@ -537,7 +505,7 @@ zabbix_export:
           description: 'Span hit limit stop reason rate threshold, in %.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '4'
             section_name: Thresholds
             label: 'Span hit limit stop reason rate threshold, in %'
             description: 'In the range from 0 to 100 inclusive.'
@@ -547,7 +515,7 @@ zabbix_export:
           description: '80th percentile for duration threshold, in seconds.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '6'
             section_name: Thresholds
             label: '80th percentile for duration threshold, in seconds'
             description: 'No less than 0'
@@ -557,7 +525,7 @@ zabbix_export:
           description: 'The TimeShift for OpenTelemetry items.'
           config:
             type: TEXT
-            priority: '3'
+            priority: '2'
             label: 'TimeShift interval'
             description: 'The TimeShift for the OpenTelemetry items.'
       dashboards:

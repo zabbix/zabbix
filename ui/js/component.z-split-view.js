@@ -314,6 +314,13 @@ class ZSplitViewHandle extends HTMLElement {
 }
 
 class ZSplitViewPane extends HTMLElement {
+	open() {
+		this.classList.remove('closed');
+	}
+
+	close() {
+		this.classList.add('closed');
+	}
 }
 
 customElements.define('z-split-view', ZSplitView);

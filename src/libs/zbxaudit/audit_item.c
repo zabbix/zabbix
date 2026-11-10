@@ -1440,7 +1440,8 @@ static void	audit_item_update_json_query_add_string_cb(const char *key, const ch
 {
 	zbx_uint64_t	itemid = *(zbx_uint64_t *)ctx;
 
-	zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, key, value, NULL, NULL);
+	zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, key,
+			ZBX_NULL2EMPTY_STR(value), NULL, NULL);
 }
 
 static void	audit_item_update_json_query_add_int_cb(const char *key, int value, void *ctx)
@@ -1464,7 +1465,6 @@ void	zbx_audit_item_update_json_add_query(int audit_context_mode, zbx_uint64_t i
 	if (SUCCEED != zbx_tq_parse_query(&query, val, error, sizeof(error)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot parse query for itemid: " ZBX_FS_UI64 ", error: %s", itemid, error);
-
 		return;
 	}
 
@@ -1491,9 +1491,10 @@ void	zbx_audit_item_update_json_add_query(int audit_context_mode, zbx_uint64_t i
 static void	audit_item_update_json_update_query_update_string(zbx_uint64_t itemid, const char *key,
 		const char *value_old, const char *value_new, int *changed)
 {
-	if (0 != strcmp(value_old, value_new))
+	if (0 != zbx_strcmp_null(value_old, value_new))
 	{
-		zbx_audit_update_json_update_string(itemid, AUDIT_ITEM_ID, key, value_old, value_new);
+		zbx_audit_update_json_update_string(itemid, AUDIT_ITEM_ID, key, ZBX_NULL2EMPTY_STR(value_old),
+				ZBX_NULL2EMPTY_STR(value_new));
 
 		if (NULL != changed)
 			*changed = SUCCEED;
@@ -1776,7 +1777,7 @@ static void	audit_entry_update_json_query_add_string_cb(const char *key, const c
 {
 	zbx_audit_entry_t	*audit_entry = (zbx_audit_entry_t *)ctx;
 
-	zbx_audit_entry_add_string(audit_entry, NULL, NULL, key, value);
+	zbx_audit_entry_add_string(audit_entry, NULL, NULL, key, ZBX_NULL2EMPTY_STR(value));
 }
 
 static void	audit_entry_update_json_query_add_int_cb(const char *key, int value, void *ctx)
@@ -1801,7 +1802,6 @@ void	zbx_audit_entry_update_json_add_query(zbx_audit_entry_t *audit_entry, const
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot parse query for itemid: " ZBX_FS_UI64 ", error: %s", audit_entry->id,
 				error);
-
 		return;
 	}
 

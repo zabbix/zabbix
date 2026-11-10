@@ -93,7 +93,7 @@
 						uncheckTableRows('script');
 					}
 
-					location.href = location.href;
+					location.reload();
 				})
 				.catch(() => {
 					clearMessages();
