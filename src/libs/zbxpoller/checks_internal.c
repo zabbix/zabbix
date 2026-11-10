@@ -15,6 +15,8 @@
 #include "checks_internal.h"
 #include "checks_java.h"
 
+#include "zbx_apm_client.h"
+#include "zbxcommon.h"
 #include "zbxmw.h"
 #include "zbxpoller.h"
 
@@ -254,6 +256,9 @@ static int	get_worker_process_stats(unsigned char process_type, unsigned char ag
 			break;
 		case ZBX_PROCESS_TYPE_CEP_WORKER:
 			ret = zbx_mw_get_worker_load(ZBX_IPC_SERVICE_CEP, &usage, &count, &error);
+			break;
+		case ZBX_PROCESS_TYPE_APM_WORKER:
+			ret = zbx_mw_get_worker_load(ZBX_IPC_SERVICE_APM, &usage, &count, &error);
 			break;
 		default:
 			return FAIL;
@@ -534,6 +539,8 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 					process_type = ZBX_PROCESS_TYPE_UNKNOWN;
 				break;
 			case ZBX_PROCESS_TYPE_DATASENDER:
+			case ZBX_PROCESS_TYPE_APM_MANAGER:
+			case ZBX_PROCESS_TYPE_APM_WORKER:
 				if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
 					process_type = ZBX_PROCESS_TYPE_UNKNOWN;
 				break;

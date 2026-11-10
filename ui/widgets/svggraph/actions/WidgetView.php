@@ -19,8 +19,7 @@ namespace Widgets\SvgGraph\Actions;
 use CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CNumberParser,
-	CParser,
-	CRangeTimeParser;
+	CParser;
 
 use Widgets\SvgGraph\Includes\{
 	CSvgGraphHelper,
@@ -95,8 +94,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'percentile_right_value' => $percentile_right_value
 			],
 			'time_period' => [
-				'time_from' => null,
-				'time_to' => null
+				'time_from' => $this->fields_values['time_period']['from_ts'],
+				'time_to' => $this->fields_values['time_period']['to_ts']
 			],
 			'axes' => [
 				'show_left_y_axis' => $this->fields_values['lefty'] == SVG_GRAPH_AXIS_ON,
@@ -106,6 +105,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'left_y_units' => $this->fields_values['lefty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC
 					? $this->fields_values['lefty_static_units']
 					: null,
+				'left_y_unsigned' => $this->fields_values['lefty_unsigned'] == SVG_GRAPH_AXIS_UNSIGNED_ON,
 				'show_right_y_axis' => $this->fields_values['righty'] == SVG_GRAPH_AXIS_ON,
 				'right_y_scale' => $this->fields_values['righty_scale'],
 				'right_y_min' => $righty_min,
@@ -113,6 +113,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'right_y_units' => $this->fields_values['righty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC
 					? $this->fields_values['righty_static_units']
 					: null,
+				'right_y_unsigned' => $this->fields_values['righty_unsigned'] == SVG_GRAPH_AXIS_UNSIGNED_ON,
 				'show_x_axis' => $this->fields_values['axisx'] == SVG_GRAPH_AXIS_ON
 			],
 			'legend' => [
@@ -138,14 +139,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 				? $this->fields_values['override_hostid'][0]
 				: ''
 		];
-
-		$range_time_parser = new CRangeTimeParser();
-
-		$range_time_parser->parse($this->fields_values['time_period']['from']);
-		$graph_data['time_period']['time_from'] = $range_time_parser->getDateTime(true)->getTimestamp();
-
-		$range_time_parser->parse($this->fields_values['time_period']['to']);
-		$graph_data['time_period']['time_to'] = $range_time_parser->getDateTime(false)->getTimestamp();
 
 		$svg_options = CSvgGraphHelper::get($graph_data, $width, $height);
 		if ($svg_options['errors']) {

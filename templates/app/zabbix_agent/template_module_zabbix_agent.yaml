@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '8.0'
+  version: '8.2'
   template_groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -18,7 +18,7 @@ zabbix_export:
         Set the timeout value after which the agent is considered unavailable.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.2-0
       groups:
         - name: Templates/Applications
       items:
@@ -178,7 +178,7 @@ zabbix_export:
         Set the timeout value after which the agent is considered unavailable and threshold value of time since the last data was received from the agent.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.2-0
       groups:
         - name: Templates/Applications
       items:

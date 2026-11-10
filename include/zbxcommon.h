@@ -87,6 +87,14 @@
 #	define ZBX_NORETURN
 #endif
 
+#if defined(__GNUC__) || defined(__clang__)
+#	define ZBX_ATTR_NOINLINE	__attribute__((__noinline__))
+#elif defined(_MSC_VER)
+#	define ZBX_ATTR_NOINLINE	__declspec(noinline)
+#else
+#	define ZBX_ATTR_NOINLINE
+#endif
+
 #define SUCCEED_OR_FAIL(result) (FAIL != (result) ? SUCCEED : FAIL)
 const char	*zbx_sysinfo_ret_string(int ret);
 const char	*zbx_result_string(int result);
@@ -328,7 +336,9 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_CEP_MANAGER		49
 #define ZBX_PROCESS_TYPE_CEP_WORKER		50
 #define ZBX_PROCESS_TYPE_TELEMETRY_QUERY_POLLER	51
-#define ZBX_PROCESS_TYPE_COUNT			52	/* number of process types */
+#define ZBX_PROCESS_TYPE_APM_MANAGER		52
+#define ZBX_PROCESS_TYPE_APM_WORKER		53
+#define ZBX_PROCESS_TYPE_COUNT			54	/* number of process types */
 
 /* special processes that are not present worker list */
 #define ZBX_PROCESS_TYPE_MAIN			126
@@ -568,6 +578,9 @@ zbx_proxy_suppress_t;
 #else
 #define ZBX_MAX_RECV_LARGE_DATA_SIZE	(1 * ZBX_GIBIBYTE)
 #endif
+
+/* maximum size of data received during a passive check */
+#define ZBX_MAX_PASSIVE_CHECK_DATA_SIZE	(8 * ZBX_MEBIBYTE)
 
 /* max length of base64 data */
 #define ZBX_MAX_B64_LEN		(16 * ZBX_KIBIBYTE)

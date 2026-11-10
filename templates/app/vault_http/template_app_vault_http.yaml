@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '8.0'
+  version: '8.2'
   template_groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -27,13 +27,13 @@ zabbix_export:
         
         ## Setup
         
-        > See [Zabbix template operation](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box/http) for basic instructions.
+        > See [Zabbix template operation](https://www.zabbix.com/documentation/8.2/manual/config/templates_out_of_the_box/http) for basic instructions.
         
         Configure Vault API. See [Vault Configuration](https://www.vaultproject.io/docs/configuration).
         Create a Vault service token and set it to the host wizard configuration field `Vault auth token`.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.2-0
       groups:
         - name: Templates/Applications
       items:

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Copyright (C) 2001-2026 Zabbix SIA
 **
@@ -23,7 +23,7 @@ class CApmLog extends CApmGeneral {
 		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
 	];
 
-	private const CLICKHOUSE_OUTPUT_FIELDS = [
+	protected const CLICKHOUSE_OUTPUT_FIELDS = [
 		'timestamp'				=> 'Timestamp',
 		'traceid'				=> 'TraceId',
 		'spanid'				=> 'SpanId',
@@ -42,7 +42,7 @@ class CApmLog extends CApmGeneral {
 		'event_name'			=> 'EventName'
 	];
 
-	private const CLICKHOUSE_FIELDS = [
+	protected const CLICKHOUSE_FIELDS = [
 		'Timestamp'				=> 'timestamp',
 		'TraceId'				=> 'traceid',
 		'SpanId'				=> 'spanid',
@@ -77,37 +77,39 @@ class CApmLog extends CApmGeneral {
 			'spanids' =>						['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'with_flags_on' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'with_flags_off' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'severity_numbers' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => '0:24', 'uniq' => true, 'default' => null],
 			'resource_attributes' =>			['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'key' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-				'operator' =>						['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_OPERATOR_LIKE, APM_ATTRIBUTE_OPERATOR_EQUAL, APM_ATTRIBUTE_OPERATOR_NOT_LIKE, APM_ATTRIBUTE_OPERATOR_NOT_EQUAL, APM_ATTRIBUTE_OPERATOR_EXISTS, APM_ATTRIBUTE_OPERATOR_NOT_EXISTS]), 'default' => APM_ATTRIBUTE_OPERATOR_LIKE],
+				'operator' =>						['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]), 'default' => TAG_OPERATOR_LIKE],
 				'value' =>							['type' => API_STRING_UTF8, 'default' => '']
 			]],
-			'resource_attributes_evaltype' =>	['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_EVAL_TYPE_AND_OR, APM_ATTRIBUTE_EVAL_TYPE_OR]), 'default' => APM_ATTRIBUTE_EVAL_TYPE_AND_OR],
+			'resource_attributes_evaltype' =>	['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
 			'scope_attributes' =>				['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'key' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-				'operator' =>						['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_OPERATOR_LIKE, APM_ATTRIBUTE_OPERATOR_EQUAL, APM_ATTRIBUTE_OPERATOR_NOT_LIKE, APM_ATTRIBUTE_OPERATOR_NOT_EQUAL, APM_ATTRIBUTE_OPERATOR_EXISTS, APM_ATTRIBUTE_OPERATOR_NOT_EXISTS]), 'default' => APM_ATTRIBUTE_OPERATOR_LIKE],
+				'operator' =>						['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]), 'default' => TAG_OPERATOR_LIKE],
 				'value' =>							['type' => API_STRING_UTF8, 'default' => '']
 			]],
-			'scope_attributes_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_EVAL_TYPE_AND_OR, APM_ATTRIBUTE_EVAL_TYPE_OR]), 'default' => APM_ATTRIBUTE_EVAL_TYPE_AND_OR],
+			'scope_attributes_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
 			'log_attributes' =>					['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'key' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-				'operator' =>						['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_OPERATOR_LIKE, APM_ATTRIBUTE_OPERATOR_EQUAL, APM_ATTRIBUTE_OPERATOR_NOT_LIKE, APM_ATTRIBUTE_OPERATOR_NOT_EQUAL, APM_ATTRIBUTE_OPERATOR_EXISTS, APM_ATTRIBUTE_OPERATOR_NOT_EXISTS]), 'default' => APM_ATTRIBUTE_OPERATOR_LIKE],
+				'operator' =>						['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]), 'default' => TAG_OPERATOR_LIKE],
 				'value' =>							['type' => API_STRING_UTF8, 'default' => '']
 			]],
-			'log_attributes_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_EVAL_TYPE_AND_OR, APM_ATTRIBUTE_EVAL_TYPE_OR]), 'default' => APM_ATTRIBUTE_EVAL_TYPE_AND_OR],
+			'log_attributes_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
 			'filter' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['traceid', 'spanid', 'trace_flags', 'severity_text', 'severity_number', 'service_name', 'resource_schema_url', 'scope_schema_url', 'scope_name', 'scope_version', 'event_name']],
 			'search' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['severity_text', 'service_name', 'body', 'resource_schema_url', 'scope_schema_url', 'scope_name', 'scope_version', 'event_name']],
 			'searchByAny' =>					['type' => API_BOOLEAN, 'default' => false],
-			'startSearch' =>					['type' => API_FLAG, 'default' => false],
-			'excludeSearch' =>					['type' => API_FLAG, 'default' => false],
+			'startSearch' =>					['type' => API_BOOLEAN, 'default' => false],
+			'excludeSearch' =>					['type' => API_BOOLEAN, 'default' => false],
 			'searchWildcardsEnabled' =>			['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>							['type' => API_OUTPUT, 'in' => implode(',', array_keys(self::CLICKHOUSE_OUTPUT_FIELDS)), 'default' => API_OUTPUT_EXTEND],
-			'countOutput' =>					['type' => API_FLAG, 'default' => false],
+			'output' =>							['type' => API_OUTPUT, 'flags' => API_NORMALIZE, 'in' => implode(',', array_keys(self::CLICKHOUSE_OUTPUT_FIELDS)), 'default' => API_OUTPUT_EXTEND],
+			'countOutput' =>					['type' => API_BOOLEAN, 'default' => false],
 			// sort and limit
-			'sortfield' =>						['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['timestamp', 'traceid', 'spanid', 'parent_spanid', 'trace_state', 'span_name', 'span_kind', 'service_name', 'scope_name', 'scope_version', 'duration', 'status_code', 'status_message']), 'uniq' => true, 'default' => []],
+			'sortfield' =>						['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['timestamp', 'traceid', 'spanid', 'trace_flags', 'severity_text', 'severity_number', 'service_name', 'resource_schema_url', 'scope_schema_url', 'scope_name', 'scope_version', 'event_name']), 'uniq' => true, 'default' => []],
 			'sortorder' =>						['type' => API_SORTORDER, 'default' => []],
-			'limit' =>							['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null]
+			'limit' =>							['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
+			'offset' =>							['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '0:'.ZBX_MAX_INT32, 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -120,29 +122,47 @@ class CApmLog extends CApmGeneral {
 	protected function getFromClickHouse(array $options): array|string {
 		$db_schema = CApmData::getClickHouseDbSchema();
 
-		$options = self::fixOptionsForClickHouse($options, self::CLICKHOUSE_OUTPUT_FIELDS);
+		$options = self::translateOptionsForClickHouse($options, self::CLICKHOUSE_OUTPUT_FIELDS);
+
+		$real_count_output = $options['countOutput'];
+
+		if (!$options['output']) {
+			$options['countOutput'] = true;
+		}
 
 		$query = (CClickHouseHelper::createQueryFromOptions('otel_logs', 'l', $db_schema, $options))
-			->where('l.Timestamp>=toDateTime64({time_from:Int32},9)', ['time_from' => $options['time_from']])
-			->where('l.Timestamp<toDateTime64({time_till:Int32},9)', ['time_till' => $options['time_till']]);
+			->where('l.Timestamp>=toDateTime64({time_from:Int32},9)', ['time_from' => ['Int32', $options['time_from']]])
+			->where('l.Timestamp<toDateTime64({time_till:Int32},9)', ['time_till' => ['Int32', $options['time_till']]]);
+
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			CClickHouseHelper::addAttributeFilter($query, 'l.ResourceAttributes',
+				CApiUserGroupHelper::getApmFilterResourceAttributes(SIGNAL_TYPE_LOGS), TAG_EVAL_TYPE_OR
+			);
+		}
 
 		if ($options['traceids'] !== null) {
-			$query->where('l.TraceId IN {traceids:Array(String)}', ['traceids' => $options['traceids']]);
+			$query->where('l.TraceId IN {traceids:Array(String)}', ['traceids' => ['String', $options['traceids']]]);
 		}
 
 		if ($options['spanids'] !== null) {
-			$query->where('l.SpanId IN {spanids:Array(String)}', ['spanids' => $options['spanids']]);
+			$query->where('l.SpanId IN {spanids:Array(String)}', ['spanids' => ['String', $options['spanids']]]);
 		}
 
 		if ($options['with_flags_on'] !== null) {
 			$query->where('bitAnd(l.TraceFlags, {flags_on:Int32})={flags_on:Int32}', [
-				'flags_on' => $options['with_flags_on']
+				'flags_on' => ['Int32', $options['with_flags_on']]
 			]);
 		}
 
 		if ($options['with_flags_off'] !== null) {
 			$query->where('bitAnd(l.TraceFlags, {flags_off:Int32})=0', [
-				'flags_off' => $options['with_flags_off']
+				'flags_off' => ['Int32', $options['with_flags_off']]
+			]);
+		}
+
+		if ($options['severity_numbers'] !== null) {
+			$query->where('l.SeverityNumber IN {severity_numbers:Array(Int32)}', [
+				'severity_numbers' => ['Int32', $options['severity_numbers']]
 			]);
 		}
 
@@ -170,10 +190,20 @@ class CApmLog extends CApmGeneral {
 
 		foreach ($db->fetch($query->getSql(), $query->getParams()) as $row) {
 			if ($options['countOutput']) {
-				return (string) $row['rowscount'];
+				if ($real_count_output) {
+					return (string) $row['rowscount'];
+				}
+
+				$count = $row['rowscount'];
+
+				if ($options['limit'] !== null) {
+					$count = min($options['limit'], $count);
+				}
+
+				return array_fill(0, $count, []);
 			}
 
-			$db_logs[] = self::fixRowForClickHouse($row, self::CLICKHOUSE_FIELDS);
+			$db_logs[] = self::translateRowForClickHouse($row, self::CLICKHOUSE_FIELDS);
 		}
 
 		return $db_logs;

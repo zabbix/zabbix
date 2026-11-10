@@ -63,56 +63,93 @@ function graph_item_drawtype2str($drawtype) {
 	}
 }
 
-function getGraphDims($graphid = null) {
+function getGraphDims($graphid = null, array $itemids = [], ?int $outer_width = null) {
 	$graphDims = [];
 
 	$graphDims['shiftYtop'] = CGraphDraw::DEFAULT_HEADER_PADDING_TOP;
+
+	$side_units = [GRAPH_YAXIS_SIDE_LEFT => [], GRAPH_YAXIS_SIDE_RIGHT => []];
+
 	if (is_null($graphid)) {
 		$graphDims['graphHeight'] = 200;
 		$graphDims['graphtype'] = 0;
 
-		if (GRAPH_YAXIS_SIDE_DEFAULT == 0) {
-			$graphDims['shiftXleft'] = 85;
-			$graphDims['shiftXright'] = 30;
+		$units = [];
+
+		if ($itemids) {
+			$items = API::Item()->get([
+				'output' => ['units'],
+				'itemids' => $itemids,
+				'webitems' => true
+			]);
+
+			foreach ($items as $item) {
+				$units[] = CGraphHelper::splitUnits($item['units'])[0];
+			}
 		}
-		else {
-			$graphDims['shiftXleft'] = 30;
-			$graphDims['shiftXright'] = 85;
-		}
 
-		return $graphDims;
-	}
-
-	// Select graph's type and height as well as which Y axes are used by graph items.
-	$dbGraphs = DBselect(
-		'SELECT MAX(g.graphtype) AS graphtype,MIN(gi.yaxisside) AS yaxissidel,MAX(gi.yaxisside) AS yaxissider,MAX(g.height) AS height'.
-		' FROM graphs g,graphs_items gi'.
-		' WHERE g.graphid='.zbx_dbstr($graphid).
-			' AND gi.graphid=g.graphid'
-	);
-	if ($graph = DBfetch($dbGraphs)) {
-		$yaxis = $graph['yaxissider'];
-		$yaxis = ($graph['yaxissidel'] == $yaxis) ? $yaxis : 2;
-
-		$graphDims['yaxis'] = $yaxis;
-		$graphDims['graphtype'] = $graph['graphtype'];
-		$graphDims['graphHeight'] = (int) $graph['height'];
-	}
-
-	if ($yaxis == 2) {
-		$graphDims['shiftXleft'] = 85;
-		$graphDims['shiftXright'] = 85;
-	}
-	elseif ($yaxis == 0) {
-		$graphDims['shiftXleft'] = 85;
-		$graphDims['shiftXright'] = 30;
+		$side_units[GRAPH_YAXIS_SIDE_DEFAULT] = $units ?: [''];
 	}
 	else {
-		$graphDims['shiftXleft'] = 30;
-		$graphDims['shiftXright'] = 85;
+		$graphDims['graphtype'] = 0;
+		$graphDims['graphHeight'] = 0;
+
+		// Select graph's type and height as well as which Y axes are used by graph items, and their units.
+		$dbGraphs = DBselect(
+			'SELECT g.graphtype,g.height,gi.yaxisside,i.units'.
+			' FROM graphs g,graphs_items gi,items i'.
+			' WHERE g.graphid='.zbx_dbstr($graphid).
+				' AND gi.graphid=g.graphid'.
+				' AND i.itemid=gi.itemid'
+		);
+
+		while ($graph = DBfetch($dbGraphs)) {
+			$graphDims['graphtype'] = max($graphDims['graphtype'], (int) $graph['graphtype']);
+			$graphDims['graphHeight'] = max($graphDims['graphHeight'], (int) $graph['height']);
+
+			$side_units[$graph['yaxisside']][] = CGraphHelper::splitUnits($graph['units'])[0];
+		}
+
+		if ($graphDims['graphHeight'] == 0) {
+			$graphDims['graphHeight'] = 200;
+		}
+
+		if (!$side_units[GRAPH_YAXIS_SIDE_LEFT] && !$side_units[GRAPH_YAXIS_SIDE_RIGHT]) {
+			$side_units[GRAPH_YAXIS_SIDE_LEFT] = [''];
+		}
+
+		$graphDims['yaxis'] = $side_units[GRAPH_YAXIS_SIDE_LEFT] && $side_units[GRAPH_YAXIS_SIDE_RIGHT]
+			? 2
+			: ($side_units[GRAPH_YAXIS_SIDE_RIGHT] ? GRAPH_YAXIS_SIDE_RIGHT : GRAPH_YAXIS_SIDE_LEFT);
 	}
 
-	$graphDims['graphHeight'] = min($graphDims['graphHeight'] + 1, 65535);
+	$shown = [
+		GRAPH_YAXIS_SIDE_LEFT => (bool) $side_units[GRAPH_YAXIS_SIDE_LEFT],
+		GRAPH_YAXIS_SIDE_RIGHT => (bool) $side_units[GRAPH_YAXIS_SIDE_RIGHT]
+	];
+
+	$shift = [];
+
+	foreach ($side_units as $side => $units) {
+		$shift[$side] = $shown[$side]
+			? CLineGraphDraw::getYAxisWidth(CLineGraphDraw::getYAxisDisplayUnits($units))
+			: CLineGraphDraw::NO_YAXIS_WIDTH;
+	}
+
+	if ($outer_width !== null) {
+		[$shift[GRAPH_YAXIS_SIDE_LEFT], $shift[GRAPH_YAXIS_SIDE_RIGHT]] = CLineGraphDraw::fitYAxisWidths(
+			$shift[GRAPH_YAXIS_SIDE_LEFT], $shown[GRAPH_YAXIS_SIDE_LEFT],
+			$shift[GRAPH_YAXIS_SIDE_RIGHT], $shown[GRAPH_YAXIS_SIDE_RIGHT],
+			$outer_width
+		);
+	}
+
+	$graphDims['shiftXleft'] = $shift[GRAPH_YAXIS_SIDE_LEFT];
+	$graphDims['shiftXright'] = $shift[GRAPH_YAXIS_SIDE_RIGHT];
+
+	if ($graphid !== null) {
+		$graphDims['graphHeight'] = min($graphDims['graphHeight'] + 1, 65535);
+	}
 
 	return $graphDims;
 }
@@ -1096,17 +1133,16 @@ function calculateLogarithmicGraphScaleExtremes(float $min, float $max, ?float $
  *
  * @param float  $min             Minimum extreme of the scale.
  * @param float  $max             Maximum extreme of the scale.
- * @param bool   $min_calculated  Is minimum extreme of the scale calculated?
- * @param bool   $max_calculated  Is maximum extreme of the scale calculated?
  * @param float  $interval        Scale interval.
  * @param string $units           Scale units.
  * @param int    $power           Scale power.
  * @param int    $precision_max   Maximum precision to use for the scale.
+ * @param bool   $unsigned        Modify negative scale values to positive.
  *
  * @return array
  */
-function calculateGraphScaleValues(float $min, float $max, bool $min_calculated, bool $max_calculated, float $interval,
-		string $units, int $power, int $precision_max): array {
+function calculateGraphScaleValues(float $min, float $max, float $interval, string $units, int $power,
+		int $precision_max, bool $unsigned): array {
 	$rows = [];
 
 	$clearance = 0.5;
@@ -1164,7 +1200,7 @@ function calculateGraphScaleValues(float $min, float $max, bool $min_calculated,
 	$scale_values[] = [
 		'relative_pos' => 0,
 		'value' => convertUnits([
-			'value' => $min
+			'value' => $unsigned ? abs($min) : $min
 		] + $options)
 	];
 
@@ -1174,7 +1210,7 @@ function calculateGraphScaleValues(float $min, float $max, bool $min_calculated,
 				? ($value / 10 - $min / 10) / ($max / 10 - $min / 10)
 				: ($value - $min) / ($max - $min),
 			'value' => convertUnits([
-				'value' => $value
+				'value' => $unsigned ? abs($value) : $value
 			] + $options)
 		];
 	}
@@ -1182,7 +1218,7 @@ function calculateGraphScaleValues(float $min, float $max, bool $min_calculated,
 	$scale_values[] = [
 		'relative_pos' => 1,
 		'value' => convertUnits([
-			'value' => $max
+			'value' => $unsigned ? abs($max) : $max
 		] + $options)
 	];
 
@@ -1201,17 +1237,17 @@ function calculateGraphScaleValues(float $min, float $max, bool $min_calculated,
  * @param bool       $max_calculated     Is maximum extreme of the scale calculated?
  * @param int        $interval           Scale interval.
  * @param string     $units              Scale units.
- * @param bool       $is_binary          Is the scale binary (use 1024 base for units)?
  * @param int        $precision_max      Maximum precision to use for the scale.
  * @param float|null $lower_power_shift  Scale bottom positive power shift extreme.
  * @param float|null $upper_power_shift  Scale top positive power shift extreme.
+ * @param bool       $unsigned           Modify negative scale values to positive.
  *
  * @return array
  */
 function calculateLogarithmicGraphScaleValues(?float $min_negative_power, ?float $max_negative_power,
 		?float $min_positive_power, ?float $max_positive_power, bool $has_zero, bool $min_calculated,
 		bool $max_calculated, int $interval, string $units, int $precision_max, ?float $lower_power_shift,
-		?float $upper_power_shift): array {
+		?float $upper_power_shift, bool $unsigned): array {
 	$rows = [];
 
 	$start_index = 0;
@@ -1226,9 +1262,15 @@ function calculateLogarithmicGraphScaleValues(?float $min_negative_power, ?float
 		$min_position = -1 * ($max_negative_power - $min_negative_power);
 
 		if ($lower_power_shift > 0) {
+			$value = -10 ** $max_negative_power;
+
+			if ($unsigned) {
+				$value = abs($value);
+			}
+
 			$rows[] = [
 				'log_value' => -1 * ($max_negative_power - $min_negative_power),
-				'value' => -10 ** $max_negative_power
+				'value' => $value
 			];
 
 			$start_index++;
@@ -1256,17 +1298,29 @@ function calculateLogarithmicGraphScaleValues(?float $min_negative_power, ?float
 					break;
 				}
 
+				$value = -10 ** $log_value;
+
+				if ($unsigned) {
+					$value = abs($value);
+				}
+
 				$rows[] = [
 					'log_value' => -1 * ($log_value - $min_negative_power),
-					'value' => -10 ** $log_value
+					'value' => $value
 				];
 			}
 		}
 
 		if ($upper_power_shift > 0 && !$has_zero) {
+			$value = -10 ** $min_negative_power;
+
+			if ($unsigned) {
+				$value = abs($value);
+			}
+
 			$rows[] = [
 				'log_value' => 1,
-				'value' => -10 ** $min_negative_power
+				'value' => $value
 			];
 		}
 	}

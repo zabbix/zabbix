@@ -20,7 +20,6 @@
 #include "zbxcommon.h"
 #include "vps_monitor.h"
 #include "zbxalgo.h"
-#include "zbxtime.h"
 #include "zbxversion.h"
 #include "zbxvault.h"
 #include "zbx_trigger_constants.h"
@@ -252,7 +251,6 @@ typedef struct
 	const char	*lookback_limit;
 	const char	*granularity;
 	time_t		lasttimestamp;
-	zbx_timespec_t	min_free_ts;
 }
 ZBX_DC_TQITEM;
 
@@ -551,6 +549,8 @@ typedef struct
 	zbx_config_item_type_timeouts_t	item_timeouts;
 
 	int				pending_history;
+
+	const char			*apm;
 }
 ZBX_DC_PROXY;
 

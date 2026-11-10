@@ -46,6 +46,9 @@ class CDocHelper {
 	const ALERTS_MEDIATYPE_LIST =								'web_interface/frontend_sections/alerts/mediatypes';
 	const ALERTS_SCRIPT_EDIT =									'web_interface/frontend_sections/alerts/scripts#configuring-a-global-script';
 	const ALERTS_SCRIPT_LIST =									'web_interface/frontend_sections/alerts/scripts';
+	const APM_TRACE_VIEW =										'web_interface/frontend_sections/apm/traces';
+	const APM_METRIC_VIEW =										'web_interface/frontend_sections/apm/metrics';
+	const APM_LOG_VIEW =										'web_interface/frontend_sections/apm/logs';
 	const CONFIGURATION_DASHBOARDS_EDIT =						'web_interface/frontend_sections/dashboards#creating-a-dashboard';
 	const CONFIGURATION_DASHBOARDS_LIST =						'web_interface/frontend_sections/monitoring/hosts/dashboards';
 	const DASHBOARDS_LIST =										'web_interface/frontend_sections/dashboards';

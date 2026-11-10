@@ -64,6 +64,24 @@ class testSidebarMenu extends CWebTest {
 			],
 			[
 				[
+					'section' => 'APM',
+					'page' => 'Traces'
+				]
+			],
+			[
+				[
+					'section' => 'APM',
+					'page' => 'Metrics'
+				]
+			],
+			[
+				[
+					'section' => 'APM',
+					'page' => 'Logs'
+				]
+			],
+			[
+				[
 					'section' => 'Services',
 					'page' => 'Services'
 				]
@@ -438,7 +456,7 @@ class testSidebarMenu extends CWebTest {
 			[
 				[
 					'section' => 'Help',
-					'link' => 'https://www.zabbix.com/documentation/'.ZABBIX_EXPORT_VERSION.'/en/manual'
+					'link' => 'https://www.zabbix.com/documentation/'.ZABBIX_MAJOR_VERSION.'/en/manual'
 				]
 			],
 			[

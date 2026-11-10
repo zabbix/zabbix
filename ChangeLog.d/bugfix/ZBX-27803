@@ -1,1 +1,0 @@
-A......... [ZBX-27803] implemented collecting history.get results by sub-periods when limit parameter is given to avoid full table scans (jfreibergs)

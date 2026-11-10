@@ -152,6 +152,7 @@ int	zbx_get_sync_in_progress(void)
 #define ZBX_TRIGGER_POLL_INTERVAL		(SEC_PER_MIN * 10)
 
 #define ZBX_STATUS_LIFETIME		SEC_PER_MIN
+#define ZBX_TRIGGER_TIMER_DELAY		30
 
 /* shorthand macro for calling zbx_in_maintenance_without_data_collection() */
 #define DCin_maintenance_without_data_collection(dc_host, dc_item)			\
@@ -1374,6 +1375,7 @@ static void	DCsync_proxy_remove(ZBX_DC_PROXY *proxy)
 		proxy->location = ZBX_LOC_NOWHERE;
 	}
 
+	dc_strpool_release(proxy->apm);
 	dc_strpool_release(proxy->allowed_addresses);
 	dc_strpool_release(proxy->address);
 	dc_strpool_release(proxy->port);
@@ -3197,8 +3199,6 @@ static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *o
 						sizeof(ZBX_DC_TQITEM));
 
 				item->itemtype.tqitem->lasttimestamp = 0;
-				item->itemtype.tqitem->min_free_ts.sec = 0;
-				item->itemtype.tqitem->min_free_ts.ns = 0;
 			}
 
 			dc_strpool_replace(found, &item->itemtype.tqitem->query, row[50]);
@@ -4296,7 +4296,6 @@ out:
 static time_t	dc_function_calculate_nextcheck(const zbx_dc_um_handle_t *um_handle, const zbx_trigger_timer_t *timer,
 		time_t from, zbx_uint64_t seed)
 {
-#define ZBX_TRIGGER_TIMER_DELAY	30
 	if (ZBX_TRIGGER_TIMER_FUNCTION_TIME == timer->type || ZBX_TRIGGER_TIMER_TRIGGER == timer->type)
 	{
 		int	nextcheck;
@@ -4329,7 +4328,6 @@ static time_t	dc_function_calculate_nextcheck(const zbx_dc_um_handle_t *um_handl
 	THIS_SHOULD_NEVER_HAPPEN;
 
 	return 0;
-#undef ZBX_TRIGGER_TIMER_DELAY
 }
 
 /******************************************************************************
@@ -4423,11 +4421,11 @@ static void	dc_trigger_timer_free(zbx_trigger_timer_t *timer)
  *                                                                            *
  * Purpose: schedule trigger timer to be executed at the specified time       *
  *                                                                            *
- * Parameter: timer   - [IN] the timer to schedule                            *
+ * Parameter: timer   - [IN] timer to schedule                                *
  *            now     - [IN] current time                                     *
  *            eval_ts - [IN] the history snapshot time, by default (NULL)     *
  *                           execution time will be used.                     *
- *            exec_ts - [IN] the tiemer execution time                        *
+ *            exec_ts - [IN] timer execution time                             *
  *                                                                            *
  ******************************************************************************/
 static void	dc_schedule_trigger_timer(zbx_trigger_timer_t *timer, int now, const zbx_timespec_t *eval_ts,
@@ -4478,9 +4476,6 @@ static void	dc_update_function_timer(ZBX_DC_FUNCTION *function, zbx_hashset_t *t
 		return;
 
 	if (NULL == (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &function->triggerid)))
-		return;
-
-	if (TRIGGER_STATUS_ENABLED != trigger->status || TRIGGER_FUNCTIONAL_TRUE != trigger->functional)
 		return;
 
 	if (NULL == (timer = dc_trigger_function_timer_create(function, now)))
@@ -7356,6 +7351,8 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 		proxy->mode = mode;
 		proxy->proxy_groupid = proxy_groupid;
 
+		dc_strpool_replace(found, &proxy->apm, row[28]);
+
 		proxy->revision = revision;
 	}
 
@@ -7528,7 +7525,8 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 			maintenance_trigger_sync, hgroup_host_sync, drules_sync, dchecks_sync, httptest_sync,
 			httptest_field_sync, httpstep_sync, httpstep_field_sync, autoreg_host_sync, connector_sync,
 			connector_tag_sync, proxy_sync, proxy_group_sync, hp_sync, autoreg_config_sync,
-			cep_rule_sync, cep_condition_sync, cep_window_sync, cep_operation_sync, cep_op_condition_sync;
+			cep_rule_sync, cep_condition_sync, cep_window_sync, cep_operation_sync, cep_op_condition_sync,
+			cep_op_scope_condition_sync;
 	zbx_uint64_t	update_flags = 0;
 	zbx_int64_t	used_size, update_size = 0, topology_size = 0, timers_size = 0, um_cache_dup_size = 0;
 	unsigned char	changelog_sync_mode = mode;	/* sync mode for objects using incremental sync */
@@ -7610,6 +7608,8 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 	zbx_dbsync_init_changelog(&cep_window_sync, "cep_window", changelog_sync_mode, db);
 	zbx_dbsync_init_changelog(&cep_operation_sync, "cep_operation", changelog_sync_mode, db);
 	zbx_dbsync_init_changelog(&cep_op_condition_sync, "cep_operation_condition", changelog_sync_mode, db);
+	zbx_dbsync_init_changelog(&cep_op_scope_condition_sync, "cep_operation_scope_condition", changelog_sync_mode,
+			db);
 
 	/* Action operation sync produces virtual rows with two columns - actionid, opflags. */
 	/* Because of this it cannot return the original database select and must always be  */
@@ -7907,8 +7907,11 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 	if (FAIL == zbx_dbsync_prepare_cep_operation_condition(&cep_op_condition_sync))
 		goto out;
 
+	if (FAIL == zbx_dbsync_prepare_cep_operation_scope_condition(&cep_op_scope_condition_sync))
+		goto out;
+
 	cep_config_sync(&cep_rule_sync, &cep_condition_sync, &cep_window_sync, &cep_operation_sync,
-			&cep_op_condition_sync, new_revision);
+			&cep_op_condition_sync, &cep_op_scope_condition_sync, new_revision);
 
 	START_SYNC;
 
@@ -8273,6 +8276,7 @@ clean:
 	zbx_dbsync_clear(&cep_window_sync);
 	zbx_dbsync_clear(&cep_operation_sync);
 	zbx_dbsync_clear(&cep_op_condition_sync);
+	zbx_dbsync_clear(&cep_op_scope_condition_sync);
 
 	if (ZBX_DBSYNC_INIT == mode)
 		zbx_hashset_destroy(&trend_queue);
@@ -9851,7 +9855,6 @@ static void	DCget_telemetry_query_item(zbx_dc_telemetry_query_item_t *dst_item, 
 	zbx_strscpy(dst_item->granularity_orig, src_item->itemtype.tqitem->granularity);
 	dst_item->telemetry_query = NULL;
 	dst_item->lasttimestamp = src_item->itemtype.tqitem->lasttimestamp;
-	dst_item->min_free_ts = src_item->itemtype.tqitem->min_free_ts;
 }
 
 void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num)
@@ -10927,32 +10930,42 @@ void	zbx_dc_get_triggers_by_timers(zbx_hashset_t *trigger_info, zbx_vector_dc_tr
 	UNLOCK_CACHE;
 }
 
+typedef enum
+{
+	TRIGGER_TIMER_STATE_OK,		/* timer is valid, but trigger might not be functional */
+	TRIGGER_TIMER_STATE_INVALID	/* timer is based on invalid data and must be removed  */
+}
+zbx_trigger_timer_state_t;
+
 /******************************************************************************
  *                                                                            *
  * Purpose: validate trigger timer                                            *
  *                                                                            *
  * Parameters: timer      - [IN] trigger timer                                *
  *             dc_trigger - [OUT] the trigger data                            *
+ *             state      - [OUT] timer state                                 *
+ *                                  OK - keep scheduling                      *
+ *                                  INVALID - remove timer                    *
  *                                                                            *
  * Return value: SUCCEED - the timer is valid                                 *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	trigger_timer_validate(zbx_trigger_timer_t *timer, ZBX_DC_TRIGGER **dc_trigger)
+static int	trigger_timer_validate(zbx_trigger_timer_t *timer, ZBX_DC_TRIGGER **dc_trigger,
+		zbx_trigger_timer_state_t *state)
 {
-	ZBX_DC_FUNCTION		*dc_function;
+	*state = TRIGGER_TIMER_STATE_INVALID;
 
 	*dc_trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &timer->triggerid);
 
 	if (0 != (timer->type & ZBX_TRIGGER_TIMER_FUNCTION))
 	{
+		ZBX_DC_FUNCTION	*dc_function;
+
 		if (NULL == (dc_function = (ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions, &timer->objectid)))
 			return FAIL;
 
-		if (dc_function->revision > timer->revision ||
-				NULL == *dc_trigger ||
-				TRIGGER_STATUS_ENABLED != (*dc_trigger)->status ||
-				TRIGGER_FUNCTIONAL_TRUE != (*dc_trigger)->functional)
+		if (dc_function->revision > timer->revision || NULL == *dc_trigger)
 		{
 			if (dc_function->timer_revision == timer->revision)
 				dc_function->timer_revision = 0;
@@ -10964,15 +10977,20 @@ static int	trigger_timer_validate(zbx_trigger_timer_t *timer, ZBX_DC_TRIGGER **d
 		if (NULL == (*dc_trigger))
 			return FAIL;
 
-		if ((*dc_trigger)->revision > timer->revision ||
-				TRIGGER_STATUS_ENABLED != (*dc_trigger)->status ||
-				TRIGGER_FUNCTIONAL_TRUE != (*dc_trigger)->functional)
+		if ((*dc_trigger)->revision > timer->revision)
 		{
 			if ((*dc_trigger)->timer_revision == timer->revision)
 				(*dc_trigger)->timer_revision = 0;
 			return FAIL;
 		}
 	}
+
+	*state = TRIGGER_TIMER_STATE_OK;
+
+	/* keep timers of disabled and non functional triggers scheduled - */
+	/* their state can change indirectly, e.g. when an item is enabled */
+	if (TRIGGER_STATUS_ENABLED != (*dc_trigger)->status || TRIGGER_FUNCTIONAL_TRUE != (*dc_trigger)->functional)
+		return FAIL;
 
 	return SUCCEED;
 }
@@ -11047,7 +11065,8 @@ void	zbx_dc_get_trigger_timers(zbx_vector_trigger_timer_ptr_t *timers, int now, 
 
 	while (SUCCEED != zbx_binary_heap_empty(&config->trigger_queue) && timers->values_num < hard_limit)
 	{
-		ZBX_DC_TRIGGER	*dc_trigger;
+		ZBX_DC_TRIGGER			*dc_trigger;
+		zbx_trigger_timer_state_t	timer_state;
 
 		elem = zbx_binary_heap_find_min(&config->trigger_queue);
 		timer = (zbx_trigger_timer_t *)elem->data;
@@ -11070,9 +11089,19 @@ void	zbx_dc_get_trigger_timers(zbx_vector_trigger_timer_ptr_t *timers, int now, 
 
 		zbx_binary_heap_remove_min(&config->trigger_queue);
 
-		if (SUCCEED != trigger_timer_validate(timer, &dc_trigger))
+		if (SUCCEED != trigger_timer_validate(timer, &dc_trigger, &timer_state))
 		{
-			dc_remove_invalid_timer(timer);
+			if (TRIGGER_TIMER_STATE_INVALID == timer_state)
+			{
+				dc_remove_invalid_timer(timer);
+			}
+			else
+			{
+				zbx_timespec_t	ts = {.sec = now + ZBX_TRIGGER_TIMER_DELAY, .ns = 0};
+
+				dc_schedule_trigger_timer(timer, now, NULL, &ts);
+			}
+
 			continue;
 		}
 
@@ -11785,20 +11814,50 @@ out:
 	return num;
 }
 
-void	zbx_dc_config_get_apm_db_config(zbx_apm_db_config_t *out, const zbx_apm_db_config_t *local_apm_db_config,
-		const char *config_source_ip, const char *config_ssl_ca_location)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get APM database configuration                                    *
+ *                                                                            *
+ * Parameters: out                    - [OUT] APM database configuration      *
+ *             local_apm_db_config    - [IN] local configuration, used        *
+ *                                           instead of global configuration  *
+ *                                           when enabled (optional)          *
+ *             config_source_ip       - [IN] source IP (optional)             *
+ *             config_ssl_ca_location - [IN] SSL CA location (optional)       *
+ *             revision               - [IN/OUT] revision of the last         *
+ *                                           retrieved global configuration,  *
+ *                                           updated on retrieval (optional)  *
+ *                                                                            *
+ * Return value: SUCCEED - configuration was retrieved                        *
+ *               FAIL    - global configuration has not changed since the     *
+ *                         specified revision, out is left empty              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_config_get_apm_db_config(zbx_apm_db_config_t *out, const zbx_apm_db_config_t *local_apm_db_config,
+		const char *config_source_ip, const char *config_ssl_ca_location, zbx_uint64_t *revision)
 {
 	const zbx_config_apm_global_db_t	*global_config;
 
-	if (0 != local_apm_db_config->status)
+	if (NULL != local_apm_db_config && 0 != local_apm_db_config->status)
 	{
 		zbx_apm_db_config_copy(out, local_apm_db_config);
-		return;
+		return SUCCEED;
 	}
 
 	memset(out, 0, sizeof(*out));
 
 	RDLOCK_CACHE;
+
+	if (NULL != revision)
+	{
+		if (*revision >= config->revision.settings_table)
+		{
+			UNLOCK_CACHE;
+			return FAIL;
+		}
+
+		*revision = config->revision.settings_table;
+	}
 
 	global_config = &config->config->apm_global_db;
 
@@ -11807,7 +11866,7 @@ void	zbx_dc_config_get_apm_db_config(zbx_apm_db_config_t *out, const zbx_apm_db_
 	if (0 == out->status)
 	{
 		UNLOCK_CACHE;
-		return;
+		return SUCCEED;
 	}
 
 	out->db_type = ZBX_APM_DB_TYPE_CLICKHOUSE;
@@ -11830,6 +11889,8 @@ void	zbx_dc_config_get_apm_db_config(zbx_apm_db_config_t *out, const zbx_apm_db_
 
 	if (NULL != config_ssl_ca_location)
 		out->ssl_ca_location = zbx_strdup(NULL, config_ssl_ca_location);
+
+	return SUCCEED;
 }
 
 int	zbx_dc_config_poller_type_has_cached_data(unsigned char poller_type)
@@ -12057,8 +12118,6 @@ static void	dc_set_cached_data(ZBX_DC_ITEM *dc_item, const zbx_dc_cached_data_t 
 	{
 		if (0 != (cached_data->upd_flags & ZBX_CACHED_DATA_FLAG_UPDATE_LASTTIMESTAMP))
 			dc_item->itemtype.tqitem->lasttimestamp = cached_data->lasttimestamp;
-		if (0 != (cached_data->upd_flags & ZBX_CACHED_DATA_FLAG_UPDATE_MIN_FREE_TS))
-			dc_item->itemtype.tqitem->min_free_ts = cached_data->min_free_ts;
 	}
 }
 
@@ -12775,6 +12834,16 @@ static void	DCget_proxy(zbx_dc_proxy_t *dst_proxy, const ZBX_DC_PROXY *src_proxy
 
 	dst_proxy->addr = NULL;
 	dst_proxy->port = 0;
+
+	if ('\0' != *src_proxy->apm)
+		dst_proxy->apm = zbx_strdup(NULL, src_proxy->apm);
+	else
+		dst_proxy->apm = NULL;
+}
+
+void	zbx_dc_proxy_clear(zbx_dc_proxy_t *proxy)
+{
+	zbx_free(proxy->apm);
 }
 
 int	zbx_dc_config_get_last_sync_time(void)
@@ -17054,12 +17123,13 @@ int	zbx_dc_httptest_next(time_t now, zbx_uint64_t *httptestid, time_t *nextcheck
 
 /******************************************************************************
  *                                                                            *
- * Purpose: queue httptest to be processed according to the delay             *
+ * Purpose: queue httptest to be processed according to supplied delay and    *
+ *          store that delay as its current delay                             *
  *                                                                            *
- * Parameter: now        - [IN] the current timestamp                         *
- *            httptestid - [IN] the id of httptest to be queued               *
- *            delay      - [IN] the number of seconds between httptest        *
- *                              processing                                    *
+ * Parameters: now        - [IN] current timestamp                            *
+ *             httptestid - [IN] ID of httptest to be queued                  *
+ *             delay      - [IN] number of seconds between httptest           *
+ *                               processing                                   *
  *                                                                            *
  ******************************************************************************/
 void	zbx_dc_httptest_queue(time_t now, zbx_uint64_t httptestid, int delay)
@@ -17071,6 +17141,30 @@ void	zbx_dc_httptest_queue(time_t now, zbx_uint64_t httptestid, int delay)
 	if (NULL != (httptest = (zbx_dc_httptest_t *)zbx_hashset_search(&config->httptests, &httptestid)))
 	{
 		httptest->delay = delay;
+		httptest->nextcheck = dc_calculate_nextcheck(httptest->httptestid, httptest->delay, now);
+		dc_httptest_queue(httptest);
+	}
+
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: queue httptest that could not be processed according to its       *
+ *          current delay                                                     *
+ *                                                                            *
+ * Parameters: now        - [IN] current timestamp                            *
+ *             httptestid - [IN] ID of httptest to be queued                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_httptest_requeue(time_t now, zbx_uint64_t httptestid)
+{
+	zbx_dc_httptest_t	*httptest;
+
+	WRLOCK_CACHE;
+
+	if (NULL != (httptest = (zbx_dc_httptest_t *)zbx_hashset_search(&config->httptests, &httptestid)))
+	{
 		httptest->nextcheck = dc_calculate_nextcheck(httptest->httptestid, httptest->delay, now);
 		dc_httptest_queue(httptest);
 	}
@@ -17556,3 +17650,23 @@ void	zbx_dc_get_trigger_deps_by_triggerid(zbx_uint64_t triggerid, zbx_vector_uin
 
 	UNLOCK_CACHE_CONFIG_HISTORY;
 }
+
+char	*zbx_dc_get_apm_config(char *old_config, zbx_uint64_t *revision)
+{
+	char	*apm_config = old_config;
+
+	RDLOCK_CACHE_CONFIG_HISTORY;
+
+	if (NULL == old_config || *revision < config->revision.settings_table)
+	{
+		if (NULL != dc_local()->apm_config)
+			apm_config = zbx_strdup(apm_config, dc_local()->apm_config);
+
+		*revision = config->revision.settings_table;
+	}
+
+	UNLOCK_CACHE_CONFIG_HISTORY;
+
+	return apm_config;
+}
+

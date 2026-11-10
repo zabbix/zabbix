@@ -1108,8 +1108,8 @@ class testDashboardHostCardWidget extends testWidgets {
 						'Server' => 'Zabbix server'
 					],
 					'Monitoring' => [
-						'Dashboards' => 8,
-						'Latest data' => 291,
+						'Dashboards' => 6,
+						'Latest data' => 302,
 						'Graphs' => 29,
 						'Web' => 1
 					],
@@ -1176,7 +1176,7 @@ class testDashboardHostCardWidget extends testWidgets {
 						'Proxy' => 'Proxy for host card widget'
 					],
 					'Monitoring' => [
-						'Dashboards' => 4,
+						'Dashboards' => 2,
 						'Latest data' => 0,
 						'Graphs' => 8,
 						'Web' => 0
@@ -1237,7 +1237,11 @@ class testDashboardHostCardWidget extends testWidgets {
 					]
 				]
 			],
-			// #3.
+			/**
+			* #3.
+			* Test case depends on items added to host by other tests, so the value differs when the test is run separately
+			* and as a part of the whole test suite.
+			*/
 			[
 				[
 					'Header' => 'Default host card widget',
@@ -1247,8 +1251,8 @@ class testDashboardHostCardWidget extends testWidgets {
 						'Server' => 'Zabbix server'
 					],
 					'Monitoring' => [
-						'Dashboards' => 4,
-						'Latest data' => 125,
+						'Dashboards' => 2,
+						'Latest data' => 130,
 						'Graphs' => 8,
 						'Web' => 0
 					]
@@ -1711,6 +1715,10 @@ class testDashboardHostCardWidget extends testWidgets {
 					'Name' => 'Host card'
 				]
 			],
+			/**
+			* Test case depends on items added to host by other tests, so the value differs when the test is run separately
+			* and as a part of the whole test suite.
+			*/
 			[
 				[
 					'Name' => 'Default host card widget'

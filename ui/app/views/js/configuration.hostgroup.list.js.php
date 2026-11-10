@@ -112,7 +112,7 @@
 						uncheckTableRows('hostgroup');
 					}
 
-					location.href = location.href;
+					location.reload();
 				})
 				.catch(() => {
 					const title = <?= json_encode(_('Unexpected server error.')) ?>;

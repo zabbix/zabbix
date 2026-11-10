@@ -182,6 +182,8 @@ class TabIndicatorFactory {
 	 */
 	static createTabIndicator(name) {
 		switch (name) {
+			case 'ApmFilter':
+				return new ApmFilterTabIndicatorItem;
 			case 'ChildServices':
 				return new ChildServicesTabIndicatorItem;
 			case 'Dependency':
@@ -252,6 +254,8 @@ class TabIndicatorFactory {
 				return new PreprocessingTabIndicatorItem;
 			case 'ProxyEncryption':
 				return new ProxyEncryptionTabIndicatorItem;
+			case 'ProxyApm':
+				return new ProxyApmTabIndicatorItem;
 			case 'ProxyTimeouts':
 				return new ProxyTimeoutsTabIndicatorItem;
 			case 'Saml':
@@ -816,6 +820,25 @@ class ProxyEncryptionTabIndicatorItem extends TabIndicatorItem {
 	}
 }
 
+class ProxyApmTabIndicatorItem extends TabIndicatorItem {
+
+	#data_collection_status;
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+
+		this.#data_collection_status = document.querySelector('[name="data_collection_status"]');
+	}
+
+	getValue() {
+		return this.#data_collection_status?.checked ?? false;
+	}
+
+	initObserver(element) {
+		this.#data_collection_status?.addEventListener('change', () => this.addAttributes());
+	}
+}
+
 class ProxyTimeoutsTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
@@ -952,13 +975,13 @@ class FiltersTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return [...document.querySelectorAll('#conditions tbody .form_row > td > z-textarea-flexible.js-macro')]
+		return [...document.querySelectorAll('#filters_conditions tbody .form_row > td > z-textarea-flexible.js-macro')]
 			.filter(el => el.value !== '')
 			.length;
 	}
 
 	initObserver() {
-		const target_node = document.querySelector('#conditions');
+		const target_node = document.querySelector('#filters_conditions');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
@@ -1433,6 +1456,12 @@ class GraphAxesTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		for (const checkbox of document.querySelectorAll('#lefty, #righty, #axisx')) {
 			if (!checkbox.checked) {
+				return true;
+			}
+		}
+
+		for (const checkbox of document.querySelectorAll('#lefty_unsigned, #righty_unsigned')) {
+			if (checkbox.checked) {
 				return true;
 			}
 		}
@@ -2108,5 +2137,31 @@ class ScatterPlotThresholdsTabIndicatorItem extends TabIndicatorItem {
 		document.getElementById('tabs').addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
 			this.addAttributes();
 		});
+	}
+}
+
+class ApmFilterTabIndicatorItem extends TabIndicatorItem {
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		return document.querySelectorAll('#apm_filter_tab .attributes-table tbody tr.form_row').length > 0;
+	}
+
+	initObserver() {
+		const target_node = document.getElementById('apm_filter_tab');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => this.addAttributes());
+
+			observer.observe(target_node, {
+				childList: true,
+				attributes: true,
+				attributeFilter: ['value', 'style'],
+				subtree: true
+			});
+		}
 	}
 }

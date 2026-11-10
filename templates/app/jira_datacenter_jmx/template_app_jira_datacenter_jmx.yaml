@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '8.0'
+  version: '8.2'
   template_groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -17,7 +17,7 @@ zabbix_export:
         
         Setup:
           Metrics are collected by JMX.
-          0. Deploy the Zabbix Java Gateway component ([instructions](https://www.zabbix.com/documentation/8.0/manual/concepts/java)).
+          0. Deploy the Zabbix Java Gateway component ([instructions](https://www.zabbix.com/documentation/8.2/manual/concepts/java)).
           1. Enable and configure JMX access to Jira Data Center. See documentation for [instructions](https://confluence.atlassian.com/adminjiraserver/live-monitoring-using-the-jmx-interface-939707304.html).
           2. Assign the "Jira Data Center by JMX" template to the host with a JMX interface.
           2. If your Jira installation requires authentication for JMX, set the values in the host macros `{$JMX.USERNAME}` and `{$JMX.PASSWORD}`.
@@ -42,7 +42,7 @@ zabbix_export:
         ## Setup
         
         Metrics are collected by JMX.
-        0. Deploy the Zabbix Java Gateway component ([instructions](https://www.zabbix.com/documentation/8.0/manual/concepts/java)).
+        0. Deploy the Zabbix Java Gateway component ([instructions](https://www.zabbix.com/documentation/8.2/manual/concepts/java)).
         1. Enable and configure JMX access to Jira Data Center. See documentation for [instructions](https://confluence.atlassian.com/adminjiraserver/live-monitoring-using-the-jmx-interface-939707304.html).
         2. Assign the "Jira Data Center by JMX" template to the host with a JMX interface.
         2. If your Jira installation requires authentication for JMX, set the values in the host wizard configuration fields `JMX user` and `JMX password`.
@@ -51,7 +51,7 @@ zabbix_export:
         5. (Optional) Assign the "Apache Tomcat by JMX" template for web server monitoring.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.2-0
       groups:
         - name: Templates/Applications
       items:

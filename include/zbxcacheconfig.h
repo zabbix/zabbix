@@ -18,6 +18,7 @@
 #include "zbxdbhigh.h"
 #include "zbxcomms.h"
 #include "zbxeval.h"
+#include "zbxexpr.h"
 #include "zbxavailability.h"
 #include "zbxtelemetry.h"
 #include "zbxtime.h"
@@ -329,7 +330,6 @@ typedef struct
 	int			granularity;
 	zbx_tq_query_t		*telemetry_query;
 	time_t			lasttimestamp;
-	zbx_timespec_t		min_free_ts;
 	unsigned char		preprocessing;
 }
 zbx_dc_telemetry_query_item_t;
@@ -346,13 +346,11 @@ typedef union
 zbx_dc_poller_item_t;
 
 #define ZBX_CACHED_DATA_FLAG_UPDATE_LASTTIMESTAMP	__UINT64_C(0x0001)
-#define ZBX_CACHED_DATA_FLAG_UPDATE_MIN_FREE_TS		__UINT64_C(0x0002)
 
 typedef struct
 {
 	zbx_uint64_t	upd_flags;
 	time_t		lasttimestamp;
-	zbx_timespec_t	min_free_ts;
 }
 zbx_dc_cached_data_t;
 
@@ -538,6 +536,8 @@ typedef struct
 	time_t				last_version_error_time;
 
 	int				pending_history;
+
+	char				*apm;
 }
 zbx_dc_proxy_t;
 
@@ -1066,8 +1066,8 @@ void	zbx_dc_config_update_autoreg_host(const char *host, const char *listen_ip, 
 		unsigned int connection_type, int now);
 void	zbx_dc_config_delete_autoreg_host(const zbx_vector_str_t *autoreg_hosts);
 
-void	zbx_dc_config_get_apm_db_config(zbx_apm_db_config_t *out, const zbx_apm_db_config_t *local_apm_db_config,
-		const char *config_source_ip, const char *config_ssl_ca_location);
+int	zbx_dc_config_get_apm_db_config(zbx_apm_db_config_t *out, const zbx_apm_db_config_t *local_apm_db_config,
+		const char *config_source_ip, const char *config_ssl_ca_location, zbx_uint64_t *revision);
 
 int	zbx_dc_config_poller_type_has_cached_data(unsigned char poller_type);
 void	zbx_dc_config_cached_data_init(zbx_dc_cached_data_t *cached_data);
@@ -1114,6 +1114,8 @@ void	*zbx_dc_config_get_stats(int request);
 int	zbx_dc_config_get_last_sync_time(void);
 int	zbx_dc_config_get_proxypoller_hosts(zbx_dc_proxy_t *proxies, int max_hosts);
 int	zbx_dc_config_get_proxypoller_nextcheck(void);
+
+void	zbx_dc_proxy_clear(zbx_dc_proxy_t *proxy);
 
 #define ZBX_PROXY_CONFIG_NEXTCHECK	0x01
 #define ZBX_PROXY_DATA_NEXTCHECK	0x02
@@ -1489,6 +1491,7 @@ int	zbx_dc_drule_revisions_get(zbx_uint64_t *rev_last, zbx_vector_uint64_pair_t 
 
 int	zbx_dc_httptest_next(time_t now, zbx_uint64_t *httptestid, time_t *nextcheck);
 void	zbx_dc_httptest_queue(time_t now, zbx_uint64_t httptestid, int delay);
+void	zbx_dc_httptest_requeue(time_t now, zbx_uint64_t httptestid);
 
 void	zbx_dc_get_upstream_revision(zbx_uint64_t *config_revision, zbx_uint64_t *hostmap_revision);
 void	zbx_dc_set_upstream_revision(zbx_uint64_t config_revision, zbx_uint64_t hostmap_revision);
@@ -1794,13 +1797,17 @@ void	zbx_dc_config_local_release(void);
 void	zbx_dc_local_set_itservices_num(int num);
 int	zbx_dc_local_get_itservices_num(void);
 
-
 typedef struct zbx_correlation_config_handle *	zbx_correlation_config_handle_t;
 
 zbx_correlation_config_handle_t	zbx_correlation_config_open(void);
 void	zbx_correlation_config_close(zbx_correlation_config_handle_t handle);
 
 zbx_vector_correlation_ptr_t	*zbx_correlation_config_get_correlations(zbx_correlation_config_handle_t handle);
+
+/* APM */
+#define ZBX_SETTINGS_APM		"apm"
+
+char	*zbx_dc_get_apm_config(char *old_config, zbx_uint64_t *revision);
 
 /* CEP */
 
@@ -1834,6 +1841,11 @@ zbx_vector_correlation_ptr_t	*zbx_correlation_config_get_correlations(zbx_correl
 #define ZBX_CEP_WHEN_EVENT_EVICTED	2
 #define ZBX_CEP_WHEN_WINDOW_CLOSED	3
 #define ZBX_CEP_WHEN_PATTERN_MATCH	4
+#define ZBX_CEP_WHEN_EVENT_CLOSED	5
+
+#define ZBX_CEP_SCOPE_CURRENT		0
+#define ZBX_CEP_SCOPE_OTHERS		1
+#define ZBX_CEP_SCOPE_ALL		2
 
 typedef struct
 {
@@ -1914,18 +1926,27 @@ zbx_cep_op_args_t;
 
 typedef struct
 {
+	int				evaltype;
+	char				*formula;
+	zbx_vector_cep_op_condition_t	conditions;
+}
+zbx_cep_op_filter_t;
+
+typedef struct
+{
 	zbx_uint64_t			operationid;
 	int				type;
 	int				execute_when;
-	int				evaltype;
+	zbx_cep_op_filter_t		execute_filter;
+	int				scope;
+	zbx_cep_op_filter_t		scope_filter;
 	int				sortorder;
 	zbx_cep_op_args_t		args;
-	zbx_vector_cep_op_condition_t	conditions;
-	char				*formula;
 }
 zbx_cep_operation_t;
 
 ZBX_VECTOR_DECL(cep_operation, zbx_cep_operation_t)
+ZBX_CONST_PTR_VECTOR_LITE_DECL(const_cep_operation_ptr, const zbx_cep_operation_t *)
 
 /* keep union names in sync with CEP condition defines */
 typedef union

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Copyright (C) 2001-2026 Zabbix SIA
 **
@@ -23,7 +23,7 @@ class CApmSpan extends CApmGeneral {
 		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
 	];
 
-	private const CLICKHOUSE_OUTPUT_FIELDS = [
+	protected const CLICKHOUSE_OUTPUT_FIELDS = [
 		'timestamp'				=> 'Timestamp',
 		'traceid'				=> 'TraceId',
 		'spanid'				=> 'SpanId',
@@ -43,7 +43,7 @@ class CApmSpan extends CApmGeneral {
 		'links'					=> ['Links.TraceId', 'Links.SpanId', 'Links.TraceState', 'Links.Attributes']
 	];
 
-	private const CLICKHOUSE_FIELDS = [
+	protected const CLICKHOUSE_FIELDS = [
 		'Timestamp'				=> 'timestamp',
 		'TraceId'				=> 'traceid',
 		'SpanId'				=> 'spanid',
@@ -85,31 +85,32 @@ class CApmSpan extends CApmGeneral {
 			'parent_spanids' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'resource_attributes' =>			['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'key' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-				'operator' =>						['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_OPERATOR_LIKE, APM_ATTRIBUTE_OPERATOR_EQUAL, APM_ATTRIBUTE_OPERATOR_NOT_LIKE, APM_ATTRIBUTE_OPERATOR_NOT_EQUAL, APM_ATTRIBUTE_OPERATOR_EXISTS, APM_ATTRIBUTE_OPERATOR_NOT_EXISTS]), 'default' => APM_ATTRIBUTE_OPERATOR_LIKE],
+				'operator' =>						['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]), 'default' => TAG_OPERATOR_LIKE],
 				'value' =>							['type' => API_STRING_UTF8, 'default' => '']
 			]],
-			'resource_attributes_evaltype' =>	['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_EVAL_TYPE_AND_OR, APM_ATTRIBUTE_EVAL_TYPE_OR]), 'default' => APM_ATTRIBUTE_EVAL_TYPE_AND_OR],
+			'resource_attributes_evaltype' =>	['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
 			'span_attributes' =>				['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'key' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-				'operator' =>						['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_OPERATOR_LIKE, APM_ATTRIBUTE_OPERATOR_EQUAL, APM_ATTRIBUTE_OPERATOR_NOT_LIKE, APM_ATTRIBUTE_OPERATOR_NOT_EQUAL, APM_ATTRIBUTE_OPERATOR_EXISTS, APM_ATTRIBUTE_OPERATOR_NOT_EXISTS]), 'default' => APM_ATTRIBUTE_OPERATOR_LIKE],
+				'operator' =>						['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]), 'default' => TAG_OPERATOR_LIKE],
 				'value' =>							['type' => API_STRING_UTF8, 'default' => '']
 			]],
-			'span_attributes_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [APM_ATTRIBUTE_EVAL_TYPE_AND_OR, APM_ATTRIBUTE_EVAL_TYPE_OR]), 'default' => APM_ATTRIBUTE_EVAL_TYPE_AND_OR],
+			'span_attributes_evaltype' =>		['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
 			'min_duration' =>					['type' => API_UINT64, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'max_duration' =>					['type' => API_UINT64, 'flags' => API_ALLOW_NULL, 'default' => null],
-			'filter' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['traceid', 'spanid', 'parent_spanid', 'span_kind', 'status_code', 'service_name', 'scope_name']],
+			'filter' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['traceid', 'spanid', 'parent_spanid', 'trace_state', 'span_name', 'span_kind', 'service_name', 'scope_name', 'scope_version', 'status_code', 'status_message']],
 			'search' =>							['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['trace_state', 'span_name', 'service_name', 'scope_name', 'scope_version', 'status_message']],
 			'searchByAny' =>					['type' => API_BOOLEAN, 'default' => false],
-			'startSearch' =>					['type' => API_FLAG, 'default' => false],
-			'excludeSearch' =>					['type' => API_FLAG, 'default' => false],
+			'startSearch' =>					['type' => API_BOOLEAN, 'default' => false],
+			'excludeSearch' =>					['type' => API_BOOLEAN, 'default' => false],
 			'searchWildcardsEnabled' =>			['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>							['type' => API_OUTPUT, 'in' => implode(',', array_keys(self::CLICKHOUSE_OUTPUT_FIELDS)), 'default' => API_OUTPUT_EXTEND],
-			'countOutput' =>					['type' => API_FLAG, 'default' => false],
+			'output' =>							['type' => API_OUTPUT, 'flags' => API_NORMALIZE, 'in' => implode(',', array_keys(self::CLICKHOUSE_OUTPUT_FIELDS)), 'default' => API_OUTPUT_EXTEND],
+			'countOutput' =>					['type' => API_BOOLEAN, 'default' => false],
 			// sort and limit
 			'sortfield' =>						['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['timestamp', 'traceid', 'spanid', 'parent_spanid', 'trace_state', 'span_name', 'span_kind', 'service_name', 'scope_name', 'scope_version', 'duration', 'status_code', 'status_message']), 'uniq' => true, 'default' => []],
 			'sortorder' =>						['type' => API_SORTORDER, 'default' => []],
-			'limit' =>							['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null]
+			'limit' =>							['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
+			'offset' =>							['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '0:'.ZBX_MAX_INT32, 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -122,23 +123,43 @@ class CApmSpan extends CApmGeneral {
 	protected function getFromClickHouse(array $options): array|string {
 		$db_schema = CApmData::getClickHouseDbSchema();
 
-		$options = self::fixOptionsForClickHouse($options, self::CLICKHOUSE_OUTPUT_FIELDS);
+		$options = self::translateOptionsForClickHouse($options, self::CLICKHOUSE_OUTPUT_FIELDS);
+
+		$real_count_output = $options['countOutput'];
+
+		if (!$options['output']) {
+			$options['countOutput'] = true;
+		}
 
 		$query = (CClickHouseHelper::createQueryFromOptions('otel_traces', 't', $db_schema, $options))
-			->where('t.Timestamp>=toDateTime64({time_from:Int32},9)', ['time_from' => $options['time_from']])
-			->where('t.Timestamp<toDateTime64({time_till:Int32},9)', ['time_till' => $options['time_till']]);
+			->where('t.Timestamp>=toDateTime64({time_from:Int32},9)', ['time_from' => ['Int32', $options['time_from']]])
+			->where('t.Timestamp<toDateTime64({time_till:Int32},9)', ['time_till' => ['Int32', $options['time_till']]]);
+
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			CClickHouseHelper::addAttributeFilter($query, 't.ResourceAttributes',
+				CApiUserGroupHelper::getApmFilterResourceAttributes(SIGNAL_TYPE_TRACES), TAG_EVAL_TYPE_OR
+			);
+		}
+
+		if (!$options['countOutput']) {
+			$fallback_sortfields = array_diff(['TraceId', 'SpanId'], $options['sortfield']);
+
+			foreach ($fallback_sortfields as $sortfield) {
+				$query->order('t.'.$sortfield);
+			}
+		}
 
 		if ($options['traceids'] !== null) {
-			$query->where('t.TraceId IN {traceids:Array(String)}', ['traceids' => $options['traceids']]);
+			$query->where('t.TraceId IN {traceids:Array(String)}', ['traceids' => ['String', $options['traceids']]]);
 		}
 
 		if ($options['spanids'] !== null) {
-			$query->where('t.SpanId IN {spanids:Array(String)}', ['spanids' => $options['spanids']]);
+			$query->where('t.SpanId IN {spanids:Array(String)}', ['spanids' => ['String', $options['spanids']]]);
 		}
 
 		if ($options['parent_spanids'] !== null) {
 			$query->where('t.ParentSpanId IN {parent_spanids:Array(String)}', [
-				'parent_spanids' => $options['parent_spanids']
+				'parent_spanids' => ['String', $options['parent_spanids']]
 			]);
 		}
 
@@ -155,11 +176,15 @@ class CApmSpan extends CApmGeneral {
 		}
 
 		if ($options['min_duration'] !== null) {
-			$query->where('t.Duration>={min_duration:Int64}', ['min_duration' => $options['min_duration']]);
+			$query->where('toUInt64(t.Duration)>={min_duration:UInt64}', [
+				'min_duration' => ['UInt64', $options['min_duration']]
+			]);
 		}
 
 		if ($options['max_duration'] !== null) {
-			$query->where('t.Duration<={max_duration:Int64}', ['max_duration' => $options['max_duration']]);
+			$query->where('toUInt64(t.Duration)<={max_duration:UInt64}', [
+				'max_duration' => ['UInt64', $options['max_duration']]
+			]);
 		}
 
 		$db = ApmDbClickHouse::getInstance(ApmDb::getInstance()->getConfig());
@@ -168,10 +193,20 @@ class CApmSpan extends CApmGeneral {
 
 		foreach ($db->fetch($query->getSql(), $query->getParams()) as $row) {
 			if ($options['countOutput']) {
-				return (string) $row['rowscount'];
+				if ($real_count_output) {
+					return (string) $row['rowscount'];
+				}
+
+				$count = $row['rowscount'];
+
+				if ($options['limit'] !== null) {
+					$count = min($options['limit'], $count);
+				}
+
+				return array_fill(0, $count, []);
 			}
 
-			$db_spans[] = self::fixRowForClickHouse($row, self::CLICKHOUSE_FIELDS);
+			$db_spans[] = self::translateRowForClickHouse($row, self::CLICKHOUSE_FIELDS);
 		}
 
 		return $db_spans;

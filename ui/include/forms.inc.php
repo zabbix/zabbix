@@ -688,6 +688,54 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 	return array_filter([$fields_row, $error_container_row]);
 }
 
+function renderApmAttrRow($index, array $attribute, array $options = []): array {
+	$fields_row = (new CRow([
+		(new CCol(
+			(new CTextAreaFlexible($options['field_name'].'['.$index.'][key]', $attribute['key']))
+				->setErrorContainer($options['has_inline_validation'] ? 'attribute_'.$index.'_error_container' : null)
+				->setErrorLabel($options['has_inline_validation'] ? _('Key') : null)
+				->setAttribute('placeholder', _('key'))
+				->setAdaptiveWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				->setReadonly($options['readonly'])
+		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+		(new CCol(
+			(new CTextAreaFlexible($options['field_name'].'['.$index.'][value]', $attribute['value']))
+				->setErrorContainer($options['has_inline_validation'] ? 'attribute_'.$index.'_error_container' : null)
+				->setErrorLabel($options['has_inline_validation'] ? _('Value') : null)
+				->setAttribute('placeholder', _('value'))
+				->setAdaptiveWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				->setReadonly($options['readonly'])
+		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+		(new CCol(
+			(new CSelect($options['field_name'].'['.$index.'][signal_type]'))
+				->setErrorContainer($options['has_inline_validation'] ? 'attribute_'.$index.'_error_container' : null)
+				->setErrorLabel($options['has_inline_validation'] ? _('Category') : null)
+				->setValue($attribute['signal_type'])
+				->addOptions(CSelect::createOptionsFromArray($options['signal_types']))
+				->setReadonly($options['readonly'])
+		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+		(new CCol(
+			(new CButton($options['field_name'].'['.$index.'][remove]', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+				->setEnabled(!$options['readonly'])
+		))
+			->addClass(ZBX_STYLE_NOWRAP)
+			->addClass(ZBX_STYLE_TOP)
+	]))->addClass(ZBX_STYLE_FORM_ROW);
+
+	$error_container_row = $options['has_inline_validation']
+		? (new CRow(
+			(new CCol())
+				->addClass(ZBX_STYLE_ERROR_CONTAINER)
+				->setId('attribute_'.$index.'_error_container')
+				->setColSpan(4)
+		))
+		: null;
+
+	return array_filter([$fields_row, $error_container_row]);
+}
+
 /**
  * Function to render templates as HTML links or span tags, based on user permissions to edit each particular template.
  */
