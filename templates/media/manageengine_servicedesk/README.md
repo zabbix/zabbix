@@ -8,7 +8,7 @@ Please note that recovery and update operations are supported only for trigger-b
 
 ## Requirements
 
-Zabbix version: 8.0 and higher.
+Zabbix version: 8.2 and higher.
 
 ## Parameters
 
@@ -136,7 +136,7 @@ Examples:<br>
 `field_ref:template`<br>
 `udf_field_string:udf_char1`
 
-For more information see [Zabbix](https://www.zabbix.com/documentation/8.0/manual/config/notifications) and [ManageEngine ServiceDesk](https://www.manageengine.com/products/service-desk/support.html) documentations.
+For more information see [Zabbix](https://www.zabbix.com/documentation/8.2/manual/config/notifications) and [ManageEngine ServiceDesk](https://www.manageengine.com/products/service-desk/support.html) documentations.
 
 ## Feedback
 

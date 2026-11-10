@@ -77,6 +77,12 @@ int	apm_clickhouse_init(zbx_apm_clickhouse_t *conn, const zbx_apm_clickhouse_cfg
 			cfg->ssl_verify_peer, cfg->ssl_verify_host, cfg->source_ip, cfg->ssl_ca_location,
 			cfg->ssl_cert_location, cfg->ssl_key_location, error);
 out:
+	if (SUCCEED != ret)
+	{
+		curl_easy_cleanup(conn->handle);
+		conn->handle = NULL;
+	}
+
 	return ret;
 }
 
@@ -285,9 +291,6 @@ int	apm_clickhouse_commit(zbx_apm_clickhouse_t *conn, const zbx_apm_clickhouse_c
 	ret |= apm_clickhouse_commit_rowset(conn, cfg, "otel_logs", &ds->logs);
 	ret |= apm_clickhouse_commit_rowset(conn, cfg, "otel_traces", &ds->traces);
 
-	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
-		apm_dataset_dump(ds);
-
 	return ret;
 }
 
@@ -379,8 +382,7 @@ int	apm_clickhouse_cfg_init(zbx_apm_clickhouse_cfg_t *cfg, const zbx_apm_db_conf
 	return SUCCEED;
 #else
 	ZBX_UNUSED(cfg);
-	ZBX_UNUSED(options);
-	ZBX_UNUSED(options_num);
+	ZBX_UNUSED(export_config);
 
 	*error = zbx_strdup(NULL, "ClickHouse telemetry provider requires curl library."
 			" This Zabbix server binary was compiled without curl");
@@ -412,122 +414,55 @@ void	apm_clickhouse_cfg_clear(zbx_apm_clickhouse_cfg_t *cfg)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: copy ClickHouse exporter configuration                            *
+ * Purpose: check whether ClickHouse exporter configuration matches apm db    *
+ *          configuration                                                     *
  *                                                                            *
- * Parameters: dst - [OUT] destination configuration                          *
- *             src - [IN] source configuration                                *
- *                                                                            *
- ******************************************************************************/
-void	apm_clickhouse_cfg_copy(zbx_apm_clickhouse_cfg_t *dst, const zbx_apm_clickhouse_cfg_t *src)
-{
-	if (NULL != src->url)
-		dst->url = zbx_strdup(NULL, src->url);
-
-	if (NULL != src->database)
-		dst->database = zbx_strdup(NULL, src->database);
-
-	if (NULL != src->username)
-		dst->username = zbx_strdup(NULL, src->username);
-
-	if (NULL != src->password)
-		dst->password = zbx_strdup(NULL, src->password);
-
-	if (NULL != src->source_ip)
-		dst->source_ip = zbx_strdup(NULL, src->source_ip);
-
-	if (NULL != src->vault_path)
-		dst->vault_path = zbx_strdup(NULL, src->vault_path);
-
-	if (NULL != src->ssl_cert_file)
-		dst->ssl_cert_file = zbx_strdup(NULL, src->ssl_cert_file);
-
-	if (NULL != src->ssl_key_file)
-		dst->ssl_key_file = zbx_strdup(NULL, src->ssl_key_file);
-
-	if (NULL != src->ssl_key_password)
-		dst->ssl_key_password = zbx_strdup(NULL, src->ssl_key_password);
-
-	dst->ssl_verify_peer = src->ssl_verify_peer;
-	dst->ssl_verify_host = src->ssl_verify_host;
-
-	if (NULL != src->ssl_ca_location)
-		dst->ssl_ca_location = zbx_strdup(NULL, src->ssl_ca_location);
-
-	if (NULL != src->ssl_cert_location)
-		dst->ssl_cert_location = zbx_strdup(NULL, src->ssl_cert_location);
-
-	if (NULL != src->ssl_key_location)
-		dst->ssl_key_location = zbx_strdup(NULL, src->ssl_key_location);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: check whether new apm clickhouse config matches current config    *
- *                                                                            *
- * Parameters: cfg_now - [IN] current apm clickhouse config                   *
- *             cfg_new - [IN] new config to compare against current           *
+ * Parameters: cfg        - [IN] ClickHouse exporter configuration            *
+ *             apm_config - [IN] apm db configuration                         *
  *                                                                            *
  * Return value: SUCCEED - configs match, FAIL - configs differ               *
  *                                                                            *
  ******************************************************************************/
-int	apm_clickhouse_cfg_compare_global(const zbx_apm_clickhouse_cfg_t *cfg_now, const zbx_apm_db_config_t *cfg_new)
+int	apm_clickhouse_cfg_compare(const zbx_apm_clickhouse_cfg_t *cfg, const zbx_apm_db_config_t *apm_config)
 {
-	if (0 != zbx_strcmp_null(cfg_now->url, cfg_new->url))
+	if (0 != zbx_strcmp_null(cfg->url, apm_config->url))
 		return FAIL;
 
-	if (0 != zbx_strcmp_null(cfg_now->database,  cfg_new->db))
+	if (0 != zbx_strcmp_null(cfg->database, apm_config->db))
 		return FAIL;
 
-	if (0 != zbx_strcmp_null(cfg_now->username,  cfg_new->username))
+	if (0 != zbx_strcmp_null(cfg->username, apm_config->username))
 		return FAIL;
 
-	if (0 != zbx_strcmp_null(cfg_now->password,  cfg_new->password))
+	if (0 != zbx_strcmp_null(cfg->password, apm_config->password))
 		return FAIL;
 
-	if (0 != zbx_strcmp_null(cfg_now->source_ip,  cfg_new->source_ip))
+	if (0 != zbx_strcmp_null(cfg->source_ip, apm_config->source_ip))
 		return FAIL;
 
-	if (0 != zbx_strcmp_null(cfg_now->ssl_ca_location,  cfg_new->ssl_ca_location))
+	if (0 != zbx_strcmp_null(cfg->vault_path, apm_config->vault_path))
 		return FAIL;
 
-	if (cfg_now->ssl_verify_peer != cfg_new->ssl_verify_peer)
+	if (0 != zbx_strcmp_null(cfg->ssl_cert_file, apm_config->ssl_cert_file))
 		return FAIL;
 
-	if (cfg_now->ssl_verify_host != cfg_new->ssl_verify_host)
+	if (0 != zbx_strcmp_null(cfg->ssl_key_file, apm_config->ssl_key_file))
+		return FAIL;
+
+	if (0 != zbx_strcmp_null(cfg->ssl_key_password, apm_config->ssl_key_password))
+		return FAIL;
+
+	if (cfg->ssl_verify_peer != apm_config->ssl_verify_peer || cfg->ssl_verify_host != apm_config->ssl_verify_host)
+		return FAIL;
+
+	if (0 != zbx_strcmp_null(cfg->ssl_ca_location, apm_config->ssl_ca_location))
+		return FAIL;
+
+	if (0 != zbx_strcmp_null(cfg->ssl_cert_location, apm_config->ssl_cert_location))
+		return FAIL;
+
+	if (0 != zbx_strcmp_null(cfg->ssl_key_location, apm_config->ssl_key_location))
 		return FAIL;
 
 	return SUCCEED;
 }
-
-/*******************************************************************************
- *                                                                             *
- * Purpose: copy global APM configuration into ClickHouse config               *
- *                                                                             *
- * Parameters: dst - [OUT] destination config to populate                      *
- *             src - [IN] source config to copy from                           *
- *                                                                             *
- ******************************************************************************/
-void	apm_clickhouse_cfg_copy_global(zbx_apm_clickhouse_cfg_t *dst, const zbx_apm_db_config_t *src)
-{
-	if (NULL != src->url)
-		dst->url = zbx_strdup(NULL, src->url);
-
-	if (NULL != src->db)
-		dst->database = zbx_strdup(NULL, src->db);
-
-	if (NULL != src->username)
-		dst->username = zbx_strdup(NULL, src->username);
-
-	if (NULL != src->password)
-		dst->password = zbx_strdup(NULL, src->password);
-
-	if (NULL != src->source_ip)
-		dst->source_ip = zbx_strdup(NULL, src->source_ip);
-
-	if (NULL != src->ssl_ca_location)
-		dst->ssl_ca_location = zbx_strdup(NULL, src->ssl_ca_location);
-
-	dst->ssl_verify_host = src->ssl_verify_host;
-	dst->ssl_verify_peer = src->ssl_verify_peer;
-}
-

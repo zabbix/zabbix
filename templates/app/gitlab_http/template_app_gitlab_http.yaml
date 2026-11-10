@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '8.0'
+  version: '8.2'
   template_groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -41,7 +41,7 @@ zabbix_export:
         *NOTE.* Some metrics may not be collected depending on your Gitlab instance version and configuration. See [Gitlab's documentation](https://docs.gitlab.com/ee/administration/monitoring/prometheus/gitlab_metrics.html) for further information about its metric collection.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.2-0
       groups:
         - name: Templates/Applications
       items:

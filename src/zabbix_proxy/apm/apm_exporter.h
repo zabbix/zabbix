@@ -20,11 +20,11 @@
 #include "zbxcfg.h"
 #include "zbxalgo.h"
 #include "zbxtelemetry.h"
+#include "zbxtypes_ext.h"
 
 typedef enum
 {
 	APM_EXPORTER_UNKNOWN,
-	APM_EXPORTER_GLOBAL,
 	APM_EXPORTER_CLICKHOUSE
 }
 zbx_apm_exporter_type_t;
@@ -39,6 +39,7 @@ typedef struct
 {
 	zbx_apm_exporter_type_t		type;
 	zbx_apm_exporter_cfg_data_t	data;
+	zbx_atomic_uint32_t		refcount;
 }
 zbx_apm_exporter_cfg_t;
 
@@ -50,7 +51,7 @@ zbx_apm_exporter_conn_t;
 
 typedef struct
 {
-	zbx_apm_exporter_cfg_t	cfg;
+	zbx_apm_exporter_cfg_t	*cfg;
 	zbx_apm_exporter_conn_t	conn;
 }
 zbx_apm_exporter_t;
@@ -59,9 +60,7 @@ ZBX_PTR_VECTOR_LITE_DECL(apm_exporter_ptr, zbx_apm_exporter_t *)
 
 typedef struct
 {
-	zbx_apm_exporter_cfg_t		cfg;
-
-	zbx_apm_db_config_t		cfg_global;
+	zbx_apm_exporter_cfg_t		*cfg;
 
 	zbx_vector_apm_exporter_ptr_t	exporters;
 
@@ -69,13 +68,15 @@ typedef struct
 }
 zbx_apm_exporter_pool_t;
 
-zbx_apm_exporter_pool_t	*apm_exporter_pool_create(zbx_apm_exporter_cfg_t *cfg, char **error);
+zbx_apm_exporter_pool_t	*apm_exporter_pool_create(const zbx_apm_db_config_t *apm_config, char **error);
 void	apm_exporter_pool_destroy(zbx_apm_exporter_pool_t *pool);
-void	apm_exporter_pool_set_global_config(zbx_apm_exporter_pool_t *pool, zbx_apm_db_config_t *cfg);
+int	apm_exporter_pool_update_config(zbx_apm_exporter_pool_t *pool, const zbx_apm_db_config_t *apm_config,
+		char **error);
+void	apm_exporter_pool_clear_config(zbx_apm_exporter_pool_t *pool);
+int	apm_exporter_pool_is_active(zbx_apm_exporter_pool_t *pool);
 
 zbx_apm_exporter_t	*apm_exporter_acquire(zbx_apm_exporter_pool_t *pool);
 void	apm_exporter_release(zbx_apm_exporter_pool_t *pool, zbx_apm_exporter_t *exporter);
-int	apm_exporter_cfg_init(zbx_apm_exporter_cfg_t *cfg, const zbx_apm_db_config_t *export_config, char **error);
 
 #define APM_COMMIT_OK		0x00
 #define APM_COMMIT_ERR		0x01

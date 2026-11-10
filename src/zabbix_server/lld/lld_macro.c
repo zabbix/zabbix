@@ -16,6 +16,7 @@
 
 #include "zbxexpr.h"
 #include "zbxeval.h"
+#include "zbxtelemetry.h"
 #include "zbxtypes.h"
 #include "zbxxml.h"
 #include "zbxvariant.h"
@@ -875,6 +876,156 @@ int	zbx_substitute_macros_in_json_pairs(char **data, const zbx_lld_entry_t *lld_
 clean:
 	zbx_json_free(&json);
 exit:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+static int	lld_validate_telemetry_query(const zbx_tq_query_t *query, int item_flags, char *error,
+		size_t max_error_len)
+{
+	for (int i = 0; i < query->conditions.values_num; i++)
+	{
+		const zbx_tq_condition_t	*cond = &query->conditions.values[i];
+		const zbx_tq_column_info_t	*col_info;
+
+		if (NULL == cond->column)
+		{
+			zbx_snprintf(error, max_error_len, "\"%s\" is not set for condition #%d",
+					ZBX_TQ_QUERY_TAG_COLUMN, i);
+			return FAIL;
+		}
+
+		col_info = zbx_tq_get_column_info(query->signal_type, query->metric_point_type, cond->column);
+
+		if (NULL == col_info)
+		{
+			zbx_snprintf(error, max_error_len, "\"%s\" is invalid for condition #%d",
+					ZBX_TQ_QUERY_TAG_COLUMN, i);
+			return FAIL;
+		}
+
+		if (NULL == cond->attribute_key)
+		{
+			zbx_snprintf(error, max_error_len, "\"%s\" is not set for condition #%d",
+					ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, i);
+			return FAIL;
+		}
+
+		if (SUCCEED != zbx_is_utf8(cond->attribute_key))
+		{
+			zbx_snprintf(error, max_error_len, "\"%s\" has invalid UTF-8 sequence in condition #%d",
+					ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, i);
+			return FAIL;
+		}
+
+		if (SUCCEED == zbx_tq_column_type_is_attributes(col_info->type) && '\0' == *cond->attribute_key)
+		{
+			zbx_snprintf(error, max_error_len,
+					"\"%s\" cannot be empty in attribute condition #%d",
+					ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, i);
+			return FAIL;
+		}
+
+		if (ZBX_TQ_CONDITION_ATTRIBUTE_KEY_LEN < zbx_strlen_utf8(cond->attribute_key))
+		{
+			zbx_snprintf(error, max_error_len, "\"%s\" maximum length (%d) exceeded in condition #%d",
+					ZBX_TQ_QUERY_TAG_ATTRIBUTE_KEY, ZBX_TQ_CONDITION_ATTRIBUTE_KEY_LEN, i);
+			return FAIL;
+		}
+
+		if (NULL == cond->value)
+		{
+			zbx_snprintf(error, max_error_len, "\"%s\" is not set for condition #%d",
+					ZBX_TQ_QUERY_TAG_VALUE, i);
+			return FAIL;
+		}
+
+		if (SUCCEED != zbx_is_utf8(cond->value))
+		{
+			zbx_snprintf(error, max_error_len, "\"%s\" has invalid UTF-8 sequence in condition #%d",
+					ZBX_TQ_QUERY_TAG_VALUE, i);
+			return FAIL;
+		}
+
+		if (ZBX_TQ_OPERATOR_UNKNOWN == cond->operator)
+		{
+			zbx_snprintf(error, max_error_len, "\"%s\" is not set for condition #%d",
+					ZBX_TQ_QUERY_TAG_OPERATOR, i);
+			return FAIL;
+		}
+
+		if ((ZBX_TQ_OPERATOR_CONTAINS == cond->operator || ZBX_TQ_OPERATOR_NOT_CONTAINS == cond->operator) &&
+				'\0' == *cond->value)
+		{
+			zbx_snprintf(error, max_error_len,
+					"\"%s\" cannot be empty for operator \"%s\" in condition #%d",
+					ZBX_TQ_QUERY_TAG_VALUE,
+					(ZBX_TQ_OPERATOR_CONTAINS == cond->operator ? "contains" : "not contains"),
+					i);
+			return FAIL;
+		}
+
+		if (ZBX_TQ_CONDITION_VALUE_LEN < zbx_strlen_utf8(cond->value))
+		{
+			zbx_snprintf(error, max_error_len, "\"%s\" maximum length (%d) exceeded in condition #%d",
+					ZBX_TQ_QUERY_TAG_VALUE, ZBX_TQ_CONDITION_VALUE_LEN, i);
+			return FAIL;
+		}
+
+		if (SUCCEED == zbx_tq_column_type_requires_numeric_comparison(col_info->type) &&
+				SUCCEED != zbx_is_user_macro(cond->value) &&
+				(0 == (item_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE) ||
+				SUCCEED != lld_is_lld_macro(cond->value)) &&
+				SUCCEED != zbx_tq_validate_numeric_condition_value(cond->value))
+		{
+			zbx_snprintf(error, max_error_len, "\"%s\" is not numeric for numeric condition #%d",
+					ZBX_TQ_QUERY_TAG_VALUE, i);
+			return FAIL;
+		}
+	}
+
+	return SUCCEED;
+}
+
+static int	telemetry_query_lld_macro_expand_cb(char **text, void *ctx)
+{
+	const zbx_lld_entry_t	*lld_obj = (const zbx_lld_entry_t *)ctx;
+
+	zbx_substitute_lld_macros(text, lld_obj, ZBX_MACRO_ANY, NULL, 0);
+
+	return SUCCEED;
+}
+
+int	zbx_substitute_macros_in_telemetry_query(char **data, const zbx_lld_entry_t *lld_obj, int item_flags,
+		char *error, int maxerrlen)
+{
+	int			ret = FAIL;
+	zbx_tq_query_t		query;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SUCCEED != zbx_tq_parse_query(&query, *data, error, maxerrlen))
+		goto out;
+
+	if (SUCCEED != zbx_tq_expand_macros_in_query(&query, telemetry_query_lld_macro_expand_cb, (void *)lld_obj,
+			error, maxerrlen))
+	{
+		goto clean;
+	}
+
+	/* during LLD telemetry query is not fully validated (as it may not be possible, */
+	/* since fields in conditions may contain non-LLD macros) */
+	if (SUCCEED != lld_validate_telemetry_query(&query, item_flags, error, maxerrlen))
+		goto clean;
+
+	zbx_free(*data);
+	*data = zbx_tq_serialize_query(&query);
+
+	ret = SUCCEED;
+clean:
+	zbx_tq_query_clean(&query);
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;

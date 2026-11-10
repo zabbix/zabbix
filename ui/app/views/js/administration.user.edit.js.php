@@ -84,23 +84,23 @@
 			const autologin_cbx = document.querySelector('#autologin');
 			const autologout_cbx = document.querySelector('#autologout_visible');
 
-			if (autologin_cbx === null || autologout_cbx === null) {
-				return;
+			if (autologin_cbx !== null) {
+				autologin_cbx.addEventListener('click', (e) => {
+					if (e.target.checked && autologout_cbx != null) {
+						autologout_cbx.checked = false;
+					}
+					this.#autologoutHandler();
+				});
 			}
 
-			autologin_cbx.addEventListener('click', (e) => {
-				if (e.target.checked) {
-					autologout_cbx.checked = false;
-				}
-				this.#autologoutHandler();
-			});
-
-			autologout_cbx.addEventListener('click', (e) => {
-				if (e.target.checked) {
-					autologin_cbx.checked = false;
-				}
-				this.#autologoutHandler();
-			});
+			if (autologout_cbx !== null) {
+				autologout_cbx.addEventListener('click', (e) => {
+					if (e.target.checked && autologin_cbx != null) {
+						autologin_cbx.checked = false;
+					}
+					this.#autologoutHandler();
+				});
+			}
 		}
 
 		#autologoutHandler() {
