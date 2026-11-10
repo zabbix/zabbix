@@ -1,7 +1,7 @@
 PERFORMANCE_RATIO_THRESHOLD=3.0
 
 declare -A BASELINE_TIMES=(
-  [Integration]=4606
+  [Integration]=4609
   [testTriggerCEPRestart]=1800
   [testTriggerCEP]=900
   [testVfsFsGet]=730
@@ -9,7 +9,7 @@ declare -A BASELINE_TIMES=(
   [testProxyHa]=417
   [testNestedLLD]=385
   [testLLDHistorySyncAtScale]=300
-  [testMacros]=279
+  [testMacros]=282
   [testItemTimeouts]=209
   [testAgentJsonProtocol]=188
   [testLLDProxyHistorySyncAtScale]=180
@@ -71,6 +71,7 @@ declare -A BASELINE_TIMES=(
   [testUserMacrosWithContext]=10
   [testGraphLinking]=8
   [testScheduledReports]=5
+  [testVfsDevGet]=5
   [testReportTest]=5
   [testFunctions]=3
 )

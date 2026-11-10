@@ -40,7 +40,7 @@
 		}
 
 		$btn_change.prop('disabled', true);
-		$btn_undo.show();
+		$btn_undo.attr('hidden', false);
 	}
 
 	var methods = {

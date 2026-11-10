@@ -7,11 +7,11 @@
 > VictorOps has been acquired by Splunk and is now called "Splunk On-Call" - https://www.splunk.com/en_us/about-splunk/acquisitions/splunk-on-call.html
 > Not sure if this integration still works with the new software. Should be tested.
 
-This guide describes how to integrate Zabbix 8.0 installation with VictorOps using the Zabbix webhook feature. This guide provides instructions on setting up a media type, a user and an action in Zabbix.
+This guide describes how to integrate Zabbix 8.2 installation with VictorOps using the Zabbix webhook feature. This guide provides instructions on setting up a media type, a user and an action in Zabbix.
 
 ## Requirements
 
-Zabbix version: 8.0 and higher.
+Zabbix version: 8.2 and higher.
 
 ## Parameters
 
@@ -95,7 +95,7 @@ Format explanation:
 "Send to" field should be filled as "Default" or your routing key.
 Make sure this user has access to all hosts, for which you would like problem notifications to be converted into VictorOps tasks.
 
-For more information see [Zabbix](https://www.zabbix.com/documentation/8.0/manual/config/notifications) and [VictorOps](https://help.victorops.com/) documentations.
+For more information see [Zabbix](https://www.zabbix.com/documentation/8.2/manual/config/notifications) and [VictorOps](https://help.victorops.com/) documentations.
 
 ## Feedback
 
