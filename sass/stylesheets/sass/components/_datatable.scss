@@ -608,6 +608,7 @@
 		&.datatable-cell-data {
 			overflow: hidden;
 			align-items: flex-start;
+			word-break: break-word;
 
 			&.datatable-cell-sticky:not(.datatable-cell-bg-hover) {
 				background-color: $ui-bg-color;

@@ -98,7 +98,10 @@
 				filter.to = this.#global_timerange.to;
 			}
 
-			this.#datatable = new CDataTable(document.getElementById('datatable-problems'), data_provider)
+			const datatable = new CDataTable(document.getElementById('datatable-problems'), data_provider);
+			const custom_text_renderer = datatable.getCellRenderer('custom_text');
+
+			this.#datatable = datatable
 				.setColumns([
 					new CDataTableColumn('time', <?= json_encode(_('Time')); ?>)
 						.setColumnOptions({
@@ -516,6 +519,13 @@
 
 					cell.classList.add(CDataTable.ZBX_STYLE_CELL_STICKY);
 					cell.appendChild(paging_container);
+				})
+				.setCellRenderer('custom_text', function(data) {
+					custom_text_renderer.call(this, data);
+
+					if (this.getOption('compact_view').checked) {
+						data.cell.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
+					}
 				})
 				.setRowRenderer('nested_symptom', ({columns, row, row_index, data_fields, row_data, response}) => {
 					const column = this.#datatable.getCheckboxColumn();
