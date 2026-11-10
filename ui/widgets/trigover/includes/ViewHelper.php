@@ -104,7 +104,7 @@ class ViewHelper {
 				$result[] = (new CButtonIcon($type === 'down' ? ZBX_ICON_BULLET_ALT_DOWN : ZBX_ICON_BULLET_ALT_UP))
 					->addClass(ZBX_STYLE_COLOR_ICON)
 					->setAttribute('aria-label', $title)
-					->setHint($table, '', false);
+					->setHint($table);
 			}
 		}
 

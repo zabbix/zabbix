@@ -39,6 +39,7 @@ libzbxdbupgrade_a_SOURCES = \
 	dbupgrade_7030.c \
 	dbupgrade_7040.c \
 	dbupgrade_7050.c \
+	dbupgrade_8000.c \
 	dbupgrade_macros.c \
 	dbupgrade_macros.h \
 	dbupgrade_common.c \

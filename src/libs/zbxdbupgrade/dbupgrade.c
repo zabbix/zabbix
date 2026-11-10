@@ -749,6 +749,7 @@ DBPATCHES_ARRAY_DECL(7020);
 DBPATCHES_ARRAY_DECL(7030);
 DBPATCHES_ARRAY_DECL(7040);
 DBPATCHES_ARRAY_DECL(7050);
+DBPATCHES_ARRAY_DECL(8000);
 
 static zbx_dbpatch_t *dbversions[] = {
 	DBPATCH_VERSION(2010), /* 2.2 development */
@@ -786,6 +787,7 @@ static zbx_dbpatch_t *dbversions[] = {
 	DBPATCH_VERSION(7030), /* 7.4 development */
 	DBPATCH_VERSION(7040), /* 7.4 maintenance */
 	DBPATCH_VERSION(7050), /* 8.0 development */
+	DBPATCH_VERSION(8000), /* 8.0 maintenance */
 	NULL
 };
 
