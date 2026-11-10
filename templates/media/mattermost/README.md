@@ -3,11 +3,11 @@
 
 ## Overview
 
-This guide describes how to integrate your Zabbix 8.0 installation with Mattermost using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
+This guide describes how to integrate your Zabbix 8.2 installation with Mattermost using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
 
 ## Requirements
 
-Zabbix version: 8.0 and higher.
+Zabbix version: 8.2 and higher.
 
 ## Parameters
 
@@ -130,7 +130,7 @@ You can view the channel identifier in the channel properties.
 [![](images/thumb.7.png?raw=true)](images/7.png)
 [![](images/thumb.6.png?raw=true)](images/6.png)
 
-For more information, use the [Zabbix](https://www.zabbix.com/documentation/8.0/manual/config/notifications) and [Mattermost](https://docs.mattermost.com) documentations.
+For more information, use the [Zabbix](https://www.zabbix.com/documentation/8.2/manual/config/notifications) and [Mattermost](https://docs.mattermost.com) documentations.
 
 ## Feedback
 

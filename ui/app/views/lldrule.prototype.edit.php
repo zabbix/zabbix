@@ -185,6 +185,10 @@ $output = [
 			'inherited_timeouts' => $data['inherited_timeouts'],
 			'field_switches' => CItemData::fieldSwitchingConfiguration(['is_discovery_rule' => true]),
 			'interface_types' => itemTypeInterface(),
+			'telemetry_columns_config' => CTelemetryHelper::getColumnConfig(),
+			'telemetry_function_labels' => CTelemetryHelper::getFunctionLabels(),
+			'telemetry_operator_labels' => CTelemetryHelper::getOperatorLabels(),
+			'telemetry_signal_type_metrics' => CItemTypeTelemetryQuery::SIGNAL_TYPE_METRICS,
 			'return_url' => $return_url
 		]).');',
 	'dialogue_class' => 'modal-popup-large'

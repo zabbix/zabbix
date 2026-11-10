@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '8.0'
+  version: '8.2'
   template_groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -28,7 +28,7 @@ zabbix_export:
         The user must be included in the Administrators group.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.2-0
       groups:
         - name: Templates/Applications
       items:

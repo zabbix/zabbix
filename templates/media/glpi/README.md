@@ -27,7 +27,7 @@ This webhook creates tickets in the GLPI Assistance section. Created tickets hav
 
 ## Requirements
 
-Zabbix version: 8.0 and higher.
+Zabbix version: 8.2 and higher.
 
 ## Parameters
 
@@ -228,7 +228,7 @@ And the following for Zabbix events that do not have severities:
 
 7. Done! You can now start using this media type in actions and create ticket items in GLPI.
 
-For more information, please see [Zabbix](https://www.zabbix.com/documentation/8.0/manual/config/notifications) and [GLPI](https://glpi-user-documentation.readthedocs.io/fr/latest/) documentation.
+For more information, please see [Zabbix](https://www.zabbix.com/documentation/8.2/manual/config/notifications) and [GLPI](https://glpi-user-documentation.readthedocs.io/fr/latest/) documentation.
 
 ## Feedback
 

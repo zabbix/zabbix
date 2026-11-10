@@ -9,7 +9,7 @@ Please consult the Claude [`API documentation`](https://platform.claude.com/docs
 
 ## Requirements
 
-Zabbix version: 8.0 and higher.
+Zabbix version: 8.2 and higher.
 
 ## Tested versions
 
@@ -18,7 +18,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.2/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -33,7 +33,7 @@ This template has been tested on:
 |{$CLAUDE.API.TOKEN}|<p>Claude API token.</p>||
 |{$CLAUDE.API.TIMEOUT}|<p>Response timeout for an API.</p>|`15s`|
 |{$CLAUDE.API.INTERVAL}|<p>Update interval for raw items.</p>|`1h`|
-|{$CLAUDE.API.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/http</p>||
+|{$CLAUDE.API.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/8.2/manual/config/items/itemtypes/http</p>||
 |{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for script items: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Claude API", e.g. {$HTTP.TLS.VERIFY:"Claude API"}.</p>|`full`|
 |{$CLAUDE.API.MSG.USAGE.BUCKET}|<p>Time period and gathering interval for Claude API message usage report data.</p>|`1m`|
 |{$CLAUDE.API.CODE.COST.WARN}|<p>Warning threshold for estimated Claude Code usage cost.</p>|`10`|

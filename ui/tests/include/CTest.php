@@ -33,6 +33,9 @@ define('TEST_GOOD', 0);
 define('TEST_BAD', 1);
 define('TEST_ERROR', 2);
 
+// Major version as shown in the frontend and documentation links (e.g. "8.2" for "8.2.0alpha1").
+define('ZABBIX_MAJOR_VERSION', implode('.', array_slice(explode('.', ZABBIX_VERSION), 0, 2)));
+
 define('USER_ACTION_ADD', 'add');
 define('USER_ACTION_UPDATE', 'update');
 define('USER_ACTION_REMOVE', 'remove');
