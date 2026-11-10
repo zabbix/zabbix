@@ -146,28 +146,7 @@
 				body: JSON.stringify({...this.token, ...fields})
 			})
 				.then((response) => response.json())
-				.then((response) => {
-					if ('error' in response) {
-						if ('title' in response.error) {
-							postMessageError(response.error.title);
-						}
-
-						postMessageDetails('error', response.error.messages);
-
-						uncheckTableRows(`trigger_prototypes_${this.parent_discoveryid}`, response.keepids ?? []);
-					}
-					else if ('success' in response) {
-						postMessageOk(response.success.title);
-
-						if ('messages' in response.success) {
-							postMessageDetails('success', response.success.messages);
-						}
-
-						uncheckTableRows(`trigger_prototypes_${this.parent_discoveryid}`);
-					}
-
-					location.reload();
-				})
+				.then((response) => this.reload(response))
 				.catch(() => {
 					clearMessages();
 
