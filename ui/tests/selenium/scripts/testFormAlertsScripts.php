@@ -1797,7 +1797,7 @@ class testFormAlertsScripts extends CWebTest {
 		}
 
 		// Check fields' placeholders.
-		$this->assertEquals('script', $form->getField('Script')->query('xpath:.//input[@type="text"]')->one()->getAttribute('placeholder'));
+		$this->assertEquals('script', $form->getField('Script')->query('xpath:.//span')->one()->getAttribute('data-placeholder'));
 		$this->assertEquals('<sub-menu/sub-menu/...>', $form->getField('Menu path')->getAttribute('placeholder'));
 		$this->assertEquals('regular expression', $form->getField('Input validation rule')->getAttribute('placeholder'));
 		$this->assertEquals('comma-separated list', $form->getField('Dropdown options')->getAttribute('placeholder'));
