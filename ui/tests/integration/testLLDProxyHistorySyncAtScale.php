@@ -31,6 +31,12 @@ require_once dirname(__FILE__).'/testLLDHistorySyncAtScale.php';
 class testLLDProxyHistorySyncAtScale extends testLLDHistorySyncAtScale {
 
 	const NODATA_SKIP_REASON = 'proxy variant: nodata-based trigger scenarios are not exercised';
+	const DEPENDENT_CHAIN_KEY = 'dependent.chain';
+	const DEPENDENT_CHAIN_DEPTH = 256;
+
+	private static $chain_itemids = [];
+	private static $chain_tm;
+	private static $chain_vps_last;
 
 	/**
 	 * Component configuration provider — adds the proxy daemon configuration on
@@ -79,6 +85,91 @@ class testLLDProxyHistorySyncAtScale extends testLLDHistorySyncAtScale {
 			$iterations = null, $delay = null) {
 		parent::reloadConfigurationCacheAndWaitForLogLine($component, $delayOverride, $iterations, $delay);
 		parent::reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY, $delayOverride, $iterations, $delay);
+	}
+
+	/**
+	 * Create a master item followed by a chain of DEPENDENT_CHAIN_DEPTH dependent items,
+	 * each depending on the previous one.
+	 */
+	public function testLLDProxyHistorySyncAtScale_DependentChainCreate() {
+		$response = $this->call('item.create', [
+			'hostid' => self::$hostid,
+			'name' => 'Dependent chain 0',
+			'key_' => self::DEPENDENT_CHAIN_KEY.'[0]',
+			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'delay' => '1h'
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['itemids']);
+		self::$chain_itemids = [(int) $response['result']['itemids'][0]];
+
+		for ($i = 1; $i <= self::DEPENDENT_CHAIN_DEPTH; $i++) {
+			$response = $this->call('item.create', [
+				'hostid' => self::$hostid,
+				'name' => 'Dependent chain '.$i,
+				'key_' => self::DEPENDENT_CHAIN_KEY.'['.$i.']',
+				'type' => ITEM_TYPE_DEPENDENT,
+				'master_itemid' => end(self::$chain_itemids),
+				'value_type' => ITEM_VALUE_TYPE_UINT64
+			]);
+			$this->assertArrayHasKey('itemids', $response['result']);
+			$this->assertArrayHasKey(0, $response['result']['itemids']);
+			self::$chain_itemids[] = (int) $response['result']['itemids'][0];
+		}
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER, null, self::LLD_ITERATIONS,
+			self::WAIT_ITERATION_DELAY);
+	}
+
+	/**
+	 * Send a single value to the master item of the dependent item chain.
+	 *
+	 * @depends testLLDProxyHistorySyncAtScale_DependentChainCreate
+	 */
+	public function testLLDProxyHistorySyncAtScale_DependentChainSend() {
+		self::$chain_tm = time();
+		self::$chain_vps_last = $this->getVpsWritten();
+
+		$this->dispatchValues([
+			[
+				'itemid' => self::$chain_itemids[0],
+				'value' => '1',
+				'clock' => self::$chain_tm,
+				'ns' => 0
+			]
+		]);
+	}
+
+	/**
+	 * Verify that the VPS written counter increased by the master value plus one value per dependent item.
+	 *
+	 * @depends testLLDProxyHistorySyncAtScale_DependentChainSend
+	 */
+	public function testLLDProxyHistorySyncAtScale_DependentChainVpsWritten() {
+		$this->assertVpsWrittenIncreasedBy(self::$chain_vps_last, self::DEPENDENT_CHAIN_DEPTH + 1);
+	}
+
+	/**
+	 * Verify that every item of the dependent item chain received the value.
+	 *
+	 * @depends testLLDProxyHistorySyncAtScale_DependentChainSend
+	 */
+	public function testLLDProxyHistorySyncAtScale_DependentChainVerify() {
+		$response = $this->callUntilDataIsPresent('history.get', [
+			'history' => ITEM_VALUE_TYPE_UINT64,
+			'itemids' => self::$chain_itemids,
+			'time_from' => self::$chain_tm,
+			'time_till' => self::$chain_tm,
+			'limit' => self::DEPENDENT_CHAIN_DEPTH + 1
+		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
+			return count($r['result']) === self::DEPENDENT_CHAIN_DEPTH + 1;
+		});
+
+		$this->assertCount(self::DEPENDENT_CHAIN_DEPTH + 1, $response['result']);
+		foreach ($response['result'] as $record) {
+			$this->assertEquals('1', $record['value'], 'Unexpected value for itemid '.$record['itemid'].'.');
+		}
 	}
 
 	public function testLLDHistorySyncAtScale_ValueOmittedDrainsDelay() {

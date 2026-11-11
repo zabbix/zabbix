@@ -3200,6 +3200,39 @@ const SUBJECT_INTERNAL = "Internal";
 
 	/***************************************************************************************************************
 
+		Test unsupported macros in calculated item query filters.
+
+	***************************************************************************************************************/
+	public function testMacros_calculatedItemFilterUnsupportedMacro() {
+		foreach (['group', 'tag'] as $filter) {
+			$response = $this->call('item.create', [
+				'hostid' => self::$host_id,
+				'name' => 'Calculated item with unsupported '.$filter.' macro',
+				'key_' => 'calc.filter.'.$filter,
+				'type' => ITEM_TYPE_CALCULATED,
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'params' => 'count(last_foreach(/*/'.self::TRAPPER_ITEM_KEY.
+						'1?['.$filter.'="{TEST}"]))',
+				'delay' => '1s'
+			]);
+			$this->assertArrayHasKey('itemids', $response['result']);
+			$this->assertCount(1, $response['result']['itemids']);
+			$itemid = $response['result']['itemids'][0];
+
+			$this->reloadConfigurationCacheAndWaitForLogLine();
+
+			// The unknown macro stays literal, so no items match the filter.
+			$response = $this->callUntilDataIsPresent('history.get', [
+				'itemids' => [$itemid],
+				'history' => ITEM_VALUE_TYPE_UINT64,
+				'limit' => 1
+			]);
+			$this->assertEquals('0', $response['result'][0]['value']);
+		}
+	}
+
+	/***************************************************************************************************************
+
 		Test macro resolution (source: event created by an autoregistration).
 
 	***************************************************************************************************************/

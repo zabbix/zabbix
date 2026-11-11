@@ -17,7 +17,7 @@ The {EVENT.NAME} macro is used as a subject of a ticket for trigger-based events
 
 ## Requirements
 
-Zabbix version: 8.0 and higher.
+Zabbix version: 8.2 and higher.
 
 ## Parameters
 
@@ -137,7 +137,7 @@ In addition, you can override the severity mapping between the Zabbix problem an
 
 8\. Use the Zendesk User in any Actions of your choice.
 
-For more information, use the [Zabbix](https://www.zabbix.com/documentation/8.0/manual/config/notifications) and [Zendesk](https://developer.zendesk.com/rest_api/docs/support/tickets) documentations.
+For more information, use the [Zabbix](https://www.zabbix.com/documentation/8.2/manual/config/notifications) and [Zendesk](https://developer.zendesk.com/rest_api/docs/support/tickets) documentations.
 
 ## Feedback
 

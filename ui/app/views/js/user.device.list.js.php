@@ -68,7 +68,7 @@ const view = new class {
 					cancel: true,
 					class: ZBX_STYLE_BTN_ALT,
 					action: () => {
-						location.href = location.href;
+						location.reload();
 					}
 				},
 				{
@@ -118,7 +118,7 @@ const view = new class {
 					}
 				}
 
-				location.href = location.href;
+				location.reload();
 			})
 			.catch(() => {
 				clearMessages();

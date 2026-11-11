@@ -332,6 +332,11 @@ select[readonly] {
 	}
 }
 
+.multilineinput-control .multilineinput-preview.multilineinput-preview-placeholder::before {
+	color: #7a858f;
+	-webkit-text-fill-color: #7a858f;
+}
+
 select[readonly] {
 	color: #e5f1ff;
 	-webkit-text-fill-color: #e5f1ff;

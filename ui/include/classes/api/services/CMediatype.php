@@ -665,7 +665,7 @@ class CMediatype extends CApiService {
 			elseif ($mediatype['type'] == MEDIA_TYPE_EXEC) {
 				$mediatype += array_intersect_key($db_mediatype, array_flip(['exec_path']));
 			}
-			elseif ($mediatype['type'] == MEDIA_TYPE_SMS) {
+			elseif ($mediatype['type'] == MEDIA_TYPE_WEBHOOK) {
 				$mediatype += array_intersect_key($db_mediatype, array_flip(['script']));
 			}
 		}

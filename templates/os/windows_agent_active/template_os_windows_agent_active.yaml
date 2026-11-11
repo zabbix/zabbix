@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '8.0'
+  version: '8.2'
   template_groups:
     - uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
@@ -8,7 +8,7 @@ zabbix_export:
       template: 'Windows by Zabbix agent active'
       name: 'Windows by Zabbix agent active'
       description: |
-        This is an official Windows template. It requires Zabbix agent 8.0 or newer.
+        This is an official Windows template. It requires Zabbix agent 8.2 or newer.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/387224-discussion-thread-for-official-zabbix-template-for-windows
         
@@ -20,7 +20,7 @@ zabbix_export:
         This is an official Windows template. It requires Zabbix agent 8.0 or newer.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.2-0
       groups:
         - name: 'Templates/Operating systems'
       items:

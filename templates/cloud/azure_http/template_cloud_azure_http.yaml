@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '8.0'
+  version: '8.2'
   template_groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -47,7 +47,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, `Azure Vault ID` and `Backup jobs period`.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.2-0
       groups:
         - name: Templates/Cloud
       items:
@@ -1348,7 +1348,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`.
       vendor:
         name: Zabbix
-        version: 8.0-7
+        version: 8.2-0
       groups:
         - name: Templates/Cloud
       items:
@@ -4865,7 +4865,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.2-0
       groups:
         - name: Templates/Cloud
       items:
@@ -6822,7 +6822,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure Cosmos DB ID`.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.2-0
       groups:
         - name: Templates/Cloud
       items:
@@ -7611,7 +7611,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`.
       vendor:
         name: Zabbix
-        version: 8.0-4
+        version: 8.2-0
       groups:
         - name: Templates/Cloud
       items:
@@ -15555,7 +15555,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure MSSQL database ID`.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.2-0
       groups:
         - name: Templates/Cloud
       items:
@@ -16850,7 +16850,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID` and `Azure SQL DTU-based database ID`.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.2-0
       groups:
         - name: Templates/Cloud
       items:
@@ -18116,7 +18116,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure MSSQL database ID`.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.2-0
       groups:
         - name: Templates/Cloud
       items:
@@ -19377,7 +19377,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure MySQL server ID`.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.2-0
       groups:
         - name: Templates/Cloud
       items:
@@ -20525,7 +20525,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure MySQL server ID`.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.2-0
       groups:
         - name: Templates/Cloud
       items:
@@ -21621,7 +21621,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure PostgreSQL server ID`.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.2-0
       groups:
         - name: Templates/Cloud
       items:
@@ -22864,7 +22864,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure PostgreSQL server ID`.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.2-0
       groups:
         - name: Templates/Cloud
       items:
@@ -23965,7 +23965,7 @@ zabbix_export:
         4. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, `Azure workspace`, and `Period`.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.2-0
       groups:
         - name: Templates/Cloud
       items:
@@ -25684,7 +25684,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure SQL managed instance ID`.
       vendor:
         name: Zabbix
-        version: 8.0-4
+        version: 8.2-0
       groups:
         - name: Templates/Cloud
       items:
@@ -26792,7 +26792,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure virtual machine ID`.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.2-0
       groups:
         - name: Templates/Cloud
       items:
@@ -28562,7 +28562,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, and `Azure scale set ID`.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.2-0
       groups:
         - name: Templates/Cloud
       items:

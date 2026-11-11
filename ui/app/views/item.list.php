@@ -329,6 +329,8 @@ $form->addItem(new CActionButtonList('action', 'itemids', $buttons,
 	->addItem($form)
 	->show();
 
+(new CTemplateTag('filter-tag-row-tmpl', CTagFilterFieldHelper::getTemplate()))->show();
+
 $confirm_messages = [
 	'item.enable' => [_('Enable selected item?'), _('Enable selected items?')],
 	'item.disable' => [_('Disable selected item?'), _('Disable selected items?')],
