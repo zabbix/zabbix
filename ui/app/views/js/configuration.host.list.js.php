@@ -18,10 +18,6 @@
  */
 ?>
 
-<script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
-	<?= CTagFilterFieldHelper::getTemplate() ?>
-</script>
-
 <script>
 	const view = new class {
 		#applied_filter_groupids = [];
@@ -117,7 +113,7 @@
 				uncheckTableRows('hosts');
 			}
 
-			location.href = location.href;
+			location.reload();
 		}
 
 		#initFilter() {
@@ -602,7 +598,8 @@
 
 					if (disabled_by_lld != 0) {
 						const description_icon = document.createElement('button');
-						description_icon.classList.add('btn-icon', ZBX_ICON_ALERT_WITH_CONTENT, ZBX_STYLE_HINTBOX_WRAP);
+						description_icon.classList.add('btn-icon', ZBX_ICON_ALERT_WITH_CONTENT, ZBX_STYLE_HINTBOX_WRAP,
+							ZBX_STYLE_NO_INDENT);
 						description_icon.setAttribute('role', 'button');
 						description_icon.setAttribute('data-content', '?');
 						description_icon.setAttribute('data-hintbox-html',
@@ -780,7 +777,7 @@
 						&& (tls_accept & HOST_ENCRYPTION_PSK) != HOST_ENCRYPTION_PSK
 						&& (tls_accept & HOST_ENCRYPTION_CERTIFICATE) != HOST_ENCRYPTION_CERTIFICATE) {
 
-						const none = document.createElement('span');
+						const none = document.createElement('div');
 						none.classList.add(ZBX_STYLE_STATUS_GREEN);
 						none.textContent = <?= json_encode(_('None')); ?>;
 
@@ -807,10 +804,10 @@
 
 						in_encryption.classList.add('in');
 
-						const out_encryption = document.createElement('span');
+						const out_encryption = document.createElement('div');
 						out_encryption.classList.add('out');
 
-						const none = document.createElement('span');
+						const none = document.createElement('div');
 						none.textContent = <?= json_encode(_('None')); ?>;
 
 						if ((tls_accept & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE) {
@@ -822,7 +819,7 @@
 
 						out_encryption.appendChild(none);
 
-						const psk = document.createElement('span');
+						const psk = document.createElement('div');
 						psk.textContent = <?= json_encode(_('PSK')); ?>;
 
 						if ((tls_accept & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK) {
@@ -834,7 +831,7 @@
 
 						out_encryption.appendChild(psk);
 
-						const cert = document.createElement('span');
+						const cert = document.createElement('div');
 						cert.textContent = <?= json_encode(_('CERT')); ?>;
 
 						if ((tls_accept & HOST_ENCRYPTION_CERTIFICATE) == HOST_ENCRYPTION_CERTIFICATE) {
@@ -847,7 +844,7 @@
 						out_encryption.appendChild(cert);
 
 						const encryption = document.createElement('div');
-						encryption.classList.add(ZBX_STYLE_STATUS_CONTAINER, ZBX_STYLE_NOWRAP);
+						encryption.classList.add(ZBX_STYLE_STATUS_CONTAINER);
 						encryption.appendChild(in_encryption);
 						encryption.innerHTML += ' ';
 						encryption.appendChild(out_encryption);

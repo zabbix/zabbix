@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '8.0'
+  version: '8.2'
   template_groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -24,7 +24,7 @@ zabbix_export:
         The Intel® 12200 is a 36-port, 40Gbps switch based on InfiniBand* architecture that  cost-effectively supports a cluster of up to 36 servers, or provides an edge switch option  for a larger fabric. This fixed-configuration switch is a member of the 12000 series, which  delivers an exceptional set of high-speed networking features and functions.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.2-0
       groups:
         - name: 'Templates/Network devices'
       items:

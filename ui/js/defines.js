@@ -173,6 +173,7 @@ const ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH = 'debug-output-table-refresh';
 
 const ZBX_STYLE_ICON = 'icon';
 
+const ZBX_ICON_ARROW_TOP_RIGHT = 'zi-arrow-top-right';
 const ZBX_ICON_ALERT_WITH_CONTENT = 'zi-alert-with-content';
 const ZBX_ICON_BELL = 'zi-bell';
 const ZBX_ICON_BELL_OFF = 'zi-bell-off';

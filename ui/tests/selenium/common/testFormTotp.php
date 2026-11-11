@@ -107,7 +107,7 @@ class testFormTotp extends CWebTest {
 
 		$help_link = $links->query('link:Help')->one();
 		$this->assertTrue($help_link->isClickable());
-		$this->assertEquals('https://www.zabbix.com/documentation/'.ZABBIX_EXPORT_VERSION.'/en/manual',
+		$this->assertEquals('https://www.zabbix.com/documentation/'.ZABBIX_MAJOR_VERSION.'/en/manual',
 				$help_link->getAttribute('href')
 		);
 		$this->assertEquals('_blank', $help_link->getAttribute('target')); // opens link in a new tab
