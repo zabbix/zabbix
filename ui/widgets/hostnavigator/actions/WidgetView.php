@@ -167,26 +167,25 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		if ($group_by_severity) {
 			// Select triggers and problems to calculate number of problems for each host.
+			$triggers = API::Trigger()->get([
+				'output' => [],
+				'selectHosts' => ['hostid'],
+				'hostids' => array_column($hosts, 'hostid'),
+				'skipDependent' => true,
+				'monitored' => true,
+				'preservekeys' => true,
+				'filter' => ['value' => TRIGGER_VALUE_TRUE]
+			]);
+
 			$problems = API::Problem()->get([
 				'output' => ['eventid', 'objectid', 'severity'],
 				'source' => EVENT_SOURCE_TRIGGERS,
 				'object' => EVENT_OBJECT_TRIGGER,
-				'hostids' => array_column($hosts, 'hostid'),
+				'objectids' => array_keys($triggers),
 				'suppressed' => $this->fields_values['problems'] == WidgetForm::PROBLEMS_UNSUPPRESSED ? false : null,
 				'severities' => $this->fields_values['severities'] ?: null,
 				'symptom' => false
 			]);
-
-			$triggers = $problems
-				? API::Trigger()->get([
-					'output' => [],
-					'selectHosts' => ['hostid'],
-					'triggerids' => array_unique(array_column($problems, 'objectid')),
-					'skipDependent' => true,
-					'monitored' => true,
-					'preservekeys' => true
-				])
-				: [];
 
 			// Group all problems per host per severity.
 			$host_problems = [];
