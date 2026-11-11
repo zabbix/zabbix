@@ -225,9 +225,9 @@ $status-grey-border-color: #003a7a;
 $multiselect-selected-bg-color: #003a7a;
 
 // List table.
-$compact-view-color: #000000;
-$compact-view-tag-color: #ffffff;
-$compact-view-tag-bg-color: $ui-bg-selected-color;
+$compact-view-color: #001833;
+$compact-view-tag-color: #e5f1ff;
+$compact-view-tag-bg-color: #001833;
 
 // Import compare.
 $toc-title-color: #e5f1ff;
@@ -236,8 +236,14 @@ $toc-title-bg-color: #003a7a;
 // Datatable.
 $datatable-resizer-border-color: #0066d9;
 $datatable-scrollbar-thumb-bg-color: #004fa8;
+$datatable-sticky-hover-bg-color: #002856;
+$datatable-sticky-selected-bg-color: #002d5e;
 // Important! @import string should come after variables
 @import 'screen';
+
+%webkit-scrollbar {
+	scrollbar-color: $scrollbar-thumb-color $scrollbar-track-color;
+}
 
 .btn-grey,
 .btn-grey-icon {
@@ -277,10 +283,22 @@ $datatable-scrollbar-thumb-bg-color: #004fa8;
 }
 
 .datatable {
-	.datatable-body .row.row-selected {
-		.row-spacer,
-		.cell:not(.cell-bg) {
-			border-bottom-color: #003a7a;
+	.datatable-body .datatable-row {
+		&:not(.row-selected):not(.datatable-row-disabled):hover {
+			.datatable-cell.datatable-cell-data.datatable-cell-sticky:not(.datatable-cell-bg) {
+				background-color: $datatable-sticky-hover-bg-color;
+			}
+		}
+
+		&.row-selected {
+			.datatable-row-spacer,
+			.datatable-cell:not(.datatable-cell-bg) {
+				border-bottom-color: #003a7a;
+			}
+
+			.datatable-cell.datatable-cell-sticky:not(.datatable-cell-bg) {
+				background-color: $datatable-sticky-selected-bg-color;
+			}
 		}
 	}
 
@@ -301,7 +319,7 @@ $datatable-scrollbar-thumb-bg-color: #004fa8;
 }
 
 .list-table .timeline-axis::before,
-.datatable .cell.cell-data .timeline-axis::before {
+.datatable .datatable-cell.datatable-cell-data .timeline-axis::before {
 	background-color: #003a7a;
 }
 
@@ -604,6 +622,14 @@ z-select,
 	}
 }
 
+.radio-card-list {
+	.radio-card {
+		&:has(input[type="radio"]:checked) {
+			border-color: #3d98ff;
+		}
+	}
+}
+
 .menu-main,
 .menu-user {
 	.submenu {
@@ -627,7 +653,7 @@ z-select,
 					&.average-bg,
 					&.high-bg,
 					&.disaster-bg {
-						color: #000000;
+						color: $compact-view-color;
 					}
 				}
 			}
@@ -646,24 +672,23 @@ z-select,
 			&.average-bg,
 			&.high-bg,
 			&.disaster-bg {
-				color: #000000;
+				color: $compact-view-color;
 				box-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, .1);
 			}
 		}
 	}
 
 	&.has-highlighted-rows {
-		.problem-unack-fg,
-		.problem-ack-fg {
-			color: #cc0000;
-		}
-
-		.ok-unack-fg,
-		.ok-ack-fg {
-			color: #009900;
-		}
-
 		tr {
+			&[class*='flh-']:not(.row-selected):not(:hover) {
+				.problem-unack-fg,
+				.problem-ack-fg,
+				.ok-unack-fg,
+				.ok-ack-fg {
+					color: $compact-view-color;
+				}
+			}
+
 			&.row-selected,
 			&:hover,
 			&:not([class*='flh-']) {
@@ -671,6 +696,101 @@ z-select,
 					&:not(:hover):not(:focus) {
 						color: $font-color;
 						border-bottom-color: $font-color;
+					}
+				}
+			}
+		}
+	}
+}
+
+.datatable {
+	&.has-highlighted-rows .datatable-body .datatable-row {
+		&.row-selected .datatable-cell.datatable-cell-data {
+			&.na-bg,
+			&.info-bg,
+			&.warning-bg,
+			&.average-bg,
+			&.high-bg,
+			&.disaster-bg {
+				a.link-action {
+					color: $font-color;
+
+					&:hover {
+						color: $link-color;
+					}
+				}
+			}
+		}
+
+		&:not(.datatable-row-disabled):not(.row-selected) {
+			.datatable-cell.datatable-cell-data {
+				color: $compact-view-color;
+
+				a {
+					color: $compact-view-color;
+				}
+
+				&.na-bg,
+				&.info-bg,
+				&.warning-bg,
+				&.average-bg,
+				&.high-bg,
+				&.disaster-bg {
+					color: $compact-view-color;
+
+					a.link-action {
+						color: $compact-view-color;
+					}
+				}
+			}
+
+			&:not(:hover) .datatable-cell.datatable-cell-data {
+				.problem-unack-fg,
+				.problem-ack-fg,
+				.ok-unack-fg,
+				.ok-ack-fg {
+					color: $compact-view-color;
+				}
+
+				.tag {
+					color: $compact-view-tag-color;
+					background-color: $compact-view-tag-bg-color;
+				}
+			}
+
+			&:hover .datatable-cell.datatable-cell-data {
+				a {
+					color: $font-color;
+
+					&:hover {
+						color: $link-color;
+					}
+				}
+
+				a.link-alt {
+					color: $link-color;
+				}
+
+				.timeline-date a {
+					color: $link-color;
+				}
+
+				&.na-bg,
+				&.info-bg,
+				&.warning-bg,
+				&.average-bg,
+				&.high-bg,
+				&.disaster-bg {
+					&:not(.datatable-cell-bg) {
+						color: $font-color;
+					}
+
+					a.link-action {
+						color: $font-color;
+
+						&:hover {
+							color: $link-color;
+						}
 					}
 				}
 			}
