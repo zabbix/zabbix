@@ -7,7 +7,7 @@ This guide describes how to integrate your Zabbix installation with Discord usin
 
 ## Requirements
 
-Zabbix version: 8.0 and higher.
+Zabbix version: 8.2 and higher.
 
 ## Parameters
 
@@ -21,7 +21,7 @@ The configurable parameters are intended to be changed according to the webhook 
 |----|-----|-----------|
 |tls_verify|\{$HTTP\.TLS\.VERIFY:"Discord"\}|TLS certificate verification for HTTP requests: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this media type only, define the global macro with the context "Discord", e.g. {$HTTP.TLS.VERIFY:"Discord"}.|
 |zabbix_url|\{$ZABBIX\.URL\}|The URL of the Zabbix frontend.|
-|user_agent|ZabbixServer \(zabbix\.com, 8\.0\)|The user agent to use in the request.|
+|user_agent|ZabbixServer \(zabbix\.com, 8\.2\)|The user agent to use in the request.|
 
 ### Internal parameters
 
@@ -93,7 +93,7 @@ You can copy the Discord webhook URL now by pressing *Copy Webhook URL*, or you 
 
 4. Done! You can now start using this media type in actions and receive alerts.
 
-For more information, please see [Zabbix](https://www.zabbix.com/documentation/8.0/manual/config/notifications) and [Discord](https://discordapp.com/developers/docs/resources/webhook#execute-webhook) documentation.
+For more information, please see [Zabbix](https://www.zabbix.com/documentation/8.2/manual/config/notifications) and [Discord](https://discordapp.com/developers/docs/resources/webhook#execute-webhook) documentation.
 
 ## Feedback
 

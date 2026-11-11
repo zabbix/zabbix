@@ -454,15 +454,13 @@
 		}
 
 		#refresh({tabfilter_changed = false, loading_fadein = false} = {}) {
-			if (this.#datatable.isUserInteracting()) {
-				return;
-			}
+			closeDialogHandler({which: KEY_ESCAPE});
 
 			this.#unscheduleRefresh();
 
 			const search_params = new URLSearchParams(location.search.substring(1));
-			const current_filter = searchParamsToObject(search_params);
-			const filter = {...this.#filter_defaults, ...current_filter};
+			const url_filter = searchParamsToObject(search_params);
+			const filter = {...this.#filter_defaults, ...url_filter};
 
 			if (!tabfilter_changed) {
 				this.#datatable.updateUserConfig();
@@ -512,11 +510,13 @@
 			}
 
 			this.#unscheduleRefresh();
+			this.#refresh_interval_id = setInterval(() => {
+				if (this.#datatable.isUserInteracting()) {
+					return;
+				}
 
-			this.#refresh_interval_id = setInterval(
-				() => this.#refresh({loading_fadein: true}),
-				this.#refresh_interval
-			);
+				this.#refresh({loading_fadein: true});
+			}, this.#refresh_interval);
 		}
 
 		#unscheduleRefresh() {

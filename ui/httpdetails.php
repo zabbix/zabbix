@@ -75,10 +75,19 @@ $details_screen = CScreenBuilder::getScreen([
 
 $graphs = [];
 
-// dims
-$graph_dims = getGraphDims();
-$graph_dims['width'] = -50;
-$graph_dims['graphHeight'] = 151;
+$httpstep_itemids = [HTTPSTEP_ITEM_TYPE_IN => [], HTTPSTEP_ITEM_TYPE_TIME => []];
+
+$db_httpstep_items = DBselect(
+	'SELECT hi.itemid,hi.type'.
+	' FROM httpstepitem hi,httpstep hs'.
+	' WHERE hi.httpstepid=hs.httpstepid'.
+		' AND hs.httptestid='.zbx_dbstr($httptest['httptestid']).
+		' AND '.dbConditionInt('hi.type', array_keys($httpstep_itemids))
+);
+
+while ($db_httpstep_item = DBfetch($db_httpstep_items)) {
+	$httpstep_itemids[$db_httpstep_item['type']][] = $db_httpstep_item['itemid'];
+}
 
 /*
  * Graph in
@@ -88,14 +97,6 @@ $graph_in = new CScreenBase([
 	'mode' => SCREEN_MODE_PREVIEW,
 	'dataId' => 'graph_in'
 ] + $timeline);
-
-$items = DBfetchArray(DBselect(
-	'SELECT i.itemid,i.value_type,i.history,i.trends,i.hostid'.
-	' FROM items i,httpstepitem hi,httpstep hs'.
-	' WHERE i.itemid=hi.itemid'.
-		' AND hi.httpstepid=hs.httpstepid'.
-		' AND hs.httptestid='.zbx_dbstr($httptest['httptestid'])
-));
 
 $url = (new CUrl('chart3.php'))
 	->setArgument('height', 150)
@@ -121,7 +122,10 @@ $time_control_data = [
 	'id' => 'graph_in',
 	'containerid' => 'graph_in_container',
 	'src' => $url,
-	'objDims' => $graph_dims,
+	'objDims' => array_merge(getGraphDims(null, $httpstep_itemids[HTTPSTEP_ITEM_TYPE_IN]), [
+		'width' => -50,
+		'graphHeight' => 151
+	]),
 	'loadSBox' => 1,
 	'loadImage' => 1
 ];
@@ -163,7 +167,10 @@ $time_control_data = [
 	'id' => 'graph_time',
 	'containerid' => 'graph_time_container',
 	'src' => $url,
-	'objDims' => $graph_dims,
+	'objDims' => array_merge(getGraphDims(null, $httpstep_itemids[HTTPSTEP_ITEM_TYPE_TIME]), [
+		'width' => -50,
+		'graphHeight' => 151
+	]),
 	'loadSBox' => 1,
 	'loadImage' => 1
 ];

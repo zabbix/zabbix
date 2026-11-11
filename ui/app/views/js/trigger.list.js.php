@@ -19,9 +19,6 @@
  */
 
 ?>
-<script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
-	<?= CTagFilterFieldHelper::getTemplate(); ?>
-</script>
 
 <script>
 	const view = new class {
@@ -125,7 +122,7 @@
 					postMessageDetails('success', e.detail.success.messages);
 				}
 
-				location.href = location.href;
+				location.reload();
 			});
 		}
 
@@ -220,7 +217,7 @@
 						uncheckTableRows(`trigger_${this.checkbox_hash}`, [], true);
 					}
 
-					location.href = location.href;
+					location.reload();
 				})
 				.catch(() => {
 					clearMessages();

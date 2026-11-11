@@ -118,8 +118,7 @@ class CSideDrawer {
 		const close_button = this.#drawer_element.querySelector('.js-close-button');
 		close_button?.addEventListener('click', this.#onClose);
 
-		document.addEventListener('keyup', this.#onKeyUp);
-
+		this.#drawer_element.addEventListener('keyup', this.#onKeyUp);
 		this.#split_view_element.addEventListener('split-end', this.#handlePositionChange);
 	}
 
@@ -127,8 +126,7 @@ class CSideDrawer {
 		const close_button = this.#drawer_element.querySelector('.js-close-button');
 		close_button?.removeEventListener('click', this.#onClose);
 
-		document.removeEventListener('keyup', this.#onKeyUp);
-
+		this.#drawer_element.removeEventListener('keyup', this.#onKeyUp);
 		this.#split_view_element.removeEventListener('split-end', this.#handlePositionChange);
 	}
 
@@ -139,7 +137,12 @@ class CSideDrawer {
 	}
 
 	#handleError(error) {
-		const $msg_box = makeMessageBox('bad', error.messages ?? [], error.title ?? t('Unexpected server error.'));
+		const title = error.title || null;
+		const messages = error.messages || [];
+
+		const $msg_box = title === null && messages.length === 0
+			? makeMessageBox('bad', [], t('Unexpected server error.'))
+			: makeMessageBox('bad', messages, title)
 
 		this.#drawer_element.innerHTML = '';
 		this.#drawer_element.appendChild($msg_box[0]);

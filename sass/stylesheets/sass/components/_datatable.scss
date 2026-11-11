@@ -608,6 +608,7 @@
 		&.datatable-cell-data {
 			overflow: hidden;
 			align-items: flex-start;
+			word-break: break-word;
 
 			&.datatable-cell-sticky:not(.datatable-cell-bg-hover) {
 				background-color: $ui-bg-color;
@@ -649,11 +650,34 @@
 				white-space: normal;
 			}
 
+			.status-container {
+				display: flex;
+				flex-wrap: wrap;
+				height: auto;
+				min-height: 16px;
+				gap: 2px 3px;
+
+				> *:not(.out) {
+					@extend %overflow-ellipsis;
+				}
+
+				.out {
+					display: flex;
+					flex-wrap: wrap;
+					overflow: hidden;
+
+					> * {
+						@extend %overflow-ellipsis;
+					}
+				}
+			}
+
 			.flex-wrapper {
 				display: flex;
 				flex-wrap: wrap;
+				height: auto;
 				min-height: 16px;
-				column-gap: 5px;
+				gap: 2px 3px;
 
 				&.nowrap {
 					flex-wrap: nowrap;
@@ -894,12 +918,19 @@
 #datatable-traces,
 #datatable-metrics,
 #datatable-logs {
-	.datatable-row:not(.row-selected):hover {
-		cursor: pointer;
+	.datatable-row {
+		&:not(.row-selected):hover {
+			cursor: pointer;
 
-		.datatable-cell {
-			border-block-end-color: $ui-border-color;
+			.datatable-cell {
+				border-block-end-color: $ui-border-color;
+				background-color: $ui-hover-bg-color;
+			}
+		}
+
+		&:focus {
 			background-color: $ui-hover-bg-color;
+			outline: none;
 		}
 	}
 }
@@ -933,7 +964,7 @@
 			display: flex;
 			align-items: center;
 			height: inherit;
-			background-color: $disabled-bg-color;
+			background-color: $trace-datatable-duration-bar-bg-color;
 		}
 
 		.duration-time-units {
