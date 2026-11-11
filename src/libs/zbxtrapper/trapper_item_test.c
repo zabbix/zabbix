@@ -437,7 +437,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 				zbx_vector_ptr_pair_append(&item.script_params, pair);
 			}
 		}
-		
+
 		zbx_free(name);
 		zbx_free(value);
 	}
