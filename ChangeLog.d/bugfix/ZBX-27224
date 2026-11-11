@@ -1,1 +1,0 @@
-.......PS. [ZBX-27224] fixed SNMP agent walk[] 'only partial data received' error by resetting retries between requests (vso)
