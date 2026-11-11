@@ -33,6 +33,7 @@
 #include "zbxavailability.h"
 #include "zbxtrends.h"
 #include "../zbxalgo/vectorimpl.h"
+#include "sha512crypt.h"
 
 static zbx_mem_info_t	*hc_index_mem = NULL;
 static zbx_mem_info_t	*hc_mem = NULL;
@@ -2001,6 +2002,7 @@ static zbx_item_diff_t	*calculate_item_update(zbx_history_sync_item_t *item, con
 {
 	zbx_uint64_t	flags = 0;
 	const char	*item_error = NULL;
+	char		error_hash[ZBX_SHA512_BINARY_LENGTH];
 	zbx_item_diff_t	*diff;
 
 	if (0 != (ZBX_DC_FLAG_META & h->flags))
@@ -2024,7 +2026,9 @@ static zbx_item_diff_t	*calculate_item_update(zbx_history_sync_item_t *item, con
 			zbx_add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_ITEM, item->itemid, &h->ts, h->state, NULL,
 					NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL, h->value.err);
 
-			if (0 != strcmp(ZBX_NULL2EMPTY_STR(item->error), h->value.err))
+			zbx_sha512_hash(h->value.err, error_hash);
+
+			if (0 != memcmp(item->error_hash, error_hash, sizeof(error_hash)))
 				item_error = h->value.err;
 		}
 		else
@@ -2038,14 +2042,19 @@ static zbx_item_diff_t	*calculate_item_update(zbx_history_sync_item_t *item, con
 					NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL, NULL);
 
 			item_error = "";
+			zbx_sha512_hash(item_error, error_hash);
 		}
 	}
-	else if (ITEM_STATE_NOTSUPPORTED == h->state && 0 != strcmp(ZBX_NULL2EMPTY_STR(item->error), h->value.err))
+	else if (ITEM_STATE_NOTSUPPORTED == h->state)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "error reason for \"%s:%s\" changed: %s", item->host.host,
-				item->key_orig, h->value.err);
+		zbx_sha512_hash(h->value.err, error_hash);
+		if (0 != memcmp(item->error_hash, error_hash, sizeof(item->error_hash)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "error reason for \"%s:%s\" changed: %s", item->host.host,
+					item->key_orig, h->value.err);
 
-		item_error = h->value.err;
+			item_error = h->value.err;
+		}
 	}
 
 	if (NULL != item_error)
@@ -2071,7 +2080,10 @@ static zbx_item_diff_t	*calculate_item_update(zbx_history_sync_item_t *item, con
 	}
 
 	if (0 != (ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR & flags))
+	{
 		diff->error = item_error;
+		memcpy(diff->error_hash, error_hash, sizeof(diff->error_hash));
+	}
 
 	return diff;
 }
@@ -3001,12 +3013,17 @@ static void	proxy_prepare_history(ZBX_DC_HISTORY *history, int history_num, zbx_
 			diff->state = h->state;
 			diff->error = (ITEM_STATE_NOTSUPPORTED == h->state ? h->value.err : "");
 			diff->flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE | ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
+			zbx_sha512_hash(diff->error, diff->error_hash);
 		}
-		else if (ITEM_STATE_NOTSUPPORTED == h->state &&
-				0 != strcmp(ZBX_NULL2EMPTY_STR(items[i].error), h->value.err))
+		else if (ITEM_STATE_NOTSUPPORTED == h->state)
 		{
-			diff->error = h->value.err;
-			diff->flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
+			zbx_sha512_hash(h->value.err, diff->error_hash);
+
+			if (0 != memcmp(items[i].error_hash, diff->error_hash, sizeof(items[i].error_hash)))
+			{
+				diff->error = h->value.err;
+				diff->flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
+			}
 		}
 
 		if (0 != (ZBX_DC_FLAG_META & history[i].flags))

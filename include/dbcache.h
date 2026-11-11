@@ -186,7 +186,7 @@ typedef struct
 	char			ssl_key_file_orig[ITEM_SSL_KEY_FILE_LEN_MAX], *ssl_key_file;
 	char			ssl_key_password_orig[ITEM_SSL_KEY_PASSWORD_LEN_MAX], *ssl_key_password;
 	char			*script_params;
-	char			*error;
+	char			error_hash[ZBX_SHA512_BINARY_LENGTH];
 	unsigned char		*formula_bin;
 }
 DC_ITEM;
@@ -210,7 +210,7 @@ typedef struct
 	zbx_uint64_t		valuemapid;
 	char			key_orig[ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 	char			*units;
-	char			*error;
+	char			error_hash[ZBX_SHA512_BINARY_LENGTH];
 	int			mtime;
 	int			history_sec;
 	int			trends_sec;
