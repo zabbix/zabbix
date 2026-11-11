@@ -173,6 +173,20 @@ class CDataTable {
 	#resize_click_count = 0;
 
 	/**
+	 * Whether a reload has been requested while being delayed.
+	 *
+	 * @type {boolean}
+	 */
+	#reload_requested = false;
+
+	/**
+	 * Whether reload is currently delayed.
+	 *
+	 * @type {boolean}
+	 */
+	#reload_delayed = false;
+
+	/**
 	 * The reference to the custom scrollbar track element.
 	 *
 	 * @type {HTMLElement|null}
@@ -873,6 +887,10 @@ class CDataTable {
 		return this;
 	}
 
+	getCellRenderer(name) {
+		return this.#cell_renderers[name];
+	}
+
 	setCellRenderer(name, renderer) {
 		if (this.#initialized) {
 			return this;
@@ -1291,6 +1309,7 @@ class CDataTable {
 
 	onInit(e) {
 		this.#has_data = false;
+		this.#reload_requested = false;
 
 		const {loading, loading_fadein, check_changes, force_load, reset} = {
 			loading: true,
@@ -1398,6 +1417,8 @@ class CDataTable {
 	}
 
 	onColumnResizeStart(e) {
+		this.#reload_delayed = true;
+
 		const {x, column_index, id} = e.detail;
 
 		this.#resize_click_count++;
@@ -1444,6 +1465,12 @@ class CDataTable {
 		this.#stopColumnResizing();
 
 		this.dispatchEvent(CDataTable.EVENT_SAVE);
+
+		this.#reload_delayed = false;
+
+		if (this.#reload_requested) {
+			this.dispatchEvent(CDataTable.EVENT_INIT, {force_load: true});
+		}
 	}
 
 	onDataSort(e) {
@@ -1582,7 +1609,12 @@ class CDataTable {
 		handle.classList.remove(CDataTable.ZBX_STYLE_OPTIONS_LINK_OPENED);
 
 		if (this.#options_popup.isForceLoadOnClose()) {
-			this.dispatchEvent(CDataTable.EVENT_INIT, {force_load: true});
+			if (this.#reload_delayed) {
+				this.#reload_requested = true;
+			}
+			else {
+				this.dispatchEvent(CDataTable.EVENT_INIT, {force_load: true});
+			}
 		}
 
 		this.#options_popup = null;

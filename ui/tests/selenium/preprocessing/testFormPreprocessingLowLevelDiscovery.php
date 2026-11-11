@@ -453,8 +453,8 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 						'type' => 'JavaScript',
 						'parameters' => [
 							[
-								'selector' => 'xpath:.//div[@class="multilineinput-control has-error"]/input[@type="text"]',
-								'placeholder' => 'script'
+								'selector' => 'xpath:.//div[contains(@class, "multilineinput-control")]/span',
+								'data-placeholder' => 'script'
 							]
 						],
 						'on_fail_enabled' => false

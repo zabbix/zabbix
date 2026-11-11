@@ -608,6 +608,7 @@
 		&.datatable-cell-data {
 			overflow: hidden;
 			align-items: flex-start;
+			word-break: break-word;
 
 			&.datatable-cell-sticky:not(.datatable-cell-bg-hover) {
 				background-color: $ui-bg-color;
@@ -649,11 +650,34 @@
 				white-space: normal;
 			}
 
+			.status-container {
+				display: flex;
+				flex-wrap: wrap;
+				height: auto;
+				min-height: 16px;
+				gap: 2px 3px;
+
+				> *:not(.out) {
+					@extend %overflow-ellipsis;
+				}
+
+				.out {
+					display: flex;
+					flex-wrap: wrap;
+					overflow: hidden;
+
+					> * {
+						@extend %overflow-ellipsis;
+					}
+				}
+			}
+
 			.flex-wrapper {
 				display: flex;
 				flex-wrap: wrap;
+				height: auto;
 				min-height: 16px;
-				column-gap: 5px;
+				gap: 2px 3px;
 
 				&.nowrap {
 					flex-wrap: nowrap;

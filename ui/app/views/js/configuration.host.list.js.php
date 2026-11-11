@@ -616,7 +616,8 @@
 					const is_monitored = status == HOST_STATUS_MONITORED;
 
 					const status_link = document.createElement('a');
-					status_link.classList.add(ZBX_STYLE_LINK_ACTION, is_monitored ? ZBX_STYLE_GREEN : ZBX_STYLE_RED);
+					status_link.classList.add(ZBX_STYLE_LINK_ACTION, is_monitored ? ZBX_STYLE_GREEN : ZBX_STYLE_RED,
+						ZBX_STYLE_WORDBREAK);
 					status_link.setAttribute('href', 'javascript:void(0);');
 					status_link.textContent = is_monitored
 						? <?= json_encode(_('Enabled')); ?>
@@ -652,7 +653,8 @@
 
 					if (disabled_by_lld != 0) {
 						const description_icon = document.createElement('button');
-						description_icon.classList.add('btn-icon', ZBX_ICON_ALERT_WITH_CONTENT, ZBX_STYLE_HINTBOX_WRAP);
+						description_icon.classList.add('btn-icon', ZBX_ICON_ALERT_WITH_CONTENT, ZBX_STYLE_HINTBOX_WRAP,
+							ZBX_STYLE_NO_INDENT);
 						description_icon.setAttribute('role', 'button');
 						description_icon.setAttribute('data-content', '?');
 						description_icon.setAttribute('data-hintbox-html',
@@ -662,8 +664,7 @@
 						description_icon.setAttribute('data-hintbox-static', '1');
 						description_icon.setAttribute('aria-expanded', 'false');
 
-						cell.innerHTML += ' ';
-						cell.appendChild(description_icon);
+						cell.append(' ', description_icon);
 					}
 				})
 				.setCellRenderer('proxy', ({cell_data, cell, response}) => {
@@ -815,7 +816,7 @@
 						&& (tls_accept & HOST_ENCRYPTION_PSK) != HOST_ENCRYPTION_PSK
 						&& (tls_accept & HOST_ENCRYPTION_CERTIFICATE) != HOST_ENCRYPTION_CERTIFICATE) {
 
-						const none = document.createElement('span');
+						const none = document.createElement('div');
 						none.classList.add(ZBX_STYLE_STATUS_GREEN);
 						none.textContent = <?= json_encode(_('None')); ?>;
 
@@ -842,10 +843,10 @@
 
 						in_encryption.classList.add('in');
 
-						const out_encryption = document.createElement('span');
+						const out_encryption = document.createElement('div');
 						out_encryption.classList.add('out');
 
-						const none = document.createElement('span');
+						const none = document.createElement('div');
 						none.textContent = <?= json_encode(_('None')); ?>;
 
 						if ((tls_accept & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE) {
@@ -857,7 +858,7 @@
 
 						out_encryption.appendChild(none);
 
-						const psk = document.createElement('span');
+						const psk = document.createElement('div');
 						psk.textContent = <?= json_encode(_('PSK')); ?>;
 
 						if ((tls_accept & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK) {
@@ -869,7 +870,7 @@
 
 						out_encryption.appendChild(psk);
 
-						const cert = document.createElement('span');
+						const cert = document.createElement('div');
 						cert.textContent = <?= json_encode(_('CERT')); ?>;
 
 						if ((tls_accept & HOST_ENCRYPTION_CERTIFICATE) == HOST_ENCRYPTION_CERTIFICATE) {
@@ -882,7 +883,7 @@
 						out_encryption.appendChild(cert);
 
 						const encryption = document.createElement('div');
-						encryption.classList.add(ZBX_STYLE_STATUS_CONTAINER, ZBX_STYLE_NOWRAP);
+						encryption.classList.add(ZBX_STYLE_STATUS_CONTAINER);
 						encryption.appendChild(in_encryption);
 						encryption.innerHTML += ' ';
 						encryption.appendChild(out_encryption);

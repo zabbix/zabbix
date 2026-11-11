@@ -19,8 +19,8 @@
 
 .sidebar .server-name, .form-grid > label,
 .form-grid .collapsible > label,
-.form-grid .fields-group > label, .dashboard-navigation-tabs .sortable li div span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .datatable.compact-view .datatable-body .datatable-cell.datatable-cell-data .flex-wrapper > .link-action, .datatable.compact-view .datatable-body .datatable-cell.datatable-cell-data .tags-wrapper .tag, .datatable.compact-view .datatable-body .datatable-cell.datatable-cell-data .opdata, .datatable .datatable-options .datatable-options-list .datatable-options-list-item label .datatable-options-list-item-label, .datatable .datatable-cell.datatable-cell-header .header-name, .datatable .datatable-cell.datatable-cell-header.datatable-cell-header-link .header-link, .datatable .datatable-cell.datatable-cell-header.datatable-cell-header-link .header-link .name, .datatable .datatable-cell.datatable-cell-data .flex-wrapper > .link-action, .datatable .datatable-cell.datatable-cell-data .flex-wrapper .flex-item > .link-action, .datatable .datatable-cell.datatable-cell-data .timeline-date, .list-table .action-container .link-action, .tag, .trace-view .trace-view-container .trace-scroll .trace-tree z-navigation-tree .trace-tree-title-content .title, div.dashboard-widget-hostcard .host-card .sections-header .host-name .link-action, div.dashboard-widget-hostcard .host-card .sections .section .section-name, div.dashboard-widget-hostcard .host-card .sections .section.section-host-groups .host-groups .host-group .host-group-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitoring .monitoring .monitoring-item .monitoring-item-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitored-by .section-body, div.dashboard-widget-hostcard .host-card .sections .section.section-templates .templates .template .template-name, div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-name,
-div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-value, div.dashboard-widget-itemcard .item-card .sections-header .section-item .item-name .link-action, div.dashboard-widget-itemcard .item-card .sections-header .section-path, div.dashboard-widget-itemcard .item-card .sections-header .section-path .path-element, div.dashboard-widget-itemcard .item-card .sections .section .section-name, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-triggers .triggers .trigger .trigger-name, div.dashboard-widget-itemcard .item-card .sections .section.section-single-parameter .section-body, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-scatterplot .dataset-head .head-row > label, form.dashboard-widget-scatterplot .dataset-body .form-grid > label, form.dashboard-widget-tophosts #list_columns .text, form.dashboard-widget-topitems #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a, .preprocessing-list .preprocessing-list-head .step-on-fail, .totals-list.totals-list-horizontal .count,
+.form-grid .fields-group > label, .dashboard-navigation-tabs .sortable li div span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .datatable.compact-view .datatable-body .datatable-cell.datatable-cell-data .flex-wrapper > .link-action, .datatable.compact-view .datatable-body .datatable-cell.datatable-cell-data .tags-wrapper .tag, .datatable.compact-view .datatable-body .datatable-cell.datatable-cell-data .opdata, .datatable .datatable-options .datatable-options-list .datatable-options-list-item label .datatable-options-list-item-label, .datatable .datatable-cell.datatable-cell-header .header-name, .datatable .datatable-cell.datatable-cell-header.datatable-cell-header-link .header-link, .datatable .datatable-cell.datatable-cell-header.datatable-cell-header-link .header-link .name, .datatable .datatable-cell.datatable-cell-data .status-container > *:not(.out), .datatable .datatable-cell.datatable-cell-data .status-container .out > *, .datatable .datatable-cell.datatable-cell-data .flex-wrapper > .link-action, .datatable .datatable-cell.datatable-cell-data .flex-wrapper .flex-item > .link-action, .datatable .datatable-cell.datatable-cell-data .timeline-date, .list-table .action-container .link-action, .tag, .trace-view .trace-view-container .trace-scroll .trace-tree z-navigation-tree .trace-tree-title-content .title, div.dashboard-widget-hostcard .host-card .sections-header .host-name .link-action, div.dashboard-widget-hostcard .host-card .sections .section .section-name, div.dashboard-widget-hostcard .host-card .sections .section.section-host-groups .host-groups .host-group .host-group-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitoring .monitoring .monitoring-item .monitoring-item-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitored-by .section-body, div.dashboard-widget-hostcard .host-card .sections .section.section-templates .templates .template .template-name, div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-name,
+div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-value, div.dashboard-widget-itemcard .item-card .sections-header .section-item .item-name .link-action, div.dashboard-widget-itemcard .item-card .sections-header .section-path, div.dashboard-widget-itemcard .item-card .sections-header .section-path .path-element, div.dashboard-widget-itemcard .item-card .sections .section .section-name, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-triggers .triggers .trigger .trigger-name, div.dashboard-widget-itemcard .item-card .sections .section.section-single-parameter .section-body, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-scatterplot .dataset-head .head-row > label, form.dashboard-widget-scatterplot .dataset-body .form-grid > label, form.dashboard-widget-tophosts #list_columns .text, form.dashboard-widget-topitems #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .multilineinput-control .multilineinput-preview, .notif-body h4, .overlay-descr-url, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a, .preprocessing-list .preprocessing-list-head .step-on-fail, .totals-list.totals-list-horizontal .count,
 .totals-list.totals-list-horizontal .name, .rules-status-container .status-green,
 .rules-status-container .status-grey {
   overflow: hidden;
@@ -1244,15 +1244,27 @@ footer {
     .form-grid .collapsible > label .icon,
     .form-grid .fields-group > label .icon {
       margin-left: 5px; }
-    .form-grid > label:has(.btn-icon:not([hidden]):not([style*="display: none"])),
-    .form-grid .collapsible > label:has(.btn-icon:not([hidden]):not([style*="display: none"])),
-    .form-grid .fields-group > label:has(.btn-icon:not([hidden]):not([style*="display: none"])) {
+    .form-grid > label:has(span:not(.display-none) .btn-icon:not([hidden]):not([style*="display: none"]),
+    > .btn-icon:not([hidden]):not([style*="display: none"])
+    ),
+    .form-grid .collapsible > label:has(span:not(.display-none) .btn-icon:not([hidden]):not([style*="display: none"]),
+    > .btn-icon:not([hidden]):not([style*="display: none"])
+    ),
+    .form-grid .fields-group > label:has(span:not(.display-none) .btn-icon:not([hidden]):not([style*="display: none"]),
+    > .btn-icon:not([hidden]):not([style*="display: none"])
+    ) {
       position: relative;
       right: -2px;
       padding-right: 23px; }
-      .form-grid > label:has(.btn-icon:not([hidden]):not([style*="display: none"])) .btn-icon,
-      .form-grid .collapsible > label:has(.btn-icon:not([hidden]):not([style*="display: none"])) .btn-icon,
-      .form-grid .fields-group > label:has(.btn-icon:not([hidden]):not([style*="display: none"])) .btn-icon {
+      .form-grid > label:has(span:not(.display-none) .btn-icon:not([hidden]):not([style*="display: none"]),
+      > .btn-icon:not([hidden]):not([style*="display: none"])
+      ) .btn-icon,
+      .form-grid .collapsible > label:has(span:not(.display-none) .btn-icon:not([hidden]):not([style*="display: none"]),
+      > .btn-icon:not([hidden]):not([style*="display: none"])
+      ) .btn-icon,
+      .form-grid .fields-group > label:has(span:not(.display-none) .btn-icon:not([hidden]):not([style*="display: none"]),
+      > .btn-icon:not([hidden]):not([style*="display: none"])
+      ) .btn-icon {
         position: absolute;
         top: 4px;
         right: 2px; }
@@ -2837,7 +2849,8 @@ button {
       z-index: 4; }
     .datatable .datatable-cell.datatable-cell-data {
       overflow: hidden;
-      align-items: flex-start; }
+      align-items: flex-start;
+      word-break: break-word; }
       .datatable .datatable-cell.datatable-cell-data.datatable-cell-sticky:not(.datatable-cell-bg-hover) {
         background-color: #000000; }
       .datatable .datatable-cell.datatable-cell-data.datatable-cell-error {
@@ -2858,11 +2871,22 @@ button {
         border-right: 1px solid transparent; }
       .datatable .datatable-cell.datatable-cell-data .wordbreak {
         white-space: normal; }
+      .datatable .datatable-cell.datatable-cell-data .status-container {
+        display: flex;
+        flex-wrap: wrap;
+        height: auto;
+        min-height: 16px;
+        gap: 2px 3px; }
+        .datatable .datatable-cell.datatable-cell-data .status-container .out {
+          display: flex;
+          flex-wrap: wrap;
+          overflow: hidden; }
       .datatable .datatable-cell.datatable-cell-data .flex-wrapper {
         display: flex;
         flex-wrap: wrap;
+        height: auto;
         min-height: 16px;
-        column-gap: 5px; }
+        gap: 2px 3px; }
         .datatable .datatable-cell.datatable-cell-data .flex-wrapper.nowrap {
           flex-wrap: nowrap; }
         .datatable .datatable-cell.datatable-cell-data .flex-wrapper .flex-item {
@@ -3308,7 +3332,7 @@ textarea.has-error {
 .multiselect-control.has-error:focus-within .multiselect {
   border-color: #ff5e5e; }
 
-.multilineinput-control.has-error > input[readonly][type="text"] {
+.multilineinput-control.has-error > .multilineinput-preview {
   border: 1px solid #ff5e5e; }
 
 div[data-field-type="set"].has-error {
@@ -4138,9 +4162,13 @@ output {
     output.msg-warning::before {
       content: ""; }
   output.msg-global {
-    max-width: fit-content;
+    display: inline-grid;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 5dvh;
+    width: min-content;
     min-width: 475px;
-    margin: 5% auto 0; }
+    max-width: 80dvw; }
   output.msg-global-footer {
     position: fixed;
     bottom: 0;
@@ -4492,7 +4520,7 @@ output {
       overflow-y: auto;
       overflow-x: hidden;
       width: 100%;
-      max-height: calc(100vh - 220px);
+      max-height: calc(100vh - 216px);
       max-width: inherit; }
       .overlay-dialogue.modal .overlay-dialogue-body form {
         padding: 2px 0; }
@@ -9290,21 +9318,33 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
 .multilineinput-control {
   display: flex;
   width: 100%; }
-  .multilineinput-control input[type=text] {
-    overflow: hidden;
+  .multilineinput-control .multilineinput-preview {
+    box-sizing: border-box;
+    flex: 1;
+    height: 24px;
+    padding: 0 5px;
+    line-height: 22px;
     cursor: pointer;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    border-right: 0;
+    background-color: #383838;
+    border: 1px solid #666666;
+    border-right-width: 0;
+    border-radius: var(--input-border-radius);
     border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    width: 100%; }
-    .multilineinput-control input[type=text][readonly] {
-      background: #383838 !important;
-      border-color: #666666;
-      color: #e1e3ed; }
-    .multilineinput-control input[type=text].monospace-font {
+    border-bottom-right-radius: 0; }
+    .multilineinput-control .multilineinput-preview.monospace-font {
       padding-top: 1px; }
+    .multilineinput-control .multilineinput-preview.multilineinput-preview-placeholder::before {
+      content: attr(data-placeholder);
+      color: #bbbbbb; }
+  .multilineinput-control.multilineinput-readonly .multilineinput-preview {
+    background-color: #000000; }
+  .multilineinput-control.multilineinput-disabled .multilineinput-preview {
+    background-color: #000000;
+    border-color: #5a5a5a;
+    color: #666666;
+    cursor: default; }
+    .multilineinput-control.multilineinput-disabled .multilineinput-preview.multilineinput-preview-placeholder::before {
+      color: #484848; }
   .multilineinput-control.editable {
     background-color: #383838 !important;
     border-color: #7d7d7d; }
@@ -9319,10 +9359,6 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
       border-color: #666666; }
       .multilineinput-control button:not([disabled]):not([readonly]):hover {
         background-color: #414141; }
-  .multilineinput-control.multilineinput-readonly input[type=text][readonly] {
-    background-color: #000000 !important; }
-  .multilineinput-control.multilineinput-disabled input[type=text] {
-    cursor: default; }
   .multilineinput-control.multilineinput-disabled button::after {
     opacity: .5; }
   .multilineinput-control button.zi-pencil::before {

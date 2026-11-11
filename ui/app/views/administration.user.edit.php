@@ -274,23 +274,24 @@ $user_form_list
 	->addRow(new CLabel(_('Theme'), $theme_select->getFocusableElementId()), $theme_select);
 
 // Append auto-login & auto-logout to form list.
-if ($data['db_user']['username'] !== ZBX_GUEST_USER) {
-	$autologout = ($data['autologout'] !== '0') ? $data['autologout'] : DB::getDefault('users', 'autologout');
+$autologout = ($data['autologout'] !== '0') ? $data['autologout'] : DB::getDefault('users', 'autologout');
 
+if ($data['db_user']['username'] !== ZBX_GUEST_USER) {
 	$user_form_list->addRow(_('Auto-login'),
 		(new CCheckBox('autologin'))
 			->setUncheckedValue('0')
 			->setChecked($data['autologin'])
 	);
-	$user_form_list->addRow(_('Auto-logout'), [
-		(new CCheckBox('autologout_visible'))
-			->setChecked($data['autologout'] !== '0')
-			->setUncheckedValue(0),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CTextBox('autologout', $autologout, false, DB::getFieldLength('users', 'autologout')))
-			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-	]);
 }
+
+$user_form_list->addRow(_('Auto-logout'), [
+	(new CCheckBox('autologout_visible'))
+		->setChecked($data['autologout'] !== '0')
+		->setUncheckedValue(0),
+	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+	(new CTextBox('autologout', $autologout, false, DB::getFieldLength('users', 'autologout')))
+		->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+]);
 
 $is_disabled = array_key_exists('profile_redirect_enforce', $data) && $data['profile_redirect_enforce'];
 

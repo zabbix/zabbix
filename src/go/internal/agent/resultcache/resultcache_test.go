@@ -70,7 +70,7 @@ func (w *mockWriter) Session() string {
 func TestResultCache(t *testing.T) {
 	agent.Options.BufferSize = 10
 	agent.Options.EnablePersistentBuffer = 0
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 
 	writer := mockWriter{lastid: 1, t: t}
 	c := New(&agent.Options, 0, nil)
@@ -141,7 +141,7 @@ func TestBuffer(t *testing.T) {
 		{Id: 10, Itemid: 10},
 	}
 
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 	agent.Options.BufferSize = 10
 	agent.Options.EnablePersistentBuffer = 0
 	c := New(&agent.Options, 0, nil)
@@ -181,7 +181,7 @@ func TestBufferFull5(t *testing.T) {
 		{Id: 15, Itemid: 15},
 	}
 
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 	agent.Options.BufferSize = 10
 	agent.Options.EnablePersistentBuffer = 0
 	c := New(&agent.Options, 0, nil)
@@ -221,7 +221,7 @@ func TestBufferFull5ReplaceFirst(t *testing.T) {
 		{Id: 15, Itemid: 5},
 	}
 
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 	agent.Options.BufferSize = 10
 	agent.Options.EnablePersistentBuffer = 0
 	c := New(&agent.Options, 0, nil)
@@ -261,7 +261,7 @@ func TestBufferFull5ReplaceLast(t *testing.T) {
 		{Id: 15, Itemid: 10},
 	}
 
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 	agent.Options.BufferSize = 10
 	agent.Options.EnablePersistentBuffer = 0
 	c := New(&agent.Options, 0, nil)
@@ -301,7 +301,7 @@ func TestBufferFull5ReplacInterleaved(t *testing.T) {
 		{Id: 15, Itemid: 9},
 	}
 
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 	agent.Options.BufferSize = 10
 	agent.Options.EnablePersistentBuffer = 0
 	c := New(&agent.Options, 0, nil)
@@ -341,7 +341,7 @@ func TestBufferFull5OneItem(t *testing.T) {
 		{Id: 15, Itemid: 1},
 	}
 
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 	agent.Options.BufferSize = 10
 	agent.Options.EnablePersistentBuffer = 0
 	c := New(&agent.Options, 0, nil)
@@ -380,7 +380,7 @@ func TestBufferFull4OneItemPersistent(t *testing.T) {
 		{Id: 14, Itemid: 1, persistent: true},
 	}
 
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 	agent.Options.BufferSize = 10
 	agent.Options.EnablePersistentBuffer = 0
 	c := New(&agent.Options, 0, nil)
@@ -421,7 +421,7 @@ func TestBufferFull5OneItemPersistent(t *testing.T) {
 		{Id: 15, Itemid: 1, persistent: true},
 	}
 
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 	agent.Options.BufferSize = 10
 	agent.Options.EnablePersistentBuffer = 0
 	c := New(&agent.Options, 0, nil)
@@ -467,7 +467,7 @@ func TestBufferFull10PersistentAndNormal(t *testing.T) {
 		{Id: 20, Itemid: 13},
 	}
 
-	_ = log.Open(log.Console, log.Debug, "", 0)
+	_ = log.NewWithOptions(log.NewOptions().WithLogType(log.Console).WithLevel(log.Debug))
 	agent.Options.BufferSize = 10
 	agent.Options.EnablePersistentBuffer = 0
 	c := New(&agent.Options, 0, nil)
