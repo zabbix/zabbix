@@ -29,6 +29,6 @@
 #define ZBX_REPORT_PERIOD_MONTH		0
 #define ZBX_REPORT_PERIOD_YEAR		0
 
-void	zbx_report_test(const struct zbx_json_parse *jp, zbx_uint64_t userid, struct zbx_json *j);
+void	zbx_report_test(const struct zbx_json_parse *jp, const zbx_user_t *user, struct zbx_json *j);
 
 #endif

@@ -40,6 +40,7 @@ require_once dirname(__FILE__).'/testHighAvailability.php';
 require_once dirname(__FILE__).'/testUserParametersReload.php';
 require_once dirname(__FILE__).'/testTriggerState.php';
 require_once dirname(__FILE__).'/testFunctionChangeCount.php';
+require_once dirname(__FILE__).'/testInternalJavaItem.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -71,6 +72,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testUserParametersReload');
 		$suite->addTestSuite('testTriggerState');
 		$suite->addTestSuite('testFunctionChangeCount');
+		$suite->addTestSuite('testInternalJavaItem');
 
 		return $suite;
 	}

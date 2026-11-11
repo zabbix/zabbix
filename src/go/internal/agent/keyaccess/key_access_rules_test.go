@@ -22,6 +22,7 @@
 package keyaccess
 
 import (
+	"slices"
 	"testing"
 
 	"golang.zabbix.com/agent2/pkg/itemutil"
@@ -365,6 +366,81 @@ func TestBlacklist(t *testing.T) {
 	}
 
 	RunScenarios(t, scenarios, records, 2)
+}
+
+//nolint:paralleltest // Access rules are stored globally.
+func TestCommandAccessRules(t *testing.T) {
+	tests := []struct {
+		name      string
+		pattern   string
+		scenarios []scenario
+	}{
+		{
+			name:    "literalCommand",
+			pattern: "system.run[/usr/bin/uptime]",
+			scenarios: []scenario{
+				{metric: "system.run[/usr/bin/uptime]", result: true},
+				{metric: `system.run["/usr/bin/uptime"]`, result: true},
+				{metric: "system.run[/usr/bin/uptime/usr/bin/uptime]", result: false},
+				{metric: "system.run[/usr/bin/uptime; cat /etc/passwd; /usr/bin/uptime]", result: false},
+				{metric: "system.run[/usr/bin/uptimeX]", result: false},
+				{metric: "system.run[X/usr/bin/uptime]", result: false},
+				{metric: "system.run[/usr/bin/up]", result: false},
+				{metric: "system.run[/usr/bin/uptime,wait]", result: false},
+				{metric: "system.run[/usr/bin/uptime,nowait]", result: false},
+			},
+		},
+		{
+			name:    "literalCommandWithMode",
+			pattern: "system.run[/usr/bin/uptime,*]",
+			scenarios: []scenario{
+				{metric: "system.run[/usr/bin/uptime]", result: true},
+				{metric: "system.run[/usr/bin/uptime,wait]", result: true},
+				{metric: "system.run[/usr/bin/uptime,nowait]", result: true},
+				{metric: "system.run[/usr/bin/uptime/usr/bin/uptime,nowait]", result: false},
+				{metric: "system.run[/usr/bin/uptime; cat /etc/passwd; /usr/bin/uptime]", result: false},
+				{metric: "system.run[/usr/bin/uptime; cat /etc/passwd; /usr/bin/uptime,wait]", result: false},
+				{metric: "system.run[/usr/bin/uptime; cat /etc/passwd; /usr/bin/uptime,nowait]", result: false},
+			},
+		},
+		{
+			name:    "utf8WildcardPrefix",
+			pattern: "system.run[é*]",
+			scenarios: []scenario{
+				{metric: "system.run[é]", result: true},
+				{metric: "system.run[é args]", result: true},
+				{metric: "system.run[éXé]", result: true},
+				{metric: "system.run[ê]", result: false},
+				{metric: "system.run[ê args]", result: false},
+				{metric: "system.run[Xé]", result: false},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			for _, permission := range []RuleType{ALLOW, DENY} {
+				t.Run(permission.String(), func(t *testing.T) {
+					var records accessRules
+
+					records.addRule(tt.pattern, permission)
+
+					scenarios := slices.Clone(tt.scenarios)
+
+					if permission == DENY {
+						// Permit other commands so an accidental deny match is observable.
+						records.addRule("system.run[*]", ALLOW)
+
+						for i := range scenarios {
+							scenarios[i].result = !scenarios[i].result
+						}
+					}
+
+					RunScenarios(t, scenarios, records, 2)
+				})
+			}
+		})
+	}
 }
 
 func TestCombinedWildcardInKey(t *testing.T) {

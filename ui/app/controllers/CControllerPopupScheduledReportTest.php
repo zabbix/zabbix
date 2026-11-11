@@ -57,7 +57,6 @@ class CControllerPopupScheduledReportTest extends CController {
 
 		$params = [
 			'name' => $this->getInput('name'),
-			'userid' => CWebUser::$data['userid'],
 			'dashboardid' => $this->getInput('dashboardid'),
 			'period' => $this->getInput('period'),
 			'now' => $this->getInput('now'),

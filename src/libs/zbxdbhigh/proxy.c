@@ -3524,6 +3524,9 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
 			break;
 	}
 
+	/* free values left by parsing error */
+	zbx_agent_values_clean(values, values_num);
+
 	if (NULL != session && 0 != last_valueid)
 	{
 		if (session->last_valueid > last_valueid)
@@ -3737,6 +3740,9 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 		if (NULL == pnext)
 			break;
 	}
+
+	/* free values left by parsing error */
+	zbx_agent_values_clean(values, values_num);
 
 	for (i = 0; i < ZBX_HISTORY_VALUES_MAX; i++)
 	{
