@@ -173,8 +173,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'hostids' => array_column($hosts, 'hostid'),
 				'skipDependent' => true,
 				'monitored' => true,
-				'preservekeys' => true,
-				'filter' => ['value' => TRIGGER_VALUE_TRUE]
+				'filter' => ['value' => TRIGGER_VALUE_TRUE],
+				'preservekeys' => true
 			]);
 
 			$problems = API::Problem()->get([
