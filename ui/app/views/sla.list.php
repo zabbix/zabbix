@@ -196,6 +196,8 @@ if ($data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]) {
 	->addItem($form)
 	->show();
 
+(new CTemplateTag('filter-tag-row-tmpl', CTagFilterFieldHelper::getTemplate()))->show();
+
 (new CScriptTag('
 	view.init();
 '))
