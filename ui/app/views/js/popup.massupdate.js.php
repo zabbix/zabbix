@@ -480,8 +480,9 @@ function submitPopup(overlay) {
 
 			message_box.insertBefore(form);
 		}
-		else if (['popup.massupdate.host', 'item.prototype.massupdate', 'trigger.prototype.massupdate',
-			'template.massupdate', 'item.massupdate', 'trigger.massupdate'].includes(action)) {
+		else if (['popup.massupdate.host', 'popup.massupdate.service', 'item.prototype.massupdate',
+			'trigger.prototype.massupdate', 'template.massupdate', 'item.massupdate',
+			'trigger.massupdate'].includes(action)) {
 
 			// Item and item prototype lists javascript handles successful update.
 			overlayDialogueDestroy(overlay.dialogueid);
