@@ -1,0 +1,192 @@
+zabbix_export:
+  version: '7.4'
+  media_types:
+    - name: Twilio SMS/WhatsApp
+      type: WEBHOOK
+      parameters:
+        # ── Twilio credentials and settings ───────────────────────────────
+        - name: account_sid
+          value: '{$TWILIO.ACCOUNT_SID}'
+        - name: auth_token
+          value: '{$TWILIO.AUTH_TOKEN}'
+        - name: message_type
+          value: 'sms'
+        - name: from_number
+          value: '<PLACE YOUR FROM NUMBER>'
+        # ── Message-specific parameters ───────────────────────────────────
+        - name: to_number
+          value: '{ALERT.SENDTO}'
+        - name: alert_subject
+          value: '{ALERT.SUBJECT}'
+        - name: alert_message
+          value: '{ALERT.MESSAGE}'
+        - name: event_id
+          value: '{EVENT.ID}'
+        - name: event_nseverity
+          value: '{EVENT.NSEVERITY}'
+        - name: event_source
+          value: '{EVENT.SOURCE}'
+        - name: event_value
+          value: '{EVENT.VALUE}'
+        # optional HTTP proxy for outbound call
+        - name: http_proxy
+          value: ''
+      status: DISABLED
+      attempts: '3'
+      max_sessions: '0'
+      process_tags: 'NO'
+      script: |
+        /**
+         * Twilio SMS/WhatsApp webhook for Zabbix
+         * Supports both SMS and WhatsApp via Twilio API
+         * Docs: https://www.twilio.com/docs/messaging/api/message-resource
+         */
+        try {
+            var params   = JSON.parse(value),
+                request  = new HttpRequest(),
+                response,
+                apiUrl,
+                payload,
+                fromNumber,
+                toNumber;
+
+            /* Proxy support */
+            if (typeof params.http_proxy === 'string' && params.http_proxy.trim() !== '') {
+                request.setProxy(params.http_proxy);
+            }
+
+            /* Basic sanity checks */
+            if (typeof params.account_sid !== 'string' || params.account_sid.trim() === '') {
+                throw 'Parameter "account_sid" is missing';
+            }
+            if (typeof params.auth_token !== 'string' || params.auth_token.trim() === '') {
+                throw 'Parameter "auth_token" is missing';
+            }
+            if (typeof params.from_number !== 'string' || params.from_number.trim() === '' || params.from_number === '<PLACE YOUR FROM NUMBER>') {
+                throw 'Parameter "from_number" is not set';
+            }
+            if (typeof params.to_number !== 'string' || params.to_number.trim() === '') {
+                throw 'Parameter "to_number" is empty (did you set "Send to" field?)';
+            }
+
+            if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
+                throw 'Incorrect "event_source" parameter given: "' + params.event_source + '".\nMust be 0-3.';
+            }
+
+            if (params.event_value !== '0' && params.event_value !== '1'
+                && (params.event_source === '0' || params.event_source === '3')) {
+                throw 'Incorrect "event_value" parameter given: ' + params.event_value + '\nMust be 0 or 1.';
+            }
+
+            if ([0, 1, 2, 3, 4, 5].indexOf(parseInt(params.event_nseverity)) === -1) {
+                params.event_nseverity = '0';
+            }
+
+            /* Determine message type and format numbers accordingly */
+            var messageType = (typeof params.message_type === 'string') ? params.message_type.toLowerCase() : 'sms';
+            
+            if (messageType === 'whatsapp') {
+                /* WhatsApp format: whatsapp:+1234567890 */
+                fromNumber = params.from_number.indexOf('whatsapp:') === 0 ? params.from_number : 'whatsapp:' + params.from_number;
+                toNumber = params.to_number.indexOf('whatsapp:') === 0 ? params.to_number : 'whatsapp:' + params.to_number;
+            } else {
+                /* SMS format: regular phone numbers */
+                fromNumber = params.from_number.replace(/^whatsapp:/, '');
+                toNumber = params.to_number.replace(/^whatsapp:/, '');
+            }
+
+            /* Compose API endpoint */
+            apiUrl = 'https://api.twilio.com/2010-04-01/Accounts/' + params.account_sid + '/Messages.json';
+
+            /* Build application/x-www-form-urlencoded payload */
+            var messageBody = (params.alert_subject ? params.alert_subject + '\n' : '') + params.alert_message;
+            
+            /* WhatsApp supports basic formatting */
+            if (messageType === 'whatsapp') {
+                messageBody = messageBody
+                    .replace(/\*([^*]+)\*/g, '*$1*')  // Keep bold formatting
+                    .replace(/Problem:/g, '*Problem:*')
+                    .replace(/Resolved:/g, '*Resolved:*');
+            }
+
+            payload = 'To='   + encodeURIComponent(toNumber) +
+                      '&From=' + encodeURIComponent(fromNumber) +
+                      '&Body=' + encodeURIComponent(messageBody);
+
+            /* Prepare HTTP request */
+            request.addHeader('Content-Type: application/x-www-form-urlencoded');
+            request.setBasicAuth(params.account_sid, params.auth_token);
+
+            Zabbix.log(4, '[ Twilio ' + messageType.toUpperCase() + ' ] Sending POST to ' + apiUrl + ' with body: ' + payload);
+            response = request.post(apiUrl, payload);
+            Zabbix.log(4, '[ Twilio ' + messageType.toUpperCase() + ' ] Response code ' + request.getStatus() + ': ' + response);
+
+            if (request.getStatus() >= 200 && request.getStatus() < 300) {
+                return 'OK';
+            }
+
+            throw 'HTTP ' + request.getStatus() + ' - ' + response;
+        }
+        catch (error) {
+            Zabbix.log(4, '[ Twilio Webhook ] Twilio notification failed: ' + error);
+            throw 'Twilio notification failed: ' + error;
+        }
+      description: |
+        Please refer to setup guide here: https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/media/twilio
+
+        Set account_sid and auth_token parameters to your Twilio credentials.
+        Set message_type to 'sms' or 'whatsapp'.
+        When assigning Twilio media to the Zabbix user - add destination phone number into send to field.
+      message_templates:
+        - event_source: TRIGGERS
+          operation_mode: PROBLEM
+          subject: 'Problem: {EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Operational data: {EVENT.OPDATA}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        - event_source: TRIGGERS
+          operation_mode: RECOVERY
+          subject: 'Resolved in {EVENT.DURATION}: {EVENT.NAME}'
+          message: |
+            Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Problem duration: {EVENT.DURATION}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        - event_source: TRIGGERS
+          operation_mode: UPDATE
+          subject: 'Updated problem in {EVENT.AGE}: {EVENT.NAME}'
+          message: |
+            {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            {EVENT.UPDATE.MESSAGE}
+
+            Current problem status is {EVENT.STATUS}, age is {EVENT.AGE}, acknowledged: {EVENT.ACK.STATUS}.
+        - event_source: DISCOVERY
+          operation_mode: PROBLEM
+          subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
+          message: |
+            Discovery rule: {DISCOVERY.RULE.NAME}
+
+            Device IP: {DISCOVERY.DEVICE.IPADDRESS}
+            Device DNS: {DISCOVERY.DEVICE.DNS}
+            Device status: {DISCOVERY.DEVICE.STATUS}
+            Device uptime: {DISCOVERY.DEVICE.UPTIME}
+
+            Device service name: {DISCOVERY.SERVICE.NAME}
+            Device service port: {DISCOVERY.SERVICE.PORT}
+            Device service status: {DISCOVERY.SERVICE.STATUS}
+            Device service uptime: {DISCOVERY.SERVICE.UPTIME}
+        - event_source: AUTOREGISTRATION
+          operation_mode: PROBLEM
+          subject: 'Autoregistration: {HOST.HOST}'
+          message: |
+            Host name: {HOST.HOST}
+            Host IP: {HOST.IP}
+            Agent port: {HOST.PORT} 
