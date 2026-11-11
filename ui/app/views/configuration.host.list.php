@@ -249,6 +249,8 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 
 $html_page->show();
 
+(new CTemplateTag('filter-tag-row-tmpl', CTagFilterFieldHelper::getTemplate()))->show();
+
 (new CScriptTag('
 	view.init('.json_encode([
 		'applied_filter_groupids' => array_keys($data['filter']['groups']),

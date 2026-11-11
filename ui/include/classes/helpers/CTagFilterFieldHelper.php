@@ -30,7 +30,7 @@ class CTagFilterFieldHelper {
 	 * @param array  $options
 	 * @param string $options['tag_field_name']       (optional)
 	 * @param string $options['evaltype_field_name']  (optional)
-	 * @param string $options['filter_type']          (optional)
+	 * @param int    $options['filter_type']          (optional)
 	 *
 	 * @return CTable
 	 */
@@ -57,7 +57,7 @@ class CTagFilterFieldHelper {
 		);
 
 		foreach (array_values($data['tags']) as $i => $tag) {
-			$tags_table->addRow(self::getTemplate($options, $i, $tag));
+			$tags_table->addRow(self::getFilterRow($options, $tag, $i));
 		}
 
 		$tags_table->addRow(
@@ -78,16 +78,16 @@ class CTagFilterFieldHelper {
 	 * @param array      $options
 	 * @param string     $options['tag_field_name']  (optional)
 	 * @param int        $options['filter_type']     (optional)
-	 * @param string|int $index
-	 * @param string     $data['tags'][]['tag']      if filter_type set to FILTER_TYPE_TAG
-	 * @param string     $data['tags'][]['key']      if filter_type set to FILTER_TYPE_APM_ATTRIBUTE
-	 * @param int        $data['tags'][]['operator']
-	 * @param string     $data['tags'][]['value']
- *
+	 *
 	 * @return CRow
 	 */
-	public static function getTemplate(array $options = [], string|int $index = '#{rowNum}',
-			array $tag = []): CRow {
+	public static function getTemplate(array $options = []): CRow {
+		return self::getFilterRow($options, ['tag' => '', 'operator' => TAG_OPERATOR_LIKE, 'value' => '']);
+	}
+
+	private static function getFilterRow(array $options, array $tag, ?int $i = null): CRow {
+		$index = $i === null ? '#{rowNum}' : $i;
+
 		$options += [
 			'tag_field_name' => 'filter_tags',
 			'filter_type' => self::FILTER_TYPE_TAG
@@ -101,14 +101,13 @@ class CTagFilterFieldHelper {
 			$name_key = 'key';
 		}
 
-		return (new CRow([
+		$items = [
 			(new CTextBox($options['tag_field_name'].'['.$index.']['.$name_key.']',
 				array_key_exists($name_key, $tag) ? $tag[$name_key] : ''
 			))
 				->setAttribute('placeholder', $name_placeholder)
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 			(new CSelect($options['tag_field_name'].'['.$index.'][operator]'))
-				->setId($options['tag_field_name'].'_'.$index.'_operator')
 				->addOptions(CSelect::createOptionsFromArray([
 					TAG_OPERATOR_EXISTS => _('Exists'),
 					TAG_OPERATOR_EQUAL => _('Equals'),
@@ -117,17 +116,23 @@ class CTagFilterFieldHelper {
 					TAG_OPERATOR_NOT_EQUAL => _('Does not equal'),
 					TAG_OPERATOR_NOT_LIKE => _('Does not contain')
 				]))
-				->setValue(array_key_exists('operator', $tag) ? $tag['operator'] : TAG_OPERATOR_LIKE),
+				->setValue((int) $tag['operator'])
+				->setFocusableElementId($options['tag_field_name'].'-'.$index.'-operator-select')
+				->setId($options['tag_field_name'].'_'.$index.'_operator'),
 			(new CTextBox($options['tag_field_name'].'['.$index.'][value]',
 				array_key_exists('value', $tag) ? $tag['value'] : ''
 			))
 				->setAttribute('placeholder', _('value'))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+				->setId($options['tag_field_name'].'_'.$index.'_value'),
 			(new CCol(
 				(new CButton($options['tag_field_name'].'['.$index.'][remove]', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-remove')
+					->removeId()
 			))->addClass(ZBX_STYLE_NOWRAP)
-		]))->addClass(ZBX_STYLE_FORM_ROW);
+		];
+
+		return (new CRow($items))->addClass('form_row');
 	}
 }
