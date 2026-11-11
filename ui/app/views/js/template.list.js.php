@@ -153,7 +153,7 @@
 						uncheckTableRows('templates');
 					}
 
-					location.href = location.href;
+					location.reload();
 				})
 				.catch(() => {
 					clearMessages();

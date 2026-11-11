@@ -91,7 +91,10 @@ class CZabbixClient extends CZabbixServer {
 			$proxy = null) {
 		$id = 1;
 		foreach ($data as &$item) {
-			$item['id'] = $id++;
+			// Non-object rows are passed as-is to allow malformed data in tests.
+			if (is_array($item)) {
+				$item['id'] = $id++;
+			}
 		}
 		unset($item);
 

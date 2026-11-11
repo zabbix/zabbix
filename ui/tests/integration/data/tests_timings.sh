@@ -1,12 +1,12 @@
 PERFORMANCE_RATIO_THRESHOLD=3.0
 
 declare -A BASELINE_TIMES=(
-  [Integration]=4533
+  [Integration]=4536
   [testEscalations]=443
   [testProxyHa]=417
   [testNestedLLD]=385
   [testLLDHistorySyncAtScale]=300
-  [testMacros]=279
+  [testMacros]=282
   [testItemTimeouts]=209
   [testAgentJsonProtocol]=188
   [testHighAvailability]=165
@@ -19,6 +19,7 @@ declare -A BASELINE_TIMES=(
   [testActiveAvailability]=100
   [testHostConnMacroValidation]=99
   [testItemState]=98
+  [testInternalJavaItem]=95
   [testHistoryPush]=92
   [testValuemaps]=89
   [testAutoregistrationPSK]=85
@@ -58,4 +59,5 @@ declare -A BASELINE_TIMES=(
   [testUserMacrosWithContext]=10
   [testScheduledReports]=10
   [testGraphLinking]=8
+  [testReportTest]=5
 )
