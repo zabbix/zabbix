@@ -196,12 +196,15 @@
 						.setWidth('auto'),
 					new CDataTableColumn('interval', <?= json_encode(_('Interval')); ?>)
 						.setFields(['interval'])
+						.setRenderer('interval')
 						.setVisible(false),
 					new CDataTableColumn('history', <?= json_encode(_('History')); ?>)
 						.setFields(['history'])
+						.setRenderer('history')
 						.setVisible(false),
 					new CDataTableColumn('trends', <?= json_encode(_('Trends')); ?>)
 						.setFields(['trends'])
+						.setRenderer('trends')
 						.setVisible(false),
 					new CDataTableColumn('type', <?= json_encode(_('Type')); ?>)
 						.setFields(['type', 'state'])
@@ -215,7 +218,7 @@
 						.setWidth('20%'),
 					new CDataTableColumn('change', <?= json_encode(_('Change')); ?>)
 						.setFields(['change'])
-						.setRenderer(CDataTableColumn.RENDERER_TEXT),
+						.setRenderer('change'),
 					new CDataTableColumnTags('tags', <?= json_encode(_('Tags')); ?>)
 						.setColumnOptions({
 							object_type: ZBX_TAG_OBJECT_ITEM
@@ -242,11 +245,8 @@
 				.setCellRenderer('host', ({cell_data, cell}) => {
 					const [host, maintenance] = cell_data;
 
-					const flex_wrapper = document.createElement('div');
-					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
-
 					const host_link = document.createElement('a');
-					host_link.classList.add(ZBX_STYLE_LINK_ACTION, ZBX_STYLE_OVERFLOW_ELLIPSIS);
+					host_link.classList.add(ZBX_STYLE_LINK_ACTION, ZBX_STYLE_WORDBREAK);
 					host_link.setAttribute('data-menu-popup', JSON.stringify({
 						type: 'host',
 						data: {
@@ -259,7 +259,7 @@
 					host_link.setAttribute('href', 'javascript:void(0);');
 					host_link.textContent = host.name;
 
-					flex_wrapper.appendChild(host_link);
+					cell.appendChild(host_link);
 
 					if (maintenance && host.status == HOST_STATUS_MONITORED) {
 						const maintenance_icon = document.createElement('button');
@@ -290,10 +290,8 @@
 						maintenance_icon.setAttribute('data-hintbox-static', '1');
 						maintenance_icon.setAttribute('aria-expanded', 'false');
 
-						flex_wrapper.appendChild(maintenance_icon);
+						cell.appendChild(maintenance_icon);
 					}
-
-					cell.appendChild(flex_wrapper);
 				})
 				.setCellRenderer('name', ({column, cell_data, cell}) => {
 					const [itemid, description_expanded, name, key_expanded] = cell_data;
@@ -302,11 +300,8 @@
 
 					const url_params = objectToSearchParams({action: 'latest.view', context: 'host'});
 
-					const flex_wrapper = document.createElement('div');
-					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
-
 					const name_link = document.createElement('a');
-					name_link.classList.add(ZBX_STYLE_LINK_ACTION, ZBX_STYLE_OVERFLOW_ELLIPSIS);
+					name_link.classList.add(ZBX_STYLE_LINK_ACTION, ZBX_STYLE_WORDBREAK);
 					name_link.setAttribute('data-menu-popup', JSON.stringify({
 						type: 'item',
 						data: {
@@ -321,7 +316,7 @@
 					name_link.setAttribute('href', 'javascript:void(0);');
 					name_link.textContent = name;
 
-					flex_wrapper.appendChild(name_link);
+					cell.appendChild(name_link);
 
 					if (description_expanded) {
 						const description_icon = document.createElement('button');
@@ -335,39 +330,64 @@
 						description_icon.setAttribute('data-hintbox-static', '1');
 						description_icon.setAttribute('aria-expanded', 'false');
 
-						flex_wrapper.appendChild(description_icon);
+						cell.appendChild(description_icon);
 					}
-
-					cell.appendChild(flex_wrapper);
 
 					const {show_item_key} = column.getColumnOptions();
 
 					if (show_item_key == 1) {
-						const overflow_ellipsis = document.createElement('div');
-						overflow_ellipsis.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
-
-						const item_key = document.createElement('span');
-						item_key.classList.add(ZBX_STYLE_GREEN);
+						const item_key = document.createElement('div');
+						item_key.classList.add(ZBX_STYLE_WORDBREAK, ZBX_STYLE_GREEN);
 						item_key.textContent = key_expanded;
 
-						overflow_ellipsis.appendChild(item_key);
-
-						cell.appendChild(overflow_ellipsis);
+						cell.appendChild(item_key);
 					}
+				})
+				.setCellRenderer('interval', ({cell_data, cell}) => {
+					const [interval] = cell_data;
+
+					const wordbreak = document.createElement('div');
+					wordbreak.classList.add(ZBX_STYLE_WORDBREAK);
+					wordbreak.textContent = interval;
+
+					cell.appendChild(wordbreak);
+				})
+				.setCellRenderer('history', ({cell_data, cell}) => {
+					const [history] = cell_data;
+
+					const wordbreak = document.createElement('div');
+					wordbreak.classList.add(ZBX_STYLE_WORDBREAK);
+					wordbreak.textContent = history;
+
+					cell.appendChild(wordbreak);
+				})
+				.setCellRenderer('trends', ({cell_data, cell}) => {
+					const [trends] = cell_data;
+
+					const wordbreak = document.createElement('div');
+					wordbreak.classList.add(ZBX_STYLE_WORDBREAK);
+					wordbreak.textContent = trends;
+
+					cell.appendChild(wordbreak);
 				})
 				.setCellRenderer('type', ({cell_data, cell}) => {
 					const [type, state] = cell_data;
+
+					const wordbreak = document.createElement('div');
+					wordbreak.classList.add(ZBX_STYLE_WORDBREAK);
 
 					if (state == ITEM_STATE_NOTSUPPORTED) {
 						const type_container = document.createElement('span');
 						type_container.textContent = type;
 						type_container.classList.add(ZBX_STYLE_GREY);
 
-						cell.appendChild(type_container);
+						wordbreak.appendChild(type_container);
 					}
 					else {
-						cell.textContent = type;
+						wordbreak.textContent = type;
 					}
+
+					cell.appendChild(wordbreak);
 				})
 				.setCellRenderer('last_value', ({cell_data, cell}) => {
 					const [value_type, last_value, last_history_value] = cell_data;
@@ -406,6 +426,15 @@
 
 					cell.appendChild(flex_wrapper);
 				})
+				.setCellRenderer('change', ({cell_data, cell}) => {
+					const [change] = cell_data;
+
+					const wordbreak = document.createElement('span');
+					wordbreak.classList.add(ZBX_STYLE_WORDBREAK);
+					wordbreak.textContent = change;
+
+					cell.appendChild(wordbreak);
+				})
 				.setCellRenderer('actions', ({cell_data, cell}) => {
 					const [itemid, is_graph, show_link] = cell_data;
 
@@ -414,16 +443,24 @@
 					}
 
 					const data_link = document.createElement('a');
-					if (is_graph) {
-						const search_params = objectToSearchParams({action: 'showgraph', itemids: [itemid]});
+					data_link.classList.add(ZBX_STYLE_WORDBREAK);
 
-						data_link.setAttribute('href', `history.php?${search_params}`);
+					if (is_graph) {
+						const url = zabbixUrl({
+							action: 'showgraph',
+							itemids: [itemid]
+						}, 'history.php');
+
+						data_link.setAttribute('href', url);
 						data_link.textContent = <?= json_encode(_('Graph')); ?>;
 					}
 					else {
-						const search_params = objectToSearchParams({action: 'showvalues', 'itemids[]': itemid});
+						const url = zabbixUrl({
+							action: 'showvalues',
+							itemids: [itemid]
+						}, 'history.php');
 
-						data_link.setAttribute('href', `history.php?${search_params}`);
+						data_link.setAttribute('href', url);
 						data_link.textContent = <?= json_encode(_('History')); ?>;
 					}
 

@@ -254,13 +254,14 @@ class CControllerHostViewData extends CControllerDataTable {
 			$total_problem_count = 0;
 
 			$problems = $this->checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS)
-				? new CLink('',
+				? (new CLink('',
 					(new CUrl('zabbix.php'))
 						->setArgument('action', 'problem.view')
 						->setArgument('severities', $filter['severities'])
 						->setArgument('hostids', [$host['hostid']])
 						->setArgument('filter_set', '1')
-				)
+				))
+					->addClass(ZBX_STYLE_WORDBREAK)
 				: (new CDiv())->addClass(ZBX_STYLE_DISABLED);
 
 			// Fill the severity icons by problem count and style and calculate the total number of problems.

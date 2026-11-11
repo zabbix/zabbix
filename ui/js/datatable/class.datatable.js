@@ -2417,9 +2417,18 @@ class CDataTable {
 		this.#applyColumnWidths('0px');
 
 		this.#raf_id = requestAnimationFrame(() => {
-			for (const column of this.#visible_columns.filter(column => column.getWidth() === 'auto')) {
+			const auto_columns = this.#visible_columns.filter(column => column.getWidth() === 'auto'
+				&& !column.isResized() && column.isResizable()
+			);
+			const fixed_width = this.#visible_columns
+				.filter(column => !auto_columns.includes(column))
+				.reduce((sum, column) => sum + (column.getHeaderCell()?.target?.offsetWidth ?? 0), 0);
+
+			for (const column of auto_columns) {
 				this.#calculateColumnWidth(column);
 			}
+
+			this.#fitAutoColumnWidths(auto_columns, this.#body.clientWidth - fixed_width);
 
 			this.#ghost_row?.remove();
 			this.#ghost_row = null;
@@ -2456,6 +2465,37 @@ class CDataTable {
 
 		column.setWidth(calculated_width)
 			.setOverrides({...overrides, width: calculated_width});
+	}
+
+	#fitAutoColumnWidths(columns, available_width) {
+		const widths = columns.map(column => parseInt(column.getWidth()));
+		const overflow = widths.reduce((sum, width) => sum + width, 0) - available_width;
+
+		if (overflow <= 0) {
+			return;
+		}
+
+		const min_widths = columns
+			.map(column => Math.max(CDataTable.COLUMN_MIN_ALLOWED_CALC_WIDTH, this.#getColumnMinWidth(column)));
+		const excesses = widths.map((width, i) => Math.max(0, width - min_widths[i]));
+		const excess_total = excesses.reduce((sum, excess) => sum + excess, 0);
+
+		if (excess_total === 0) {
+			return;
+		}
+
+		const ratio = Math.min(1, overflow / excess_total);
+
+		columns.forEach((column, i) => {
+			if (excesses[i] === 0) {
+				return;
+			}
+
+			const calculated_width = `${Math.max(min_widths[i], widths[i] - Math.ceil(excesses[i] * ratio))}px`;
+
+			column.setWidth(calculated_width)
+				.setOverrides({...column.getOverrides(), width: calculated_width});
+		});
 	}
 
 	#renderHeaderCells() {

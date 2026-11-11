@@ -60,7 +60,9 @@
 					}
 				}
 
-				.opdata {
+				.opdata,
+				.latest-values,
+				.timeline-date {
 					@extend %overflow-ellipsis;
 				}
 
@@ -206,7 +208,7 @@
 		}
 
 		.form-field {
-			input {
+			input:not(.checkbox-radio) {
 				width: 100%;
 			}
 
@@ -683,24 +685,6 @@
 					flex-wrap: nowrap;
 				}
 
-				& > .link-action {
-					@extend %overflow-ellipsis;
-				}
-
-				.flex-item {
-					display: flex;
-					min-width: 0;
-
-					& > .link-action {
-						@extend %overflow-ellipsis;
-					}
-
-					.wordbreak {
-						word-break: normal;
-						overflow-wrap: normal;
-					}
-				}
-
 				.separator {
 					flex-shrink: 0;
 				}
@@ -769,7 +753,6 @@
 			}
 
 			.timeline-date {
-				@extend %overflow-ellipsis;
 				text-align: right;
 			}
 
