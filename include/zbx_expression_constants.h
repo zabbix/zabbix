@@ -280,5 +280,6 @@
 #define MVAR_USER_FULLNAME		"{USER.FULLNAME}"
 
 #define MVAR_USER_MACRO			"{$"
+#define MVAR_MANUALINPUT		"{MANUALINPUT}"
 
 #endif

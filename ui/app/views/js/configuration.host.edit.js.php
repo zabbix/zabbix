@@ -67,7 +67,7 @@
 						}
 					}
 
-					location.href = location.href;
+					location.reload();
 				}, {once: true}
 			);
 		},
@@ -90,7 +90,7 @@
 					}
 				}
 
-				location.href = location.href;
+				location.reload();
 			});
 		},
 
@@ -112,7 +112,7 @@
 					}
 				}
 
-				location.href = location.href;
+				location.reload();
 			});
 		},
 

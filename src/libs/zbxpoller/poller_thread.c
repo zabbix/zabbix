@@ -252,9 +252,9 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				ZBX_STRDUP(port, items[i].interface.port_orig);
 				if (ZBX_MACRO_EXPAND_YES == expand_macros)
 				{
-					zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid,
-							NULL, NULL, NULL, NULL, NULL, NULL, NULL, &port,
-							ZBX_MACRO_TYPE_COMMON, NULL, 0);
+					zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &items[i].host, NULL,
+							NULL, NULL, NULL, NULL, NULL, &port, ZBX_MACRO_TYPE_COMMON,
+							NULL, 0);
 				}
 
 				if (FAIL == zbx_is_ushort(port, &items[i].interface.port))
@@ -292,9 +292,8 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				if (ZBX_MACRO_EXPAND_NO == expand_macros)
 					break;
 
-				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						NULL, NULL, NULL, NULL, NULL, &timeout, ZBX_MACRO_TYPE_COMMON, NULL,
-						0);
+				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &items[i].host, NULL, NULL,
+						NULL, NULL, NULL, NULL, &timeout, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 				break;
 			case ITEM_TYPE_SNMP:
 				if (ZBX_MACRO_EXPAND_NO == expand_macros)
@@ -307,30 +306,30 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 					ZBX_STRDUP(items[i].snmpv3_privpassphrase, items[i].snmpv3_privpassphrase_orig);
 					ZBX_STRDUP(items[i].snmpv3_contextname, items[i].snmpv3_contextname_orig);
 
-					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL,
-							&items[i].host.hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL,
+							&items[i].host, NULL, NULL, NULL, NULL, NULL, NULL,
 							&items[i].snmpv3_securityname, ZBX_MACRO_TYPE_COMMON, NULL, 0);
-					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL,
-							&items[i].host.hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL,
+							&items[i].host, NULL, NULL, NULL, NULL, NULL, NULL,
 							&items[i].snmpv3_authpassphrase, ZBX_MACRO_TYPE_COMMON, NULL,
 							0);
-					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL,
-							&items[i].host.hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL,
+							&items[i].host, NULL, NULL, NULL, NULL, NULL, NULL,
 							&items[i].snmpv3_privpassphrase, ZBX_MACRO_TYPE_COMMON, NULL,
 							0);
-					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL,
-							&items[i].host.hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL,
+							&items[i].host, NULL, NULL, NULL, NULL, NULL, NULL,
 							&items[i].snmpv3_contextname, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 				}
 
 				ZBX_STRDUP(items[i].snmp_community, items[i].snmp_community_orig);
 				ZBX_STRDUP(items[i].snmp_oid, items[i].snmp_oid_orig);
 
-				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid,
-						NULL, NULL, NULL, NULL, NULL, NULL, NULL, &items[i].snmp_community,
+				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, &items[i].host,
+						NULL, NULL, NULL, NULL, NULL, NULL, &items[i].snmp_community,
 						ZBX_MACRO_TYPE_COMMON, NULL, 0);
-				if (SUCCEED != zbx_substitute_key_macros(&items[i].snmp_oid, &items[i].host.hostid,
-						NULL, NULL, NULL, ZBX_MACRO_TYPE_SNMP_OID, error, sizeof(error)))
+				if (SUCCEED != zbx_substitute_key_macros(&items[i].snmp_oid, &items[i].host, NULL, NULL,
+						NULL, ZBX_MACRO_TYPE_SNMP_OID, error, sizeof(error)))
 				{
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 					errcodes[i] = CONFIG_ERROR;
@@ -338,17 +337,16 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 					continue;
 				}
 
-				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						NULL, NULL, NULL, NULL, NULL, &timeout, ZBX_MACRO_TYPE_COMMON, NULL,
-						0);
+				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &items[i].host, NULL, NULL,
+						NULL, NULL, NULL, NULL, &timeout, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 				break;
 			case ITEM_TYPE_SCRIPT:
 			case ITEM_TYPE_BROWSER:
 				if (ZBX_MACRO_EXPAND_NO == expand_macros)
 					break;
 
-				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						NULL, NULL, NULL, NULL, NULL, &timeout, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &items[i].host, NULL, NULL,
+						NULL, NULL, NULL, NULL, &timeout, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 				for (int j = 0; j < items[i].script_params.values_num; j++)
 				{
 					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
@@ -362,8 +360,8 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 							ZBX_MACRO_TYPE_SCRIPT_PARAMS_FIELD, NULL, 0);
 				}
 
-				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid,
-						NULL, NULL, NULL, NULL, NULL, NULL, NULL, &items[i].params,
+				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, &items[i].host,
+						NULL, NULL, NULL, NULL, NULL, NULL, &items[i].params,
 						ZBX_MACRO_TYPE_COMMON, NULL, 0);
 				break;
 			case ITEM_TYPE_SSH:
@@ -373,12 +371,12 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				ZBX_STRDUP(items[i].publickey, items[i].publickey_orig);
 				ZBX_STRDUP(items[i].privatekey, items[i].privatekey_orig);
 
-				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						NULL, NULL, NULL, NULL, NULL, &items[i].publickey,
-						ZBX_MACRO_TYPE_COMMON, NULL, 0);
-				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						NULL, NULL, NULL, NULL, NULL, &items[i].privatekey,
-						ZBX_MACRO_TYPE_COMMON, NULL, 0);
+				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &items[i].host, NULL, NULL,
+						NULL, NULL, NULL, NULL, &items[i].publickey, ZBX_MACRO_TYPE_COMMON,
+						NULL, 0);
+				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &items[i].host, NULL, NULL,
+						NULL, NULL, NULL, NULL, &items[i].privatekey, ZBX_MACRO_TYPE_COMMON,
+						NULL, 0);
 				ZBX_FALLTHROUGH;
 			case ITEM_TYPE_TELNET:
 			case ITEM_TYPE_DB_MONITOR:
@@ -396,16 +394,15 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				items[i].username = zbx_strdup(items[i].username, items[i].username_orig);
 				items[i].password = zbx_strdup(items[i].password, items[i].password_orig);
 
-				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid,
-						NULL, NULL, NULL, NULL, NULL, NULL, NULL, &items[i].username,
+				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, &items[i].host,
+						NULL, NULL, NULL, NULL, NULL, NULL, &items[i].username,
 						ZBX_MACRO_TYPE_COMMON, NULL, 0);
-				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid,
-						NULL, NULL, NULL, NULL, NULL, NULL, NULL, &items[i].password,
+				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, &items[i].host,
+						NULL, NULL, NULL, NULL, NULL, NULL, &items[i].password,
 						ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
-				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						NULL, NULL, NULL, NULL, NULL, &timeout, ZBX_MACRO_TYPE_COMMON, NULL,
-						0);
+				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &items[i].host, NULL, NULL,
+						NULL, NULL, NULL, NULL, &timeout, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 				break;
 			case ITEM_TYPE_JMX:
 				if (ZBX_MACRO_EXPAND_NO == expand_macros)
@@ -415,11 +412,11 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				items[i].password = zbx_strdup(items[i].password, items[i].password_orig);
 				items[i].jmx_endpoint = zbx_strdup(items[i].jmx_endpoint, items[i].jmx_endpoint_orig);
 
-				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid,
-						NULL, NULL, NULL, NULL, NULL, NULL, NULL, &items[i].username,
+				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, &items[i].host,
+						NULL, NULL, NULL, NULL, NULL, NULL, &items[i].username,
 						ZBX_MACRO_TYPE_COMMON, NULL, 0);
-				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid,
-						NULL, NULL, NULL, NULL, NULL, NULL, NULL, &items[i].password,
+				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, &items[i].host,
+						NULL, NULL, NULL, NULL, NULL, NULL, &items[i].password,
 						ZBX_MACRO_TYPE_COMMON, NULL, 0);
 				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &items[i], NULL, NULL,
 						NULL, NULL, NULL, &items[i].jmx_endpoint, ZBX_MACRO_TYPE_JMX_ENDPOINT,
@@ -438,9 +435,9 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 					ZBX_STRDUP(items[i].password, items[i].password_orig);
 					ZBX_STRDUP(items[i].query_fields, items[i].query_fields_orig);
 
-					zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid,
-							NULL, NULL, NULL, NULL, NULL, NULL, NULL, &timeout,
-							ZBX_MACRO_TYPE_COMMON, NULL, 0);
+					zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &items[i].host, NULL,
+							NULL, NULL, NULL, NULL, NULL, &timeout, ZBX_MACRO_TYPE_COMMON,
+							NULL, 0);
 
 					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL,
 							&items[i].host, &items[i], NULL, NULL, NULL, NULL, NULL,
@@ -494,26 +491,26 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL,NULL, NULL, &items[i].host,
 						&items[i], NULL, NULL, NULL, NULL, NULL, &items[i].headers,
 						ZBX_MACRO_TYPE_HTTP_RAW, NULL, 0);
-				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
-						NULL, NULL, NULL, NULL, NULL, NULL, &items[i].status_codes,
-						ZBX_MACRO_TYPE_COMMON, NULL, 0);
-				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
-						NULL, NULL, NULL, NULL, NULL, NULL, &items[i].http_proxy,
-						ZBX_MACRO_TYPE_COMMON, NULL, 0);
+				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &items[i].host, NULL, NULL,
+						NULL, NULL, NULL, NULL, &items[i].status_codes, ZBX_MACRO_TYPE_COMMON,
+						NULL, 0);
+				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &items[i].host, NULL, NULL,
+						NULL, NULL, NULL, NULL, &items[i].http_proxy, ZBX_MACRO_TYPE_COMMON,
+						NULL, 0);
 				zbx_substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i],
 						NULL, NULL, NULL, NULL, NULL, &items[i].ssl_cert_file,
 						ZBX_MACRO_TYPE_HTTP_RAW, NULL, 0);
 				zbx_substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &items[i].host, &items[i],
 						NULL, NULL, NULL, NULL, NULL, &items[i].ssl_key_file,
 						ZBX_MACRO_TYPE_HTTP_RAW, NULL, 0);
-				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid,
-						NULL, NULL, NULL, NULL, NULL, NULL, NULL, &items[i].ssl_key_password,
+				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, &items[i].host,
+						NULL, NULL, NULL, NULL, NULL, NULL, &items[i].ssl_key_password,
 						ZBX_MACRO_TYPE_COMMON, NULL, 0);
-				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid,
-						NULL, NULL, NULL, NULL, NULL, NULL, NULL, &items[i].username,
+				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, &items[i].host,
+						NULL, NULL, NULL, NULL, NULL, NULL, &items[i].username,
 						ZBX_MACRO_TYPE_COMMON, NULL, 0);
-				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid,
-						NULL, NULL, NULL, NULL, NULL, NULL, NULL, &items[i].password,
+				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, &items[i].host,
+						NULL, NULL, NULL, NULL, NULL, NULL, &items[i].password,
 						ZBX_MACRO_TYPE_COMMON, NULL, 0);
 				break;
 		}

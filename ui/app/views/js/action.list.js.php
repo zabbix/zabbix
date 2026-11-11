@@ -68,7 +68,7 @@
 					postMessageDetails('success', e.detail.messages);
 				}
 
-				location.href = location.href;
+				location.reload();
 			});
 		}
 
@@ -148,7 +148,7 @@
 						uncheckTableRows('action_' + this.eventsource);
 					}
 
-					location.href = location.href;
+					location.reload();
 				})
 				.catch(() => {
 					clearMessages();
