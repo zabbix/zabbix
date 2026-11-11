@@ -22,7 +22,7 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 /**
  * @backup role, users, usrgrp, module
  *
- * @onBefore prepareUserData
+ * @onBefore prepareTestData
  *
  * @dataSource UserPermissions, MonitoringOverview
  */
@@ -55,10 +55,24 @@ class testFormUserPermissions extends CWebTest {
 	protected static $admin_user;
 
 	/**
-	 * Function used to create roles.
+	 * ID of the user created for proxy access checks.
+	 *
+	 * @var integer
 	 */
-	public function prepareUserData() {
-		$role = CDataHelper::call('role.create', [
+	protected static $proxy_access_userid;
+
+	/**
+	 * ID of the user group created for proxy access checks.
+	 *
+	 * @var integer
+	 */
+	protected static $proxy_access_usrgrpid;
+
+	/**
+	 * Function used to create test data.
+	 */
+	public function prepareTestData() {
+		self::$admin_roleid = CDataHelper::call('role.create', [
 			[
 				'name' => 'admin_role',
 				'type' => 2,
@@ -69,11 +83,9 @@ class testFormUserPermissions extends CWebTest {
 					]
 				]
 			]
-		]);
-		$this->assertArrayHasKey('roleids', $role);
-		self::$admin_roleid = $role['roleids'][0];
+		])['roleids'][0];
 
-		$user = CDataHelper::call('user.create', [
+		self::$admin_user = CDataHelper::call('user.create', [
 			[
 				'username' => 'admin_role_check',
 				'passwd' => 'test5678',
@@ -84,9 +96,46 @@ class testFormUserPermissions extends CWebTest {
 					]
 				]
 			]
+		])['userids'][0];
+
+		self::$proxy_access_usrgrpid = CDataHelper::call('usergroup.create', [
+			[
+				'name' => 'User group for proxy access'
+			]
+		])['usrgrpids'][0];
+
+		self::$proxy_access_userid = CDataHelper::call('user.create', [
+			[
+				'username' => 'user_proxy_access',
+				'passwd' => 'test5678',
+				'roleid' => 1, // User role
+				'usrgrps' => [
+					[
+						'usrgrpid' => self::$proxy_access_usrgrpid
+					]
+				]
+			]
+		])['userids'][0];
+
+		CDataHelper::call('proxy.create', [
+			[
+				'name' => 'Selected proxy',
+				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
+			],
+			[
+				'name' => 'Unselected proxy',
+				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
+			]
 		]);
-		$this->assertArrayHasKey('userids', $user);
-		self::$admin_user = $user['userids'][0];
+
+		CDataHelper::call('proxygroup.create', [
+			[
+				'name' => 'Selected proxy group'
+			],
+			[
+				'name' => 'Unselected proxy group'
+			]
+		]);
 	}
 
 	public static function getUpdateRoleData() {
@@ -481,6 +530,45 @@ class testFormUserPermissions extends CWebTest {
 			]
 		];
 		$this->assertTableData($permissions_after, $table_selector);
+	}
+
+	/**
+	 * Check proxy and proxy group permissions.
+	 */
+	public function testFormUserPermissions_UpdateProxyAccessList() {
+		$this->page->login();
+
+		$scenarios = [
+			'Allow list' => ['Selected', 'Unselected'],
+			'Deny list' => ['Unselected', 'Selected']
+		];
+
+		foreach ($scenarios as $mode => [$visible, $hidden]) {
+			$this->page->open('zabbix.php?action=usergroup.edit&usrgrpid='.self::$proxy_access_usrgrpid)->waitUntilReady();
+			$form = $this->query('id:user-group-form')->waitUntilPresent()->asForm()->one();
+
+			$form->selectTab('Proxy access list');
+			$form->fill([
+				'Proxies' => $mode,
+				'Proxy groups' => $mode
+			]);
+
+			$this->query('xpath://div[@id="proxyids_"]/..')->asMultiselect()->one()->clear()->fill('Selected proxy');
+			$this->query('xpath://div[@id="proxy_groupids_"]/..')->asMultiselect()->one()->clear()->fill('Selected proxy group');
+
+			$form->submit();
+			$this->assertMessage(TEST_GOOD, 'User group updated');
+
+			$this->page->open('zabbix.php?action=user.edit&userid='.self::$proxy_access_userid)->waitUntilReady();
+			$user_form = $this->query('xpath://form[@name="user_form"]')->waitUntilPresent()->asForm()->one();
+			$user_form->selectTab('Permissions');
+
+			foreach (['Proxies' => ' proxy', 'Proxy groups' => ' proxy group'] as $field => $suffix) {
+				$values = $user_form->getField($field)->query('tag:span')->all()->asText();
+				$this->assertContains($visible.$suffix, $values);
+				$this->assertNotContains($hidden.$suffix, $values);
+			}
+		}
 	}
 
 	/**

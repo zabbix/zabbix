@@ -482,4 +482,82 @@ $html_page
 	->addItem($form)
 	->show();
 
+(new CTemplateTag('url-tpl',
+	(new CRow([
+		(new CTextBox('urls[#{id}][name]'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		(new CTextBox('urls[#{id}][url]', '', false, DB::getFieldLength('sysmap_url', 'url')))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		(new CSelect('urls[#{id}][elementtype]'))
+			->addOptions(CSelect::createOptionsFromArray(sysmap_element_types())),
+		(new CCol(
+			(new CButtonLink(_('Remove')))->onClick('$("#url-row-#{id}").remove();')
+		))->addClass(ZBX_STYLE_NOWRAP)
+	]))
+		->setId('url-row-#{id}')
+))->show();
+
+(new CTemplateTag('user_group_row_tpl',
+	(new CRow([
+		new CCol([
+			(new CTextBox('userGroups[#{usrgrpid}][usrgrpid]', '#{usrgrpid}'))->setAttribute('type', 'hidden'),
+			(new CSpan('#{name}'))
+		]),
+		new CCol(
+			(new CTag('ul', false, [
+				new CTag('li', false, [
+					(new CInput('radio', 'userGroups[#{usrgrpid}][permission]', PERM_READ))
+						->setId('user_group_#{usrgrpid}_permission_'.PERM_READ),
+					(new CTag('label', false, _('Read-only')))
+						->setAttribute('for', 'user_group_#{usrgrpid}_permission_'.PERM_READ)
+				]),
+				new CTag('li', false, [
+					(new CInput('radio', 'userGroups[#{usrgrpid}][permission]', PERM_READ_WRITE))
+						->setId('user_group_#{usrgrpid}_permission_'.PERM_READ_WRITE),
+					(new CTag('label', false, _('Read-write')))
+						->setAttribute('for', 'user_group_#{usrgrpid}_permission_'.PERM_READ_WRITE)
+				])
+			]))->addClass(CRadioButtonList::ZBX_STYLE_CLASS)
+		),
+		(new CCol(
+			(new CButton('remove', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->onClick('removeUserGroupShares("#{usrgrpid}");')
+				->removeId()
+		))->addClass(ZBX_STYLE_NOWRAP)
+	]))
+		->setId('user_group_shares_#{usrgrpid}')
+))->show();
+
+(new CTemplateTag('user_row_tpl',
+	(new CRow([
+		new CCol([
+			(new CTextBox('users[#{id}][userid]', '#{id}'))->setAttribute('type', 'hidden'),
+			(new CSpan('#{name}'))
+		]),
+		new CCol(
+			(new CTag('ul', false, [
+				new CTag('li', false, [
+					(new CInput('radio', 'users[#{id}][permission]', PERM_READ))
+						->setId('user_#{id}_permission_'.PERM_READ),
+					(new CTag('label', false, _('Read-only')))
+						->setAttribute('for', 'user_#{id}_permission_'.PERM_READ)
+				]),
+				new CTag('li', false, [
+					(new CInput('radio', 'users[#{id}][permission]', PERM_READ_WRITE))
+						->setId('user_#{id}_permission_'.PERM_READ_WRITE),
+					(new CTag('label', false, _('Read-write')))
+						->setAttribute('for', 'user_#{id}_permission_'.PERM_READ_WRITE)
+				])
+			]))->addClass(CRadioButtonList::ZBX_STYLE_CLASS)
+		),
+		(new CCol(
+			(new CButton('remove', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->onClick('removeUserShares("#{id}");')
+				->removeId()
+		))->addClass(ZBX_STYLE_NOWRAP)
+	]))
+		->setId('user_shares_#{id}')
+))->show();
+
 zbx_add_post_js("history.replaceState({}, '');");

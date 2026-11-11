@@ -100,7 +100,7 @@ zabbix_export:
         3. Set the hostname or IP address of the Proxmox API VE host in the `Proxmox VE Host`. You can also change the API port in the `Proxmox VE Port` if necessary.
       vendor:
         name: Zabbix
-        version: 8.0-5
+        version: 8.0-6
       groups:
         - name: Templates/Applications
       items:
@@ -4966,19 +4966,42 @@ zabbix_export:
           name: 'Proxmox VE'
           display_period: '3600'
           pages:
-            - name: 'Proxmox VE overview'
+            - name: 'Proxmox VE: Overview'
               widgets:
                 - type: item
-                  name: Status
-                  width: '12'
-                  height: '3'
+                  name: 'Quorum Status'
+                  width: '8'
+                  hide_header: 'YES'
                   fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 4D91FF
                     - type: INTEGER
                       name: decimal_places
                       value: '0'
                     - type: INTEGER
                       name: decimal_size
-                      value: '10'
+                      value: '13'
+                    - type: STRING
+                      name: description
+                      value: |
+                        QUORUM
+                        STATUS
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
+                    - type: STRING
+                      name: desc_color
+                      value: FAFAFA
+                    - type: INTEGER
+                      name: desc_size
+                      value: '12'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '1'
+                    - type: STRING
+                      name: down_color
+                      value: DBEAFE
                     - type: ITEM
                       name: itemid.0
                       value:
@@ -4986,25 +5009,40 @@ zabbix_export:
                         key: proxmox_ve.cluster.quorum.status
                     - type: INTEGER
                       name: show.0
-                      value: '2'
+                      value: '1'
                     - type: INTEGER
                       name: show.1
+                      value: '2'
+                    - type: INTEGER
+                      name: show.2
                       value: '4'
+                    - type: INTEGER
+                      name: show.3
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.color
+                      value: 0D68FD
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: DASHBOARD._timeperiod
+                    - type: INTEGER
+                      name: sparkline.width
+                      value: '3'
                     - type: STRING
                       name: thresholds.0.color
-                      value: FF8A65
+                      value: 094EB3
                     - type: STRING
                       name: thresholds.0.threshold
                       value: '0'
                     - type: STRING
                       name: thresholds.1.color
-                      value: 81C784
+                      value: 4D91FF
                     - type: STRING
                       name: thresholds.1.threshold
                       value: '1'
                     - type: STRING
                       name: thresholds.2.color
-                      value: 3272fc
+                      value: 0D68FD
                     - type: STRING
                       name: thresholds.2.threshold
                       value: '2'
@@ -5014,36 +5052,448 @@ zabbix_export:
                     - type: INTEGER
                       name: units_show
                       value: '0'
+                    - type: STRING
+                      name: updown_color
+                      value: DBEAFE
+                    - type: STRING
+                      name: up_color
+                      value: DBEAFE
+                    - type: STRING
+                      name: value_color
+                      value: FFFFFF
                     - type: INTEGER
                       name: value_size
-                      value: '15'
-                - type: gauge
-                  name: CPU
+                      value: '13'
+                    - type: INTEGER
+                      name: value_v_pos
+                      value: '2'
+                - type: honeycomb
+                  name: 'Node: Status'
+                  'y': '2'
+                  width: '8'
+                  height: '7'
+                  fields:
+                    - type: INTEGER
+                      name: interpolation
+                      value: '1'
+                    - type: STRING
+                      name: items.0
+                      value: 'Node [*]: Status'
+                    - type: INTEGER
+                      name: item_tags.0.operator
+                      value: '5'
+                    - type: STRING
+                      name: item_tags.0.tag
+                      value: qemu
+                    - type: STRING
+                      name: item_tags.0.value
+                      value: ''
+                    - type: INTEGER
+                      name: item_tags.1.operator
+                      value: '5'
+                    - type: STRING
+                      name: item_tags.1.tag
+                      value: lxc
+                    - type: STRING
+                      name: item_tags.1.value
+                      value: ''
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("^(Node \[)(.*)(\]: Status)", "\2")}'
+                    - type: INTEGER
+                      name: primary_label_bold
+                      value: '1'
+                    - type: STRING
+                      name: primary_label_color
+                      value: FAFAFA
+                    - type: STRING
+                      name: reference
+                      value: VXSVP
+                    - type: INTEGER
+                      name: rf_rate
+                      value: '10'
+                    - type: STRING
+                      name: secondary_label_color
+                      value: FAFAFA
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: secondary_label_units_show
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: D40000
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '1'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: '656565'
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '5'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 0D68FD
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '10'
+                - type: topitems
+                  name: 'Node: Uptime'
+                  'y': '9'
+                  width: '18'
+                  height: '4'
+                  fields:
+                    - type: STRING
+                      name: columns.0.base_color
+                      value: 0D68FD
+                    - type: STRING
+                      name: columns.0.items.0
+                      value: 'Node [*]: uptime'
+                    - type: INTEGER
+                      name: columns.0.item_tags.0.operator
+                      value: '2'
+                    - type: STRING
+                      name: columns.0.item_tags.0.tag
+                      value: component
+                    - type: STRING
+                      name: columns.0.item_tags.0.value
+                      value: cluster
+                    - type: INTEGER
+                      name: columns.0.item_tags.1.operator
+                      value: '5'
+                    - type: STRING
+                      name: columns.0.item_tags.1.tag
+                      value: qemu
+                    - type: STRING
+                      name: columns.0.item_tags.1.value
+                      value: ''
+                    - type: INTEGER
+                      name: columns.0.item_tags.2.operator
+                      value: '5'
+                    - type: STRING
+                      name: columns.0.item_tags.2.tag
+                      value: lxc
+                    - type: STRING
+                      name: columns.0.item_tags.2.value
+                      value: ''
+                    - type: STRING
+                      name: columns.0.thresholds.0.color
+                      value: D40000
+                    - type: STRING
+                      name: columns.0.thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: columns.0.thresholds.1.color
+                      value: 4D91FF
+                    - type: STRING
+                      name: columns.0.thresholds.1.threshold
+                      value: '86400'
+                    - type: STRING
+                      name: columns.0.thresholds.2.color
+                      value: 0D68FD
+                    - type: STRING
+                      name: columns.0.thresholds.2.threshold
+                      value: '604800'
+                    - type: INTEGER
+                      name: item_ordering_limit
+                      value: '50'
+                    - type: INTEGER
+                      name: layout
+                      value: '1'
+                    - type: INTEGER
+                      name: problems
+                      value: '2'
+                    - type: INTEGER
+                      name: rf_rate
+                      value: '10'
+                    - type: INTEGER
+                      name: show_column_header
+                      value: '1'
+                - type: piechart
+                  name: 'Cluster: Nodes'
+                  x: '8'
+                  width: '10'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: draw_type
+                      value: '1'
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 0D68FD
+                    - type: INTEGER
+                      name: ds.0.dataset_aggregation
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: STRING
+                      name: ds.0.data_set_label
+                      value: 'Cluster: Nodes online'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Proxmox VE by HTTP'
+                        key: proxmox_ve.cluster.nodes.online
+                    - type: INTEGER
+                      name: ds.0.type.0
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: 76ABFF
+                    - type: INTEGER
+                      name: ds.1.dataset_aggregation
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.data_set_label
+                      value: 'Cluster: Nodes offline'
+                    - type: ITEM
+                      name: ds.1.itemids.0
+                      value:
+                        host: 'Proxmox VE by HTTP'
+                        key: proxmox_ve.cluster.nodes.offline
+                    - type: INTEGER
+                      name: ds.1.type.0
+                      value: '0'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_lines_mode
+                      value: '1'
+                    - type: INTEGER
+                      name: legend_value
+                      value: '1'
+                    - type: INTEGER
+                      name: space
+                      value: '3'
+                    - type: INTEGER
+                      name: total_show
+                      value: '1'
+                    - type: STRING
+                      name: units
+                      value: '!nodes'
+                    - type: INTEGER
+                      name: units_show
+                      value: '1'
+                    - type: INTEGER
+                      name: value_bold
+                      value: '1'
+                    - type: INTEGER
+                      name: width
+                      value: '20'
+                - type: piechart
+                  name: 'Cluster: Virtual mashines'
+                  x: '8'
                   'y': '3'
-                  width: '12'
+                  width: '10'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: draw_type
+                      value: '1'
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 0D68FD
+                    - type: INTEGER
+                      name: ds.0.dataset_aggregation
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: STRING
+                      name: ds.0.data_set_label
+                      value: 'Cluster: Running VMs'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Proxmox VE by HTTP'
+                        key: proxmox_ve.cluster.vms.running
+                    - type: INTEGER
+                      name: ds.0.type.0
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: 76ABFF
+                    - type: INTEGER
+                      name: ds.1.dataset_aggregation
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.data_set_label
+                      value: 'Cluster: Stopped VMs'
+                    - type: ITEM
+                      name: ds.1.itemids.0
+                      value:
+                        host: 'Proxmox VE by HTTP'
+                        key: proxmox_ve.cluster.vms.stopped
+                    - type: INTEGER
+                      name: ds.1.type.0
+                      value: '0'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_lines_mode
+                      value: '1'
+                    - type: INTEGER
+                      name: legend_value
+                      value: '1'
+                    - type: INTEGER
+                      name: space
+                      value: '3'
+                    - type: INTEGER
+                      name: total_show
+                      value: '1'
+                    - type: STRING
+                      name: units
+                      value: '!VMs'
+                    - type: INTEGER
+                      name: units_show
+                      value: '1'
+                    - type: INTEGER
+                      name: value_bold
+                      value: '1'
+                    - type: INTEGER
+                      name: width
+                      value: '20'
+                - type: piechart
+                  name: 'Cluster: LXC containers'
+                  x: '8'
+                  'y': '6'
+                  width: '10'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: draw_type
+                      value: '1'
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 0D68FD
+                    - type: INTEGER
+                      name: ds.0.dataset_aggregation
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: STRING
+                      name: ds.0.data_set_label
+                      value: 'Cluster: Running LXC''s'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Proxmox VE by HTTP'
+                        key: proxmox_ve.cluster.lxc.running
+                    - type: INTEGER
+                      name: ds.0.type.0
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: 76ABFF
+                    - type: INTEGER
+                      name: ds.1.dataset_aggregation
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.data_set_label
+                      value: 'Cluster: Stopped LXC''s'
+                    - type: ITEM
+                      name: ds.1.itemids.0
+                      value:
+                        host: 'Proxmox VE by HTTP'
+                        key: proxmox_ve.cluster.lxc.stopped
+                    - type: INTEGER
+                      name: ds.1.type.0
+                      value: '0'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_lines_mode
+                      value: '1'
+                    - type: INTEGER
+                      name: legend_value
+                      value: '1'
+                    - type: INTEGER
+                      name: space
+                      value: '3'
+                    - type: INTEGER
+                      name: total_show
+                      value: '1'
+                    - type: STRING
+                      name: units
+                      value: '!LXCs'
+                    - type: INTEGER
+                      name: units_show
+                      value: '1'
+                    - type: INTEGER
+                      name: value_bold
+                      value: '1'
+                    - type: INTEGER
+                      name: width
+                      value: '20'
+                - type: gauge
+                  name: 'Cluster: Storage utilization'
+                  x: '18'
+                  width: '11'
                   height: '4'
                   hide_header: 'YES'
                   fields:
                     - type: INTEGER
                       name: angle
                       value: '270'
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '0'
                     - type: STRING
                       name: description
-                      value: CPU
+                      value: |
+                        CLUSTER 
+                        STORAGE UTIL
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
+                    - type: STRING
+                      name: desc_color
+                      value: 0D68FD
+                    - type: INTEGER
+                      name: desc_size
+                      value: '6'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
                     - type: ITEM
                       name: itemid.0
                       value:
                         host: 'Proxmox VE by HTTP'
-                        key: proxmox_ve.cluster.cpu.utilization
+                        key: proxmox_ve.cluster.storage.utilization
+                    - type: STRING
+                      name: max
+                      value: '100'
+                    - type: STRING
+                      name: min
+                      value: '0'
                     - type: INTEGER
                       name: rf_rate
                       value: '10'
                     - type: INTEGER
-                      name: scale_show_units
-                      value: '0'
+                      name: scale_size
+                      value: '14'
                     - type: INTEGER
                       name: show.0
                       value: '1'
@@ -5061,63 +5511,1094 @@ zabbix_export:
                       value: '5'
                     - type: STRING
                       name: thresholds.0.color
-                      value: 4CAF50
+                      value: BDD8FE
                     - type: STRING
                       name: thresholds.0.threshold
                       value: '0'
                     - type: STRING
                       name: thresholds.1.color
-                      value: FFFF00
+                      value: 76ABFF
                     - type: STRING
                       name: thresholds.1.threshold
-                      value: '50'
+                      value: '20'
                     - type: STRING
                       name: thresholds.2.color
-                      value: FF8000
+                      value: 0D68FD
                     - type: STRING
                       name: thresholds.2.threshold
-                      value: '80'
+                      value: '40'
                     - type: STRING
                       name: thresholds.3.color
-                      value: FF4000
+                      value: '063375'
                     - type: STRING
                       name: thresholds.3.threshold
+                      value: '60'
+                    - type: STRING
+                      name: thresholds.4.color
+                      value: '900000'
+                    - type: STRING
+                      name: thresholds.4.threshold
+                      value: '75'
+                    - type: STRING
+                      name: thresholds.5.color
+                      value: D40000
+                    - type: STRING
+                      name: thresholds.5.threshold
                       value: '90'
+                    - type: INTEGER
+                      name: th_arc_size
+                      value: '6'
                     - type: INTEGER
                       name: th_show_arc
                       value: '1'
                     - type: INTEGER
                       name: th_show_labels
                       value: '1'
+                    - type: INTEGER
+                      name: units_bold
+                      value: '1'
+                    - type: STRING
+                      name: units_color
+                      value: 9BC2FF
+                    - type: INTEGER
+                      name: units_size
+                      value: '18'
                     - type: STRING
                       name: value_arc_color
-                      value: 1E88E5
+                      value: D40000
+                    - type: INTEGER
+                      name: value_arc_size
+                      value: '67'
+                    - type: INTEGER
+                      name: value_bold
+                      value: '1'
+                    - type: STRING
+                      name: value_color
+                      value: 0D68FD
+                - type: svggraph
+                  name: 'Cluster: Storage capacity'
+                  x: '18'
+                  'y': '4'
+                  width: '18'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: ds.0.aggregate_function
+                      value: '7'
+                    - type: INTEGER
+                      name: ds.0.aggregate_grouping
+                      value: '1'
+                    - type: STRING
+                      name: ds.0.aggregate_interval
+                      value: 5m
+                    - type: INTEGER
+                      name: ds.0.approximation
+                      value: '4'
+                    - type: STRING
+                      name: ds.0.color
+                      value: 0D68FD
+                    - type: STRING
+                      name: ds.0.data_set_label
+                      value: 'Cluster: Storage used'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '5'
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: 'Cluster: Storage used'
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.0.transparency
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.type
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.1.aggregate_function
+                      value: '7'
+                    - type: INTEGER
+                      name: ds.1.aggregate_grouping
+                      value: '1'
+                    - type: STRING
+                      name: ds.1.aggregate_interval
+                      value: 5m
+                    - type: INTEGER
+                      name: ds.1.approximation
+                      value: '4'
+                    - type: STRING
+                      name: ds.1.color
+                      value: 9BC2FF
+                    - type: STRING
+                      name: ds.1.data_set_label
+                      value: 'Cluster: Storage total'
+                    - type: INTEGER
+                      name: ds.1.fill
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.items.0
+                      value: 'Cluster: Storage total'
+                    - type: INTEGER
+                      name: ds.1.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.1.transparency
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.1.type
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.1.width
+                      value: '4'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '3'
+                    - type: INTEGER
+                      name: legend_lines_mode
+                      value: '1'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: IHZPM
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                    - type: INTEGER
+                      name: simple_triggers
+                      value: '1'
+                    - type: INTEGER
+                      name: working_time
+                      value: '1'
+                - type: topitems
+                  name: 'Node: Storage utilization'
+                  x: '18'
+                  'y': '9'
+                  width: '18'
+                  height: '4'
+                  fields:
+                    - type: INTEGER
+                      name: columns.0.display
+                      value: '3'
+                    - type: STRING
+                      name: columns.0.items.0
+                      value: '*torage [*]: Utilization'
+                    - type: STRING
+                      name: columns.0.max
+                      value: '100'
+                    - type: STRING
+                      name: columns.0.min
+                      value: '0'
+                    - type: STRING
+                      name: columns.0.thresholds.0.color
+                      value: BDD8FE
+                    - type: STRING
+                      name: columns.0.thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: columns.0.thresholds.1.color
+                      value: 76ABFF
+                    - type: STRING
+                      name: columns.0.thresholds.1.threshold
+                      value: '20'
+                    - type: STRING
+                      name: columns.0.thresholds.2.color
+                      value: 0D68FD
+                    - type: STRING
+                      name: columns.0.thresholds.2.threshold
+                      value: '40'
+                    - type: STRING
+                      name: columns.0.thresholds.3.color
+                      value: 094EB3
+                    - type: STRING
+                      name: columns.0.thresholds.3.threshold
+                      value: '60'
+                    - type: STRING
+                      name: columns.0.thresholds.4.color
+                      value: D40000
+                    - type: STRING
+                      name: columns.0.thresholds.4.threshold
+                      value: '80'
+                    - type: INTEGER
+                      name: item_ordering_limit
+                      value: '50'
+                    - type: INTEGER
+                      name: layout
+                      value: '1'
+                    - type: INTEGER
+                      name: problems
+                      value: '2'
+                    - type: INTEGER
+                      name: rf_rate
+                      value: '10'
+                    - type: INTEGER
+                      name: show_column_header
+                      value: '1'
                 - type: item
-                  'y': '7'
-                  width: '12'
-                  height: '1'
+                  name: 'Cluster: Storage used'
+                  x: '29'
+                  width: '7'
+                  hide_header: 'YES'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 4D91FF
+                    - type: INTEGER
+                      name: decimal_size
+                      value: '16'
+                    - type: STRING
+                      name: description
+                      value: |
+                        CLUSTER 
+                        STORAGE USED
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
+                    - type: STRING
+                      name: desc_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: desc_size
+                      value: '12'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '1'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Proxmox VE by HTTP'
+                        key: proxmox_ve.cluster.storage.used
+                    - type: INTEGER
+                      name: show.0
+                      value: '1'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.color
+                      value: 0B5ED7
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: DASHBOARD._timeperiod
+                    - type: INTEGER
+                      name: sparkline.width
+                      value: '3'
+                    - type: STRING
+                      name: units_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: units_size
+                      value: '15'
+                    - type: STRING
+                      name: value_color
+                      value: FAFAFA
+                    - type: INTEGER
+                      name: value_size
+                      value: '16'
+                    - type: INTEGER
+                      name: value_v_pos
+                      value: '2'
+                - type: item
+                  name: 'Cluster: Storage total'
+                  x: '29'
+                  'y': '2'
+                  width: '7'
+                  hide_header: 'YES'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 4D91FF
+                    - type: INTEGER
+                      name: decimal_size
+                      value: '16'
+                    - type: STRING
+                      name: description
+                      value: |
+                        CLUSTER 
+                        STORAGE TOTAL
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
+                    - type: STRING
+                      name: desc_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: desc_size
+                      value: '12'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '1'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Proxmox VE by HTTP'
+                        key: proxmox_ve.cluster.storage.total
+                    - type: INTEGER
+                      name: show.0
+                      value: '1'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.color
+                      value: 0B5ED7
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: DASHBOARD._timeperiod
+                    - type: INTEGER
+                      name: sparkline.width
+                      value: '3'
+                    - type: STRING
+                      name: units_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: units_size
+                      value: '15'
+                    - type: STRING
+                      name: value_color
+                      value: FAFAFA
+                    - type: INTEGER
+                      name: value_size
+                      value: '16'
+                    - type: INTEGER
+                      name: value_v_pos
+                      value: '2'
+                - type: gauge
+                  name: 'Cluster: Memory utilization'
+                  x: '36'
+                  width: '11'
+                  height: '4'
                   hide_header: 'YES'
                   fields:
                     - type: INTEGER
-                      name: decimal_places
+                      name: angle
+                      value: '270'
+                    - type: STRING
+                      name: description
+                      value: |
+                        CLUSTER
+                        MEMORY UTIL
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
+                    - type: STRING
+                      name: desc_color
+                      value: 0D68FD
+                    - type: INTEGER
+                      name: desc_size
+                      value: '6'
+                    - type: INTEGER
+                      name: desc_v_pos
                       value: '0'
                     - type: ITEM
                       name: itemid.0
                       value:
                         host: 'Proxmox VE by HTTP'
-                        key: proxmox_ve.cluster.cpu.count
+                        key: proxmox_ve.cluster.memory.utilization
+                    - type: STRING
+                      name: max
+                      value: '100'
+                    - type: STRING
+                      name: min
+                      value: '0'
+                    - type: INTEGER
+                      name: rf_rate
+                      value: '10'
+                    - type: INTEGER
+                      name: scale_size
+                      value: '14'
                     - type: INTEGER
                       name: show.0
+                      value: '1'
+                    - type: INTEGER
+                      name: show.1
                       value: '2'
-                - type: topitems
-                  'y': '8'
+                    - type: INTEGER
+                      name: show.2
+                      value: '3'
+                    - type: INTEGER
+                      name: show.3
+                      value: '4'
+                    - type: INTEGER
+                      name: show.4
+                      value: '5'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: BDD8FE
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: 76ABFF
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '20'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 0D68FD
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '40'
+                    - type: STRING
+                      name: thresholds.3.color
+                      value: '063375'
+                    - type: STRING
+                      name: thresholds.3.threshold
+                      value: '60'
+                    - type: STRING
+                      name: thresholds.4.color
+                      value: '900000'
+                    - type: STRING
+                      name: thresholds.4.threshold
+                      value: '75'
+                    - type: STRING
+                      name: thresholds.5.color
+                      value: D40000
+                    - type: STRING
+                      name: thresholds.5.threshold
+                      value: '90'
+                    - type: INTEGER
+                      name: th_arc_size
+                      value: '6'
+                    - type: INTEGER
+                      name: th_show_arc
+                      value: '1'
+                    - type: INTEGER
+                      name: th_show_labels
+                      value: '1'
+                    - type: INTEGER
+                      name: units_bold
+                      value: '1'
+                    - type: STRING
+                      name: units_color
+                      value: 9BC2FF
+                    - type: INTEGER
+                      name: units_size
+                      value: '18'
+                    - type: STRING
+                      name: value_arc_color
+                      value: D40000
+                    - type: INTEGER
+                      name: value_arc_size
+                      value: '67'
+                    - type: INTEGER
+                      name: value_bold
+                      value: '1'
+                    - type: STRING
+                      name: value_color
+                      value: 0D68FD
+                - type: svggraph
+                  name: 'Cluster: Memory capacity'
+                  x: '36'
+                  'y': '4'
                   width: '18'
                   height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: ds.0.aggregate_function
+                      value: '7'
+                    - type: INTEGER
+                      name: ds.0.aggregate_grouping
+                      value: '1'
+                    - type: STRING
+                      name: ds.0.aggregate_interval
+                      value: 5m
+                    - type: INTEGER
+                      name: ds.0.approximation
+                      value: '4'
+                    - type: STRING
+                      name: ds.0.color
+                      value: 0D68FD
+                    - type: STRING
+                      name: ds.0.data_set_label
+                      value: 'Cluster: Memory used'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '5'
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: 'Cluster: Memory used'
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.0.transparency
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.type
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.1.aggregate_function
+                      value: '7'
+                    - type: INTEGER
+                      name: ds.1.aggregate_grouping
+                      value: '1'
+                    - type: STRING
+                      name: ds.1.aggregate_interval
+                      value: 5m
+                    - type: INTEGER
+                      name: ds.1.approximation
+                      value: '4'
+                    - type: STRING
+                      name: ds.1.color
+                      value: 9BC2FF
+                    - type: STRING
+                      name: ds.1.data_set_label
+                      value: 'Cluster: Memory total'
+                    - type: INTEGER
+                      name: ds.1.fill
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.items.0
+                      value: 'Cluster: Memory total'
+                    - type: INTEGER
+                      name: ds.1.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.1.transparency
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.1.type
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.1.width
+                      value: '4'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '3'
+                    - type: INTEGER
+                      name: legend_lines_mode
+                      value: '1'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: VOYOI
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                    - type: INTEGER
+                      name: simple_triggers
+                      value: '1'
+                    - type: INTEGER
+                      name: working_time
+                      value: '1'
+                - type: topitems
+                  name: 'Node: Memory utilization'
+                  x: '36'
+                  'y': '9'
+                  width: '18'
+                  height: '4'
+                  fields:
+                    - type: INTEGER
+                      name: columns.0.display
+                      value: '3'
+                    - type: STRING
+                      name: columns.0.items.0
+                      value: '*Memory utilization'
+                    - type: INTEGER
+                      name: columns.0.item_tags.0.operator
+                      value: '2'
+                    - type: STRING
+                      name: columns.0.item_tags.0.tag
+                      value: component
+                    - type: STRING
+                      name: columns.0.item_tags.0.value
+                      value: cluster
+                    - type: INTEGER
+                      name: columns.0.item_tags.1.operator
+                      value: '5'
+                    - type: STRING
+                      name: columns.0.item_tags.1.tag
+                      value: qemu
+                    - type: STRING
+                      name: columns.0.item_tags.1.value
+                      value: ''
+                    - type: INTEGER
+                      name: columns.0.item_tags.2.operator
+                      value: '5'
+                    - type: STRING
+                      name: columns.0.item_tags.2.tag
+                      value: lxc
+                    - type: STRING
+                      name: columns.0.item_tags.2.value
+                      value: ''
+                    - type: STRING
+                      name: columns.0.max
+                      value: '100'
+                    - type: STRING
+                      name: columns.0.min
+                      value: '0'
+                    - type: STRING
+                      name: columns.0.thresholds.0.color
+                      value: BDD8FE
+                    - type: STRING
+                      name: columns.0.thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: columns.0.thresholds.1.color
+                      value: 76ABFF
+                    - type: STRING
+                      name: columns.0.thresholds.1.threshold
+                      value: '20'
+                    - type: STRING
+                      name: columns.0.thresholds.2.color
+                      value: 0D68FD
+                    - type: STRING
+                      name: columns.0.thresholds.2.threshold
+                      value: '40'
+                    - type: STRING
+                      name: columns.0.thresholds.3.color
+                      value: 094EB3
+                    - type: STRING
+                      name: columns.0.thresholds.3.threshold
+                      value: '60'
+                    - type: STRING
+                      name: columns.0.thresholds.4.color
+                      value: D40000
+                    - type: STRING
+                      name: columns.0.thresholds.4.threshold
+                      value: '80'
+                    - type: INTEGER
+                      name: item_ordering_limit
+                      value: '20'
+                    - type: INTEGER
+                      name: item_ordering_order_by
+                      value: '2'
+                    - type: INTEGER
+                      name: layout
+                      value: '1'
+                    - type: INTEGER
+                      name: problems
+                      value: '2'
+                    - type: INTEGER
+                      name: rf_rate
+                      value: '10'
+                    - type: INTEGER
+                      name: show_column_header
+                      value: '1'
+                - type: item
+                  name: 'Cluster: Memory total'
+                  x: '47'
+                  width: '7'
                   hide_header: 'YES'
                   fields:
                     - type: STRING
-                      name: columns.0.base_color
-                      value: 4CAF50
+                      name: bg_color
+                      value: 4D91FF
+                    - type: INTEGER
+                      name: decimal_size
+                      value: '16'
+                    - type: STRING
+                      name: description
+                      value: |
+                        CLUSTER 
+                        MEMORY TOTAL
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
+                    - type: STRING
+                      name: desc_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: desc_size
+                      value: '12'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '1'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Proxmox VE by HTTP'
+                        key: proxmox_ve.cluster.memory.total
+                    - type: INTEGER
+                      name: show.0
+                      value: '1'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.color
+                      value: 0B5ED7
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: DASHBOARD._timeperiod
+                    - type: INTEGER
+                      name: sparkline.width
+                      value: '3'
+                    - type: STRING
+                      name: units_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: units_size
+                      value: '15'
+                    - type: STRING
+                      name: value_color
+                      value: FAFAFA
+                    - type: INTEGER
+                      name: value_size
+                      value: '16'
+                    - type: INTEGER
+                      name: value_v_pos
+                      value: '2'
+                - type: item
+                  name: 'Cluster: Memory used'
+                  x: '47'
+                  'y': '2'
+                  width: '7'
+                  hide_header: 'YES'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 4D91FF
+                    - type: INTEGER
+                      name: decimal_size
+                      value: '16'
+                    - type: STRING
+                      name: description
+                      value: |
+                        CLUSTER 
+                        MEMORY USED
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
+                    - type: STRING
+                      name: desc_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: desc_size
+                      value: '12'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '1'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Proxmox VE by HTTP'
+                        key: proxmox_ve.cluster.memory.used
+                    - type: INTEGER
+                      name: show.0
+                      value: '1'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.color
+                      value: 0B5ED7
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: DASHBOARD._timeperiod
+                    - type: INTEGER
+                      name: sparkline.width
+                      value: '3'
+                    - type: STRING
+                      name: units_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: units_size
+                      value: '15'
+                    - type: STRING
+                      name: value_color
+                      value: FAFAFA
+                    - type: INTEGER
+                      name: value_size
+                      value: '16'
+                    - type: INTEGER
+                      name: value_v_pos
+                      value: '2'
+                - type: gauge
+                  name: 'Cluster: CPU utilization'
+                  x: '54'
+                  width: '11'
+                  height: '4'
+                  hide_header: 'YES'
+                  fields:
+                    - type: INTEGER
+                      name: angle
+                      value: '270'
+                    - type: STRING
+                      name: description
+                      value: |
+                        CLUSTER
+                        CPU UTIL
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
+                    - type: STRING
+                      name: desc_color
+                      value: 0D68FD
+                    - type: INTEGER
+                      name: desc_size
+                      value: '6'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Proxmox VE by HTTP'
+                        key: proxmox_ve.cluster.cpu.utilization
+                    - type: STRING
+                      name: max
+                      value: '100'
+                    - type: STRING
+                      name: min
+                      value: '0'
+                    - type: INTEGER
+                      name: rf_rate
+                      value: '10'
+                    - type: INTEGER
+                      name: scale_size
+                      value: '14'
+                    - type: INTEGER
+                      name: show.0
+                      value: '1'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
+                    - type: INTEGER
+                      name: show.2
+                      value: '3'
+                    - type: INTEGER
+                      name: show.3
+                      value: '4'
+                    - type: INTEGER
+                      name: show.4
+                      value: '5'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: BDD8FE
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: 76ABFF
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '20'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 0D68FD
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '40'
+                    - type: STRING
+                      name: thresholds.3.color
+                      value: '063375'
+                    - type: STRING
+                      name: thresholds.3.threshold
+                      value: '60'
+                    - type: STRING
+                      name: thresholds.4.color
+                      value: '900000'
+                    - type: STRING
+                      name: thresholds.4.threshold
+                      value: '75'
+                    - type: STRING
+                      name: thresholds.5.color
+                      value: D40000
+                    - type: STRING
+                      name: thresholds.5.threshold
+                      value: '90'
+                    - type: INTEGER
+                      name: th_arc_size
+                      value: '6'
+                    - type: INTEGER
+                      name: th_show_arc
+                      value: '1'
+                    - type: INTEGER
+                      name: th_show_labels
+                      value: '1'
+                    - type: INTEGER
+                      name: units_bold
+                      value: '1'
+                    - type: STRING
+                      name: units_color
+                      value: 9BC2FF
+                    - type: INTEGER
+                      name: units_size
+                      value: '18'
+                    - type: STRING
+                      name: value_arc_color
+                      value: D40000
+                    - type: INTEGER
+                      name: value_arc_size
+                      value: '67'
+                    - type: INTEGER
+                      name: value_bold
+                      value: '1'
+                    - type: STRING
+                      name: value_color
+                      value: 0D68FD
+                - type: svggraph
+                  name: 'Cluster: Resource utilization'
+                  x: '54'
+                  'y': '4'
+                  width: '18'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: ds.0.aggregate_function
+                      value: '7'
+                    - type: INTEGER
+                      name: ds.0.aggregate_grouping
+                      value: '1'
+                    - type: STRING
+                      name: ds.0.aggregate_interval
+                      value: 5m
+                    - type: INTEGER
+                      name: ds.0.approximation
+                      value: '4'
+                    - type: STRING
+                      name: ds.0.color
+                      value: 0D68FD
+                    - type: STRING
+                      name: ds.0.data_set_label
+                      value: 'Cluster: CPU utilization'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: 'Cluster: CPU utilization'
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.0.transparency
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.type
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '4'
+                    - type: INTEGER
+                      name: ds.1.aggregate_function
+                      value: '7'
+                    - type: INTEGER
+                      name: ds.1.aggregate_grouping
+                      value: '1'
+                    - type: STRING
+                      name: ds.1.aggregate_interval
+                      value: 5m
+                    - type: INTEGER
+                      name: ds.1.approximation
+                      value: '4'
+                    - type: STRING
+                      name: ds.1.color
+                      value: 9BC2FF
+                    - type: STRING
+                      name: ds.1.data_set_label
+                      value: 'Cluster: Memory utilization'
+                    - type: STRING
+                      name: ds.1.items.0
+                      value: 'Cluster: Memory utilization'
+                    - type: INTEGER
+                      name: ds.1.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.1.transparency
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.1.type
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.1.width
+                      value: '4'
+                    - type: INTEGER
+                      name: ds.2.aggregate_function
+                      value: '7'
+                    - type: INTEGER
+                      name: ds.2.aggregate_grouping
+                      value: '1'
+                    - type: STRING
+                      name: ds.2.aggregate_interval
+                      value: 5m
+                    - type: INTEGER
+                      name: ds.2.approximation
+                      value: '4'
+                    - type: STRING
+                      name: ds.2.color
+                      value: 3D98FF
+                    - type: STRING
+                      name: ds.2.data_set_label
+                      value: 'Cluster: Storage utilization'
+                    - type: INTEGER
+                      name: ds.2.fill
+                      value: '6'
+                    - type: STRING
+                      name: ds.2.items.0
+                      value: 'Cluster: Storage utilization'
+                    - type: INTEGER
+                      name: ds.2.missingdatafunc
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.2.transparency
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.2.type
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.2.width
+                      value: '3'
+                    - type: STRING
+                      name: lefty_max
+                      value: '100'
+                    - type: STRING
+                      name: lefty_min
+                      value: '0'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '3'
+                    - type: INTEGER
+                      name: legend_lines_mode
+                      value: '1'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: BVRZF
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                    - type: INTEGER
+                      name: simple_triggers
+                      value: '1'
+                    - type: INTEGER
+                      name: working_time
+                      value: '1'
+                - type: topitems
+                  name: 'Node: CPU utilization'
+                  x: '54'
+                  'y': '9'
+                  width: '18'
+                  height: '4'
+                  fields:
                     - type: INTEGER
                       name: columns.0.display
                       value: '3'
@@ -5159,22 +6640,34 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: columns.0.thresholds.0.color
-                      value: FFFF00
+                      value: BDD8FE
                     - type: STRING
                       name: columns.0.thresholds.0.threshold
-                      value: '50'
+                      value: '0'
                     - type: STRING
                       name: columns.0.thresholds.1.color
-                      value: FFD54F
+                      value: 76ABFF
                     - type: STRING
                       name: columns.0.thresholds.1.threshold
-                      value: '80'
+                      value: '20'
                     - type: STRING
                       name: columns.0.thresholds.2.color
-                      value: FF4000
+                      value: 0D68FD
                     - type: STRING
                       name: columns.0.thresholds.2.threshold
-                      value: '90'
+                      value: '40'
+                    - type: STRING
+                      name: columns.0.thresholds.3.color
+                      value: 094EB3
+                    - type: STRING
+                      name: columns.0.thresholds.3.threshold
+                      value: '60'
+                    - type: STRING
+                      name: columns.0.thresholds.4.color
+                      value: D40000
+                    - type: STRING
+                      name: columns.0.thresholds.4.threshold
+                      value: '80'
                     - type: INTEGER
                       name: item_ordering_limit
                       value: '20'
@@ -5192,97 +6685,45 @@ zabbix_export:
                       value: '10'
                     - type: INTEGER
                       name: show_column_header
-                      value: '0'
-                - type: honeycomb
-                  name: 'Node status'
-                  x: '12'
-                  width: '15'
-                  height: '3'
-                  fields:
-                    - type: STRING
-                      name: items.0
-                      value: 'Node [*]: Status'
-                    - type: INTEGER
-                      name: item_tags.0.operator
-                      value: '5'
-                    - type: STRING
-                      name: item_tags.0.tag
-                      value: qemu
-                    - type: STRING
-                      name: item_tags.0.value
-                      value: ''
-                    - type: INTEGER
-                      name: item_tags.1.operator
-                      value: '5'
-                    - type: STRING
-                      name: item_tags.1.tag
-                      value: lxc
-                    - type: STRING
-                      name: item_tags.1.value
-                      value: ''
-                    - type: STRING
-                      name: primary_label
-                      value: '{{ITEM.NAME}.regsub("^(Node \[)(.*)(\]: Status)", "\2")}'
-                    - type: STRING
-                      name: reference
-                      value: FEFFA
-                    - type: INTEGER
-                      name: rf_rate
-                      value: '10'
-                    - type: INTEGER
-                      name: show.0
                       value: '1'
-                    - type: STRING
-                      name: thresholds.0.color
-                      value: B0BEC5
-                    - type: STRING
-                      name: thresholds.0.threshold
-                      value: '5'
-                    - type: STRING
-                      name: thresholds.1.color
-                      value: E65660
-                    - type: STRING
-                      name: thresholds.1.threshold
-                      value: '1'
-                    - type: STRING
-                      name: thresholds.2.color
-                      value: 3BC97D
-                    - type: STRING
-                      name: thresholds.2.threshold
-                      value: '10'
-                    - type: STRING
-                      name: thresholds.3.color
-                      value: B0BEC5
-                    - type: STRING
-                      name: thresholds.3.threshold
-                      value: '0'
-                - type: gauge
-                  x: '12'
-                  'y': '3'
-                  width: '12'
+                - type: item
+                  name: 'Cluster: Number of CPUs'
+                  x: '65'
+                  width: '7'
                   height: '4'
                   hide_header: 'YES'
                   fields:
-                    - type: INTEGER
-                      name: angle
-                      value: '270'
+                    - type: STRING
+                      name: bg_color
+                      value: 4D91FF
                     - type: INTEGER
                       name: decimal_places
                       value: '0'
+                    - type: INTEGER
+                      name: decimal_size
+                      value: '8'
                     - type: STRING
                       name: description
-                      value: Memory
+                      value: |
+                        CLUSTER 
+                        CPU COUNT
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
+                    - type: STRING
+                      name: desc_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: desc_size
+                      value: '7'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '1'
                     - type: ITEM
                       name: itemid.0
                       value:
                         host: 'Proxmox VE by HTTP'
-                        key: proxmox_ve.cluster.memory.utilization
-                    - type: INTEGER
-                      name: rf_rate
-                      value: '10'
-                    - type: INTEGER
-                      name: scale_show_units
-                      value: '0'
+                        key: proxmox_ve.cluster.cpu.count
                     - type: INTEGER
                       name: show.0
                       value: '1'
@@ -5291,650 +6732,40 @@ zabbix_export:
                       value: '2'
                     - type: INTEGER
                       name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: sparkline.color
+                      value: 0B5ED7
+                    - type: STRING
+                      name: sparkline.time_period._reference
+                      value: DASHBOARD._timeperiod
+                    - type: INTEGER
+                      name: sparkline.width
                       value: '3'
+                    - type: STRING
+                      name: units
+                      value: '!CPUs'
+                    - type: STRING
+                      name: units_color
+                      value: FAFAFA
                     - type: INTEGER
-                      name: show.3
-                      value: '4'
-                    - type: INTEGER
-                      name: show.4
+                      name: units_size
                       value: '5'
                     - type: STRING
-                      name: thresholds.0.color
-                      value: 4CAF50
-                    - type: STRING
-                      name: thresholds.0.threshold
-                      value: '0'
-                    - type: STRING
-                      name: thresholds.1.color
-                      value: FFFF00
-                    - type: STRING
-                      name: thresholds.1.threshold
-                      value: '50'
-                    - type: STRING
-                      name: thresholds.2.color
-                      value: FF8000
-                    - type: STRING
-                      name: thresholds.2.threshold
-                      value: '80'
-                    - type: STRING
-                      name: thresholds.3.color
-                      value: FF4000
-                    - type: STRING
-                      name: thresholds.3.threshold
-                      value: '90'
+                      name: value_color
+                      value: FFFFFF
                     - type: INTEGER
-                      name: th_show_arc
-                      value: '1'
+                      name: value_size
+                      value: '8'
                     - type: INTEGER
-                      name: th_show_labels
-                      value: '1'
-                    - type: STRING
-                      name: value_arc_color
-                      value: 1E88E5
-                - type: item
-                  x: '12'
-                  'y': '7'
-                  width: '6'
-                  height: '1'
-                  hide_header: 'YES'
-                  fields:
-                    - type: ITEM
-                      name: itemid.0
-                      value:
-                        host: 'Proxmox VE by HTTP'
-                        key: proxmox_ve.cluster.memory.used
-                    - type: INTEGER
-                      name: show.0
+                      name: value_v_pos
                       value: '2'
-                - type: item
-                  x: '18'
-                  'y': '7'
-                  width: '6'
-                  height: '1'
-                  hide_header: 'YES'
-                  fields:
-                    - type: ITEM
-                      name: itemid.0
-                      value:
-                        host: 'Proxmox VE by HTTP'
-                        key: proxmox_ve.cluster.memory.total
-                    - type: INTEGER
-                      name: show.0
-                      value: '2'
-                - type: topitems
-                  x: '18'
-                  'y': '8'
-                  width: '18'
-                  height: '5'
-                  hide_header: 'YES'
-                  fields:
-                    - type: STRING
-                      name: columns.0.base_color
-                      value: 4CAF50
-                    - type: INTEGER
-                      name: columns.0.display
-                      value: '2'
-                    - type: STRING
-                      name: columns.0.items.0
-                      value: '*Memory utilization'
-                    - type: INTEGER
-                      name: columns.0.item_tags.0.operator
-                      value: '2'
-                    - type: STRING
-                      name: columns.0.item_tags.0.tag
-                      value: component
-                    - type: STRING
-                      name: columns.0.item_tags.0.value
-                      value: cluster
-                    - type: INTEGER
-                      name: columns.0.item_tags.1.operator
-                      value: '5'
-                    - type: STRING
-                      name: columns.0.item_tags.1.tag
-                      value: qemu
-                    - type: STRING
-                      name: columns.0.item_tags.1.value
-                      value: ''
-                    - type: INTEGER
-                      name: columns.0.item_tags.2.operator
-                      value: '5'
-                    - type: STRING
-                      name: columns.0.item_tags.2.tag
-                      value: lxc
-                    - type: STRING
-                      name: columns.0.item_tags.2.value
-                      value: ''
-                    - type: STRING
-                      name: columns.0.max
-                      value: '100'
-                    - type: STRING
-                      name: columns.0.min
-                      value: '0'
-                    - type: STRING
-                      name: columns.0.thresholds.0.color
-                      value: FFFF00
-                    - type: STRING
-                      name: columns.0.thresholds.0.threshold
-                      value: '50'
-                    - type: STRING
-                      name: columns.0.thresholds.1.color
-                      value: FFD54F
-                    - type: STRING
-                      name: columns.0.thresholds.1.threshold
-                      value: '80'
-                    - type: STRING
-                      name: columns.0.thresholds.2.color
-                      value: FF4000
-                    - type: STRING
-                      name: columns.0.thresholds.2.threshold
-                      value: '90'
-                    - type: INTEGER
-                      name: item_ordering_limit
-                      value: '20'
-                    - type: INTEGER
-                      name: item_ordering_order_by
-                      value: '2'
-                    - type: INTEGER
-                      name: layout
-                      value: '1'
-                    - type: INTEGER
-                      name: problems
-                      value: '2'
-                    - type: INTEGER
-                      name: rf_rate
-                      value: '10'
-                    - type: INTEGER
-                      name: show_column_header
-                      value: '0'
-                - type: gauge
-                  x: '24'
-                  'y': '3'
-                  width: '12'
-                  height: '4'
-                  hide_header: 'YES'
-                  fields:
-                    - type: INTEGER
-                      name: angle
-                      value: '270'
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '0'
-                    - type: STRING
-                      name: description
-                      value: Storage
-                    - type: ITEM
-                      name: itemid.0
-                      value:
-                        host: 'Proxmox VE by HTTP'
-                        key: proxmox_ve.cluster.storage.utilization
-                    - type: INTEGER
-                      name: rf_rate
-                      value: '10'
-                    - type: INTEGER
-                      name: scale_show_units
-                      value: '0'
-                    - type: INTEGER
-                      name: show.0
-                      value: '1'
-                    - type: INTEGER
-                      name: show.1
-                      value: '2'
-                    - type: INTEGER
-                      name: show.2
-                      value: '3'
-                    - type: INTEGER
-                      name: show.3
-                      value: '4'
-                    - type: INTEGER
-                      name: show.4
-                      value: '5'
-                    - type: STRING
-                      name: thresholds.0.color
-                      value: 4CAF50
-                    - type: STRING
-                      name: thresholds.0.threshold
-                      value: '0'
-                    - type: STRING
-                      name: thresholds.1.color
-                      value: FFFF00
-                    - type: STRING
-                      name: thresholds.1.threshold
-                      value: '50'
-                    - type: STRING
-                      name: thresholds.2.color
-                      value: FF8000
-                    - type: STRING
-                      name: thresholds.2.threshold
-                      value: '80'
-                    - type: STRING
-                      name: thresholds.3.color
-                      value: FF4000
-                    - type: STRING
-                      name: thresholds.3.threshold
-                      value: '90'
-                    - type: INTEGER
-                      name: th_show_arc
-                      value: '1'
-                    - type: INTEGER
-                      name: th_show_labels
-                      value: '1'
-                    - type: STRING
-                      name: value_arc_color
-                      value: 1E88E5
-                - type: item
-                  x: '24'
-                  'y': '7'
-                  width: '6'
-                  height: '1'
-                  hide_header: 'YES'
-                  fields:
-                    - type: ITEM
-                      name: itemid.0
-                      value:
-                        host: 'Proxmox VE by HTTP'
-                        key: proxmox_ve.cluster.storage.used
-                    - type: INTEGER
-                      name: show.0
-                      value: '2'
-                - type: piechart
-                  name: Nodes
-                  x: '27'
-                  width: '15'
-                  height: '3'
-                  fields:
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '0'
-                    - type: INTEGER
-                      name: draw_type
-                      value: '1'
-                    - type: STRING
-                      name: ds.0.color.0
-                      value: 81C784
-                    - type: INTEGER
-                      name: ds.0.dataset_type
-                      value: '0'
-                    - type: ITEM
-                      name: ds.0.itemids.0
-                      value:
-                        host: 'Proxmox VE by HTTP'
-                        key: proxmox_ve.cluster.nodes.online
-                    - type: INTEGER
-                      name: ds.0.type.0
-                      value: '0'
-                    - type: STRING
-                      name: ds.1.color.0
-                      value: FF8A65
-                    - type: INTEGER
-                      name: ds.1.dataset_type
-                      value: '0'
-                    - type: ITEM
-                      name: ds.1.itemids.0
-                      value:
-                        host: 'Proxmox VE by HTTP'
-                        key: proxmox_ve.cluster.nodes.offline
-                    - type: INTEGER
-                      name: ds.1.type.0
-                      value: '0'
-                    - type: INTEGER
-                      name: legend_lines
-                      value: '2'
-                    - type: INTEGER
-                      name: legend_value
-                      value: '1'
-                    - type: INTEGER
-                      name: total_show
-                      value: '1'
-                - type: item
-                  x: '30'
-                  'y': '7'
-                  width: '6'
-                  height: '1'
-                  hide_header: 'YES'
-                  fields:
-                    - type: ITEM
-                      name: itemid.0
-                      value:
-                        host: 'Proxmox VE by HTTP'
-                        key: proxmox_ve.cluster.storage.total
-                    - type: INTEGER
-                      name: show.0
-                      value: '2'
-                - type: svggraph
-                  x: '36'
-                  'y': '3'
-                  width: '36'
-                  height: '5'
-                  fields:
-                    - type: STRING
-                      name: ds.0.color.0
-                      value: 0080FF
-                    - type: STRING
-                      name: ds.0.color.1
-                      value: FFD54F
-                    - type: STRING
-                      name: ds.0.color.2
-                      value: 0EC9AC
-                    - type: INTEGER
-                      name: ds.0.dataset_type
-                      value: '0'
-                    - type: INTEGER
-                      name: ds.0.fill
-                      value: '1'
-                    - type: ITEM
-                      name: ds.0.itemids.0
-                      value:
-                        host: 'Proxmox VE by HTTP'
-                        key: proxmox_ve.cluster.cpu.utilization
-                    - type: ITEM
-                      name: ds.0.itemids.1
-                      value:
-                        host: 'Proxmox VE by HTTP'
-                        key: proxmox_ve.cluster.memory.utilization
-                    - type: ITEM
-                      name: ds.0.itemids.2
-                      value:
-                        host: 'Proxmox VE by HTTP'
-                        key: proxmox_ve.cluster.storage.utilization
-                    - type: INTEGER
-                      name: ds.0.missingdatafunc
-                      value: '3'
-                    - type: INTEGER
-                      name: ds.0.transparency
-                      value: '4'
-                    - type: INTEGER
-                      name: ds.0.type
-                      value: '2'
-                    - type: INTEGER
-                      name: ds.0.width
-                      value: '2'
-                    - type: STRING
-                      name: lefty_max
-                      value: '100'
-                    - type: STRING
-                      name: lefty_min
-                      value: '0'
-                    - type: INTEGER
-                      name: legend_lines
-                      value: '3'
-                    - type: INTEGER
-                      name: legend_statistic
-                      value: '1'
-                    - type: STRING
-                      name: reference
-                      value: ZZQQX
-                    - type: INTEGER
-                      name: righty
-                      value: '0'
-                    - type: INTEGER
-                      name: simple_triggers
-                      value: '1'
-                    - type: INTEGER
-                      name: working_time
-                      value: '1'
-                - type: topitems
-                  x: '36'
-                  'y': '8'
-                  width: '18'
-                  height: '5'
-                  hide_header: 'YES'
-                  fields:
-                    - type: STRING
-                      name: columns.0.base_color
-                      value: 4CAF50
-                    - type: INTEGER
-                      name: columns.0.display_value_as
-                      value: '2'
-                    - type: STRING
-                      name: columns.0.items.0
-                      value: 'Node [*]: uptime'
-                    - type: INTEGER
-                      name: columns.0.item_tags.0.operator
-                      value: '2'
-                    - type: STRING
-                      name: columns.0.item_tags.0.tag
-                      value: component
-                    - type: STRING
-                      name: columns.0.item_tags.0.value
-                      value: cluster
-                    - type: INTEGER
-                      name: columns.0.item_tags.1.operator
-                      value: '5'
-                    - type: STRING
-                      name: columns.0.item_tags.1.tag
-                      value: qemu
-                    - type: STRING
-                      name: columns.0.item_tags.1.value
-                      value: ''
-                    - type: INTEGER
-                      name: columns.0.item_tags.2.operator
-                      value: '5'
-                    - type: STRING
-                      name: columns.0.item_tags.2.tag
-                      value: lxc
-                    - type: STRING
-                      name: columns.0.item_tags.2.value
-                      value: ''
-                    - type: INTEGER
-                      name: item_ordering_limit
-                      value: '20'
-                    - type: INTEGER
-                      name: item_ordering_order_by
-                      value: '2'
-                    - type: INTEGER
-                      name: layout
-                      value: '1'
-                    - type: INTEGER
-                      name: problems
-                      value: '2'
-                    - type: INTEGER
-                      name: rf_rate
-                      value: '10'
-                    - type: INTEGER
-                      name: show_column_header
-                      value: '0'
-                - type: piechart
-                  name: 'Virtual mashines'
-                  x: '42'
-                  width: '15'
-                  height: '3'
-                  fields:
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '0'
-                    - type: INTEGER
-                      name: draw_type
-                      value: '1'
-                    - type: STRING
-                      name: ds.0.color.0
-                      value: 81C784
-                    - type: INTEGER
-                      name: ds.0.dataset_type
-                      value: '0'
-                    - type: ITEM
-                      name: ds.0.itemids.0
-                      value:
-                        host: 'Proxmox VE by HTTP'
-                        key: proxmox_ve.cluster.vms.running
-                    - type: INTEGER
-                      name: ds.0.type.0
-                      value: '0'
-                    - type: STRING
-                      name: ds.1.color.0
-                      value: FF8A65
-                    - type: INTEGER
-                      name: ds.1.dataset_type
-                      value: '0'
-                    - type: ITEM
-                      name: ds.1.itemids.0
-                      value:
-                        host: 'Proxmox VE by HTTP'
-                        key: proxmox_ve.cluster.vms.stopped
-                    - type: INTEGER
-                      name: ds.1.type.0
-                      value: '0'
-                    - type: INTEGER
-                      name: legend_lines
-                      value: '2'
-                    - type: INTEGER
-                      name: legend_value
-                      value: '1'
-                    - type: INTEGER
-                      name: total_show
-                      value: '1'
-                - type: topitems
-                  x: '54'
-                  'y': '8'
-                  width: '18'
-                  height: '5'
-                  hide_header: 'YES'
-                  fields:
-                    - type: STRING
-                      name: columns.0.base_color
-                      value: 4CAF50
-                    - type: INTEGER
-                      name: columns.0.display
-                      value: '2'
-                    - type: STRING
-                      name: columns.0.items.0
-                      value: '*torage [*]: Utilization'
-                    - type: STRING
-                      name: columns.0.max
-                      value: '100'
-                    - type: STRING
-                      name: columns.0.min
-                      value: '0'
-                    - type: STRING
-                      name: columns.0.thresholds.0.color
-                      value: FFFF00
-                    - type: STRING
-                      name: columns.0.thresholds.0.threshold
-                      value: '50'
-                    - type: STRING
-                      name: columns.0.thresholds.1.color
-                      value: FFD54F
-                    - type: STRING
-                      name: columns.0.thresholds.1.threshold
-                      value: '80'
-                    - type: STRING
-                      name: columns.0.thresholds.2.color
-                      value: FF4000
-                    - type: STRING
-                      name: columns.0.thresholds.2.threshold
-                      value: '90'
-                    - type: INTEGER
-                      name: item_ordering_limit
-                      value: '20'
-                    - type: INTEGER
-                      name: item_ordering_order_by
-                      value: '2'
-                    - type: INTEGER
-                      name: layout
-                      value: '1'
-                    - type: INTEGER
-                      name: problems
-                      value: '2'
-                    - type: INTEGER
-                      name: rf_rate
-                      value: '10'
-                    - type: INTEGER
-                      name: show_column_header
-                      value: '0'
-                - type: piechart
-                  name: 'LXC containers'
-                  x: '57'
-                  width: '15'
-                  height: '3'
-                  fields:
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '0'
-                    - type: INTEGER
-                      name: draw_type
-                      value: '1'
-                    - type: STRING
-                      name: ds.0.color.0
-                      value: 81C784
-                    - type: INTEGER
-                      name: ds.0.dataset_type
-                      value: '0'
-                    - type: ITEM
-                      name: ds.0.itemids.0
-                      value:
-                        host: 'Proxmox VE by HTTP'
-                        key: proxmox_ve.cluster.lxc.running
-                    - type: INTEGER
-                      name: ds.0.type.0
-                      value: '0'
-                    - type: STRING
-                      name: ds.1.color.0
-                      value: FF8A65
-                    - type: INTEGER
-                      name: ds.1.dataset_type
-                      value: '0'
-                    - type: ITEM
-                      name: ds.1.itemids.0
-                      value:
-                        host: 'Proxmox VE by HTTP'
-                        key: proxmox_ve.cluster.lxc.stopped
-                    - type: INTEGER
-                      name: ds.1.type.0
-                      value: '0'
-                    - type: INTEGER
-                      name: legend_lines
-                      value: '2'
-                    - type: INTEGER
-                      name: legend_value
-                      value: '1'
-                    - type: INTEGER
-                      name: total_show
-                      value: '1'
-            - name: 'Proxmox VE Virtual machines/LXC containers'
+            - name: 'Proxmox VE: VMs'
               widgets:
-                - type: honeycomb
-                  name: 'Virtual machines'
-                  width: '36'
-                  height: '3'
-                  fields:
-                    - type: STRING
-                      name: items.0
-                      value: 'Node [*]: QEMU [*]: status'
-                    - type: STRING
-                      name: primary_label
-                      value: '{{ITEM.NAME}.regsub("^(Node \[)(.*)(: QEMU \[)(.*)(\]: Status)", "\4")}'
-                    - type: STRING
-                      name: reference
-                      value: CEUHK
-                    - type: INTEGER
-                      name: rf_rate
-                      value: '10'
-                    - type: INTEGER
-                      name: show.0
-                      value: '1'
-                    - type: STRING
-                      name: thresholds.0.color
-                      value: B0BEC5
-                    - type: STRING
-                      name: thresholds.0.threshold
-                      value: '0'
-                    - type: STRING
-                      name: thresholds.1.color
-                      value: E65660
-                    - type: STRING
-                      name: thresholds.1.threshold
-                      value: '1'
-                    - type: STRING
-                      name: thresholds.2.color
-                      value: 3BC97D
-                    - type: STRING
-                      name: thresholds.2.threshold
-                      value: '2'
                 - type: itemnavigator
-                  name: QEMU
-                  'y': '3'
-                  width: '12'
-                  height: '10'
-                  hide_header: 'YES'
+                  name: 'QEMU: Navigator'
+                  width: '16'
+                  height: '13'
                   fields:
                     - type: INTEGER
                       name: group_by.0.attribute
@@ -5962,62 +6793,37 @@ zabbix_export:
                       value: raw
                     - type: STRING
                       name: reference
-                      value: LAYQE
+                      value: KLMNF
                     - type: INTEGER
                       name: show_lines
                       value: '500'
-                - type: topitems
-                  x: '12'
-                  'y': '3'
-                  width: '12'
-                  height: '5'
-                  hide_header: 'YES'
-                  fields:
-                    - type: INTEGER
-                      name: columns.0.display
-                      value: '2'
-                    - type: STRING
-                      name: columns.0.items.0
-                      value: 'Node [*]: QEMU [*]: CPU utilization'
-                    - type: STRING
-                      name: columns.0.max
-                      value: '100'
-                    - type: STRING
-                      name: columns.0.min
-                      value: '0'
-                    - type: INTEGER
-                      name: item_ordering_order_by
-                      value: '2'
-                    - type: INTEGER
-                      name: layout
-                      value: '1'
-                    - type: INTEGER
-                      name: problems
-                      value: '2'
-                    - type: INTEGER
-                      name: rf_rate
-                      value: '10'
-                    - type: INTEGER
-                      name: show_column_header
-                      value: '0'
                 - type: svggraph
-                  x: '12'
-                  'y': '8'
-                  width: '24'
-                  height: '5'
+                  name: 'QEMU: Graph'
+                  x: '16'
+                  width: '27'
+                  height: '9'
                   fields:
+                    - type: INTEGER
+                      name: ds.0.approximation
+                      value: '4'
                     - type: STRING
                       name: ds.0.color.0
-                      value: 0080FF
+                      value: 0D68FD
                     - type: INTEGER
                       name: ds.0.dataset_type
                       value: '0'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '5'
                     - type: STRING
                       name: ds.0.itemids.0._reference
-                      value: LAYQE._itemid
+                      value: KLMNF._itemid
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '3'
                     - type: INTEGER
                       name: ds.0.transparency
-                      value: '7'
+                      value: '0'
                     - type: INTEGER
                       name: ds.0.type
                       value: '2'
@@ -6029,7 +6835,7 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: reference
-                      value: OTZNF
+                      value: HVYZK
                     - type: INTEGER
                       name: rf_rate
                       value: '10'
@@ -6043,27 +6849,57 @@ zabbix_export:
                       name: working_time
                       value: '1'
                 - type: topitems
-                  x: '24'
-                  'y': '3'
-                  width: '12'
-                  height: '5'
-                  hide_header: 'YES'
+                  name: 'VM: CPU utilization'
+                  x: '16'
+                  'y': '9'
+                  width: '27'
+                  height: '4'
                   fields:
                     - type: INTEGER
                       name: columns.0.display
-                      value: '2'
+                      value: '3'
                     - type: STRING
                       name: columns.0.items.0
-                      value: 'Node [*]: QEMU [*]: Memory utilization'
+                      value: 'Node [*]: QEMU [*]: CPU utilization'
                     - type: STRING
                       name: columns.0.max
                       value: '100'
                     - type: STRING
                       name: columns.0.min
                       value: '0'
+                    - type: STRING
+                      name: columns.0.thresholds.0.color
+                      value: BDD8FE
+                    - type: STRING
+                      name: columns.0.thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: columns.0.thresholds.1.color
+                      value: 76ABFF
+                    - type: STRING
+                      name: columns.0.thresholds.1.threshold
+                      value: '20'
+                    - type: STRING
+                      name: columns.0.thresholds.2.color
+                      value: 0D68FD
+                    - type: STRING
+                      name: columns.0.thresholds.2.threshold
+                      value: '40'
+                    - type: STRING
+                      name: columns.0.thresholds.3.color
+                      value: 094EB3
+                    - type: STRING
+                      name: columns.0.thresholds.3.threshold
+                      value: '60'
+                    - type: STRING
+                      name: columns.0.thresholds.4.color
+                      value: D40000
+                    - type: STRING
+                      name: columns.0.thresholds.4.threshold
+                      value: '80'
                     - type: INTEGER
-                      name: item_ordering_order_by
-                      value: '2'
+                      name: item_ordering_limit
+                      value: '50'
                     - type: INTEGER
                       name: layout
                       value: '1'
@@ -6075,53 +6911,125 @@ zabbix_export:
                       value: '10'
                     - type: INTEGER
                       name: show_column_header
-                      value: '0'
+                      value: '1'
                 - type: honeycomb
-                  name: 'LXC containers'
-                  x: '36'
-                  width: '36'
-                  height: '3'
+                  name: 'VM: Status'
+                  x: '43'
+                  width: '29'
+                  height: '9'
                   fields:
+                    - type: INTEGER
+                      name: interpolation
+                      value: '1'
                     - type: STRING
                       name: items.0
-                      value: 'Node [*]: LXC [*]: Status'
+                      value: 'Node [*]: QEMU [*]: status'
                     - type: STRING
                       name: primary_label
-                      value: '{{ITEM.NAME}.regsub("^(Node \[)(.*)(: LXC \[)(.*)(\]: Status)", "\4")}'
+                      value: '{{ITEM.NAME}.regsub("^(Node \[)(.*)(: QEMU \[)(.*)(\]: Status)", "\4")}'
+                    - type: STRING
+                      name: primary_label_color
+                      value: FAFAFA
                     - type: STRING
                       name: reference
-                      value: FYYJF
+                      value: NLQZK
                     - type: INTEGER
                       name: rf_rate
                       value: '10'
+                    - type: STRING
+                      name: secondary_label_color
+                      value: FAFAFA
                     - type: INTEGER
-                      name: show.0
-                      value: '1'
+                      name: secondary_label_decimal_places
+                      value: '0'
                     - type: STRING
                       name: thresholds.0.color
-                      value: B0BEC5
+                      value: '656565'
                     - type: STRING
                       name: thresholds.0.threshold
                       value: '0'
                     - type: STRING
                       name: thresholds.1.color
-                      value: E65660
+                      value: D40000
                     - type: STRING
                       name: thresholds.1.threshold
                       value: '1'
                     - type: STRING
                       name: thresholds.2.color
-                      value: 3BC97D
+                      value: 0D68FD
                     - type: STRING
                       name: thresholds.2.threshold
                       value: '2'
+                - type: topitems
+                  name: 'VM: Memory utilization'
+                  x: '43'
+                  'y': '9'
+                  width: '29'
+                  height: '4'
+                  fields:
+                    - type: INTEGER
+                      name: columns.0.display
+                      value: '3'
+                    - type: STRING
+                      name: columns.0.items.0
+                      value: 'Node [*]: QEMU [*]: Memory utilization'
+                    - type: STRING
+                      name: columns.0.max
+                      value: '100'
+                    - type: STRING
+                      name: columns.0.min
+                      value: '0'
+                    - type: STRING
+                      name: columns.0.thresholds.0.color
+                      value: BDD8FE
+                    - type: STRING
+                      name: columns.0.thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: columns.0.thresholds.1.color
+                      value: 76ABFF
+                    - type: STRING
+                      name: columns.0.thresholds.1.threshold
+                      value: '20'
+                    - type: STRING
+                      name: columns.0.thresholds.2.color
+                      value: 0D68FD
+                    - type: STRING
+                      name: columns.0.thresholds.2.threshold
+                      value: '40'
+                    - type: STRING
+                      name: columns.0.thresholds.3.color
+                      value: 094EB3
+                    - type: STRING
+                      name: columns.0.thresholds.3.threshold
+                      value: '60'
+                    - type: STRING
+                      name: columns.0.thresholds.4.color
+                      value: D40000
+                    - type: STRING
+                      name: columns.0.thresholds.4.threshold
+                      value: '80'
+                    - type: INTEGER
+                      name: item_ordering_limit
+                      value: '50'
+                    - type: INTEGER
+                      name: layout
+                      value: '1'
+                    - type: INTEGER
+                      name: problems
+                      value: '2'
+                    - type: INTEGER
+                      name: rf_rate
+                      value: '10'
+                    - type: INTEGER
+                      name: show_column_header
+                      value: '1'
+            - name: 'Proxmox VE: LXCs'
+              widgets:
                 - type: itemnavigator
-                  name: LXC
-                  x: '36'
-                  'y': '3'
-                  width: '12'
-                  height: '10'
-                  hide_header: 'YES'
+                  name: 'LXC: Navigator'
+                  width: '16'
+                  height: '13'
                   fields:
                     - type: INTEGER
                       name: group_by.0.attribute
@@ -6146,62 +7054,30 @@ zabbix_export:
                       value: raw
                     - type: STRING
                       name: reference
-                      value: NYHTO
+                      value: PRFKW
                     - type: INTEGER
                       name: show_lines
                       value: '500'
-                - type: topitems
-                  x: '48'
-                  'y': '3'
-                  width: '12'
-                  height: '5'
-                  hide_header: 'YES'
-                  fields:
-                    - type: INTEGER
-                      name: columns.0.display
-                      value: '2'
-                    - type: STRING
-                      name: columns.0.items.0
-                      value: 'Node [*]: LXC [*]: CPU utilization'
-                    - type: STRING
-                      name: columns.0.max
-                      value: '100'
-                    - type: STRING
-                      name: columns.0.min
-                      value: '0'
-                    - type: INTEGER
-                      name: item_ordering_order_by
-                      value: '2'
-                    - type: INTEGER
-                      name: layout
-                      value: '1'
-                    - type: INTEGER
-                      name: problems
-                      value: '2'
-                    - type: INTEGER
-                      name: rf_rate
-                      value: '10'
-                    - type: INTEGER
-                      name: show_column_header
-                      value: '0'
                 - type: svggraph
-                  x: '48'
-                  'y': '8'
-                  width: '24'
-                  height: '5'
+                  x: '16'
+                  width: '27'
+                  height: '9'
                   fields:
                     - type: STRING
                       name: ds.0.color.0
-                      value: 0080FF
+                      value: 0D68FD
                     - type: INTEGER
                       name: ds.0.dataset_type
                       value: '0'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '5'
                     - type: STRING
                       name: ds.0.itemids.0._reference
-                      value: NYHTO._itemid
+                      value: PRFKW._itemid
                     - type: INTEGER
                       name: ds.0.transparency
-                      value: '7'
+                      value: '0'
                     - type: INTEGER
                       name: ds.0.type
                       value: '2'
@@ -6213,7 +7089,7 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: reference
-                      value: BWRJQ
+                      value: BNWAY
                     - type: INTEGER
                       name: rf_rate
                       value: '10'
@@ -6227,27 +7103,54 @@ zabbix_export:
                       name: working_time
                       value: '1'
                 - type: topitems
-                  x: '60'
-                  'y': '3'
-                  width: '12'
-                  height: '5'
-                  hide_header: 'YES'
+                  name: 'LXC: CPU utilization'
+                  x: '16'
+                  'y': '9'
+                  width: '27'
+                  height: '4'
                   fields:
                     - type: INTEGER
                       name: columns.0.display
-                      value: '2'
+                      value: '3'
                     - type: STRING
                       name: columns.0.items.0
-                      value: 'Node [*]: LXC [*]: Memory utilization'
+                      value: 'Node [*]: LXC [*]: CPU utilization'
                     - type: STRING
                       name: columns.0.max
                       value: '100'
                     - type: STRING
                       name: columns.0.min
                       value: '0'
-                    - type: INTEGER
-                      name: item_ordering_order_by
-                      value: '2'
+                    - type: STRING
+                      name: columns.0.thresholds.0.color
+                      value: BDD8FE
+                    - type: STRING
+                      name: columns.0.thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: columns.0.thresholds.1.color
+                      value: 76ABFF
+                    - type: STRING
+                      name: columns.0.thresholds.1.threshold
+                      value: '20'
+                    - type: STRING
+                      name: columns.0.thresholds.2.color
+                      value: 0D68FD
+                    - type: STRING
+                      name: columns.0.thresholds.2.threshold
+                      value: '40'
+                    - type: STRING
+                      name: columns.0.thresholds.3.color
+                      value: 094EB3
+                    - type: STRING
+                      name: columns.0.thresholds.3.threshold
+                      value: '60'
+                    - type: STRING
+                      name: columns.0.thresholds.4.color
+                      value: D40000
+                    - type: STRING
+                      name: columns.0.thresholds.4.threshold
+                      value: '80'
                     - type: INTEGER
                       name: layout
                       value: '1'
@@ -6259,7 +7162,113 @@ zabbix_export:
                       value: '10'
                     - type: INTEGER
                       name: show_column_header
+                      value: '1'
+                - type: honeycomb
+                  name: 'LXC: Status'
+                  x: '43'
+                  width: '29'
+                  height: '9'
+                  fields:
+                    - type: STRING
+                      name: items.0
+                      value: 'Node [*]: LXC [*]: Status'
+                    - type: STRING
+                      name: primary_label
+                      value: '{{ITEM.NAME}.regsub("^(Node \[)(.*)(: LXC \[)(.*)(\]: Status)", "\4")}'
+                    - type: STRING
+                      name: primary_label_color
+                      value: FAFAFA
+                    - type: STRING
+                      name: reference
+                      value: BCHUX
+                    - type: INTEGER
+                      name: rf_rate
+                      value: '10'
+                    - type: STRING
+                      name: secondary_label_color
+                      value: FAFAFA
+                    - type: INTEGER
+                      name: secondary_label_decimal_places
                       value: '0'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: '656565'
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: D40000
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '1'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 0D68FD
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '2'
+                - type: topitems
+                  name: 'LXC: Memory utilization'
+                  x: '43'
+                  'y': '9'
+                  width: '29'
+                  height: '4'
+                  fields:
+                    - type: INTEGER
+                      name: columns.0.display
+                      value: '3'
+                    - type: STRING
+                      name: columns.0.items.0
+                      value: 'Node [*]: LXC [*]: Memory utilization'
+                    - type: STRING
+                      name: columns.0.max
+                      value: '100'
+                    - type: STRING
+                      name: columns.0.min
+                      value: '0'
+                    - type: STRING
+                      name: columns.0.thresholds.0.color
+                      value: BDD8FE
+                    - type: STRING
+                      name: columns.0.thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: columns.0.thresholds.1.color
+                      value: 76ABFF
+                    - type: STRING
+                      name: columns.0.thresholds.1.threshold
+                      value: '20'
+                    - type: STRING
+                      name: columns.0.thresholds.2.color
+                      value: 0D68FD
+                    - type: STRING
+                      name: columns.0.thresholds.2.threshold
+                      value: '40'
+                    - type: STRING
+                      name: columns.0.thresholds.3.color
+                      value: 094EB3
+                    - type: STRING
+                      name: columns.0.thresholds.3.threshold
+                      value: '60'
+                    - type: STRING
+                      name: columns.0.thresholds.4.color
+                      value: D40000
+                    - type: STRING
+                      name: columns.0.thresholds.4.threshold
+                      value: '80'
+                    - type: INTEGER
+                      name: layout
+                      value: '1'
+                    - type: INTEGER
+                      name: problems
+                      value: '2'
+                    - type: INTEGER
+                      name: rf_rate
+                      value: '10'
+                    - type: INTEGER
+                      name: show_column_header
+                      value: '1'
       valuemaps:
         - uuid: b515085461664df1923e94cae6a7ab77
           name: 'Proxmox cluster quorum status'

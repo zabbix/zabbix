@@ -837,6 +837,8 @@ void	zbx_queue_ptr_destroy(zbx_queue_ptr_t *queue);
 void	zbx_queue_ptr_push(zbx_queue_ptr_t *queue, void *value);
 void	*zbx_queue_ptr_pop(zbx_queue_ptr_t *queue);
 void	*zbx_queue_ptr_peek(zbx_queue_ptr_t *queue);
+void	*zbx_queue_ptr_pop_last(zbx_queue_ptr_t *queue);
+void	*zbx_queue_ptr_peek_last(zbx_queue_ptr_t *queue);
 void	zbx_queue_ptr_remove_value(zbx_queue_ptr_t *queue, const void *value);
 
 typedef struct
