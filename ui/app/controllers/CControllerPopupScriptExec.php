@@ -74,6 +74,9 @@ class CControllerPopupScriptExec extends CController {
 			'debug' => [],
 			'messages' => null,
 			'success' => false,
+			'is_ping' => false,
+			'ping_host' => '',
+			'ping_ip' => '',
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
@@ -88,6 +91,32 @@ class CControllerPopupScriptExec extends CController {
 			$script = $scripts[0];
 			$data['title'] = $script['name'];
 			$data['type'] =  $script['type'];
+			$data['is_ping'] = $script['type'] != ZBX_SCRIPT_TYPE_WEBHOOK
+				&& preg_match('/^(?:.*\/)?(?:ICMP\s+)?ping$/i', trim($script['name'])) === 1;
+
+			if ($data['is_ping']) {
+				$ping_hostid = $hostid;
+				if (!$ping_hostid && $eventid) {
+					$events = API::Event()->get([
+						'output' => [], 'eventids' => $eventid, 'selectHosts' => ['hostid']
+					]);
+					$ping_hostid = $events[0]['hosts'][0]['hostid'] ?? '';
+				}
+				if ($ping_hostid) {
+					$hosts = API::Host()->get([
+						'output' => ['name'], 'hostids' => $ping_hostid,
+						'selectInterfaces' => ['ip', 'main', 'type']
+					]);
+					if ($hosts) {
+						$data['ping_host'] = $hosts[0]['name'];
+						$interfaces = $hosts[0]['interfaces'];
+						usort($interfaces, static function ($a, $b) {
+							return [$b['main'], -$b['type']] <=> [$a['main'], -$a['type']];
+						});
+						$data['ping_ip'] = $interfaces[0]['ip'] ?? '';
+					}
+				}
+			}
 
 			$execution_params = ['scriptid' => $scriptid];
 

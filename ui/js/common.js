@@ -289,7 +289,8 @@ function PopUp(action, parameters, {
 	position = undefined,
 	position_fix = null,
 	trigger_element = document.activeElement,
-	prevent_navigation = false
+	prevent_navigation = false,
+	loading_content = null
 } = {}) {
 	hintBox.deleteAll();
 
@@ -299,7 +300,7 @@ function PopUp(action, parameters, {
 		overlay = overlayDialogue({
 			title: '',
 			doc_url: '',
-			content: jQuery('<div>', {'height': '68px', 'width': '105px', class: 'is-loading'}),
+			content: loading_content ?? jQuery('<div>', {'height': '68px', 'width': '105px', class: 'is-loading'}),
 			class: `modal-popup ${dialogue_class}`,
 			buttons: [],
 			prevent_navigation
