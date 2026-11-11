@@ -139,10 +139,10 @@
 						.setRenderer('web'),
 					new CDataTableColumn('vendor', <?= json_encode(_('Vendor')); ?>)
 						.setFields(['vendor_name'])
-						.setRenderer(CDataTableColumn.RENDERER_TEXT),
+						.setRenderer('vendor'),
 					new CDataTableColumn('version', <?= json_encode(_('Version')); ?>)
 						.setFields(['vendor_version'])
-						.setRenderer(CDataTableColumn.RENDERER_TEXT),
+						.setRenderer('vendor_version'),
 					new CDataTableColumn('linked_templates', <?= json_encode(_('Linked templates')); ?>)
 						.setFields(['parentTemplates'])
 						.setRenderer('linked_templates'),
@@ -166,13 +166,15 @@
 				.setCellRenderer('name', ({cell_data, cell}) => {
 					const [templateid, name] = cell_data;
 
-					const url = new URL('zabbix.php', location.href);
-					url.searchParams.set('action', 'popup');
-					url.searchParams.set('popup', 'template.edit');
-					url.searchParams.set('templateid', templateid);
+					const url = zabbixUrl({
+						action: 'popup',
+						popup: 'template.edit',
+						templateid
+					});
 
 					const edit_link = document.createElement('a');
-					edit_link.setAttribute('href', url.toString())
+					edit_link.classList.add(ZBX_STYLE_WORDBREAK);
+					edit_link.setAttribute('href', url)
 					edit_link.textContent = name;
 
 					cell.appendChild(edit_link);
@@ -184,40 +186,47 @@
 					let items = Object.keys(editable_hosts).length;
 
 					if (allowed_ui_conf_hosts) {
-						const url = new URL('zabbix.php', location.href);
-						url.searchParams.set('action', 'host.list');
-						url.searchParams.set('filter_set', '1');
-						url.searchParams.set('filter_templates[0]', templateid);
+						const url = zabbixUrl({
+							action: 'host.list',
+							filter_set: 1,
+							filter_templates: [templateid]
+						});
 
 						const item_link = document.createElement('a');
-						item_link.setAttribute('href', url.toString());
+						item_link.classList.add(ZBX_STYLE_WORDBREAK);
+						item_link.setAttribute('href', url);
 						item_link.textContent = <?= json_encode(_('Hosts')); ?>;
 
 						cell.appendChild(item_link);
 					}
 					else {
-						cell.innerHTML += <?= json_encode(_('Hosts')); ?>;
+						const hosts = document.createElement('span');
+						hosts.classList.add(ZBX_STYLE_WORDBREAK);
+						hosts.textContent = <?= json_encode(_('Hosts')); ?>;
+
+						cell.appendChild(hosts);
 					}
 
 					if (items > 0) {
 						const count = document.createElement('sup');
 						count.textContent = items;
 
-						cell.innerHTML += ' ';
-						cell.appendChild(count);
+						cell.append(' ', count);
 					}
 				})
 				.setCellRenderer('items', ({cell_data, cell}) => {
 					const [templateid, items] = cell_data;
 
-					const url = new URL('zabbix.php', location.href);
-					url.searchParams.set('action', 'item.list');
-					url.searchParams.set('filter_set', '1');
-					url.searchParams.set('filter_hostids[0]', templateid);
-					url.searchParams.set('context', 'template');
+					const url = zabbixUrl({
+						action: 'item.list',
+						filter_set: 1,
+						filter_hostids: [templateid],
+						context: 'template'
+					});
 
 					const item_link = document.createElement('a');
-					item_link.setAttribute('href', url.toString());
+					item_link.classList.add(ZBX_STYLE_WORDBREAK);
+					item_link.setAttribute('href', url);
 					item_link.textContent = <?= json_encode(_('Items')); ?>;
 
 					cell.appendChild(item_link);
@@ -226,21 +235,22 @@
 						const count = document.createElement('sup');
 						count.textContent = items;
 
-						cell.innerHTML += ' ';
-						cell.appendChild(count);
+						cell.append(' ', count);
 					}
 				})
 				.setCellRenderer('triggers', ({cell_data, cell}) => {
 					const [templateid, triggers] = cell_data;
 
-					const url = new URL('zabbix.php', location.href);
-					url.searchParams.set('action', 'trigger.list');
-					url.searchParams.set('filter_set', '1');
-					url.searchParams.set('filter_hostids[0]', templateid);
-					url.searchParams.set('context', 'template');
+					const url = zabbixUrl({
+						action: 'trigger.list',
+						filter_set: 1,
+						filter_hostids: [templateid],
+						context: 'template'
+					});
 
 					const item_link = document.createElement('a');
-					item_link.setAttribute('href', url.toString());
+					item_link.classList.add(ZBX_STYLE_WORDBREAK);
+					item_link.setAttribute('href', url);
 					item_link.textContent = <?= json_encode(_('Triggers')); ?>;
 
 					cell.appendChild(item_link);
@@ -249,21 +259,22 @@
 						const count = document.createElement('sup');
 						count.textContent = triggers;
 
-						cell.innerHTML += ' ';
-						cell.appendChild(count);
+						cell.append(' ', count);
 					}
 				})
 				.setCellRenderer('graphs', ({cell_data, cell}) => {
 					const [templateid, graphs] = cell_data;
 
-					const url = new URL('zabbix.php', location.href);
-					url.searchParams.set('action', 'graph.list');
-					url.searchParams.set('filter_set', '1');
-					url.searchParams.set('filter_hostids[0]', templateid);
-					url.searchParams.set('context', 'template');
+					const url = zabbixUrl({
+						action: 'graph.list',
+						filter_set: 1,
+						filter_hostids: [templateid],
+						context: 'template'
+					});
 
 					const item_link = document.createElement('a');
-					item_link.setAttribute('href', url.toString());
+					item_link.classList.add(ZBX_STYLE_WORDBREAK);
+					item_link.setAttribute('href', url);
 					item_link.textContent = <?= json_encode(_('Graphs')); ?>;
 
 					cell.appendChild(item_link);
@@ -272,19 +283,20 @@
 						const count = document.createElement('sup');
 						count.textContent = graphs;
 
-						cell.innerHTML += ' ';
-						cell.appendChild(count);
+						cell.append(' ', count);
 					}
 				})
 				.setCellRenderer('dashboards', ({cell_data, cell}) => {
 					const [templateid, dashboards] = cell_data;
 
-					const url = new URL('zabbix.php', location.href);
-					url.searchParams.set('action', 'template.dashboard.list');
-					url.searchParams.set('templateid', templateid);
+					const url = zabbixUrl({
+						action: 'template.dashboard.list',
+						templateid
+					});
 
 					const item_link = document.createElement('a');
-					item_link.setAttribute('href', url.toString());
+					item_link.classList.add(ZBX_STYLE_WORDBREAK);
+					item_link.setAttribute('href', url);
 					item_link.textContent = <?= json_encode(_('Dashboards')); ?>;
 
 					cell.appendChild(item_link);
@@ -293,22 +305,22 @@
 						const count = document.createElement('sup');
 						count.textContent = dashboards;
 
-						cell.innerHTML += ' ';
-						cell.appendChild(count);
+						cell.append(' ', count);
 					}
 				})
 				.setCellRenderer('discovery', ({cell_data, cell}) => {
 					const [templateid, discovery_rules] = cell_data;
 
-					const url_params = {
+					const url = zabbixUrl({
 						action: 'lldrule.list',
 						filter_set: 1,
 						filter_hostids: [templateid],
 						context: 'template'
-					};
+					});
 
 					const item_link = document.createElement('a');
-					item_link.setAttribute('href', zabbixUrl(url_params));
+					item_link.classList.add(ZBX_STYLE_WORDBREAK);
+					item_link.setAttribute('href', url);
 					item_link.textContent = <?= json_encode(_('Discovery')); ?>;
 
 					cell.appendChild(item_link);
@@ -317,20 +329,21 @@
 						const count = document.createElement('sup');
 						count.textContent = discovery_rules;
 
-						cell.innerHTML += ' ';
-						cell.appendChild(count);
+						cell.append(' ', count);
 					}
 				})
 				.setCellRenderer('web', ({cell_data, cell}) => {
 					const [templateid, http_tests] = cell_data;
 
-					const url = new URL('httpconf.php', location.href);
-					url.searchParams.set('filter_set', '1');
-					url.searchParams.set('filter_hostids[0]', templateid);
-					url.searchParams.set('context', 'template');
+					const url = zabbixUrl({
+						filter_set: 1,
+						filter_hostids: [templateid],
+						context: 'template'
+					}, 'httpconf.php');
 
 					const item_link = document.createElement('a');
-					item_link.setAttribute('href', url.toString());
+					item_link.classList.add(ZBX_STYLE_WORDBREAK);
+					item_link.setAttribute('href', url);
 					item_link.textContent = <?= json_encode(_('Web')); ?>;
 
 					cell.appendChild(item_link);
@@ -339,8 +352,7 @@
 						const count = document.createElement('sup');
 						count.textContent = http_tests;
 
-						cell.innerHTML += ' ';
-						cell.appendChild(count);
+						cell.append(' ', count);
 					}
 				})
 				.setCellRenderer('linked_templates', ({cell_data, cell, response}) => {
@@ -352,21 +364,22 @@
 						const template = parent_templates[i];
 
 						if (template.editable) {
-							const url = new URL('zabbix.php', location.href);
-							url.searchParams.set('action', 'popup');
-							url.searchParams.set('popup', 'template.edit');
-							url.searchParams.set('templateid', template.templateid);
+							const url = zabbixUrl({
+								action: 'popup',
+								popup: 'template.edit',
+								templateid: template.templateid
+							});
 
 							const template_link = document.createElement('a');
-							template_link.classList.add(ZBX_STYLE_LINK_ALT, ZBX_STYLE_GREY);
-							template_link.setAttribute('href', url.toString());
+							template_link.classList.add(ZBX_STYLE_LINK_ALT, ZBX_STYLE_GREY, ZBX_STYLE_WORDBREAK);
+							template_link.setAttribute('href', url);
 							template_link.textContent = template.name;
 
 							cell.appendChild(template_link);
 						}
 						else {
 							const template_link = document.createElement('span');
-							template_link.classList.add(ZBX_STYLE_GREY);
+							template_link.classList.add(ZBX_STYLE_GREY, ZBX_STYLE_WORDBREAK);
 							template_link.textContent = template.name;
 
 							cell.appendChild(template_link);
@@ -390,21 +403,22 @@
 						const template = templates[i];
 
 						if (template.editable) {
-							const url = new URL('zabbix.php', location.href);
-							url.searchParams.set('action', 'popup');
-							url.searchParams.set('popup', 'template.edit');
-							url.searchParams.set('templateid', template.templateid);
+							const url = zabbixUrl({
+								action: 'popup',
+								popup: 'template.edit',
+								templateid: template.templateid
+							});
 
 							const template_link = document.createElement('a');
-							template_link.classList.add(ZBX_STYLE_LINK_ALT, ZBX_STYLE_GREY);
-							template_link.setAttribute('href', url.toString());
+							template_link.classList.add(ZBX_STYLE_LINK_ALT, ZBX_STYLE_GREY, ZBX_STYLE_WORDBREAK);
+							template_link.setAttribute('href', url);
 							template_link.textContent = template.name;
 
 							cell.appendChild(template_link);
 						}
 						else {
 							const template_link = document.createElement('span');
-							template_link.classList.add(ZBX_STYLE_GREY);
+							template_link.classList.add(ZBX_STYLE_GREY, ZBX_STYLE_WORDBREAK);
 							template_link.textContent = template.name;
 
 							cell.appendChild(template_link);
@@ -418,6 +432,24 @@
 					if (templates.length > max_in_table) {
 						cell.innerHTML += ' &hellip;';
 					}
+				})
+				.setCellRenderer('vendor', ({cell_data, cell}) => {
+					const [vendor] = cell_data;
+
+					const wordbreak = document.createElement('span');
+					wordbreak.classList.add(ZBX_STYLE_WORDBREAK);
+					wordbreak.textContent = vendor;
+
+					cell.appendChild(wordbreak);
+				})
+				.setCellRenderer('vendor_version', ({cell_data, cell}) => {
+					const [vendor_version] = cell_data;
+
+					const wordbreak = document.createElement('span');
+					wordbreak.classList.add(ZBX_STYLE_WORDBREAK);
+					wordbreak.textContent = vendor_version;
+
+					cell.appendChild(wordbreak);
 				})
 				.on(CMessageHelper.EVENT_MESSAGE, e => {
 					e.stopPropagation();
