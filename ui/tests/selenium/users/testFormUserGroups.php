@@ -20,7 +20,7 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 /**
  * @backup usrgrp
  *
- * @dataSource LoginUsers, ScheduledReports
+ * @dataSource LoginUsers, ScheduledReports, Proxies
  *
  * @onBefore prepareMfaHostgroupData
  */
@@ -59,6 +59,9 @@ class testFormUserGroups extends CWebTest {
 
 		CDataHelper::call('authentication.update', ['mfa_status' => MFA_ENABLED]);
 
+		$proxyid = CDataHelper::get('Proxies.proxyids.active_proxy1');
+		$proxy_groupid = CDataHelper::get('Proxies.proxy_groupids.Online proxy group');
+
 		CDataHelper::call('usergroup.create', [
 			[
 				'name' => 'User group with all specified fields for deletion',
@@ -68,6 +71,18 @@ class testFormUserGroups extends CWebTest {
 				'userdirectoryid' => 0,
 				'mfa_status' => MFA_ENABLED,
 				'mfaid' => $mfaids[0],
+				'proxy_mode' => PROXY_MODE_DENY,
+				'proxy_group_mode' => PROXY_GROUP_MODE_ALLOW,
+				'proxies' => [
+					[
+						'proxyid' => $proxyid
+					]
+				],
+				'proxy_groups' => [
+					[
+						'proxy_groupid' => $proxy_groupid
+					]
+				],
 				'hostgroup_rights' => [
 					[
 						'id' => 2, // Linux servers.
@@ -165,6 +180,17 @@ class testFormUserGroups extends CWebTest {
 				$this->assertEquals('Multi-factor authentication is disabled system-wide.', $hint->getText());
 				$hint->close();
 			}
+		}
+
+		// Check the default layout in "Proxy access list" tab.
+		$form->selectTab('Proxy access list');
+		$this->assertEquals(['Proxies', 'Proxy groups'], array_values($form->getLabels(CElementFilter::VISIBLE)->asText()));
+
+		foreach (['proxy_mode', 'proxy_group_mode'] as $field) {
+			$radio_list = $form->query('id:'.$field)->one();
+			$this->assertEquals(['Allow list', 'Deny list'], $radio_list->query('tag:label')->all()->asText());
+			// "Allow list" is selected by default.
+			$this->assertTrue($radio_list->query('id:'.$field.'_0')->one()->isSelected());
 		}
 
 		// Check the default layout in other tabs.
