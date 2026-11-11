@@ -53,7 +53,6 @@ class CRoleHelper {
 	public const UI_CONFIGURATION_CEPRULES = 'ui.configuration.ceprules';
 	public const UI_CONFIGURATION_DISCOVERY = 'ui.configuration.discovery';
 	public const UI_ADMINISTRATION_GENERAL = 'ui.administration.general';
-	public const UI_ADMINISTRATION_DATA_SOURCE = 'ui.administration.data_source';
 	public const UI_ADMINISTRATION_AUDIT_LOG = 'ui.administration.audit_log';
 	public const UI_ADMINISTRATION_HOUSEKEEPING = 'ui.administration.housekeeping';
 	public const UI_ADMINISTRATION_PROXY_GROUPS = 'ui.administration.proxy_groups';
