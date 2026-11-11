@@ -392,10 +392,8 @@ class CMenuHelper {
 						(new CMenuItem(_('Connectors')))
 							->setAction('connector.list')
 							->setAliases(['connector.edit']),
-						CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_DATA_SOURCE)
-							? (new CMenuItem(_('APM')))
-								->setAction('apm.db.edit')
-							: null,
+						(new CMenuItem(_('APM')))
+							->setAction('apm.db.edit'),
 						(new CMenuItem(_('Other')))
 							->setAction('miscconfig.edit')
 					])))

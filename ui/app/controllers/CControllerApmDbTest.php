@@ -22,8 +22,7 @@ class CControllerApmDbTest extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)
-			&& $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_DATA_SOURCE);
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
 	protected function checkInput(): bool {
