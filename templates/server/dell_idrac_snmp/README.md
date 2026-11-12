@@ -272,7 +272,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Network interface discovery|<p>Discovery of network interfaces.</p>|Dependent item|net.if.discovery<p>**Preprocessing**</p><ul><li><p>SNMP walk to JSON</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Network interface discovery|<p>Discovery of network interfaces.</p>|Dependent item|dell.server.net.if.discovery<p>**Preprocessing**</p><ul><li><p>SNMP walk to JSON</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Item prototypes for Network interface discovery
 
