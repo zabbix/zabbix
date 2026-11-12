@@ -115,4 +115,8 @@ div.dashboard-widget-geomap {
 	tr[data-hostid] {
 		cursor: pointer;
 	}
+
+	.widget-info-maintenance {
+		display: inline-block;
+	}
 }

@@ -218,6 +218,7 @@ const ZBX_PREG_NUMBER = /(?<number>-?((?<int>\d+)(\.(?<frac>\d*))?|\.(?<frac_onl
 
 const HOST_STATUS_MONITORED = 0;
 
+const HOST_MAINTENANCE_STATUS_OFF = 0;
 const HOST_MAINTENANCE_STATUS_ON = 1;
 
 const HOST_ENCRYPTION_NONE = 1;
