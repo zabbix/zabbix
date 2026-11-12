@@ -1073,9 +1073,7 @@ class testDashboardItemCardWidget extends testWidgets {
 		$i = 1;
 		foreach ($show_rows as $row) {
 			$this->assertTrue($row->getColumn(0)->query('class:drag-icon')->one()->isEnabled());
-
-			// TODO: after ZBX-27000 is merged, change column index "2" to column name "Name".
-			$dropdown = $row->getColumn(2)->query('tag:z-select')->one()->asDropdown();
+			$dropdown = $row->getColumn('Name')->query('tag:z-select')->one()->asDropdown();
 			$options = $dropdown->getOptions();
 			$this->assertEquals($rows[$i], $dropdown->getText());
 			$this->assertEquals(array_keys($option_states), $options->asText());
