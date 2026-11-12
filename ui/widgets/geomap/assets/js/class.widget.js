@@ -563,8 +563,8 @@ class CWidgetGeoMap extends CWidget {
 			button.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_WRENCH_ALT_SMALL,	ZBX_STYLE_COLOR_WARNING);
 			button.dataset.hintbox = '1';
 			button.dataset.hintboxStatic = '1';
-			button.dataset.hintboxContents = `${maintenance.name} [${maintenance.type}] `
-				+ (maintenance.description ? `<br>${maintenance.description}` : '');
+			button.dataset.hintboxHtml = escapeHtml(`${maintenance.name} [${maintenance.type}] `
+				+ (maintenance.description ? `\n${maintenance.description}` : ''));
 
 			maintenance_info.appendChild(button);
 
