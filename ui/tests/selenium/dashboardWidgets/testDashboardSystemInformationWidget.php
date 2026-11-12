@@ -114,7 +114,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 			[
 				[
 					'role' => USER_TYPE_SUPER_ADMIN,
-					'screenshot_suffix' => 'super_admin'
+					'suffix' => 'super_admin'
 				]
 			],
 			// #1 Admin.
@@ -123,7 +123,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 					'role' => USER_TYPE_ZABBIX_ADMIN,
 					'user' => 'admin for system information test',
 					'password' => 'z@$$ix!#%1',
-					'screenshot_suffix' => 'admin'
+					'suffix' => 'admin'
 				]
 			]
 		];
@@ -147,7 +147,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
 				[$this->query('xpath://table[@class="list-table sticky-header rounded-surface"]/tbody/tr[3]/td[1]')->one()]
 		);
-		$this->assertScreenshot($dashboard, 'widget_without_ha_'.$data['screenshot_suffix']);
+		$this->assertScreenshot($dashboard, 'widget_without_ha_'.$data['suffix']);
 	}
 
 	public function testDashboardSystemInformationWidget_Create() {
@@ -282,7 +282,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 			$this->assertEnabledHACluster(self::$dashboardid);
 		}
 
-		$this->assertScreenshotExcept(CDashboardElement::find()->one(), self::$skip_fields, 'widgets_with_ha_'.$data['screenshot_suffix']);
+		$this->assertScreenshotExcept(CDashboardElement::find()->one(), self::$skip_fields, 'widgets_with_ha_'.$data['suffix']);
 	}
 
 	public static function getSystemInformationDataForRunningServer() {

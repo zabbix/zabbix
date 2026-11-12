@@ -145,20 +145,20 @@ class testSystemInformation extends CWebTest {
 	/**
 	 * Function that checks how a running HA cluster info is displayed in system information widget or report.
 	 *
-	* @param integer $dashboardid	id of the dashboard that the widgets are located in.
-	* @param string  $username		optional username to log in with.
-	* @param string  $password		optional password for the user (defaults to 'zabbix').
-	* @param integer $user_type     user role type (defaults to USER_TYPE_SUPER_ADMIN).
+	 * @param integer $dashboardid	id of the dashboard that the widgets are located in.
+	 * @param string  $username		optional username to log in with.
+	 * @param string  $password		optional password for the user (defaults to 'zabbix').
+	 * @param integer $user_type    user role type (defaults to USER_TYPE_SUPER_ADMIN).
 	 */
-	public function assertEnabledHACluster($dashboardid = null, $username = null, $password = 'zabbix', $user_type = USER_TYPE_SUPER_ADMIN) {
+	public function assertEnabledHACluster($dashboardid, $username = null, $password = 'zabbix', $user_type = USER_TYPE_SUPER_ADMIN) {
 		global $DB;
 		self::$skip_fields = [];
-		$url = (!$dashboardid) ? 'zabbix.php?action=report.status' : 'zabbix.php?action=dashboard.view&dashboardid='.$dashboardid;
+		$url = ($dashboardid) ? 'zabbix.php?action=dashboard.view&dashboardid='.$dashboardid : 'zabbix.php?action=report.status';
 
 		// Wait for frontend to get the new config from updated zabbix.conf.php file.
 		sleep((int) ini_get('opcache.revalidate_freq') + 1);
 
-		if ($username !== null) {
+		if ($username) {
 			$this->page->userLogin($username, $password);
 			$this->page->open($url)->waitUntilReady();
 		}
@@ -167,18 +167,18 @@ class testSystemInformation extends CWebTest {
 		}
 		$current_time = time();
 
-		if (!$dashboardid) {
-			$server_address = $this->query('xpath://th[text()="Zabbix server is running"]/../td[2]')->one();
-		}
-		else {
+		if ($dashboardid) {
 			$dashboard = CDashboardElement::find()->waitUntilReady()->one();
 			$server_address = $dashboard->getWidget('System stats view')->query('xpath:.//tbody/tr[1]/td[2]')->one();
+		}
+		else {
+			$server_address = $this->query('xpath://th[text()="Zabbix server is running"]/../td[2]')->one();
 		}
 
 		// In report both Super admin and Admin see the HA nodes table, in widgets only Super admin sees it.
 		if (!$dashboardid || $user_type === USER_TYPE_SUPER_ADMIN) {
 			$nodes_table = (!$dashboardid)
-				? $this->query('xpath://table[@class="list-table sticky-header rounded-surface sticky-footer"]')->asTable()->one()
+				? $this->query('xpath:(//table)[2]')->asTable()->one()
 				: $dashboard->getWidget('High availability nodes view')->query('xpath:.//table')->asTable()->one();
 
 			// Define expected absolute timestamps for calculating the lastaccess value.
@@ -219,6 +219,11 @@ class testSystemInformation extends CWebTest {
 					$this->assertEquals($DB['SERVER'].':0', $row->getColumn('Address')->getText());
 				}
 			}
+		}
+		else {
+			$this->assertEquals('No permissions to referred object or it does not exist!',
+					$dashboard->getWidget('High availability nodes view')->query('tag:table')->one()->getText()
+			);
 		}
 
 		// Check fields that are not checked in screenshot with enabled HA.
