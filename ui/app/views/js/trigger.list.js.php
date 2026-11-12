@@ -176,12 +176,41 @@
 		}
 
 		#massupdate(target) {
-			openMassupdatePopup('trigger.massupdate', {
+			const overlay = openMassupdatePopup('trigger.massupdate', {
 				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('trigger')) ?>
 			}, {
 				dialogue_class: 'modal-popup-static',
 				trigger_element: target
 			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
+				chkbxRange.clearSelectedOnFilterChange();
+
+				this.reload({success: e.detail});
+			});
+		}
+
+		reload(result) {
+			if ('error' in result) {
+				if ('title' in result.error) {
+					postMessageError(result.error.title);
+				}
+
+				postMessageDetails('error', result.error.messages);
+
+				uncheckTableRows('trigger', result.keepids ?? []);
+			}
+			else if ('success' in result) {
+				postMessageOk(result.success.title);
+
+				if ('messages' in result.success) {
+					postMessageDetails('success', result.success.messages);
+				}
+
+				uncheckTableRows('trigger');
+			}
+
+			location.href = location.href;
 		}
 
 		#updateMultiselect($ms) {
