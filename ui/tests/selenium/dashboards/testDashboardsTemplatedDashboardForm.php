@@ -2674,8 +2674,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 
 			case 'show_table':
 				$table = $field->asTable();
-				// TODO: Uncomment the below check after ZBX-27000 is merged.
-				// $this->assertEquals($field_details['headers'], $table->getHeadersText());
+				$this->assertEquals($field_details['headers'], $table->getHeadersText());
 				$this->assertTrue($table->query('id:add-row')->one()->isClickable());
 
 				// Check each default row in "Show" field and its contents.
@@ -2683,9 +2682,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 				$i = 1;
 				foreach ($show_rows as $row) {
 					$this->assertTrue($row->getColumn(0)->query('class:drag-icon')->one()->isEnabled());
-
-					// TODO: after ZBX-27000 is merged, change column index "2" to column name "Name".
-					$dropdown = $row->getColumn(2)->query('tag:z-select')->one()->asDropdown();
+					$dropdown = $row->getColumn('Name')->query('tag:z-select')->one()->asDropdown();
 					$options = $dropdown->getOptions();
 					$this->assertEquals($field_details['rows'][$i], $dropdown->getText());
 					$this->assertEquals(array_keys($field_details['option_states']), $options->asText());
