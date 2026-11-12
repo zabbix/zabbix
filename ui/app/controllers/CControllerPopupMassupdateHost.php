@@ -498,8 +498,6 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				$backurl = new CUrl($this->getInput('backurl'));
 
 				if ($result) {
-					$backurl->setArgument('uncheck', 1);
-
 					CMessageHelper::setSuccessTitle($upd_status
 						? _n('Host enabled', 'Hosts enabled', $hosts_count)
 						: _n('Host disabled', 'Hosts disabled', $hosts_count)

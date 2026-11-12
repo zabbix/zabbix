@@ -188,12 +188,18 @@
 			});
 
 			form.querySelector('.js-massupdate-host').addEventListener('click', e => {
-				openMassupdatePopup('popup.massupdate.host', {
+				const overlay = openMassupdatePopup('popup.massupdate.host', {
 					[CSRF_TOKEN_NAME]: this.#csrf_token
 				}, {
 					dialogue_class: 'modal-popup-static',
 					trigger_element: e.target
 				})
+
+				overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
+					chkbxRange.clearSelectedOnFilterChange();
+
+					this.reload({success: e.detail});
+				});
 			});
 
 			form.querySelector('.js-massdelete-host').addEventListener('click', e => {
