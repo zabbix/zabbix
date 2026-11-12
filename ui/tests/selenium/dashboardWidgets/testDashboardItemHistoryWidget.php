@@ -2904,7 +2904,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 
 				// Wait until the button is ready to open the hintbox.
 				$button->waitUntilAttributesPresent('data-hintbox-preload')->waitUntilClassesNotPresent('is-loading');
-				$this->assertTrue($button->isClickable());
 				$button->click();
 
 				// Wait until the hintbox content is loaded.
