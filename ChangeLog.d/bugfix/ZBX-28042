@@ -1,1 +1,0 @@
-..F....... [ZBX-28042] fixed runtime error in PHP error log when opening an invalid URL leading to an access denied message (aluchko)

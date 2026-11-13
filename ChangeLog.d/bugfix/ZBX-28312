@@ -1,1 +1,0 @@
-........S. [ZBX-28312] fixed autoregistration, invalid SQL in add_discovered_host() due to missing delim = ',' (mprihodko)
