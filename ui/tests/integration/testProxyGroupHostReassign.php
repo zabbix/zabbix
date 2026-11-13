@@ -48,6 +48,7 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 	const DIRECT_HOSTNAME = 'pg_reassign_direct';
 	const RENAME_HOSTNAME = 'pg_reassign_rename';
 	const RENAMED_HOSTNAME = 'pg_reassign_renamed';
+	const DIRECT_OTHER_HOSTNAME = 'pg_reassign_direct_other';
 	const ITEM_KEY = 'agent.ping';
 	const FAILOVER_DELAY = 10;
 	const USERNAME = 'pg_reassign_admin';
@@ -61,6 +62,7 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 	private static $itemid;
 	private static $direct_hostid;
 	private static $rename_hostid;
+	private static $direct_other_hostid;
 	private static $usrgrpid;
 	private static $roleid;
 	private static $userid;
@@ -229,7 +231,7 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 		$response = CAPIHelper::call('host.get', [
 			'output' => ['hostid'],
 			'filter' => ['host' => [self::HOSTNAME, self::DIRECT_HOSTNAME, self::RENAME_HOSTNAME,
-				self::RENAMED_HOSTNAME
+				self::RENAMED_HOSTNAME, self::DIRECT_OTHER_HOSTNAME
 			]]
 		]);
 		$hostids = array_column($response['result'], 'hostid');
@@ -239,6 +241,7 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 		self::$hostid = null;
 		self::$direct_hostid = null;
 		self::$rename_hostid = null;
+		self::$direct_other_hostid = null;
 
 		if (self::$userid !== null) {
 			CAPIHelper::call('user.delete', [self::$userid]);
@@ -332,7 +335,6 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 	 * @depends testProxyGroupHostReassign_reassignAfterGroupRecovery
 	 */
 	public function testProxyGroupHostReassign_activeChecksCollected() {
-		return;
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY_HANODE1);
 
 		$time_from = time();
@@ -356,7 +358,6 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 	 * @depends testProxyGroupHostReassign_reassignAfterGroupRecovery
 	 */
 	public function testProxyGroupHostReassign_itemTestOnAssignedProxy() {
-		return;
 		$client = $this->getClient(self::COMPONENT_SERVER);
 
 		// Without a host the user must be denied - only the host assignment can allow the test.
@@ -653,6 +654,129 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 
 		$this->waitForProxyActiveCheck(self::COMPONENT_PROXY_HANODE1, self::RENAMED_HOSTNAME, false,
 				'Deleted renamed host is still monitored by proxy "'.self::PROXY2_NAME.'"');
+	}
+
+	/**
+	 * Switch a proxy group host to a directly assigned proxy and then to another proxy group before the server
+	 * syncs the removal of its old host_proxy row:
+	 *   1) host is in group 1, assigned to proxy 1 (host_proxy row R1);
+	 *   2) host is switched to be monitored directly by proxy 2 - server moves it from proxy 1 to proxy 2,
+	 *      proxy group manager deletes R1;
+	 *   3) host is switched to group 2 - server keeps it on proxy 2 until the group assigns it;
+	 *   4) the same sync gets the R1 removal - it must take the host off proxy 2 (where it is registered now),
+	 *      not off proxy 1 (which R1 points to);
+	 *   5) group 2 assigns the host to proxy 2 by a new host_proxy row R2 - if the host was left on proxy 2 in
+	 *      step 4, registering it again makes a duplicate entry in the proxy 2 host list, and after the host
+	 *      is deleted proxy 2 is left with a dangling pointer.
+	 *
+	 * @depends testProxyGroupHostReassign_reassignAfterGroupRecovery
+	 */
+	public function testProxyGroupHostReassign_directProxyToOtherGroup() {
+		// group 2 must be able to take the host right away
+		$this->callUntilDataIsPresent('proxygroup.get', [
+			'output' => ['proxy_groupid', 'state'],
+			'proxy_groupids' => [self::$proxy_groupid2]
+		], 60, 1, function ($response) {
+			return ($response['result'][0]['state'] == ZBX_PROXYGROUP_STATE_ONLINE)
+				? true
+				: 'Proxy group "'.self::PROXY_GROUP2_NAME.'" is not online, state: '.
+					$response['result'][0]['state'];
+		});
+
+		$response = $this->call('host.create', [
+			'host' => self::DIRECT_OTHER_HOSTNAME,
+			'groups' => [['groupid' => 4]],
+			'monitored_by' => ZBX_MONITORED_BY_PROXY_GROUP,
+			'proxy_groupid' => self::$proxy_groupid1
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		self::$direct_other_hostid = $response['result']['hostids'][0];
+
+		$response = $this->call('item.create', [
+			'name' => 'Agent ping',
+			'key_' => self::ITEM_KEY,
+			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'delay' => '1s',
+			'hostid' => self::$direct_other_hostid
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+
+		// 1) assign the host to proxy 1 and load the R1 host_proxy row into the configuration cache
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+		$row = $this->waitForHostProxyRow(self::$direct_other_hostid, function ($row) {
+			return ($row !== false && bccomp($row['proxyid'], self::$proxyid1) == 0)
+				? true
+				: 'Host is expected to be assigned to proxy 1, host_proxy: '.json_encode($row);
+		});
+		$old_hostproxyid = $row['hostproxyid'];
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		// 2) monitor the host directly by proxy 2
+		$response = $this->call('host.update', [
+			'hostid' => self::$direct_other_hostid,
+			'monitored_by' => ZBX_MONITORED_BY_PROXY,
+			'proxyid' => self::$proxyid2
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		// Proxy group manager deletes R1. The server must not sync it yet, so the removal ends up in the same
+		// sync as the move to group 2.
+		$this->waitForHostProxyRow(self::$direct_other_hostid, function ($row) {
+			return ($row === false) ? true : 'Host is expected to have no host_proxy row, got: '.json_encode($row);
+		});
+
+		// 3) switch the host to group 2
+		$response = $this->call('host.update', [
+			'hostid' => self::$direct_other_hostid,
+			'monitored_by' => ZBX_MONITORED_BY_PROXY_GROUP,
+			'proxy_groupid' => self::$proxy_groupid2
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+
+		// 4) the same sync gets the host in group 2 and the removal of R1
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		// 5) group 2 assigns the host to proxy 2 with a new host_proxy row, load it
+		$this->waitForHostProxyRow(self::$direct_other_hostid, function ($row) use ($old_hostproxyid) {
+			return ($row !== false && bccomp($row['hostproxyid'], $old_hostproxyid) != 0
+					&& bccomp($row['proxyid'], self::$proxyid2) == 0)
+				? true
+				: 'Host is expected to be assigned to proxy 2 by a new host_proxy row, got: '.json_encode($row);
+		});
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY_HANODE1);
+
+		$this->waitForProxyActiveCheck(self::COMPONENT_PROXY_HANODE1, self::DIRECT_OTHER_HOSTNAME, true,
+				'Host moved to group "'.self::PROXY_GROUP2_NAME.'" is not monitored by proxy "'.self::PROXY2_NAME.'"');
+		$this->waitForProxyActiveCheck(self::COMPONENT_PROXY, self::DIRECT_OTHER_HOSTNAME, false,
+				'Host moved out of group "'.self::PROXY_GROUP1_NAME.'" is still monitored by proxy "'.
+				self::PROXY1_NAME.'"');
+
+		// delete the host and make the server walk through the hosts registered for proxy 2
+		$response = $this->call('host.delete', [self::$direct_other_hostid]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		self::$direct_other_hostid = null;
+
+		$response = $this->call('proxy.update', [
+			'proxyid' => self::$proxyid2,
+			'description' => 'updated after direct to other group host deletion'
+		]);
+		$this->assertArrayHasKey('proxyids', $response['result']);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY_HANODE1);
+
+		$this->assertFalse(self::isLogLinePresent(self::COMPONENT_SERVER, 'Crashing ...', false),
+				'Server crashed while sending configuration to proxy "'.self::PROXY2_NAME.'", see '.
+				self::getLogPath(self::COMPONENT_SERVER));
+
+		$this->waitForProxyActiveCheck(self::COMPONENT_PROXY_HANODE1, self::DIRECT_OTHER_HOSTNAME, false,
+				'Deleted host is still monitored by proxy "'.self::PROXY2_NAME.'"');
 	}
 
 	/**
