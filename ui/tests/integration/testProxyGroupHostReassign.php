@@ -49,6 +49,8 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 	const RENAME_HOSTNAME = 'pg_reassign_rename';
 	const RENAMED_HOSTNAME = 'pg_reassign_renamed';
 	const DIRECT_OTHER_HOSTNAME = 'pg_reassign_direct_other';
+	const REDIRECT_HOSTNAME = 'pg_reassign_redirect';
+	const REDIRECT_RENAMED_HOSTNAME = 'pg_reassign_redirect_renamed';
 	const ITEM_KEY = 'agent.ping';
 	const FAILOVER_DELAY = 10;
 	const USERNAME = 'pg_reassign_admin';
@@ -63,6 +65,7 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 	private static $direct_hostid;
 	private static $rename_hostid;
 	private static $direct_other_hostid;
+	private static $redirect_hostid;
 	private static $usrgrpid;
 	private static $roleid;
 	private static $userid;
@@ -231,7 +234,8 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 		$response = CAPIHelper::call('host.get', [
 			'output' => ['hostid'],
 			'filter' => ['host' => [self::HOSTNAME, self::DIRECT_HOSTNAME, self::RENAME_HOSTNAME,
-				self::RENAMED_HOSTNAME, self::DIRECT_OTHER_HOSTNAME
+				self::RENAMED_HOSTNAME, self::DIRECT_OTHER_HOSTNAME, self::REDIRECT_HOSTNAME,
+				self::REDIRECT_RENAMED_HOSTNAME
 			]]
 		]);
 		$hostids = array_column($response['result'], 'hostid');
@@ -242,6 +246,7 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 		self::$direct_hostid = null;
 		self::$rename_hostid = null;
 		self::$direct_other_hostid = null;
+		self::$redirect_hostid = null;
 
 		if (self::$userid !== null) {
 			CAPIHelper::call('user.delete', [self::$userid]);
@@ -780,6 +785,106 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 	}
 
 	/**
+	 * Renaming a proxy group host must reach the server and the proxies of the group:
+	 *   1) both proxies are put to group 1, the host is assigned to one of them (owner) - the other proxy gets
+	 *      the host_proxy row by the proxy group configuration and redirects agents of the host to the owner;
+	 *   2) host is renamed - server moves its host_proxy index entry to the new name, and proxy group manager
+	 *      re-assigns the host to the same proxy, which bumps the host_proxy row revision;
+	 *   3) the other proxy gets the updated row and redirects by the new name, server redirects by the new name
+	 *      and no longer knows the old one.
+	 *
+	 * @depends testProxyGroupHostReassign_reassignAfterGroupRecovery
+	 */
+	public function testProxyGroupHostReassign_renameHostRedirect() {
+		// 1) put proxy 2 to group 1, so a proxy that does not monitor the host holds its host_proxy row
+		$response = $this->call('proxy.update', [
+			'proxyid' => self::$proxyid2,
+			'proxy_groupid' => self::$proxy_groupid1
+		]);
+		$this->assertArrayHasKey('proxyids', $response['result']);
+
+		$response = $this->call('host.create', [
+			'host' => self::REDIRECT_HOSTNAME,
+			'groups' => [['groupid' => 4]],
+			'monitored_by' => ZBX_MONITORED_BY_PROXY_GROUP,
+			'proxy_groupid' => self::$proxy_groupid1
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		self::$redirect_hostid = $response['result']['hostids'][0];
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		$row = $this->waitForHostProxyRow(self::$redirect_hostid, function ($row) {
+			return ($row !== false) ? true : 'Host is expected to be assigned to a proxy of group 1';
+		});
+
+		if (bccomp($row['proxyid'], self::$proxyid1) == 0) {
+			$owner = self::COMPONENT_PROXY;
+			$other = self::COMPONENT_PROXY_HANODE1;
+		}
+		else {
+			$owner = self::COMPONENT_PROXY_HANODE1;
+			$other = self::COMPONENT_PROXY;
+		}
+		$owner_address = '127.0.0.1:'.self::getConfigurationValue($owner, 'ListenPort');
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCacheAndWaitForLogLine($other);
+
+		$this->waitForRedirect(self::COMPONENT_SERVER, self::REDIRECT_HOSTNAME, $owner_address,
+				'Server does not redirect the host to its proxy');
+		$this->waitForRedirect($other, self::REDIRECT_HOSTNAME, $owner_address,
+				'Proxy that does not monitor the host does not redirect it to the owner proxy');
+
+		// 2) rename the host, proxy group manager must bump the revision of the same host_proxy row
+		$response = $this->call('host.update', [
+			'hostid' => self::$redirect_hostid,
+			'host' => self::REDIRECT_RENAMED_HOSTNAME
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		$this->waitForHostProxyRow(self::$redirect_hostid, function ($new_row) use ($row) {
+			return ($new_row !== false && bccomp($new_row['hostproxyid'], $row['hostproxyid']) == 0
+					&& bccomp($new_row['proxyid'], $row['proxyid']) == 0
+					&& bccomp($new_row['revision'], $row['revision']) > 0)
+				? true
+				: 'Host rename is expected to bump the revision of host_proxy row '.json_encode($row).
+					', got: '.json_encode($new_row);
+		});
+
+		// 3) load the updated row on the server and on the other proxy
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCacheAndWaitForLogLine($other);
+
+		$this->waitForRedirect(self::COMPONENT_SERVER, self::REDIRECT_RENAMED_HOSTNAME, $owner_address,
+				'Server does not redirect the renamed host to its proxy');
+		$this->waitForRedirect($other, self::REDIRECT_RENAMED_HOSTNAME, $owner_address,
+				'Proxy that does not monitor the host does not redirect it by the new name');
+		$this->waitForRedirect(self::COMPONENT_SERVER, self::REDIRECT_HOSTNAME, null,
+				'Server still redirects the old host name');
+
+		// restore the proxy groups
+		$response = $this->call('host.delete', [self::$redirect_hostid]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		self::$redirect_hostid = null;
+
+		$response = $this->call('proxy.update', [
+			'proxyid' => self::$proxyid2,
+			'proxy_groupid' => self::$proxy_groupid2
+		]);
+		$this->assertArrayHasKey('proxyids', $response['result']);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY_HANODE1);
+
+		$this->assertFalse(self::isLogLinePresent(self::COMPONENT_SERVER, 'Crashing ...', false),
+				'Server crashed after deleting the renamed host, see '.self::getLogPath(self::COMPONENT_SERVER));
+	}
+
+	/**
 	 * Stop proxy 2 and wait until it and group 2 (where it is the only proxy) are offline.
 	 */
 	private function takeGroup2Offline() {
@@ -818,7 +923,8 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 		$row = false;
 
 		for ($i = 0; $i < 90; $i++) {
-			$row = CDBHelper::getRow('SELECT hostproxyid,proxyid FROM host_proxy WHERE hostid='.zbx_dbstr($hostid));
+			$row = CDBHelper::getRow('SELECT hostproxyid,proxyid,revision FROM host_proxy WHERE hostid='.
+					zbx_dbstr($hostid));
 			$result = $condition($row);
 
 			if ($result === true) {
@@ -909,5 +1015,64 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 				? true
 				: 'Host is expected to be assigned to proxy '.$proxyid.', got: '.$assigned;
 		});
+	}
+
+	/**
+	 * Wait until the component redirects active checks of the host to the expected address.
+	 *
+	 * @param string      $component  server or proxy component
+	 * @param string      $hostname   host to request active checks for
+	 * @param string|null $address    expected redirect address, null to wait for no redirect
+	 * @param string      $message    failure message
+	 */
+	private function waitForRedirect($component, $hostname, $address, $message) {
+		$redirect = null;
+		$error = null;
+
+		for ($i = 0; $i < 15; $i++) {
+			$client = new CRedirectAwareClient('localhost', self::getConfigurationValue($component, 'ListenPort'),
+				10, 10, ZBX_SOCKET_BYTES_LIMIT, tls_config: ['ACTIVE' => false]
+			);
+			$client->getActiveChecks($hostname);
+			$redirect = $client->redirect;
+			$error = $client->getError();
+
+			$redirected = (is_array($redirect) && array_key_exists('address', $redirect)) ? $redirect['address'] : null;
+
+			if ($redirected === $address) {
+				return;
+			}
+
+			sleep(1);
+		}
+
+		$this->fail($message.', host: "'.$hostname.'", expected redirect: '.json_encode($address).', got: '.
+				json_encode($redirect).', error: '.json_encode($error));
+	}
+}
+
+/**
+ * Client that keeps the redirect block of the response, which is sent with failed status and without info.
+ */
+class CRedirectAwareClient extends CZabbixClient {
+
+	/**
+	 * @var array|null
+	 */
+	public $redirect = null;
+
+	/**
+	 * @inheritdoc
+	 */
+	protected function normalizeResponse(array &$response): bool {
+		if (array_key_exists('redirect', $response)) {
+			$this->redirect = $response['redirect'];
+
+			if (!array_key_exists('info', $response)) {
+				$response['info'] = 'redirect';
+			}
+		}
+
+		return parent::normalizeResponse($response);
 	}
 }
