@@ -38,13 +38,17 @@ const (
 // Plugin -
 type Plugin struct {
 	plugin.Base
-	cpus []*cpuUnit
+	cpus             []*cpuUnit
+	findStatLineFunc func(prefix string) (string, error)
 }
 
 func init() {
+	impl.findStatLineFunc = findProcStatLine
+
 	err := plugin.RegisterMetrics(
 		&impl, pluginName,
 		"system.cpu.discovery", "List of detected CPUs/CPU cores, used for low-level discovery.",
+		"system.cpu.intr", "Device interrupts.",
 		"system.cpu.num", "Number of CPUs.",
 		"system.cpu.util", "CPU utilization percentage.",
 	)
@@ -168,6 +172,10 @@ func (p *Plugin) Stop() {
 }
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+	if key == "system.cpu.intr" {
+		return p.getCPUIntr(params)
+	}
+
 	if p.cpus == nil || p.cpus[0].head == p.cpus[0].tail {
 		// no data gathered yet
 		return

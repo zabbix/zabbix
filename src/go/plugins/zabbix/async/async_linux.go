@@ -19,7 +19,6 @@ func getMetrics() []string {
 		"net.tcp.listen", "Checks if this TCP port is in LISTEN state.",
 		"sensor", "Hardware sensor reading.",
 		"system.cpu.load", "CPU load.",
-		"system.cpu.intr", "Device interrupts.",
 		"system.hw.cpu", "CPU information.",
 		"system.hw.macaddr", "Listing of MAC addresses.",
 	}

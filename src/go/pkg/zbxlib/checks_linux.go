@@ -39,8 +39,6 @@ func resolveMetric(key string) (cfunc unsafe.Pointer) {
 		cfunc = unsafe.Pointer(C.get_sensor)
 	case "system.cpu.load":
 		cfunc = unsafe.Pointer(C.system_cpu_load)
-	case "system.cpu.intr":
-		cfunc = unsafe.Pointer(C.system_cpu_intr)
 	case "system.hw.cpu":
 		cfunc = unsafe.Pointer(C.system_hw_cpu)
 	case "system.hw.macaddr":
