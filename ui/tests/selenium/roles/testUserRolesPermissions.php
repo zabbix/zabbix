@@ -772,6 +772,50 @@ class testUserRolesPermissions extends CWebTest {
 		}
 	}
 
+	/**
+	 * Check "Monitored by" in host creation form and "Discovery by" in discovery rule creation form
+	 * when 'Select "Server" for monitoring and discovery' role rule is enabled and disabled.
+	 */
+	public function testUserRolesPermissions_SelectServer() {
+		$this->page->userLogin('user_for_role', 'zabbixzabbix');
+
+		foreach ([true, false] as $action_status) {
+			// Verify "Monitored by" options in the Host creation form.
+			$this->page->open('zabbix.php?action=host.list')->waitUntilReady();
+			$this->query('button:Create host')->waitUntilClickable()->one()->click();
+			$host_dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+			$monitored_by = $host_dialog->asForm()->getField('Monitored by')->asSegmentedRadio();
+
+			// Check default selected option ('Server' when allowed, 'Proxy' when 'Server' is disabled).
+			$this->assertEquals($action_status ? 'Server' : 'Proxy', $monitored_by->getSelected());
+
+			foreach (['monitored_by_0', 'monitored_by_1', 'monitored_by_2'] as $id) {
+				$enabled = ($id === 'monitored_by_0') ? $action_status : true;
+				$this->assertTrue($host_dialog->query('id:'.$id)->one()->isEnabled($enabled));
+			}
+
+			$host_dialog->close();
+
+			// Verify "Discovery by" options in the Discovery rule creation form.
+			$this->page->open('zabbix.php?action=discovery.list')->waitUntilReady();
+			$this->query('button:Create discovery rule')->waitUntilClickable()->one()->click();
+			$discovery_dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+			$discovery_by = $discovery_dialog->asForm()->getField('Discovery by')->asSegmentedRadio();
+
+			// Check default selected option ('Server' when allowed, 'Proxy' when 'Server' is disabled).
+			$this->assertEquals($action_status ? 'Server' : 'Proxy', $discovery_by->getSelected());
+
+			$this->assertTrue($discovery_dialog->query('id:discovery_by_0')->one()->isEnabled($action_status));
+			$this->assertTrue($discovery_dialog->query('id:discovery_by_1')->one()->isEnabled());
+
+			$discovery_dialog->close();
+
+			if ($action_status) {
+				$this->changeRoleRule(['Select "Server" for monitoring and discovery' => false]);
+			}
+		}
+	}
+
 	public static function getUIData() {
 		return [
 			[

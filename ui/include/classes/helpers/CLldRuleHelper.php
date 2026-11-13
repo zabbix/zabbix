@@ -30,6 +30,9 @@ class CLldRuleHelper extends CItemGeneralHelper {
 			'formula' => DB::getDefault('items', 'formula'),
 			'conditions'=> []
 		];
+		$item['filters_evaltype'] = $item['filter']['evaltype'];
+		$item['filters_formula'] = $item['filter']['formula'];
+		$item['filters_conditions'] = $item['filter']['conditions'];
 		$item['discovered_lld'] = false;
 		$item['lifetime_type'] = DB::getDefault('items', 'lifetime_type');
 		$item['lifetime'] = DB::getDefault('items', 'lifetime');
@@ -211,7 +214,10 @@ class CLldRuleHelper extends CItemGeneralHelper {
 			'snmp_oid',
 
 			// SSH item type specific fields.
-			'publickey', 'privatekey'
+			'publickey', 'privatekey',
+
+			// Telemetry Query item type specific fields.
+			'query', 'time_shift', 'lookback_limit', 'granularity'
 		];
 
 		if ($is_lld_prototype) {
@@ -243,6 +249,17 @@ class CLldRuleHelper extends CItemGeneralHelper {
 			]);
 
 		foreach ($src_items as &$src_item) {
+			if ($src_item['type'] == ITEM_TYPE_TELEMETRY_QUERY) {
+				unset($src_item['query']['filter']['eval_formula']);
+
+				if ($src_item['query']['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+					foreach ($src_item['query']['filter']['conditions'] as &$condition) {
+						unset($condition['formulaid']);
+					}
+					unset($condition);
+				}
+			}
+
 			foreach ($src_item['filter']['conditions'] as &$condition) {
 				if ($src_item['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
 					unset($condition['formulaid']);
@@ -276,21 +293,21 @@ class CLldRuleHelper extends CItemGeneralHelper {
 	}
 
 	public static function normalizeFormData(array $input): array {
-		if (array_key_exists('conditions', $input)) {
+		if (array_key_exists('filters_conditions', $input)) {
 			$input['filter'] = [
-				'evaltype' => array_key_exists('evaltype', $input)
-					? $input['evaltype']
+				'evaltype' => array_key_exists('filters_evaltype', $input)
+					? $input['filters_evaltype']
 					: DB::getDefault('items', 'evaltype'),
-				'formula' => array_key_exists('formula', $input)
-					? $input['formula']
+				'formula' => array_key_exists('filters_formula', $input)
+					? $input['filters_formula']
 					: DB::getDefault('items', 'formula'),
-				'conditions' => array_key_exists('conditions', $input) ? $input['conditions'] : []
+				'conditions' => array_key_exists('filters_conditions', $input) ? $input['filters_conditions'] : []
 			];
 		}
 
-		unset($input['evaltype']);
-		unset($input['formula']);
-		unset($input['conditions']);
+		unset($input['filters_evaltype']);
+		unset($input['filters_formula']);
+		unset($input['filters_conditions']);
 
 		return parent::normalizeFormData($input);
 	}

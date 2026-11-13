@@ -1,0 +1,973 @@
+---
+test case: "0"
+in:
+  value: "0"
+out:
+  return: SUCCEED
+
+---
+test case: "1"
+in:
+  value: "1"
+out:
+  return: SUCCEED
+
+---
+test case: "0.0"
+in:
+  value: "0.0"
+out:
+  return: SUCCEED
+
+---
+test case: "1.0"
+in:
+  value: "1.0"
+out:
+  return: SUCCEED
+
+---
+test case: "123.456"
+in:
+  value: "123.456"
+out:
+  return: SUCCEED
+
+---
+test case: "0e0"
+in:
+  value: "0e0"
+out:
+  return: SUCCEED
+
+---
+test case: "0E0"
+in:
+  value: "0E0"
+out:
+  return: SUCCEED
+
+---
+test case: "0.0E0"
+in:
+  value: "0.0E0"
+out:
+  return: SUCCEED
+
+---
+test case: "0.0E0.0"
+in:
+  value: "0.0E0.0"
+out:
+  return: FAIL
+
+---
+test case: "123.456E5"
+in:
+  value: "123.456E5"
+out:
+  return: SUCCEED
+
+---
+test case: "123.456e5"
+in:
+  value: "123.456e5"
+out:
+  return: SUCCEED
+
+---
+test case: "0.123456e5"
+in:
+  value: "0.123456e5"
+out:
+  return: SUCCEED
+
+---
+test case: "-123"
+in:
+  value: "-123"
+out:
+  return: SUCCEED
+
+---
+test case: "-0"
+in:
+  value: "-0"
+out:
+  return: SUCCEED
+
+---
+test case: "-0.123456"
+in:
+  value: "-0.123456"
+out:
+  return: SUCCEED
+
+---
+test case: "-123.456"
+in:
+  value: "-123.456"
+out:
+  return: SUCCEED
+
+---
+test case: "-123.456E0"
+in:
+  value: "-123.456E0"
+out:
+  return: SUCCEED
+
+---
+test case: "-123.456e5"
+in:
+  value: "-123.456e5"
+out:
+  return: SUCCEED
+
+---
+test case: "-123.456e-5"
+in:
+  value: "-123.456e-5"
+out:
+  return: SUCCEED
+
+---
+test case: "-123.456e-0"
+in:
+  value: "-123.456e-0"
+out:
+  return: SUCCEED
+
+---
+test case: "123.456e-5"
+in:
+  value: "123.456e-5"
+out:
+  return: SUCCEED
+
+---
+test case: "123.456e-0"
+in:
+  value: "123.456e-0"
+out:
+  return: SUCCEED
+
+---
+test case: "123.456e-0.0"
+in:
+  value: "123.456e-0.0"
+out:
+  return: FAIL
+
+---
+test case: "123; --"
+in:
+  value: "123; --"
+out:
+  return: FAIL
+
+---
+test case: "123; #"
+in:
+  value: "123; #"
+out:
+  return: FAIL
+
+---
+test case: "'; --"
+in:
+  value: "'; --"
+out:
+  return: FAIL
+
+---
+test case: "123'; --"
+in:
+  value: "123'; --"
+out:
+  return: FAIL
+
+---
+test case: "asdf"
+in:
+  value: "asdf"
+out:
+  return: FAIL
+
+---
+test case: "123E"
+in:
+  value: "123E"
+out:
+  return: FAIL
+
+---
+test case: "123e"
+in:
+  value: "123e"
+out:
+  return: FAIL
+
+---
+test case: empty string
+in:
+  value: ""
+out:
+  return: FAIL
+
+---
+test case: trailing newline
+in:
+  value: "123\n"
+out:
+  return: FAIL
+
+---
+test case: leading newline
+in:
+  value: "\n123"
+out:
+  return: FAIL
+
+---
+test case: newline in the middle
+in:
+  value: "12\n3"
+out:
+  return: FAIL
+
+---
+test case: trailing space
+in:
+  value: "123 "
+out:
+  return: FAIL
+
+---
+test case: leading space
+in:
+  value: " 123"
+out:
+  return: FAIL
+
+---
+test case: space in the middle
+in:
+  value: "12 3"
+out:
+  return: FAIL
+
+---
+test case: space
+in:
+  value: " "
+out:
+  return: FAIL
+
+---
+test case: trailing backslash
+in:
+  value: "123\\"
+out:
+  return: FAIL
+
+---
+test case: only newline
+in:
+  value: "\n"
+out:
+  return: FAIL
+
+---
+test case: non-breaking space
+in:
+  value: "1\u00a0"
+out:
+  return: FAIL
+
+---
+test case: Unicode line separator
+in:
+  value: "1\u2028"
+out:
+  return: FAIL
+
+---
+test case: Unicode paragraph separator
+in:
+  value: "1\u2029"
+out:
+  return: FAIL
+
+---
+test case: actual tab
+in:
+  value: "1\t"
+out:
+  return: FAIL
+
+---
+test case: actual carriage return
+in:
+  value: "1\r"
+out:
+  return: FAIL
+
+---
+test case: actual backspace
+in:
+  value: "1\b"
+out:
+  return: FAIL
+
+---
+test case: actual form feed
+in:
+  value: "1\f"
+out:
+  return: FAIL
+
+---
+test case: explicit positive sign
+in:
+  value: "+123"
+out:
+  return: SUCCEED
+
+---
+test case: explicit positive sign with fraction
+in:
+  value: "+123.456"
+out:
+  return: SUCCEED
+
+---
+test case: positive exponent sign
+in:
+  value: "123e+5"
+out:
+  return: SUCCEED
+
+---
+test case: negative mantissa and positive exponent
+in:
+  value: "-123.456E+5"
+out:
+  return: SUCCEED
+
+---
+test case: positive mantissa and negative exponent
+in:
+  value: "+123.456e-5"
+out:
+  return: SUCCEED
+
+---
+test case: integer scientific notation with negative exponent
+in:
+  value: "123e-5"
+out:
+  return: SUCCEED
+
+---
+test case: leading zeros
+in:
+  value: "000123"
+out:
+  return: SUCCEED
+
+---
+test case: leading zeros with fraction
+in:
+  value: "000123.4500"
+out:
+  return: SUCCEED
+
+---
+test case: negative zero with exponent
+in:
+  value: "-0e+0"
+out:
+  return: SUCCEED
+
+---
+test case: very small syntactically valid value
+in:
+  value: "1e-999"
+out:
+  return: SUCCEED
+
+---
+test case: too large but syntactically valid value
+in:
+  value: "1e999"
+out:
+  return: FAIL
+
+---
+test case: leading decimal point
+in:
+  value: ".5"
+out:
+  return: SUCCEED
+
+---
+test case: negative leading decimal point
+in:
+  value: "-.5"
+out:
+  return: SUCCEED
+
+---
+test case: leading decimal point followed by 0
+in:
+  value: ".0"
+out:
+  return: SUCCEED
+
+---
+test case: negative leading decimal point followed by 0
+in:
+  value: "-.0"
+out:
+  return: SUCCEED
+
+---
+test case: trailing decimal point
+in:
+  value: "1."
+out:
+  return: SUCCEED
+
+---
+test case: negative trailing decimal point
+in:
+  value: "-1."
+out:
+  return: SUCCEED
+
+---
+test case: trailing decimal point after 0
+in:
+  value: "0."
+out:
+  return: SUCCEED
+
+---
+test case: trailing decimal point after -0
+in:
+  value: "-0."
+out:
+  return: SUCCEED
+
+---
+test case: leading decimal point with exponent
+in:
+  value: ".5e2"
+out:
+  return: SUCCEED
+
+---
+test case: trailing decimal point with exponent
+in:
+  value: "1.e2"
+out:
+  return: SUCCEED
+
+---
+test case: decimal point only
+in:
+  value: "."
+out:
+  return: FAIL
+
+---
+test case: signed decimal point only
+in:
+  value: "-."
+out:
+  return: FAIL
+
+---
+test case: decimal point followed by exponent
+in:
+  value: ".e2"
+out:
+  return: FAIL
+
+---
+test case: exponent with no mantissa
+in:
+  value: "e5"
+out:
+  return: FAIL
+
+---
+test case: exponent sign without digits
+in:
+  value: "1e+"
+out:
+  return: FAIL
+
+---
+test case: negative exponent sign without digits
+in:
+  value: "1e-"
+out:
+  return: FAIL
+
+---
+test case: exponent with decimal point
+in:
+  value: "1e2.5"
+out:
+  return: FAIL
+
+---
+test case: repeated exponent
+in:
+  value: "1e2e3"
+out:
+  return: FAIL
+
+---
+test case: repeated decimal point
+in:
+  value: "1.2.3"
+out:
+  return: FAIL
+
+---
+test case: repeated plus sign
+in:
+  value: "++1"
+out:
+  return: FAIL
+
+---
+test case: repeated minus sign
+in:
+  value: "--1"
+out:
+  return: FAIL
+
+---
+test case: mixed signs
+in:
+  value: "+-1"
+out:
+  return: FAIL
+
+---
+test case: reversed mixed signs
+in:
+  value: "-+1"
+out:
+  return: FAIL
+
+---
+test case: sign only
+in:
+  value: "+"
+out:
+  return: FAIL
+
+---
+test case: negative sign only
+in:
+  value: "-"
+out:
+  return: FAIL
+
+---
+test case: plus separated by space
+in:
+  value: "+ 1"
+out:
+  return: FAIL
+
+---
+test case: minus separated by space
+in:
+  value: "- 1"
+out:
+  return: FAIL
+
+---
+test case: exponent separated by space
+in:
+  value: "1e 2"
+out:
+  return: FAIL
+
+---
+test case: newline followed by injected statement
+in:
+  value: "123\nSELECT 1"
+out:
+  return: FAIL
+
+---
+test case: carriage return followed by injected statement
+in:
+  value: "123\rSELECT 1"
+out:
+  return: FAIL
+
+---
+test case: tab before injected statement
+in:
+  value: "123\tOR 1=1"
+out:
+  return: FAIL
+
+---
+test case: SQL boolean expression
+in:
+  value: "1 OR 1=1"
+out:
+  return: FAIL
+
+---
+test case: SQL boolean expression without spaces
+in:
+  value: "1OR1=1"
+out:
+  return: FAIL
+
+---
+test case: arithmetic expression
+in:
+  value: "1+1"
+out:
+  return: FAIL
+
+---
+test case: subtraction expression
+in:
+  value: "1-1"
+out:
+  return: FAIL
+
+---
+test case: multiplication expression
+in:
+  value: "1*1"
+out:
+  return: FAIL
+
+---
+test case: division expression
+in:
+  value: "1/1"
+out:
+  return: FAIL
+
+---
+test case: parenthesized number
+in:
+  value: "(1)"
+out:
+  return: FAIL
+
+---
+test case: comma followed by expression
+in:
+  value: "1,2"
+out:
+  return: FAIL
+
+---
+test case: closing parenthesis injection
+in:
+  value: "1); SELECT 1; --"
+out:
+  return: FAIL
+
+---
+test case: block comment after number
+in:
+  value: "123/*comment*/"
+out:
+  return: FAIL
+
+---
+test case: block comment inside number
+in:
+  value: "12/**/3"
+out:
+  return: FAIL
+
+---
+test case: slash comment after number
+in:
+  value: "123//comment"
+out:
+  return: FAIL
+
+---
+test case: hash comment without space
+in:
+  value: "123#comment"
+out:
+  return: FAIL
+
+---
+test case: ClickHouse hash-bang comment
+in:
+  value: "123#!comment"
+out:
+  return: FAIL
+
+---
+test case: SQL comment without trailing text
+in:
+  value: "123--"
+out:
+  return: FAIL
+
+---
+test case: quote after exponent
+in:
+  value: "1e2'"
+out:
+  return: FAIL
+
+---
+test case: double quote after number
+in:
+  value: "123\""
+out:
+  return: FAIL
+
+---
+test case: backtick after number
+in:
+  value: "123`"
+out:
+  return: FAIL
+
+---
+test case: zero-width space after number
+in:
+  value: "123\u200b"
+out:
+  return: FAIL
+
+---
+test case: byte order mark before number
+in:
+  value: "\ufeff123"
+out:
+  return: FAIL
+
+---
+test case: narrow no-break space
+in:
+  value: "123\u202f"
+out:
+  return: FAIL
+
+---
+test case: ideographic space
+in:
+  value: "123\u3000"
+out:
+  return: FAIL
+
+---
+test case: Arabic-Indic digits
+in:
+  value: "\u0661\u0662\u0663"
+out:
+  return: FAIL
+
+---
+test case: full-width digits
+in:
+  value: "\uff11\uff12\uff13"
+out:
+  return: FAIL
+
+---
+test case: Unicode minus sign
+in:
+  value: "\u2212123"
+out:
+  return: FAIL
+
+---
+test case: full-width plus sign
+in:
+  value: "\uff0b123"
+out:
+  return: FAIL
+
+---
+test case: Unicode full-width decimal point
+in:
+  value: "123\uff0e456"
+out:
+  return: FAIL
+
+---
+test case: hexadecimal integer
+in:
+  value: "0x10"
+out:
+  return: FAIL
+
+---
+test case: binary integer
+in:
+  value: "0b101"
+out:
+  return: FAIL
+
+---
+test case: octal-like value with prefix
+in:
+  value: "0o10"
+out:
+  return: FAIL
+
+---
+test case: hexadecimal floating literal
+in:
+  value: "0x1.2p3"
+out:
+  return: FAIL
+
+---
+test case: digit separator underscore
+in:
+  value: "1_000"
+out:
+  return: FAIL
+
+---
+test case: comma decimal separator
+in:
+  value: "1,5"
+out:
+  return: FAIL
+
+---
+test case: NaN
+in:
+  value: "NaN"
+out:
+  return: FAIL
+
+---
+test case: lowercase NaN
+in:
+  value: "nan"
+out:
+  return: FAIL
+
+---
+test case: positive infinity
+in:
+  value: "Infinity"
+out:
+  return: FAIL
+
+---
+test case: negative infinity
+in:
+  value: "-Infinity"
+out:
+  return: FAIL
+
+---
+test case: abbreviated infinity
+in:
+  value: "inf"
+out:
+  return: FAIL
+
+---
+test case: SQL NULL
+in:
+  value: "NULL"
+out:
+  return: FAIL
+
+---
+test case: "TRUE"
+in:
+  value: "TRUE"
+out:
+  return: FAIL
+
+---
+test case: "FALSE"
+in:
+  value: "FALSE"
+out:
+  return: FAIL
+
+---
+test case: "true"
+in:
+  value: "true"
+out:
+  return: FAIL
+
+---
+test case: "false"
+in:
+  value: "false"
+out:
+  return: FAIL
+
+---
+test case: "True"
+in:
+  value: "True"
+out:
+  return: FAIL
+
+---
+test case: "False"
+in:
+  value: "False"
+out:
+  return: FAIL
+
+---
+test case: array-like expression
+in:
+  value: "[1]"
+out:
+  return: FAIL
+
+---
+test case: parameter marker
+in:
+  value: "?"
+out:
+  return: FAIL
+
+---
+test case: PostgreSQL positional parameter
+in:
+  value: "$1"
+out:
+  return: FAIL
+
+---
+test case: MySQL user variable
+in:
+  value: "@x"
+out:
+  return: FAIL
+...
+
+---
+test case: long syntactically valid value
+in:
+  value: "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
+out:
+  return: SUCCEED

@@ -54,7 +54,7 @@
 				},
 				callback: () => {
 					uncheckTableRows('regexp');
-					location.href = location.href;
+					location.reload();
 				}
 			});
 		}
@@ -105,7 +105,7 @@
 						uncheckTableRows('regexp');
 					}
 
-					location.href = location.href;
+					location.reload();
 				})
 				.catch(() => {
 					clearMessages();

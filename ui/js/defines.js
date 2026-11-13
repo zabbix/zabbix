@@ -173,6 +173,7 @@ const ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH = 'debug-output-table-refresh';
 
 const ZBX_STYLE_ICON = 'icon';
 
+const ZBX_ICON_ARROW_TOP_RIGHT = 'zi-arrow-top-right';
 const ZBX_ICON_ALERT_WITH_CONTENT = 'zi-alert-with-content';
 const ZBX_ICON_BELL = 'zi-bell';
 const ZBX_ICON_BELL_OFF = 'zi-bell-off';
@@ -217,6 +218,7 @@ const ZBX_PREG_NUMBER = /(?<number>-?((?<int>\d+)(\.(?<frac>\d*))?|\.(?<frac_onl
 
 const HOST_STATUS_MONITORED = 0;
 
+const HOST_MAINTENANCE_STATUS_OFF = 0;
 const HOST_MAINTENANCE_STATUS_ON = 1;
 
 const HOST_ENCRYPTION_NONE = 1;

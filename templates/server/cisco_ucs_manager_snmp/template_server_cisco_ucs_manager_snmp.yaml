@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '8.0'
+  version: '8.2'
   template_groups:
     - uuid: e960332b3f6c46a1956486d4f3f99fce
       name: 'Templates/Server hardware'
@@ -33,7 +33,7 @@ zabbix_export:
         You can download UCS MIB files there ftp://ftp.cisco.com/pub/mibs/ucs-mibs/.
       vendor:
         name: Zabbix
-        version: 8.0-4
+        version: 8.2-0
       groups:
         - name: 'Templates/Server hardware'
       items:

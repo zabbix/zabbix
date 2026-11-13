@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '8.0'
+  version: '8.2'
   template_groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -27,7 +27,7 @@ zabbix_export:
         You should define the IP address (or FQDN) and Web-UI port for the ResourceManager in `ResourceManager host` and `ResourceManager Web UI port` host wizard configuration fields and for the NameNode in `NameNode host` and `NameNode Web UI port` host wizard configuration fields respectively.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.2-0
       groups:
         - name: Templates/Applications
       items:

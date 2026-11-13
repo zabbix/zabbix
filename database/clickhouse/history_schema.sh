@@ -1,12 +1,11 @@
 #!/bin/bash
 
 DIR="$(dirname "$0")"
+CH_SCRIPT=schema
 . "$DIR/clickhouse.sh"
 
-echo "DROP TABLE IF EXISTS $CH_DB.history SYNC" | curl $CH_CURL_AUTH $CH_URL --data-binary @-
-
-cat << EOF | curl $CH_CURL_AUTH $CH_URL --data-binary @-
-CREATE TABLE $CH_DB.history
+cat << EOF | curl "${CH_CURL_OPTS[@]}" "$CH_URL" --data-binary @-
+CREATE TABLE $CH_DB.history$CH_LOCAL_SUFFIX$CH_ON_CLUSTER
 (
 	itemid UInt64,
 	clock_ns DateTime64(9),
@@ -17,3 +16,5 @@ PARTITION BY $CH_PARTITION(clock_ns)
 PRIMARY KEY (itemid, clock_ns)
 TTL clock_ns + toIntervalSecond($CH_TTL)
 EOF
+
+ch_create_distributed_table history

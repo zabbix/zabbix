@@ -13,6 +13,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+require_once __DIR__ .'/../../include/forms.inc.php';
 
 class CControllerUsergroupEdit extends CController {
 
@@ -41,7 +42,8 @@ class CControllerUsergroupEdit extends CController {
 			'proxies' =>				'array_db proxy.proxyid',
 			'proxy_group_mode' =>		'db usrgrp.proxy_group_mode|in '.PROXY_GROUP_MODE_ALLOW.','.PROXY_GROUP_MODE_DENY,
 			'proxy_groups' =>			'array_db proxy_group.proxy_groupid',
-			'tag_filters' =>			'array'
+			'tag_filters' =>			'array',
+			'apm_filters' =>			'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -66,6 +68,7 @@ class CControllerUsergroupEdit extends CController {
 				'selectTagFilters' => ['groupid', 'tag', 'value'],
 				'selectProxies' => ['proxyid', 'name'],
 				'selectProxyGroups' => ['proxy_groupid', 'name'],
+				'selectApmFilters' => ['key', 'value', 'signal_type'],
 				'usrgrpids' => $this->getInput('usrgrpid'),
 				'editable' => true
 			]);
@@ -124,6 +127,8 @@ class CControllerUsergroupEdit extends CController {
 
 		// Get the sorted list of unique tag filters and hostgroup names.
 		$data['tag_filters'] = collapseTagFilters($this->hasInput('usrgrpid') ? $this->user_group['tag_filters'] : []);
+
+		$data['apm_filters'] = $this->hasInput('usrgrpid') ? $this->user_group['apm_filters'] : [];
 
 		if ($this->hasInput('tag_filters')) {
 			foreach ($this->getInput('tag_filters') as $tag_filter) {

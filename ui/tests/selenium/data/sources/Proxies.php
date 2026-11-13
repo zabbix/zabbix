@@ -396,5 +396,10 @@ class Proxies {
 				'proxy_groupid' => $proxy_groupids['Online proxy group']
 			]
 		]);
+
+		return [
+			'proxyids' => $proxyids,
+			'proxy_groupids' => $proxy_groupids
+		];
 	}
 }

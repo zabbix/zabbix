@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 DIR="$(dirname "$0")"
 "$DIR/history_schema.sh" "$@"
 "$DIR/history_str_schema.sh" "$@"

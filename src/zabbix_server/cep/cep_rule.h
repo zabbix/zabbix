@@ -26,7 +26,7 @@ char	*cep_tag_value_dec(const char *value);
 
 #define CEP_FLAG_WHEN_ALL		(CEP_FLAG(ZBX_CEP_WHEN_EVENT_OCCURRED) | CEP_FLAG(ZBX_CEP_WHEN_EVENT_ADDED) | \
 					CEP_FLAG(ZBX_CEP_WHEN_EVENT_EVICTED) | CEP_FLAG(ZBX_CEP_WHEN_WINDOW_CLOSED)  | \
-					CEP_FLAG(ZBX_CEP_WHEN_PATTERN_MATCH))
+					CEP_FLAG(ZBX_CEP_WHEN_PATTERN_MATCH) | CEP_FLAG(ZBX_CEP_WHEN_EVENT_CLOSED))
 
 #define CEP_OP_SET_NAME_MASK		CEP_FLAG_WHEN_ALL
 #define CEP_OP_CLOSE_MASK		CEP_FLAG_WHEN_ALL
@@ -42,18 +42,21 @@ char	*cep_tag_value_dec(const char *value);
 #define CEP_OP_RENAME_TAG_MASK		CEP_FLAG_WHEN_ALL
 #define CEP_OP_REMOVE_TAG_MASK		CEP_FLAG_WHEN_ALL
 #define CEP_OP_COPY_EVENT_MASK		(CEP_FLAG(ZBX_CEP_WHEN_EVENT_EVICTED) | CEP_FLAG(ZBX_CEP_WHEN_PATTERN_MATCH) | \
-						CEP_FLAG(ZBX_CEP_WHEN_WINDOW_CLOSED))
+					CEP_FLAG(ZBX_CEP_WHEN_WINDOW_CLOSED) | CEP_FLAG(ZBX_CEP_WHEN_EVENT_CLOSED))
 #define CEP_OP_DISCARD_MASK		CEP_FLAG(ZBX_CEP_WHEN_EVENT_OCCURRED)
 #define CEP_OP_CLOSE_WINDOW_MASK	(CEP_FLAG(ZBX_CEP_WHEN_EVENT_ADDED) | CEP_FLAG(ZBX_CEP_WHEN_EVENT_EVICTED) | \
-						CEP_FLAG(ZBX_CEP_WHEN_PATTERN_MATCH))
+					CEP_FLAG(ZBX_CEP_WHEN_PATTERN_MATCH) | CEP_FLAG(ZBX_CEP_WHEN_EVENT_CLOSED))
 #define CEP_OP_UNSUPPRESS_MASK		CEP_FLAG_WHEN_ALL
 
-int	cep_operation_match_event(const zbx_cep_operation_t *op, zbx_cep_event_context_t *ctx);
+int	cep_op_filter_match_event(const zbx_cep_op_filter_t *filter, zbx_cep_event_context_t *ctx);
 
 int	cep_event_process_rules(zbx_cep_config_handle_t handle, const zbx_cep_rule_t ***matched_rules,
 		int *matched_rules_num, zbx_cep_event_context_t *ctx, zbx_vector_mw_task_ptr_t *tasks);
 
 void	cep_rule_handle_error(const zbx_cep_rule_t *rule, char **error, zbx_vector_mw_task_ptr_t *tasks);
+
+int	cep_rule_get_execute_ops(const zbx_cep_rule_t *rule, int execute_when, zbx_cep_event_context_t *ctx,
+		zbx_vector_const_cep_operation_ptr_t *ops);
 
 #endif
 
