@@ -865,16 +865,9 @@ static int	DBpatch_7050062(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK <= zbx_db_execute(
-			"insert into graph_theme"
-			" values (5,'blue-classic-theme','FFFFFF','FFFFFF','CCD5D9','ACBBC2','ACBBC2','1F2C33',"
-				"'E33734','429E47','E33734','EBEBEB','" ZBX_COLORPALETTE_LIGHT "')"))
-	{
-		return SUCCEED;
-	}
+	return add_graph_theme("blue-classic-theme", "'FFFFFF','FFFFFF','CCD5D9','ACBBC2','ACBBC2','1F2C33','E33734',"
+			"'429E47','E33734','EBEBEB','" ZBX_COLORPALETTE_LIGHT "'");
 #undef ZBX_COLORPALETTE_LIGHT
-
-	return FAIL;
 }
 
 static int	DBpatch_7050063(void)
@@ -885,16 +878,9 @@ static int	DBpatch_7050063(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK <= zbx_db_execute(
-			"insert into graph_theme"
-			" values (6,'dark-classic-theme','2B2B2B','2B2B2B','454545','4F4F4F','4F4F4F','F2F2F2',"
-				"'E45959','59DB8F','E45959','333333','" ZBX_COLORPALETTE_DARK "')"))
-	{
-		return SUCCEED;
-	}
+	return add_graph_theme("dark-classic-theme", "'2B2B2B','2B2B2B','454545','4F4F4F','4F4F4F','F2F2F2','E45959',"
+			"'59DB8F','E45959','333333','" ZBX_COLORPALETTE_DARK "'");
 #undef ZBX_COLORPALETTE_DARK
-
-	return FAIL;
 }
 
 static int	DBpatch_7050064(void)
@@ -1127,11 +1113,27 @@ static int	DBpatch_7050085(void)
 static int	DBpatch_7050086(void)
 {
 	zbx_db_insert_t	db_insert;
+	zbx_db_result_t	result;
 	zbx_uint64_t	mediatypeid;
-	int		ret;
+	int		ret, exists = FAIL;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
+
+	if (NULL == (result = zbx_db_select("select null from media_type where name='Push notification'")))
+		return FAIL;
+
+	if (NULL != zbx_db_fetch(result))
+		exists = SUCCEED;
+
+	zbx_db_free_result(result);
+
+	if (SUCCEED == exists)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s(): media type \"Push notification\" already exists,"
+				" skipping its creation", __func__);
+		return SUCCEED;
+	}
 
 	mediatypeid = zbx_db_get_maxid("media_type");
 
@@ -1265,16 +1267,9 @@ static int	DBpatch_7050092(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK <= zbx_db_execute(
-			"insert into graph_theme"
-			" values (7,'dark-blue-theme','001F42','001F42','004FA8','004FA8','004FA8','E5F1FF',"
-				"'FF5555','10B981','FF5555','002247','" ZBX_COLORPALETTE_DARK "')"))
-	{
-		return SUCCEED;
-	}
+	return add_graph_theme("dark-blue-theme", "'001F42','001F42','004FA8','004FA8','004FA8','E5F1FF','FF5555',"
+			"'10B981','FF5555','002247','" ZBX_COLORPALETTE_DARK "'");
 #undef ZBX_COLORPALETTE_DARK
-
-	return FAIL;
 }
 
 static int	DBpatch_7050093(void)
@@ -2186,6 +2181,131 @@ static int	DBpatch_7050195(void)
 	return DBset_default("userdirectory_saml", &field);
 }
 
+static int	DBpatch_7050196(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("delete from role_rule"
+			" where name like 'api.method.%%'"
+				" and value_str in ("
+					"'hostinterface.create',"
+					"'hostinterface.update',"
+					"'hostinterface.delete',"
+					"'hostinterface.massadd',"
+					"'hostinterface.massremove'"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050197(void)
+{
+	const zbx_db_field_t	field = {"scope", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("cep_operation", &field);
+}
+
+static int	DBpatch_7050198(void)
+{
+	const zbx_db_field_t	field = {"scope_evaltype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("cep_operation", &field);
+}
+
+static int	DBpatch_7050199(void)
+{
+	const zbx_db_field_t	field = {"scope_formula", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("cep_operation", &field);
+}
+
+static int	DBpatch_7050200(void)
+{
+	const zbx_db_table_t	table =
+			{"cep_operation_scope_condition", "cep_operation_scope_conditionid", 0,
+				{
+					{"cep_operation_scope_conditionid", NULL, NULL, NULL, 0, ZBX_TYPE_ID,
+							ZBX_NOTNULL, 0},
+					{"cep_operationid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"type", "29", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"operator", "10", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"tag_value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050201(void)
+{
+	return DBcreate_index("cep_operation_scope_condition", "cep_operation_scope_condition_1", "cep_operationid",
+			0);
+}
+
+static int	DBpatch_7050202(void)
+{
+	const zbx_db_field_t	field = {"cep_operationid", NULL, "cep_operation", "cep_operationid", 0, ZBX_TYPE_ID,
+			ZBX_NOTNULL, 0};
+
+	return DBadd_foreign_key("cep_operation_scope_condition", 1, &field);
+}
+
+static int	DBpatch_7050203(void)
+{
+	return DBcreate_changelog_insert_trigger("cep_operation_scope_condition", "cep_operation_scope_conditionid");
+}
+
+static int	DBpatch_7050204(void)
+{
+	return DBcreate_changelog_update_trigger("cep_operation_scope_condition", "cep_operation_scope_conditionid");
+}
+
+static int	DBpatch_7050205(void)
+{
+	return DBcreate_changelog_delete_trigger("cep_operation_scope_condition", "cep_operation_scope_conditionid");
+}
+
+static int	DBpatch_7050206(void)
+{
+	const zbx_db_table_t	table =
+			{"usrgrp_apm_filter", "usrgrp_apm_filterid", 0,
+				{
+					{"usrgrp_apm_filterid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"usrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"attribute_key", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"signal_type", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050207(void)
+{
+	return DBcreate_index("usrgrp_apm_filter", "usrgrp_apm_filter_1", "usrgrpid", 0);
+}
+
+static int	DBpatch_7050208(void)
+{
+	const zbx_db_field_t	field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("usrgrp_apm_filter", 1, &field);
+}
+
+static int	DBpatch_7050209(void)
+{
+	const zbx_db_field_t	field = {"opdata", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("triggers", &field, NULL);
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -2388,5 +2508,19 @@ DBPATCH_ADD(7050192, 0, 1)
 DBPATCH_ADD(7050193, 0, 1)
 DBPATCH_ADD(7050194, 0, 1)
 DBPATCH_ADD(7050195, 0, 1)
+DBPATCH_ADD(7050196, 0, 1)
+DBPATCH_ADD(7050197, 0, 1)
+DBPATCH_ADD(7050198, 0, 1)
+DBPATCH_ADD(7050199, 0, 1)
+DBPATCH_ADD(7050200, 0, 1)
+DBPATCH_ADD(7050201, 0, 1)
+DBPATCH_ADD(7050202, 0, 1)
+DBPATCH_ADD(7050203, 0, 1)
+DBPATCH_ADD(7050204, 0, 1)
+DBPATCH_ADD(7050205, 0, 1)
+DBPATCH_ADD(7050206, 0, 1)
+DBPATCH_ADD(7050207, 0, 1)
+DBPATCH_ADD(7050208, 0, 1)
+DBPATCH_ADD(7050209, 0, 1)
 
 DBPATCH_END()

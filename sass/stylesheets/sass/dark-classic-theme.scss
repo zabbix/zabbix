@@ -196,6 +196,10 @@ $toc-title-bg-color: #4f4f4f;
 // Datatable.
 $datatable-overlay-color: rgba(#383838, .4);
 $datatable-resizer-border-color: #69808d;
+
+// Trace.
+$trace-datatable-duration-bar-bg-color: $ui-bg-selected-color;
+
 // Important! @import string should come after variables
 @import 'screen';
 

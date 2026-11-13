@@ -62,7 +62,7 @@ static void	apm_worker_process_commit(zbx_apm_worker_t *worker, zbx_apm_task_com
 
 	zbx_apm_dataset_t	ds;
 	zbx_vector_tag_t	*attrs;
-	int			ret, retries = 0;
+	int			ret = APM_COMMIT_ERR, retries = 0;
 
 	apm_dataset_init(&ds);
 
@@ -88,8 +88,6 @@ static void	apm_worker_process_commit(zbx_apm_worker_t *worker, zbx_apm_task_com
 
 	zbx_apm_exporter_t	*exporter;
 
-	exporter = apm_exporter_acquire(worker->exporters);
-
 	apm_dataset_flush_stats(&ds, worker->commit_stats);
 
 	do
@@ -103,14 +101,18 @@ static void	apm_worker_process_commit(zbx_apm_worker_t *worker, zbx_apm_task_com
 			else
 				delay = 1 << (retries - 2);
 
-			zabbix_log(LOG_LEVEL_WARNING, "ClickHouse database is down, retrying in %d seconds",
-					delay);
+			zabbix_log(LOG_LEVEL_WARNING, "APM database is down, retrying in %d seconds", delay);
 
 			for (int i = 0; i < delay && SUCCEED == zbx_mw_worker_is_running(&worker->base); i++)
 				sleep(1);
 		}
 
+		if (NULL == (exporter = apm_exporter_acquire(worker->exporters)))
+			break;
+
 		ret = apm_exporter_commit(exporter, &ds);
+		apm_exporter_release(worker->exporters, exporter);
+
 		retries++;
 	}
 	while (0 != (ret & APM_COMMIT_RETRY) && SUCCEED == zbx_mw_worker_is_running(&worker->base));
@@ -118,8 +120,6 @@ static void	apm_worker_process_commit(zbx_apm_worker_t *worker, zbx_apm_task_com
 	/* uncommitted rows are left in dataset, undo commit stats for them */
 	if (APM_COMMIT_OK != ret)
 		apm_dataset_undo_stats(&ds, worker->commit_stats);
-
-	apm_exporter_release(worker->exporters, exporter);
 
 	apm_dataset_destroy(&ds);
 
@@ -154,7 +154,7 @@ void	*apm_worker_entry(void *args)
 			zbx_mw_queue_unlock(worker->base.queue);
 			zbx_mw_worker_report_busy(&worker->base);
 
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() process task type:%u", __func__, task->type);
+			zabbix_log(LOG_LEVEL_DEBUG, "process task type:%u", task->type);
 
 			switch (task->type)
 			{

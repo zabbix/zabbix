@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '8.0'
+  version: '8.2'
   template_groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -46,7 +46,7 @@ zabbix_export:
         Set the hostname or IP address of the CockroachDB node host in the `CockroachDB host` host wizard configuration field. You can also change the port in the `CockroachDB port` and the scheme in the `Request scheme` if necessary.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.2-0
       groups:
         - name: Templates/Databases
       items:

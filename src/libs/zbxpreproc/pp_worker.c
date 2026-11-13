@@ -107,6 +107,7 @@ static void	*pp_worker_entry(void *args)
 	zbx_pp_task_t		*in;
 	char			*error = NULL, component[ZBX_LOG_COMPONENT_NAME_LEN];
 	sigjmp_buf		jmp_ret;
+	int			notify = 0;
 
 	zbx_snprintf(component, sizeof(component), "preprocessing worker #%d", worker->id);
 	zbx_set_log_component(component, &worker->logger);
@@ -127,6 +128,12 @@ static void	*pp_worker_entry(void *args)
 		if (NULL != (in = pp_task_queue_pop_new(queue)))
 		{
 			pp_task_queue_unlock(queue);
+
+			if (1 == notify)
+			{
+				worker->pp_finished_task_cb(worker->pp_finished_task_data);
+				notify = 0;
+			}
 
 			zbx_timekeeper_update(worker->timekeeper, worker->id - 1, ZBX_PROCESS_STATE_BUSY);
 
@@ -153,12 +160,21 @@ static void	*pp_worker_entry(void *args)
 			in->time_ms = zbx_timekeeper_update(worker->timekeeper, worker->id - 1, ZBX_PROCESS_STATE_IDLE);
 
 			pp_task_queue_lock(queue);
+
+			zbx_uint64_t	finished_num = queue->finished_num;
+
 			pp_task_queue_push_finished(queue, in);
 
-			if (NULL != worker->pp_finished_task_cb)
-				worker->pp_finished_task_cb(worker->pp_finished_task_data);
+			if (NULL != worker->pp_finished_task_cb && 0 == finished_num && 0 != queue->finished_num)
+				notify = 1;
 
 			continue;
+		}
+
+		if (1 == notify)
+		{
+			worker->pp_finished_task_cb(worker->pp_finished_task_data);
+			notify = 0;
 		}
 
 		if (SUCCEED != pp_task_queue_wait(queue, &error))

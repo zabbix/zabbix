@@ -3,12 +3,12 @@
 
 ## Overview
 
-This guide describes how to integrate Zabbix 8.0 installation with SolarWinds Service Desk using the Zabbix webhook feature. This guide provides instructions on setting up a media type, a user and an action in Zabbix.
+This guide describes how to integrate Zabbix 8.2 installation with SolarWinds Service Desk using the Zabbix webhook feature. This guide provides instructions on setting up a media type, a user and an action in Zabbix.
 Please note that recovery and update operations and SolarWinds Service Desk's custom fields are supported only for trigger-based events.
 
 ## Requirements
 
-Zabbix version: 8.0 and higher.
+Zabbix version: 8.2 and higher.
 
 ## Parameters
 
@@ -89,7 +89,7 @@ _Example:_
 Though a "Send to" field is not used in SolarWinds Service Desk webhook, it cannot be empty. To comply with frontend requirements, you can put any symbol there.
 Make sure this user has access to all hosts for which you would like problem notifications to be converted into SolarWinds Service Desk tickets.
 
-For more information see [Zabbix](https://www.zabbix.com/documentation/8.0/manual/config/notifications) and [SOLARWINDS](https://documentation.solarwinds.com/en/Success_Center/swsd/Content/SWSD_Getting_Started_Guide.htm) documentations.
+For more information see [Zabbix](https://www.zabbix.com/documentation/8.2/manual/config/notifications) and [SOLARWINDS](https://documentation.solarwinds.com/en/Success_Center/swsd/Content/SWSD_Getting_Started_Guide.htm) documentations.
 
 ## Feedback
 

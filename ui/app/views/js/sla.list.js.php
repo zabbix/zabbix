@@ -19,10 +19,6 @@
  */
 ?>
 
-<script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
-	<?= CTagFilterFieldHelper::getTemplate() ?>
-</script>
-
 <script>
 	const view = new class {
 
@@ -149,7 +145,7 @@
 						uncheckTableRows('sla');
 					}
 
-					location.href = location.href;
+					location.reload();
 				})
 				.catch(() => {
 					clearMessages();

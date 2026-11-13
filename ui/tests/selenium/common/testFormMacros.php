@@ -2597,7 +2597,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		$this->assertEquals($name, $name_column->query('tag:a')->one()->getText());
 
 		$this->assertEquals($key, (strpos($url, 'latest')
-				? $name_column->query('xpath://span[@class="green"]')->one()->getText()
+				? $name_column->query('xpath:.//div[contains(@class, "green")]')->one()->getText()
 				: $table->findRow('Name', $name)->getColumn('Key')->getText()
 		));
 	}

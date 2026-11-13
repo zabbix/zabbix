@@ -7,7 +7,7 @@ This guide describes how to integrate your Zabbix installation with SysAid using
 
 ## Requirements
 
-Zabbix version: 8.0 and higher.
+Zabbix version: 8.2 and higher.
 
 ## Parameters
 
@@ -72,16 +72,16 @@ You will need to configure the following fields in Sysaid webhook
 * sysaid_urgency_id = Your selected urgency id (Example: 1)
 * sysaid_url = Sysaid URL (Example: https://sysaid10577.sysaidit.com/)
 
-For more information about the Zabbix Webhook configuration, please see the [documentation](https://www.zabbix.com/documentation/8.0/manual/config/notifications/media/webhook).
+For more information about the Zabbix Webhook configuration, please see the [documentation](https://www.zabbix.com/documentation/8.2/manual/config/notifications/media/webhook).
 
-To utilize the media type, we recommend creating a dedicated [Zabbix user](https://www.zabbix.com/documentation/8.0/manual/web_interface/frontend_sections/administration/users) to represent SysAid. The default settings for SysAid User should suffice as this user will not be logging into Zabbix. Please note, that in order to be notified about problems on a host, this user must have at least read permissions for the host.  
+To utilize the media type, we recommend creating a dedicated [Zabbix user](https://www.zabbix.com/documentation/8.2/manual/web_interface/frontend_sections/administration/users) to represent SysAid. The default settings for SysAid User should suffice as this user will not be logging into Zabbix. Please note, that in order to be notified about problems on a host, this user must have at least read permissions for the host.  
 
 ### Internal alerts
 To receive notifications about internal problem and recovery events in SysAid: in the internal action configuration mark the Custom message checkbox and specify custom message templates for problem and recovery operations. 
 If an internal action operation is configured without a custom message, the notification will not be sent. 
 Note, that this step is required only for notifications about internal events; for other event types specifying a custom message is optional. For other even types message templates still should be defined on media type level.
 
-For more information, please see [Zabbix](https://www.zabbix.com/documentation/8.0/manual/config/notifications) and [SysAid](http://cdn1.SysAid.com/SysAidUserManual.pdf) documentation.
+For more information, please see [Zabbix](https://www.zabbix.com/documentation/8.2/manual/config/notifications) and [SysAid](http://cdn1.SysAid.com/SysAidUserManual.pdf) documentation.
 
 ## Feedback
 
