@@ -26,7 +26,31 @@ $data_table = (new CTable())
 		_('Value')
 	]);
 
-foreach ($data['data_table_rows'] as $row) {
+foreach ($data['test_data_rows'] as $i => $macro) {
+	$row = (new CRow())->addItem(
+		(new CCol($macro['macro']))
+			->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+			->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	);
+
+	if ($macro['error'] !== null) {
+		$row->addItem((new CCol($macro['error']))->addClass(ZBX_STYLE_RED)->setColspan(2));
+	}
+	else {
+		$name = 'test_data['.$i.'][value]';
+
+		$control = $macro['values'] !== null
+			? (new CSelect($name))
+				->addOptions(CSelect::createOptionsFromArray($macro['values']))
+				->setValue($macro['value'])
+			: (new CTextBox($name, $macro['value']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
+
+		$row->addItem([
+			$macro['value_type'],
+			[(new CVar('test_data['.$i.'][key]', $macro['key']))->removeId(), $control]
+		]);
+	}
+
 	$data_table->addRow($row);
 }
 
