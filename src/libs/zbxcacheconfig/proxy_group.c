@@ -322,13 +322,29 @@ void	dc_update_host_proxy(const char *host_old, const char *host_new)
 	if (NULL != (hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_search(&get_dc_config()->host_proxy_index,
 			&hpi_local)))
 	{
+		zbx_dc_host_proxy_t	*hp = hpi->host_proxy;
+
 		dc_strpool_release(hpi->host);
 		zbx_hashset_remove_direct(&get_dc_config()->host_proxy_index, hpi);
 
-		hpi_local.host_proxy = hpi->host_proxy;
+		dc_strpool_replace(1, &hp->host, host_new);
+		hpi_local.host_proxy = hp;
 		hpi_local.host = dc_strpool_intern(host_new);
 		zbx_hashset_insert(&get_dc_config()->host_proxy_index, &hpi_local, sizeof(hpi_local));
 	}
+}
+
+static int	dc_host_proxy_is_current(const zbx_dc_host_proxy_t *hp)
+{
+	zbx_dc_host_proxy_index_t	*hpi, hpi_local = {.host = hp->host};
+
+	if (NULL == (hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_search(&get_dc_config()->host_proxy_index,
+			&hpi_local)))
+	{
+		return FAIL;
+	}
+
+	return hpi->host_proxy == hp ? SUCCEED : FAIL;
 }
 
 /******************************************************************************
@@ -403,9 +419,9 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 					if (0 != dc_host->proxyid)
 						dc_host_deregister_proxy(dc_host, dc_host->proxyid, revision);
 
-					dc_host_register_proxy(dc_host, hp->proxyid, revision);
 					dc_host->proxyid = hp->proxyid;
 					dc_host->revision = revision;
+					dc_host_register_proxy(dc_host, dc_host->proxyid, revision);
 				}
 			}
 		}
@@ -429,17 +445,21 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		if (NULL == (hp = (zbx_dc_host_proxy_t *)zbx_hashset_search(&get_dc_config()->host_proxy, &rowid)))
 			continue;
 
-		if (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&get_dc_config()->hosts, &hp->hostid)))
+		/* check if not already deregistered */
+		if (SUCCEED == dc_host_proxy_is_current(hp))
 		{
-			if (0 != dc_host->proxy_groupid)
+			if (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&get_dc_config()->hosts, &hp->hostid)))
 			{
-				dc_host_deregister_proxy(dc_host, hp->proxyid, revision);
-				dc_host->proxyid = 0;
-				dc_host->revision = revision;
+				if (0 != dc_host->proxy_groupid)
+				{
+					dc_host_deregister_proxy(dc_host, dc_host->proxyid, revision);
+					dc_host->proxyid = 0;
+					dc_host->revision = revision;
+				}
 			}
-		}
 
-		dc_deregister_host_proxy(hp);
+			dc_deregister_host_proxy(hp);
+		}
 
 		dc_strpool_release(hp->host);
 
