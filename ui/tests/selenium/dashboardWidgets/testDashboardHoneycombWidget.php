@@ -1544,8 +1544,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'id:secondary_label_bold' => false,
 						'id:primary_label_size' => 99,
 						'id:secondary_label_size' => 99,
-						self::PATH_TO_COLOR_PICKER.'"primary_label_color"]' => '81C784', // Primary label Color.
-						self::PATH_TO_COLOR_PICKER.'"secondary_label_color"]' => '81C784', // Primary label Color.
+						'xpath:.//input[@id="primary_label_color"]/..' => '81C784', // Primary label Color.
+						'xpath:.//input[@id="secondary_label_color"]/..' => '81C784', // Primary label Color.
 						'id:primary_label_units_pos' => 'Before value',
 						'id:primary_label_units' => 'primary',
 						'Background colour' => 'B2DFDB'
@@ -1579,8 +1579,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'id:secondary_label_bold' => false,
 						'id:primary_label_size' => 99,
 						'id:secondary_label_size' => 99,
-						self::PATH_TO_COLOR_PICKER.'"primary_label_color"]' => '81C784', // Primary label Color.
-						self::PATH_TO_COLOR_PICKER.'"secondary_label_color"]' => '81C784', // Primary label Color.
+						'xpath:.//input[@id="primary_label_color"]/..' => '81C784', // Primary label Color.
+						'xpath:.//input[@id="secondary_label_color"]/..' => '81C784', // Primary label Color.
 						'id:primary_label_units_pos' => 'Before value',
 						'id:primary_label_units' => 'primary',
 						'Background colour' => 'B2DFDB'
@@ -1614,8 +1614,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'id:secondary_label_bold' => false,
 						'id:primary_label_size' => 99,
 						'id:secondary_label_size' => 99,
-						self::PATH_TO_COLOR_PICKER.'"primary_label_color"]' => '81C784', // Primary label Color.
-						self::PATH_TO_COLOR_PICKER.'"secondary_label_color"]' => '81C784', // Primary label Color.
+						'xpath:.//input[@id="primary_label_color"]/..' => '81C784', // Primary label Color.
+						'xpath:.//input[@id="secondary_label_color"]/..' => '81C784', // Primary label Color.
 						'id:primary_label_units_pos' => 'Before value',
 						'id:primary_label_units' => 'primary',
 						'Background colour' => 'B2DFDB'
@@ -1649,8 +1649,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'id:secondary_label_bold' => false,
 						'id:primary_label_size' => 99,
 						'id:secondary_label_size' => 99,
-						self::PATH_TO_COLOR_PICKER.'"primary_label_color"]' => '81C784', // Primary label Color.
-						self::PATH_TO_COLOR_PICKER.'"secondary_label_color"]' => '81C784', // Primary label Color.
+						'xpath:.//input[@id="primary_label_color"]/..' => '81C784', // Primary label Color.
+						'xpath:.//input[@id="secondary_label_color"]/..' => '81C784', // Primary label Color.
 						'id:primary_label_units_pos' => 'Before value',
 						'id:primary_label_units' => 'primary',
 						'Background colour' => 'B2DFDB'
@@ -1684,8 +1684,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'id:secondary_label_bold' => false,
 						'id:primary_label_size' => 99,
 						'id:secondary_label_size' => 99,
-						self::PATH_TO_COLOR_PICKER.'"primary_label_color"]' => '81C784', // Primary label Color.
-						self::PATH_TO_COLOR_PICKER.'"secondary_label_color"]' => '81C784', // Primary label Color.
+						'xpath:.//input[@id="primary_label_color"]/..' => '81C784', // Primary label Color.
+						'xpath:.//input[@id="secondary_label_color"]/..' => '81C784', // Primary label Color.
 						'id:primary_label_units_pos' => 'Before value',
 						'id:primary_label_units' => 'primary',
 						'Background colour' => 'B2DFDB'
@@ -1719,8 +1719,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'id:secondary_label_bold' => false,
 						'id:primary_label_size' => 99,
 						'id:secondary_label_size' => 99,
-						self::PATH_TO_COLOR_PICKER.'"primary_label_color"]' => '81C784', // Primary label Color.
-						self::PATH_TO_COLOR_PICKER.'"secondary_label_color"]' => '81C784', // Primary label Color.
+						'xpath:.//input[@id="primary_label_color"]/..' => '81C784', // Primary label Color.
+						'xpath:.//input[@id="secondary_label_color"]/..' => '81C784', // Primary label Color.
 						'id:primary_label_units_pos' => 'Before value',
 						'id:primary_label_units' => 'primary',
 						'Background colour' => 'B2DFDB'
