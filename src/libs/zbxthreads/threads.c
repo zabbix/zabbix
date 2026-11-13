@@ -243,9 +243,7 @@ static void	threads_kill_fatal(ZBX_THREAD_HANDLE *threads, int threads_num)
 		if (ZBX_THREAD_HANDLE_NULL == threads[i])
 			continue;
 
-		while (-1 == waitpid(threads[i], NULL, 0) && EINTR == errno)
-			;
-
+		(void)zbx_thread_wait(threads[i]);
 		threads[i] = ZBX_THREAD_HANDLE_NULL;
 	}
 
