@@ -4,6 +4,13 @@ New features:
 A......PS. [ZBXNEXT-10796] updated maximum supported MariaDB version to 13.0 (mprihodko)
 
 Bug fixes:
+.........T [ZBX-23192] added JS script for job discovery with configurable folder depth in Jenkins by HTTP template (mruszczyk)
+.........T [ZBX-23148] fixed uniqueness of Dell template items (kflorowski)
+........S. [ZBX-28284] fixed Zabbix server crash if database connection is lost during startup (vso)
+........S. [ZBX-27868] fixed Zabbix server crash when resolving macros in calculated item query filters (rtrizna)
+..F....... [ZBX-27578] changed multiline input preview to a span element (vskalbins)
+..F....... [ZBX-1977] fixed Y axis label clipping in classic graphs by sizing the margin to content (msnihach)
+........S. [ZBX-28312] fixed autoregistration, invalid SQL in add_discovered_host() due to missing delim = ',' (mprihodko)
 .......PS. [ZBX-28117] fixed web scenario checks stopping permanently after failed database query (arimdjonoks, jburlakovs)
 .D........ [ZBX-25451] clarified zabbix_sender man page options (rtrizna)
 A......... [ZBX-27613] fixed the mandatory script parameter not being required when changing media type to webhook (vskalbins)
@@ -1682,6 +1689,12 @@ New features:
 A......PS. [ZBXNEXT-10796] updated maximum supported MariaDB version to 13.0 (mprihodko)
 
 Bug fixes:
+.........T [ZBX-23192] added JS script for job discovery with configurable folder depth in Jenkins by HTTP template (mruszczyk)
+.........T [ZBX-23148] fixed uniqueness of Dell template items (kflorowski)
+........S. [ZBX-28284] fixed Zabbix server crash if database connection is lost during startup (vso)
+..F....... [ZBX-27578] changed multiline input preview to a span element (vskalbins)
+..F....... [ZBX-1977] fixed Y axis label clipping in classic graphs by sizing the margin to content (msnihach)
+........S. [ZBX-28312] fixed autoregistration, invalid SQL in add_discovered_host() due to missing delim = ',' (mprihodko)
 .......PS. [ZBX-28117] fixed web scenario checks stopping permanently after failed database query (arimdjonoks, jburlakovs)
 .D........ [ZBX-25451] clarified zabbix_sender man page options (rtrizna)
 .......PS. [ZBX-27224] fixed SNMP agent walk[] 'only partial data received' error by resetting retries between requests (vso)
