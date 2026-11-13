@@ -793,8 +793,8 @@ class testDashboardHostCardWidget extends testWidgets {
 		$dialogs->last()->close(true);
 
 		// Check default and available options in 'Show' section.
-		$show_form = $form->getFieldContainer('Show')->asMultifieldTable(['mapping' => ['' => 'section']]);
-		$show_form->checkValue([['section' => 'Monitoring'], ['section' => 'Availability'], ['section' => 'Monitored by']]);
+		$show_form = $form->getFieldContainer('Show')->asMultifieldTable();
+		$show_form->checkValue([['Name' => 'Monitoring'], ['Name' => 'Availability'], ['Name' => 'Monitored by']]);
 
 		// Clear all default options
 		$show_form->query('button:Remove')->all()->click();
@@ -896,7 +896,7 @@ class testDashboardHostCardWidget extends testWidgets {
 						'Refresh interval' => '10 seconds'
 					],
 					'Show' => [
-						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Description'],
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'Name' => 'Description'],
 						['action' => USER_ACTION_REMOVE, 'index' => 1],
 						['action' => USER_ACTION_REMOVE, 'index' => 1]
 					],
@@ -928,9 +928,9 @@ class testDashboardHostCardWidget extends testWidgets {
 						'Refresh interval' => '30 seconds'
 					],
 					'Show' => [
-						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Tags'],
-						['action' => USER_ACTION_UPDATE, 'index' => 1, 'section' => 'Inventory'],
-						['action' => USER_ACTION_REMOVE, 'index' => 1, 'section' => 'Templates']
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'Name' => 'Tags'],
+						['action' => USER_ACTION_UPDATE, 'index' => 1, 'Name' => 'Inventory'],
+						['action' => USER_ACTION_REMOVE, 'index' => 1, 'Name' => 'Templates']
 					]
 				]
 			],
@@ -944,11 +944,11 @@ class testDashboardHostCardWidget extends testWidgets {
 						'Refresh interval' => '1 minute'
 					],
 					'Show' => [
-						['section' => 'Host groups'],
-						['section' => 'Description'],
-						['section' => 'Templates'],
-						['section' => 'Inventory'],
-						['section' => 'Tags']
+						['Name' => 'Host groups'],
+						['Name' => 'Description'],
+						['Name' => 'Templates'],
+						['Name' => 'Inventory'],
+						['Name' => 'Tags']
 					],
 					'Screenshot' => true,
 					'Inventory' => ['Tag', 'Type', 'Location latitude', 'Location longitude']
@@ -964,14 +964,14 @@ class testDashboardHostCardWidget extends testWidgets {
 						'Refresh interval' => '2 minutes'
 					],
 					'Show' => [
-						['section' => 'Host groups'],
-						['section' => 'Description'],
-						['section' => 'Templates'],
-						['section' => 'Inventory'],
-						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Tags'],
-						['action' => USER_ACTION_UPDATE, 'index' => 6, 'section' => 'Monitoring'],
+						['Name' => 'Host groups'],
+						['Name' => 'Description'],
+						['Name' => 'Templates'],
+						['Name' => 'Inventory'],
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'Name' => 'Tags'],
+						['action' => USER_ACTION_UPDATE, 'index' => 6, 'Name' => 'Monitoring'],
 						['action' => USER_ACTION_REMOVE, 'index' => 1],
-						['section' => 'Availability']
+						['Name' => 'Availability']
 					]
 				]
 			],
@@ -985,15 +985,15 @@ class testDashboardHostCardWidget extends testWidgets {
 						'Refresh interval' => '10 minutes'
 					],
 					'Show' => [
-						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Templates'],
-						['section' => 'Monitoring'],
-						['action' => USER_ACTION_UPDATE, 'index' => 1, 'section' => 'Host groups'],
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'Name' => 'Templates'],
+						['Name' => 'Monitoring'],
+						['action' => USER_ACTION_UPDATE, 'index' => 1, 'Name' => 'Host groups'],
 						['action' => USER_ACTION_REMOVE, 'index' => 2],
-						['section' => 'Monitored by'],
-						['action' => USER_ACTION_UPDATE, 'index' => 2, 'section' => 'Description'],
-						['section' => 'Inventory'],
-						['section' => 'Availability'],
-						['action' => USER_ACTION_UPDATE, 'index' => 4, 'section' => 'Monitoring']
+						['Name' => 'Monitored by'],
+						['action' => USER_ACTION_UPDATE, 'index' => 2, 'Name' => 'Description'],
+						['Name' => 'Inventory'],
+						['Name' => 'Availability'],
+						['action' => USER_ACTION_UPDATE, 'index' => 4, 'Name' => 'Monitoring']
 					]
 				]
 			]
@@ -1664,13 +1664,13 @@ class testDashboardHostCardWidget extends testWidgets {
 
 		$data = [
 			'Show' => [
-				['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Tags'],
+				['action' => USER_ACTION_UPDATE, 'index' => 0, 'Name' => 'Tags'],
 				['action' => USER_ACTION_REMOVE, 'index' => 1],
-				['action' => USER_ACTION_UPDATE, 'index' => 1, 'section' => 'Description'],
-				['section' => 'Inventory']
+				['action' => USER_ACTION_UPDATE, 'index' => 1, 'Name' => 'Description'],
+				['Name' => 'Inventory']
 			]
 		];
-		$this->getShowTable()->fill($data['Show']);
+		$this->query('id:sections-table')->asMultifieldTable()->one()->fill($data['Show']);
 
 		// Save or cancel widget.
 		if (CTestArrayHelper::get($data, 'save_widget', false)) {
@@ -1754,7 +1754,7 @@ class testDashboardHostCardWidget extends testWidgets {
 		$form->fill($data['fields']);
 
 		if (array_key_exists('Show', $data)) {
-			$this->getShowTable()->fill($data['Show']);
+			$this->query('id:sections-table')->asMultifieldTable()->one()->fill($data['Show']);
 
 			if (array_key_exists('Inventory', $data)) {
 				$form->getField('Inventory fields')->fill($data['Inventory']);
@@ -1768,23 +1768,6 @@ class testDashboardHostCardWidget extends testWidgets {
 		}
 
 		$form->submit();
-	}
-
-	/**
-	 * Get 'Show' table element with mapping set.
-	 *
-	 * @return CMultifieldTable
-	 */
-	protected function getShowTable() {
-		return $this->query('id:sections-table')->asMultifieldTable([
-			'mapping' => [
-				'' => [
-					'name' => 'section',
-					'selector' => 'xpath:./z-select',
-					'class' => 'CDropdownElement'
-				]
-			]
-		])->one();
 	}
 
 	/**
@@ -1825,7 +1808,9 @@ class testDashboardHostCardWidget extends testWidgets {
 			$this->assertEquals(self::$old_widget_count + (($action === 'create') ? 1 : 0), $dashboard->getWidgets()->count());
 
 			$dashboard->getWidget($header)->edit()->checkValue($data['fields']);
-			$this->getShowTable()->checkValue($this->calculateShowResult(CTestArrayHelper::get($data, 'Show', [])));
+
+			$this->query('id:sections-table')->asMultifieldTable()->one()
+					->checkValue($this->calculateShowResult(CTestArrayHelper::get($data, 'Show', [])));
 			COverlayDialogElement::find()->one()->close();
 			$dashboard->save();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
@@ -1839,9 +1824,9 @@ class testDashboardHostCardWidget extends testWidgets {
 	 */
 	protected function calculateShowResult($rows) {
 		$result = [
-			['section' => 'Monitoring'],
-			['section' => 'Availability'],
-			['section' => 'Monitored by']
+			['Name' => 'Monitoring'],
+			['Name' => 'Availability'],
+			['Name' => 'Monitored by']
 		];
 
 		foreach ($rows as $row) {
@@ -1849,13 +1834,15 @@ class testDashboardHostCardWidget extends testWidgets {
 				if ($row['action'] === USER_ACTION_REMOVE) {
 					// Remove element at index.
 					array_splice($result, $row['index'], 1);
-				} elseif ($row['action'] === USER_ACTION_UPDATE) {
-					// Update existing element
-					$result[$row['index']]['section'] = $row['section'];
 				}
-			} else {
+				elseif ($row['action'] === USER_ACTION_UPDATE) {
+					// Update existing element
+					$result[$row['index']]['Name'] = $row['Name'];
+				}
+			}
+			else {
 				// If no action is specified, it means we are adding a new section.
-				$result[] = ['section' => $row['section']];
+				$result[] = ['Name' => $row['Name']];
 			}
 		}
 
