@@ -134,6 +134,7 @@ void	zbx_server_stats_ext_get(struct zbx_json *json, const void *arg)
 
 	zbx_json_addobject(json, "vps");
 	zbx_json_adduint64(json, "status", (SUCCEED == zbx_vps_monitor_capped() ? 1 : 0));
+	zbx_json_adduint64(json, "collected_total", vps_stats.collected_num);
 	zbx_json_adduint64(json, "written_total", vps_stats.written_num);
 	zbx_json_adduint64(json, "limit", vps_stats.values_limit);
 
