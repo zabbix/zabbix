@@ -18,14 +18,12 @@ require_once __DIR__.'/../../include/CWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 /**
- * @backup items, hosts, ids
+ * @backup items, ids
  *
  * @onBefore prepareOverridesData
  */
 class testFormLowLevelDiscoveryOverrides extends CWebTest {
 
-	const HOST_NAME = 'Host for LLD overrides';
-	const LLD_KEY = 'lld.overrides.update';
 	const TEMPLATE_NAME = 'Template for LLD overrides';
 
 	const INTERVAL_MAPPING = [
@@ -66,9 +64,12 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	 * Create host with LLD rule, template for override operations and overrides for LLD rule used in update scenarios.
 	 */
 	public function prepareOverridesData() {
+		$host_name = 'Host for LLD overrides';
+		$lld_key = 'lld.overrides.update';
+
 		$hosts = CDataHelper::createHosts([
 			[
-				'host' => self::HOST_NAME,
+				'host' => $host_name,
 				'groups' => ['groupid' => 4], // host group 'Zabbix servers'.
 				'interfaces' => [
 					[
@@ -83,15 +84,15 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 				'discoveryrules' => [
 					[
 						'name' => 'LLD for overrides update',
-						'key_' => self::LLD_KEY,
+						'key_' => $lld_key,
 						'type' => ITEM_TYPE_ZABBIX,
 						'delay' => '30s'
 					]
 				]
 			]
 		]);
-		self::$hostid = $hosts['hostids'][self::HOST_NAME];
-		self::$lldid = $hosts['discoveryruleids'][self::HOST_NAME.':'.self::LLD_KEY];
+		self::$hostid = $hosts['hostids'][$host_name];
+		self::$lldid = $hosts['discoveryruleids'][$host_name.':'.$lld_key];
 
 		$templates = CDataHelper::createTemplates([
 			[
@@ -1751,10 +1752,10 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 
 	protected function overridesUpdate($data) {
 		$sql = 'SELECT * FROM lld_override lo'.
-				' LEFT JOIN lld_override_condition loc ON loc.lld_overrideid=lo.lld_overrideid'.
-				' LEFT JOIN lld_override_operation loo ON loo.lld_overrideid=lo.lld_overrideid'.
-				' WHERE lo.itemid='.self::$lldid.
-				' ORDER BY lo.lld_overrideid, loc.lld_override_conditionid, loo.lld_override_operationid';
+			' LEFT JOIN lld_override_condition loc ON loc.lld_overrideid=lo.lld_overrideid'.
+			' LEFT JOIN lld_override_operation loo ON loo.lld_overrideid=lo.lld_overrideid'.
+			' WHERE lo.itemid='.self::$lldid.
+			' ORDER BY lo.lld_overrideid, loc.lld_override_conditionid, loo.lld_override_operationid';
 		$old_hash = CDBHelper::getHash($sql);
 
 		$this->page->login()->open('zabbix.php?action=popup&popup=lldrule.edit&context=host&itemid='.self::$lldid);
