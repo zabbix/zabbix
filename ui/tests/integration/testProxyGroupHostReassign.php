@@ -54,6 +54,7 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 	const SWAP_HOSTNAME_W = 'pg_reassign_swap_w';
 	const SWAP_HOSTNAME_X = 'pg_reassign_swap_x';
 	const SWAP_HOSTNAME_Y = 'pg_reassign_swap_y';
+	const FAILOVER_HOSTNAME = 'pg_reassign_failover';
 	const ITEM_KEY = 'agent.ping';
 	const FAILOVER_DELAY = 10;
 	const USERNAME = 'pg_reassign_admin';
@@ -71,6 +72,7 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 	private static $redirect_hostid;
 	private static $swap_hostid_a;
 	private static $swap_hostid_b;
+	private static $failover_hostid;
 	private static $usrgrpid;
 	private static $roleid;
 	private static $userid;
@@ -241,7 +243,7 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 			'filter' => ['host' => [self::HOSTNAME, self::DIRECT_HOSTNAME, self::RENAME_HOSTNAME,
 				self::RENAMED_HOSTNAME, self::DIRECT_OTHER_HOSTNAME, self::REDIRECT_HOSTNAME,
 				self::REDIRECT_RENAMED_HOSTNAME, self::SWAP_HOSTNAME_W, self::SWAP_HOSTNAME_X,
-				self::SWAP_HOSTNAME_Y
+				self::SWAP_HOSTNAME_Y, self::FAILOVER_HOSTNAME
 			]]
 		]);
 		$hostids = array_column($response['result'], 'hostid');
@@ -255,6 +257,7 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 		self::$redirect_hostid = null;
 		self::$swap_hostid_a = null;
 		self::$swap_hostid_b = null;
+		self::$failover_hostid = null;
 
 		if (self::$userid !== null) {
 			CAPIHelper::call('user.delete', [self::$userid]);
@@ -335,10 +338,6 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 
 		// The same configuration sync gets both the new host_proxy row and the removal of the old one.
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
-
-		$this->assertFalse(self::isLogLinePresent(self::COMPONENT_SERVER, 'Crashing ...', false),
-				'Server crashed after syncing host_proxy changes, see '.
-				self::getLogPath(self::COMPONENT_SERVER));
 	}
 
 	/**
@@ -399,6 +398,10 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 	public function testProxyGroupHostReassign_deleteHost() {
 		self::stopComponent(self::COMPONENT_AGENT);
 
+		$this->waitForRedirect(self::COMPONENT_SERVER, self::HOSTNAME,
+				self::getProxyAddress(self::COMPONENT_PROXY_HANODE1),
+				'Server does not redirect the host to proxy "'.self::PROXY2_NAME.'"');
+
 		$response = $this->call('host.delete', [self::$hostid]);
 		$this->assertArrayHasKey('hostids', $response['result']);
 		self::$hostid = null;
@@ -414,12 +417,9 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY_HANODE1);
 
-		$this->assertFalse(self::isLogLinePresent(self::COMPONENT_SERVER, 'Crashing ...', false),
-				'Server crashed while sending configuration to proxy "'.self::PROXY2_NAME.'", see '.
-				self::getLogPath(self::COMPONENT_SERVER));
-
 		$this->waitForProxyActiveCheck(self::COMPONENT_PROXY_HANODE1, self::HOSTNAME, false,
 				'Deleted host is still monitored by proxy "'.self::PROXY2_NAME.'"');
+		$this->waitForRedirect(self::COMPONENT_SERVER, self::HOSTNAME, null, 'Server still redirects the deleted host');
 	}
 
 	/**
@@ -464,6 +464,10 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 		});
 		$old_hostproxyid = $row['hostproxyid'];
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY);
+		$this->waitForProxyActiveCheck(self::COMPONENT_PROXY, self::DIRECT_HOSTNAME, true,
+				'Host assigned to proxy "'.self::PROXY1_NAME.'" is not monitored by it');
 
 		// 2) monitor the host directly by proxy 2
 		$response = $this->call('host.update', [
@@ -514,6 +518,9 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 		$this->waitForProxyActiveCheck(self::COMPONENT_PROXY_HANODE1, self::DIRECT_HOSTNAME, false,
 				'Host moved back to group "'.self::PROXY_GROUP1_NAME.'" is still monitored by proxy "'.
 				self::PROXY2_NAME.'"');
+		$this->waitForRedirect(self::COMPONENT_SERVER, self::DIRECT_HOSTNAME,
+				self::getProxyAddress(self::COMPONENT_PROXY),
+				'Server does not redirect the host assigned back to proxy "'.self::PROXY1_NAME.'"');
 
 		// delete the host and make the server walk through the hosts registered for proxy 2
 		$response = $this->call('host.delete', [self::$direct_hostid]);
@@ -526,12 +533,16 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 		]);
 		$this->assertArrayHasKey('proxyids', $response['result']);
 
+		// proxy 1 asks for configuration after proxy 2, so it gets the host deletion only if the server
+		// sent configuration to proxy 2 without crashing
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY_HANODE1);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY);
 
-		$this->assertFalse(self::isLogLinePresent(self::COMPONENT_SERVER, 'Crashing ...', false),
-				'Server crashed while sending configuration to proxy "'.self::PROXY2_NAME.'", see '.
-				self::getLogPath(self::COMPONENT_SERVER));
+		$this->waitForProxyActiveCheck(self::COMPONENT_PROXY, self::DIRECT_HOSTNAME, false,
+				'Deleted host is still monitored by proxy "'.self::PROXY1_NAME.'"');
+		$this->waitForRedirect(self::COMPONENT_SERVER, self::DIRECT_HOSTNAME, null,
+				'Server still redirects the deleted host');
 	}
 
 	/**
@@ -647,6 +658,12 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 				json_encode($result));
 		$this->assertEquals('1', $result['item']['result']);
 
+		$this->waitForRedirect(self::COMPONENT_SERVER, self::RENAMED_HOSTNAME,
+				self::getProxyAddress(self::COMPONENT_PROXY_HANODE1),
+				'Server does not redirect the renamed host to proxy "'.self::PROXY2_NAME.'"');
+		$this->waitForRedirect(self::COMPONENT_SERVER, self::RENAME_HOSTNAME, null,
+				'Server redirects the old name of the renamed host');
+
 		// delete the host and make the server walk through the hosts registered for both proxies
 		$response = $this->call('host.delete', [self::$rename_hostid]);
 		$this->assertArrayHasKey('hostids', $response['result']);
@@ -662,11 +679,10 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY);
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY_HANODE1);
 
-		$this->assertFalse(self::isLogLinePresent(self::COMPONENT_SERVER, 'Crashing ...', false),
-				'Server crashed after deleting the renamed host, see '.self::getLogPath(self::COMPONENT_SERVER));
-
 		$this->waitForProxyActiveCheck(self::COMPONENT_PROXY_HANODE1, self::RENAMED_HOSTNAME, false,
 				'Deleted renamed host is still monitored by proxy "'.self::PROXY2_NAME.'"');
+		$this->waitForRedirect(self::COMPONENT_SERVER, self::RENAMED_HOSTNAME, null,
+				'Server still redirects the deleted renamed host');
 	}
 
 	/**
@@ -725,6 +741,10 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 		$old_hostproxyid = $row['hostproxyid'];
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY);
+		$this->waitForProxyActiveCheck(self::COMPONENT_PROXY, self::DIRECT_OTHER_HOSTNAME, true,
+				'Host assigned to proxy "'.self::PROXY1_NAME.'" is not monitored by it');
+
 		// 2) monitor the host directly by proxy 2
 		$response = $this->call('host.update', [
 			'hostid' => self::$direct_other_hostid,
@@ -769,6 +789,10 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 		$this->waitForProxyActiveCheck(self::COMPONENT_PROXY, self::DIRECT_OTHER_HOSTNAME, false,
 				'Host moved out of group "'.self::PROXY_GROUP1_NAME.'" is still monitored by proxy "'.
 				self::PROXY1_NAME.'"');
+		$this->waitForRedirect(self::COMPONENT_SERVER, self::DIRECT_OTHER_HOSTNAME,
+				self::getProxyAddress(self::COMPONENT_PROXY_HANODE1),
+				'Server does not redirect the host moved to group "'.self::PROXY_GROUP2_NAME.'" to proxy "'.
+				self::PROXY2_NAME.'"');
 
 		// delete the host and make the server walk through the hosts registered for proxy 2
 		$response = $this->call('host.delete', [self::$direct_other_hostid]);
@@ -784,12 +808,10 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY_HANODE1);
 
-		$this->assertFalse(self::isLogLinePresent(self::COMPONENT_SERVER, 'Crashing ...', false),
-				'Server crashed while sending configuration to proxy "'.self::PROXY2_NAME.'", see '.
-				self::getLogPath(self::COMPONENT_SERVER));
-
 		$this->waitForProxyActiveCheck(self::COMPONENT_PROXY_HANODE1, self::DIRECT_OTHER_HOSTNAME, false,
 				'Deleted host is still monitored by proxy "'.self::PROXY2_NAME.'"');
+		$this->waitForRedirect(self::COMPONENT_SERVER, self::DIRECT_OTHER_HOSTNAME, null,
+				'Server still redirects the deleted host');
 	}
 
 	/**
@@ -836,7 +858,7 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 			$owner = self::COMPONENT_PROXY_HANODE1;
 			$other = self::COMPONENT_PROXY;
 		}
-		$owner_address = '127.0.0.1:'.self::getConfigurationValue($owner, 'ListenPort');
+		$owner_address = self::getProxyAddress($owner);
 
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCacheAndWaitForLogLine($other);
@@ -917,9 +939,6 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY);
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY_HANODE1);
-
-		$this->assertFalse(self::isLogLinePresent(self::COMPONENT_SERVER, 'Crashing ...', false),
-				'Server crashed after deleting the renamed host, see '.self::getLogPath(self::COMPONENT_SERVER));
 	}
 
 	/**
@@ -965,8 +984,8 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 
 		$owner_a = $this->getProxyComponent($row_a['proxyid']);
 		$owner_b = $this->getProxyComponent($row_b['proxyid']);
-		$address_a = '127.0.0.1:'.self::getConfigurationValue($owner_a, 'ListenPort');
-		$address_b = '127.0.0.1:'.self::getConfigurationValue($owner_b, 'ListenPort');
+		$address_a = self::getProxyAddress($owner_a);
+		$address_b = self::getProxyAddress($owner_b);
 
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY);
@@ -1022,11 +1041,22 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 					'Component "'.$component.'" still redirects the old name W of host B');
 		}
 
-		// restore the proxy groups
+		// delete the hosts, the server and the proxies must stop redirecting them
 		$response = $this->call('host.delete', [self::$swap_hostid_a, self::$swap_hostid_b]);
 		$this->assertArrayHasKey('hostids', $response['result']);
 		self::$swap_hostid_a = null;
 		self::$swap_hostid_b = null;
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		foreach ([self::SWAP_HOSTNAME_X, self::SWAP_HOSTNAME_Y] as $hostname) {
+			foreach ([self::COMPONENT_SERVER, self::COMPONENT_PROXY, self::COMPONENT_PROXY_HANODE1] as $component) {
+				$this->waitForRedirect($component, $hostname, null, 'Component "'.$component.
+						'" still redirects deleted host "'.$hostname.'"', $component !== self::COMPONENT_SERVER);
+			}
+		}
+
+		// restore the proxy groups
 
 		$response = $this->call('proxy.update', [
 			'proxyid' => self::$proxyid2,
@@ -1037,10 +1067,109 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY);
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY_HANODE1);
+	}
 
-		$this->assertFalse(self::isLogLinePresent(self::COMPONENT_SERVER, 'Crashing ...', false),
-				'Server crashed after deleting the hosts with swapped names, see '.
-				self::getLogPath(self::COMPONENT_SERVER));
+	/**
+	 * Proxy that monitored a host must redirect it to the proxy the host failed over to:
+	 *   1) host of group 1 is assigned to proxy P, P gets the host and its host_proxy row;
+	 *   2) P is stopped, proxy group manager fails the host over to proxy Q in the database, while the server
+	 *      configuration cache still lists the host for P;
+	 *   3) P is started and gets the host_proxy row pointing to Q, while the host is still in its hosts table;
+	 *   4) server syncs, so P gets the host removed, its host_proxy row is not changed anymore;
+	 *   5) P must redirect the host to Q. The host_proxy row must have been loaded by P with the encryption
+	 *      settings of the host, also when P was still monitoring the host at that time.
+	 *
+	 * @depends testProxyGroupHostReassign_reassignAfterGroupRecovery
+	 */
+	public function testProxyGroupHostReassign_failoverRedirect() {
+		// 1) both proxies in group 1, the host is assigned to one of them
+		$response = $this->call('proxy.update', [
+			'proxyid' => self::$proxyid2,
+			'proxy_groupid' => self::$proxy_groupid1
+		]);
+		$this->assertArrayHasKey('proxyids', $response['result']);
+
+		$response = $this->call('host.create', [
+			'host' => self::FAILOVER_HOSTNAME,
+			'groups' => [['groupid' => 4]],
+			'monitored_by' => ZBX_MONITORED_BY_PROXY_GROUP,
+			'proxy_groupid' => self::$proxy_groupid1
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		self::$failover_hostid = $response['result']['hostids'][0];
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		$row = $this->waitForHostProxyRow(self::$failover_hostid, function ($row) {
+			return ($row !== false) ? true : 'Host is expected to be assigned to a proxy of group 1';
+		});
+
+		$owner = $this->getProxyComponent($row['proxyid']);
+		if ($owner === self::COMPONENT_PROXY) {
+			$other = self::COMPONENT_PROXY_HANODE1;
+			$other_proxyid = self::$proxyid2;
+		}
+		else {
+			$other = self::COMPONENT_PROXY;
+			$other_proxyid = self::$proxyid1;
+		}
+		$owner_address = self::getProxyAddress($owner);
+		$other_address = self::getProxyAddress($other);
+
+		// load the host to the proxy list of the owner on the server, then the host with its host_proxy row
+		// to both proxies
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCacheAndWaitForLogLine($owner);
+		$this->reloadConfigurationCacheAndWaitForLogLine($other);
+
+		$this->waitForRedirect($other, self::FAILOVER_HOSTNAME, $owner_address,
+				'Proxy that does not monitor the host does not redirect it to the owner proxy');
+
+		// 2) stop the owner, the host fails over to the other proxy - server configuration cache is not synced
+		self::stopComponent($owner);
+
+		$this->waitForAssignedProxy(self::$failover_hostid, $other_proxyid);
+
+		// 3) the owner gets the host_proxy row pointing to the other proxy, while the host is still in the
+		// proxy list of the owner on the server
+		$this->startComponent($owner);
+		$this->reloadConfigurationCacheAndWaitForLogLine($owner);
+
+		// 4) server removes the host from the proxy list of the owner, the owner removes the host, the host_proxy
+		// row is not changed
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCacheAndWaitForLogLine($owner);
+		$this->reloadConfigurationCacheAndWaitForLogLine($other);
+
+		// 5) the former owner must redirect the host to the proxy it failed over to
+		$this->waitForRedirect(self::COMPONENT_SERVER, self::FAILOVER_HOSTNAME, $other_address,
+				'Server does not redirect the host to the proxy it failed over to');
+		$this->waitForRedirect($owner, self::FAILOVER_HOSTNAME, $other_address,
+				'Former owner proxy does not redirect the host to the proxy it failed over to');
+
+		// delete the host, the server and the former owner must stop redirecting it
+		$response = $this->call('host.delete', [self::$failover_hostid]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		self::$failover_hostid = null;
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		$this->waitForRedirect(self::COMPONENT_SERVER, self::FAILOVER_HOSTNAME, null,
+				'Server still redirects the deleted host');
+		$this->waitForRedirect($owner, self::FAILOVER_HOSTNAME, null,
+				'Former owner proxy still redirects the deleted host', true);
+
+		// restore the proxy groups
+
+		$response = $this->call('proxy.update', [
+			'proxyid' => self::$proxyid2,
+			'proxy_groupid' => self::$proxy_groupid2
+		]);
+		$this->assertArrayHasKey('proxyids', $response['result']);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY_HANODE1);
 	}
 
 	/**
@@ -1051,7 +1180,7 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 	 */
 	private function checkSwapRedirects(array $owners, $stage) {
 		foreach ($owners as $hostname => $owner) {
-			$address = '127.0.0.1:'.self::getConfigurationValue($owner, 'ListenPort');
+			$address = self::getProxyAddress($owner);
 
 			foreach ([self::COMPONENT_SERVER, self::COMPONENT_PROXY, self::COMPONENT_PROXY_HANODE1] as $component) {
 				// the proxy monitoring the host does not redirect it to itself
@@ -1074,6 +1203,17 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 	 */
 	private function getProxyComponent($proxyid) {
 		return (bccomp($proxyid, self::$proxyid1) == 0) ? self::COMPONENT_PROXY : self::COMPONENT_PROXY_HANODE1;
+	}
+
+	/**
+	 * Get the address agents are redirected to for the proxy component.
+	 *
+	 * @param string $component  proxy component
+	 *
+	 * @return string
+	 */
+	private static function getProxyAddress($component) {
+		return '127.0.0.1:'.self::getConfigurationValue($component, 'ListenPort');
 	}
 
 	/**
@@ -1216,8 +1356,10 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 	 * @param string      $hostname   host to request active checks for
 	 * @param string|null $address    expected redirect address, null to wait for no redirect
 	 * @param string      $message    failure message
+	 * @param bool        $reload     reload configuration cache of the component before each retry, for changes
+	 *                                that reach the component only through its configuration sync
 	 */
-	private function waitForRedirect($component, $hostname, $address, $message) {
+	private function waitForRedirect($component, $hostname, $address, $message, $reload = false) {
 		$redirect = null;
 		$error = null;
 
@@ -1235,7 +1377,12 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 				return;
 			}
 
-			sleep(1);
+			if ($reload) {
+				$this->reloadConfigurationCacheAndWaitForLogLine($component);
+			}
+			else {
+				sleep(1);
+			}
 		}
 
 		$this->fail($message.', host: "'.$hostname.'", expected redirect: '.json_encode($address).', got: '.
