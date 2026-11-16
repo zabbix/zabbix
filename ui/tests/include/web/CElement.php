@@ -734,6 +734,10 @@ class CElement extends CBaseElement implements IWaitable {
 			return $this->asElement($options);
 		}
 
+		if (in_array('multilineinput-preview', $class)) {
+			return $this->asElement($options);
+		}
+
 		CTest::zbxAddWarning('No specific element was detected');
 
 		return $this;
