@@ -791,7 +791,9 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 	 *   2) host is renamed - server moves its host_proxy index entry to the new name, and proxy group manager
 	 *      re-assigns the host to the same proxy, which bumps the host_proxy row revision;
 	 *   3) the other proxy gets the updated row and redirects by the new name, server redirects by the new name
-	 *      and no longer knows the old one.
+	 *      and no longer knows the old one;
+	 *   4) host is removed from the proxy group - proxy group manager deletes its host_proxy row;
+	 *   5) neither the server nor the other proxy may redirect the host anymore, by the new or the old name.
 	 *
 	 * @depends testProxyGroupHostReassign_reassignAfterGroupRecovery
 	 */
@@ -864,6 +866,32 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 				'Proxy that does not monitor the host does not redirect it by the new name');
 		$this->waitForRedirect(self::COMPONENT_SERVER, self::REDIRECT_HOSTNAME, null,
 				'Server still redirects the old host name');
+
+		// 4) remove the host from the proxy group, proxy group manager deletes its host_proxy row
+		$response = $this->call('host.update', [
+			'hostid' => self::$redirect_hostid,
+			'monitored_by' => ZBX_MONITORED_BY_SERVER
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		$this->waitForHostProxyRow(self::$redirect_hostid, function ($row) {
+			return ($row === false) ? true : 'Host is expected to have no host_proxy row, got: '.json_encode($row);
+		});
+
+		// 5) load the row removal on the server and on the other proxy - nobody may redirect the host anymore
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCacheAndWaitForLogLine($other);
+
+		$this->waitForRedirect(self::COMPONENT_SERVER, self::REDIRECT_RENAMED_HOSTNAME, null,
+				'Server still redirects the host removed from the proxy group');
+		$this->waitForRedirect($other, self::REDIRECT_RENAMED_HOSTNAME, null,
+				'Proxy still redirects the host removed from the proxy group');
+		// the proxy got the new name with the updated host_proxy row, the entry of the old name must not be left
+		// pointing to the removed row
+		$this->waitForRedirect($other, self::REDIRECT_HOSTNAME, null,
+				'Proxy still redirects the old name of the host removed from the proxy group');
 
 		// restore the proxy groups
 		$response = $this->call('host.delete', [self::$redirect_hostid]);
