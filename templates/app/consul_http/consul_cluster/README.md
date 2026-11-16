@@ -16,7 +16,7 @@ Zabbix version: 8.2 and higher.
 ## Tested versions
 
 This template has been tested on:
-- HashiCorp Consul 1.10.0
+- HashiCorp Consul 2.0.4
 
 ## Configuration
 
@@ -55,15 +55,15 @@ In case of Open Source version leave this macro empty.
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Cluster leader|<p>Current leader address.</p>|HTTP agent|consul.get_leader<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Trim: `"`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Nodes: peers|<p>The number of Raft peers for the datacenter in which the agent is running.</p>|HTTP agent|consul.get_peers<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.length()`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Nodes: Peers|<p>The number of Raft peers for the datacenter in which the agent is running.</p>|HTTP agent|consul.get_peers<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.length()`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Get nodes|<p>Catalog of nodes registered in a given datacenter.</p>|HTTP agent|consul.get_nodes<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get nodes Serf health status|<p>Get Serf Health Status for all agents in cluster.</p>|HTTP agent|consul.get_cluster_serf<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Nodes: total|<p>Number of nodes on current dc.</p>|Dependent item|consul.nodes_total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.length()`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Nodes: passing|<p>Number of agents on current dc with serf health status 'passing'.</p>|Dependent item|consul.nodes_passing<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Status == "passing")].length()`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Nodes: critical|<p>Number of agents on current dc with serf health status 'critical'.</p>|Dependent item|consul.nodes_critical<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Status == "critical")].length()`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Nodes: warning|<p>Number of agents on current dc with serf health status 'warning'.</p>|Dependent item|consul.nodes_warning<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Status == "warning")].length()`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Nodes: Total|<p>Number of nodes on current dc.</p>|Dependent item|consul.nodes_total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.length()`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Nodes: Passing|<p>Number of agents on current dc with serf health status 'passing'.</p>|Dependent item|consul.nodes_passing<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Status == "passing")].length()`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Nodes: Critical|<p>Number of agents on current dc with serf health status 'critical'.</p>|Dependent item|consul.nodes_critical<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Status == "critical")].length()`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Nodes: Warning|<p>Number of agents on current dc with serf health status 'warning'.</p>|Dependent item|consul.nodes_warning<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Status == "warning")].length()`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Get services|<p>Catalog of services registered in a given datacenter.</p>|HTTP agent|consul.get_catalog_services<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Services: total|<p>Number of services on current dc.</p>|Dependent item|consul.services_total<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Services: Total|<p>Number of services on current dc.</p>|Dependent item|consul.services_total<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Triggers
 

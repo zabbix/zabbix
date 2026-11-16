@@ -13,7 +13,7 @@ Zabbix version: 8.2 and higher.
 ## Tested versions
 
 This template has been tested on:
-- Jenkins 2.263.1 
+- Jenkins 2.263.1, 2.572
 
 ## Configuration
 
@@ -29,15 +29,22 @@ For monitoring computers and builds:
  Create API token for monitoring user according [official documentations](https://www.jenkins.io/doc/book/system-administration/authenticating-scripted-clients/) and change macro {$JENKINS.USER}, {$JENKINS.API.TOKEN}.
 Don't forget to change macros {$JENKINS.URL}.
 
+For jobs discovery:
+ Jobs are discovered by querying the Jenkins jobs tree, including jobs nested inside folders. The macro {$JENKINS.JOBS.MAX.DEPTH} controls how many levels of folder nesting are included in a single API request.
+ The default value (5) covers typical Jenkins folder structures. If your Jenkins instance has jobs nested deeper than the default, increase this macro accordingly (up to 10) so that deeper jobs are not omitted from discovery.
+
 
 ### Macros used
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$HTTP.TLS.VERIFY}|<p>TLS certificate verification for the script item: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Jenkins", e.g. {$HTTP.TLS.VERIFY:"Jenkins"}.</p>|`full`|
+|{$JENKINS.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/8.2/manual/config/items/itemtypes/http.</p>||
 |{$JENKINS.URL}|<p>Jenkins URL in the format `<scheme>://<host>:<port>`</p>||
 |{$JENKINS.API.KEY}|<p>API key to access Metrics Servlet.</p>||
-|{$JENKINS.USER}|<p>Username for HTTP BASIC authentication.</p>|`zabbix`|
-|{$JENKINS.API.TOKEN}|<p>API token for HTTP BASIC authentication.</p>||
+|{$JENKINS.USER}|<p>Username for HTTP BASIC authentication. Leave empty together with {$JENKINS.API.TOKEN} if the Jenkins instance allows anonymous read access.</p>||
+|{$JENKINS.API.TOKEN}|<p>API token for HTTP BASIC authentication. Leave empty together with {$JENKINS.USER} if the Jenkins instance allows anonymous read access.</p>||
+|{$JENKINS.JOBS.MAX.DEPTH}|<p>Maximum folder nesting depth used when querying the Jenkins jobs tree via the API.</p>|`5`|
 |{$JENKINS.PING.REPLY}|<p>Expected reply to the ping.</p>|`pong`|
 |{$JENKINS.FILE_DESCRIPTORS.MAX.WARN}|<p>Maximum percentage of file descriptors usage alert threshold (for trigger expression).</p>|`85`|
 |{$JENKINS.JOB.HEALTH.SCORE.MIN.WARN}|<p>Minimum job's health score (for trigger expression).</p>|`50`|
@@ -48,7 +55,8 @@ Don't forget to change macros {$JENKINS.URL}.
 |----|-----------|----|-----------------------|
 |Get service metrics||HTTP agent|jenkins.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get healthcheck||HTTP agent|jenkins.healthcheck<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Get jobs info||HTTP agent|jenkins.job_info<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get jobs info|<p>The result of API requests is returned as JSON.</p>|Script|jenkins.job_info|
+|Get jobs info errors|<p>A list of errors from API requests for Jenkins metrics.</p>|Dependent item|jenkins.job_info.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Get computer info||HTTP agent|jenkins.computer_info<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Disk space check message|<p>The message will reference the first node which fails this check.  There may be other nodes that fail the check, but this health check is designed to fail fast.</p>|Dependent item|jenkins.disk_space.message<p>**Preprocessing**</p><ul><li><p>JSON Path: `$['disk-space'].message`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Temporary space check message|<p>The message will reference the first node which fails this check. There may be other nodes that fail the check, but this health check is designed to fail fast.</p>|Dependent item|jenkins.temporary_space.message<p>**Preprocessing**</p><ul><li><p>JSON Path: `$['temporary-space'].message`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
@@ -128,6 +136,7 @@ Don't forget to change macros {$JENKINS.URL}.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
+|Jenkins: There are errors in requests to API|<p>An error occurred while attempting to retrieve values for the `Get jobs info` item.</p>|`length(last(/Jenkins by HTTP/jenkins.job_info.errors))>0`|Warning||
 |Jenkins: Disk space is too low|<p>Jenkins disk space monitors are reporting the disk space as less than the configured threshold. The message will reference the first node which fails this check.<br>Health check message: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}</p>|`last(/Jenkins by HTTP/jenkins.disk_space)=0 and length(last(/Jenkins by HTTP/jenkins.disk_space.message))>0`|Warning||
 |Jenkins: One or more Jenkins plugins failed to start|<p>A failure is typically indicative of a potential issue within the Jenkins installation that will either be solved by explicitly disabling the failing plugin(s) or by resolving the corresponding plugin dependency issues.<br>Health check message: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}</p>|`last(/Jenkins by HTTP/jenkins.plugins)=0 and length(last(/Jenkins by HTTP/jenkins.plugins.message))>0`|Info|**Manual close**: Yes|
 |Jenkins: Temporary space is too low|<p>Jenkins temporary space monitors are reporting the temporary space as less than the configured threshold. The message will reference the first node which fails this check.<br>Health check message: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}</p>|`last(/Jenkins by HTTP/jenkins.temporary_space)=0 and length(last(/Jenkins by HTTP/jenkins.temporary_space.message))>0`|Warning||
@@ -142,30 +151,30 @@ Don't forget to change macros {$JENKINS.URL}.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Jobs discovery||HTTP agent|jenkins.jobs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.jobs.[*]`</p></li></ul>|
+|Jobs discovery||Dependent item|jenkins.jobs<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.jobs`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Jobs discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Job [{#NAME}]: Get job|<p>Raw data for a job.</p>|Dependent item|jenkins.job.get[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.jobs.[?(@.name == "{#NAME}")].first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
-|Job [{#NAME}]: Health score|<p>Represents health of project. A number between 0-100.</p><p>Job Description: {#DESCRIPTION}</p><p>Job Url: {#URL}</p>|Dependent item|jenkins.build.health[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.healthReport..score.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
-|Job [{#NAME}]: Last Build number|<p>Details: {#URL}/lastBuild/</p>|Dependent item|jenkins.last_build.number[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lastBuild.number`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
-|Job [{#NAME}]: Last Build duration|<p>Build duration (in seconds).</p>|Dependent item|jenkins.last_build.duration[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lastBuild.duration`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `0.001`</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
-|Job [{#NAME}]: Last Build timestamp||Dependent item|jenkins.last_build.timestamp[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lastBuild.timestamp`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `0.001`</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
-|Job [{#NAME}]: Last Build result||Dependent item|jenkins.last_build.result[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lastBuild.result`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
-|Job [{#NAME}]: Last Failed Build number|<p>Details: {#URL}/lastFailedBuild/</p>|Dependent item|jenkins.last_failed_build.number[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lastFailedBuild.number`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
-|Job [{#NAME}]: Last Failed Build duration|<p>Build duration (in seconds).</p>|Dependent item|jenkins.last_failed_build.duration[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lastFailedBuild.duration`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `0.001`</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
-|Job [{#NAME}]: Last Failed Build timestamp||Dependent item|jenkins.last_failed_build.timestamp[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lastFailedBuild.timestamp`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `0.001`</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
-|Job [{#NAME}]: Last Successful Build number|<p>Details: {#URL}/lastSuccessfulBuild/</p>|Dependent item|jenkins.last_successful_build.number[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lastSuccessfulBuild.number`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
-|Job [{#NAME}]: Last Successful Build duration|<p>Build duration (in seconds).</p>|Dependent item|jenkins.last_successful_build.duration[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lastSuccessfulBuild.duration`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `0.001`</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
-|Job [{#NAME}]: Last Successful Build timestamp||Dependent item|jenkins.last_successful_build.timestamp[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lastSuccessfulBuild.timestamp`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `0.001`</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|Job [{#FULL_NAME}]: Get job|<p>Raw data for a job.</p>|Dependent item|jenkins.job.get[{#FULL_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.jobs.[?(@.fullName=='{#FULL_NAME}')].first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|Job [{#FULL_NAME}]: Health score|<p>Represents health of project. A number between 0-100.</p><p>Job Description: {#DESCRIPTION}</p><p>Job Url: {#URL}</p>|Dependent item|jenkins.build.health[{#FULL_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.healthReport..score.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|Job [{#FULL_NAME}]: Last Build number|<p>Details: {#URL}/lastBuild/</p>|Dependent item|jenkins.last_build.number[{#FULL_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lastBuild.number`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|Job [{#FULL_NAME}]: Last Build duration|<p>Build duration.</p>|Dependent item|jenkins.last_build.duration[{#FULL_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lastBuild.duration`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `0.001`</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|Job [{#FULL_NAME}]: Last Build timestamp||Dependent item|jenkins.last_build.timestamp[{#FULL_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lastBuild.timestamp`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `0.001`</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|Job [{#FULL_NAME}]: Last Build result||Dependent item|jenkins.last_build.result[{#FULL_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lastBuild.result`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|Job [{#FULL_NAME}]: Last Failed Build number|<p>Details: {#URL}/lastFailedBuild/</p>|Dependent item|jenkins.last_failed_build.number[{#FULL_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lastFailedBuild.number`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|Job [{#FULL_NAME}]: Last Failed Build duration|<p>Build duration.</p>|Dependent item|jenkins.last_failed_build.duration[{#FULL_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lastFailedBuild.duration`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `0.001`</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|Job [{#FULL_NAME}]: Last Failed Build timestamp||Dependent item|jenkins.last_failed_build.timestamp[{#FULL_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lastFailedBuild.timestamp`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `0.001`</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|Job [{#FULL_NAME}]: Last Successful Build number|<p>Details: {#URL}/lastSuccessfulBuild/</p>|Dependent item|jenkins.last_successful_build.number[{#FULL_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lastSuccessfulBuild.number`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|Job [{#FULL_NAME}]: Last Successful Build duration|<p>Build duration.</p>|Dependent item|jenkins.last_successful_build.duration[{#FULL_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lastSuccessfulBuild.duration`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `0.001`</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|Job [{#FULL_NAME}]: Last Successful Build timestamp||Dependent item|jenkins.last_successful_build.timestamp[{#FULL_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lastSuccessfulBuild.timestamp`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `0.001`</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
 
 ### Trigger prototypes for Jobs discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Jenkins: Job [{#NAME}]: Job is unhealthy||`last(/Jenkins by HTTP/jenkins.build.health[{#NAME}])<{$JENKINS.JOB.HEALTH.SCORE.MIN.WARN}`|Warning|**Manual close**: Yes|
+|Jenkins: Job [{#FULL_NAME}]: Job is unhealthy||`last(/Jenkins by HTTP/jenkins.build.health[{#FULL_NAME}])<{$JENKINS.JOB.HEALTH.SCORE.MIN.WARN}`|Warning|**Manual close**: Yes|
 
 ### LLD rule Computers discovery
 
