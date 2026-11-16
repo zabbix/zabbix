@@ -1500,12 +1500,14 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 	signed char			ipmi_authtype;
 	unsigned char			ipmi_privilege, monitored_by;
 	zbx_vector_dc_host_ptr_t	proxy_hosts;
+	zbx_vector_dc_host_proxy_ptr_t	host_proxy_reindex;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_dcsync_sync_start(sync, dbconfig_used_size());
 
 	zbx_vector_dc_host_ptr_create(&proxy_hosts);
+	zbx_vector_dc_host_proxy_ptr_create(&host_proxy_reindex);
 
 	now = time(NULL);
 
@@ -1542,6 +1544,8 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 		{
 			if (1 == found)
 			{
+				zbx_dc_host_proxy_t	*host_proxy;
+
 				host_h_local.host = host->host;
 				host_h = (ZBX_DC_HOST_H *)zbx_hashset_search(&config->hosts_h, &host_h_local);
 
@@ -1552,7 +1556,8 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 				}
 
 				/* update host proxy index if host was renamed */
-				dc_update_host_proxy(host->host, row[2]);
+				if (NULL != (host_proxy = dc_update_host_proxy(host->host, row[2])))
+					zbx_vector_dc_host_proxy_ptr_append(&host_proxy_reindex, host_proxy);
 			}
 
 			host_h_local.host = row[2];
@@ -1715,6 +1720,9 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 		dc_host_set_proxy_group(host, proxy_groupid, pg_host_reloc);
 	}
 
+	for (i = 0; i < host_proxy_reindex.values_num; i++)
+		dc_register_host_proxy(host_proxy_reindex.values[i]);
+
 	for (i = 0; i < proxy_hosts.values_num; i++)
 		dc_host_register_proxy(proxy_hosts.values[i], proxy_hosts.values[i]->proxyid, revision);
 
@@ -1774,6 +1782,7 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 		zbx_vector_dc_httptest_ptr_destroy(&host->httptests);
 	}
 
+	zbx_vector_dc_host_proxy_ptr_destroy(&host_proxy_reindex);
 	zbx_vector_dc_host_ptr_destroy(&proxy_hosts);
 
 	zbx_dcsync_sync_end(sync, dbconfig_used_size());

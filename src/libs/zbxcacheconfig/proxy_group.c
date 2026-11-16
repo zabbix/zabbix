@@ -31,6 +31,7 @@ ZBX_PTR_VECTOR_IMPL(pg_proxy_ptr, zbx_pg_proxy_t *)
 ZBX_PTR_VECTOR_IMPL(pg_group_ptr, zbx_pg_group_t *)
 ZBX_VECTOR_IMPL(pg_host, zbx_pg_host_t)
 ZBX_VECTOR_IMPL(pg_host_ref_ptr, zbx_pg_host_ref_t *)
+ZBX_PTR_VECTOR_IMPL(dc_host_proxy_ptr, zbx_dc_host_proxy_t *)
 
 static zbx_hash_t	pg_host_ref_hash(const void *d)
 {
@@ -289,7 +290,7 @@ out:
 	return ret;
 }
 
-static void	dc_register_host_proxy(zbx_dc_host_proxy_t *hp)
+void	dc_register_host_proxy(zbx_dc_host_proxy_t *hp)
 {
 	zbx_dc_host_proxy_index_t	*hpi, hpi_local = {.host = hp->host};
 
@@ -303,19 +304,22 @@ static void	dc_register_host_proxy(zbx_dc_host_proxy_t *hp)
 	hpi->host_proxy = hp;
 }
 
-static void	dc_deregister_host_proxy(zbx_dc_host_proxy_t *hp)
+static int	dc_deregister_host_proxy(zbx_dc_host_proxy_t *hp)
 {
 	zbx_dc_host_proxy_index_t	*hpi, hpi_local = {.host = hp->host};
 
 	if (NULL != (hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_search(&get_dc_config()->host_proxy_index,
-			&hpi_local)))
+			&hpi_local)) && hpi->host_proxy == hp)
 	{
 		dc_strpool_release(hpi->host);
 		zbx_hashset_remove_direct(&get_dc_config()->host_proxy_index, hpi);
+		return SUCCEED;
 	}
+
+	return FAIL;
 }
 
-void	dc_update_host_proxy(const char *host_old, const char *host_new)
+zbx_dc_host_proxy_t	*dc_update_host_proxy(const char *host_old, const char *host_new)
 {
 	zbx_dc_host_proxy_index_t	*hpi, hpi_local = {.host = host_old};
 
@@ -328,23 +332,11 @@ void	dc_update_host_proxy(const char *host_old, const char *host_new)
 		zbx_hashset_remove_direct(&get_dc_config()->host_proxy_index, hpi);
 
 		dc_strpool_replace(1, &hp->host, host_new);
-		hpi_local.host_proxy = hp;
-		hpi_local.host = dc_strpool_intern(host_new);
-		zbx_hashset_insert(&get_dc_config()->host_proxy_index, &hpi_local, sizeof(hpi_local));
-	}
-}
 
-static int	dc_host_proxy_is_current(const zbx_dc_host_proxy_t *hp)
-{
-	zbx_dc_host_proxy_index_t	*hpi, hpi_local = {.host = hp->host};
-
-	if (NULL == (hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_search(&get_dc_config()->host_proxy_index,
-			&hpi_local)))
-	{
-		return FAIL;
+		return hp;
 	}
 
-	return hpi->host_proxy == hp ? SUCCEED : FAIL;
+	return NULL;
 }
 
 /******************************************************************************
@@ -371,10 +363,13 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 	int				ret;
 	ZBX_DC_HOST			*dc_host;
 	zbx_hashset_t			psk_owners;
+	zbx_vector_dc_host_proxy_ptr_t	host_proxy_reindex;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_dcsync_sync_start(sync, dbconfig_used_size());
+
+	zbx_vector_dc_host_proxy_ptr_create(&host_proxy_reindex);
 
 	/* Encryption data in host_proxy table is stored and synced only on proxy. */
 	/* The identify conflicts have been already checked by server, so they can */
@@ -427,7 +422,7 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		}
 		else	/* proxy */
 		{
-			if (1 == found && 0 != strcmp(hp->host, row[2]) && SUCCEED == dc_host_proxy_is_current(hp))
+			if (1 == found && 0 != strcmp(hp->host, row[2]))
 				dc_deregister_host_proxy(hp);
 
 			dc_strpool_replace(found, &hp->host, row[2]);
@@ -440,16 +435,19 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 #endif
 		}
 
-		dc_register_host_proxy(hp);
+		zbx_vector_dc_host_proxy_ptr_append(&host_proxy_reindex, hp);
 	}
+
+	for (int i = 0; i < host_proxy_reindex.values_num; i++)
+		dc_register_host_proxy(host_proxy_reindex.values[i]);
 
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
 		if (NULL == (hp = (zbx_dc_host_proxy_t *)zbx_hashset_search(&get_dc_config()->host_proxy, &rowid)))
 			continue;
 
-		/* check if not already deregistered */
-		if (SUCCEED == dc_host_proxy_is_current(hp))
+		/* skip stale row */
+		if (SUCCEED == dc_deregister_host_proxy(hp))
 		{
 			if (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&get_dc_config()->hosts, &hp->hostid)))
 			{
@@ -460,8 +458,6 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 					dc_host->revision = revision;
 				}
 			}
-
-			dc_deregister_host_proxy(hp);
 		}
 
 		dc_strpool_release(hp->host);
@@ -479,6 +475,7 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 	zbx_hashset_destroy(&psk_owners);
 
+	zbx_vector_dc_host_proxy_ptr_destroy(&host_proxy_reindex);
 	zbx_dcsync_sync_end(sync, dbconfig_used_size());
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
