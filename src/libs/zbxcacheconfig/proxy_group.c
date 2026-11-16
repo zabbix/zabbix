@@ -290,18 +290,23 @@ out:
 	return ret;
 }
 
-void	dc_register_host_proxy(zbx_dc_host_proxy_t *hp)
+void	dc_reindex_host_proxies(const zbx_vector_dc_host_proxy_ptr_t *host_proxy_reindex)
 {
-	zbx_dc_host_proxy_index_t	*hpi, hpi_local = {.host = hp->host};
-
-	if (NULL == (hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_search(&get_dc_config()->host_proxy_index, &hpi_local)))
+	for (int i = 0; i < host_proxy_reindex->values_num; i++)
 	{
-		hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_insert(&get_dc_config()->host_proxy_index, &hpi_local,
-				sizeof(hpi_local));
-		dc_strpool_acquire(hpi->host);
-	}
+		zbx_dc_host_proxy_t		*host_proxy = host_proxy_reindex->values[i];
+		zbx_dc_host_proxy_index_t	*hpi, hpi_local = {.host = host_proxy->host};
 
-	hpi->host_proxy = hp;
+		if (NULL == (hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_search(&get_dc_config()->host_proxy_index,
+				&hpi_local)))
+		{
+			hpi = (zbx_dc_host_proxy_index_t *)zbx_hashset_insert(&get_dc_config()->host_proxy_index,
+					&hpi_local, sizeof(hpi_local));
+			dc_strpool_acquire(hpi->host);
+		}
+
+		hpi->host_proxy = host_proxy;
+	}
 }
 
 static int	dc_deregister_host_proxy(zbx_dc_host_proxy_t *hp)
@@ -319,7 +324,8 @@ static int	dc_deregister_host_proxy(zbx_dc_host_proxy_t *hp)
 	return FAIL;
 }
 
-zbx_dc_host_proxy_t	*dc_update_host_proxy(const char *host_old, const char *host_new)
+void	dc_rename_host_proxy(const char *host_old, const char *host_new,
+		zbx_vector_dc_host_proxy_ptr_t *host_proxy_reindex)
 {
 	zbx_dc_host_proxy_index_t	*hpi, hpi_local = {.host = host_old};
 
@@ -333,10 +339,8 @@ zbx_dc_host_proxy_t	*dc_update_host_proxy(const char *host_old, const char *host
 
 		dc_strpool_replace(1, &hp->host, host_new);
 
-		return hp;
+		zbx_vector_dc_host_proxy_ptr_append(host_proxy_reindex, hp);
 	}
-
-	return NULL;
 }
 
 /******************************************************************************
@@ -438,8 +442,7 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		zbx_vector_dc_host_proxy_ptr_append(&host_proxy_reindex, hp);
 	}
 
-	for (int i = 0; i < host_proxy_reindex.values_num; i++)
-		dc_register_host_proxy(host_proxy_reindex.values[i]);
+	dc_reindex_host_proxies(&host_proxy_reindex);
 
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{

@@ -19,12 +19,12 @@
 #include "zbxcomms.h"
 #include "zbxtypes.h"
 
-void			dc_sync_proxy_group(zbx_dbsync_t *sync, zbx_uint64_t revision);
-void			dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision);
-zbx_dc_host_proxy_t	*dc_update_host_proxy(const char *host_old, const char *host_new);
-void			dc_register_host_proxy(zbx_dc_host_proxy_t *hp);
-int			dc_get_host_redirect(const char *host, const zbx_tls_conn_attr_t *attr,
-			zbx_comms_redirect_t *redirect);
-void			dc_update_proxy_failover_delay(void);
+void	dc_sync_proxy_group(zbx_dbsync_t *sync, zbx_uint64_t revision);
+void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision);
+void	dc_reindex_host_proxies(const zbx_vector_dc_host_proxy_ptr_t *host_proxy_reindex);
+void	dc_rename_host_proxy(const char *host_old, const char *host_new,
+		zbx_vector_dc_host_proxy_ptr_t *host_proxy_reindex);
+int	dc_get_host_redirect(const char *host, const zbx_tls_conn_attr_t *attr, zbx_comms_redirect_t *redirect);
+void	dc_update_proxy_failover_delay(void);
 
 #endif
