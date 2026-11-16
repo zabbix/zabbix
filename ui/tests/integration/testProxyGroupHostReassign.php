@@ -1070,14 +1070,15 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 	}
 
 	/**
-	 * Proxy that monitored a host must redirect it to the proxy the host failed over to:
-	 *   1) host of group 1 is assigned to proxy P, P gets the host and its host_proxy row;
+	 * Host must fail over between proxies of a group and back, and the proxy that lost the host must redirect it:
+	 *   1) host of group 1 is assigned to proxy P;
 	 *   2) P is stopped, proxy group manager fails the host over to proxy Q in the database, while the server
 	 *      configuration cache still lists the host for P;
 	 *   3) P is started and gets the host_proxy row pointing to Q, while the host is still in its hosts table;
-	 *   4) server syncs, so P gets the host removed, its host_proxy row is not changed anymore;
-	 *   5) P must redirect the host to Q. The host_proxy row must have been loaded by P with the encryption
-	 *      settings of the host, also when P was still monitoring the host at that time.
+	 *   4) server syncs, so P gets the host removed and Q gets the host;
+	 *   5) Q monitors the host, P redirects it to Q;
+	 *   6) the same with the roles swapped - Q is stopped, the host fails back over to P, P must get the host
+	 *      again and Q must redirect it to P.
 	 *
 	 * @depends testProxyGroupHostReassign_reassignAfterGroupRecovery
 	 */
@@ -1098,6 +1099,16 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 		$this->assertArrayHasKey('hostids', $response['result']);
 		self::$failover_hostid = $response['result']['hostids'][0];
 
+		$response = $this->call('item.create', [
+			'name' => 'Agent ping',
+			'key_' => self::ITEM_KEY,
+			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'delay' => '1s',
+			'hostid' => self::$failover_hostid
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
 		$row = $this->waitForHostProxyRow(self::$failover_hostid, function ($row) {
@@ -1105,61 +1116,25 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 		});
 
 		$owner = $this->getProxyComponent($row['proxyid']);
-		if ($owner === self::COMPONENT_PROXY) {
-			$other = self::COMPONENT_PROXY_HANODE1;
-			$other_proxyid = self::$proxyid2;
-		}
-		else {
-			$other = self::COMPONENT_PROXY;
-			$other_proxyid = self::$proxyid1;
-		}
-		$owner_address = self::getProxyAddress($owner);
-		$other_address = self::getProxyAddress($other);
+		$other = ($owner === self::COMPONENT_PROXY) ? self::COMPONENT_PROXY_HANODE1 : self::COMPONENT_PROXY;
 
-		// load the host to the proxy list of the owner on the server, then the host with its host_proxy row
-		// to both proxies
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCacheAndWaitForLogLine($owner);
 		$this->reloadConfigurationCacheAndWaitForLogLine($other);
 
-		$this->waitForRedirect($other, self::FAILOVER_HOSTNAME, $owner_address,
+		$this->waitForProxyActiveCheck($owner, self::FAILOVER_HOSTNAME, true,
+				'Host is not monitored by the proxy it is assigned to');
+		$this->waitForRedirect($other, self::FAILOVER_HOSTNAME, self::getProxyAddress($owner),
 				'Proxy that does not monitor the host does not redirect it to the owner proxy');
 
-		// 2) stop the owner, the host fails over to the other proxy - server configuration cache is not synced
-		self::stopComponent($owner);
+		// 2) - 5) fail the host over to the other proxy, 6) and back to the owner
+		$this->failOverHost($owner, $other);
+		$this->failOverHost($other, $owner);
 
-		$this->waitForAssignedProxy(self::$failover_hostid, $other_proxyid);
-
-		// 3) the owner gets the host_proxy row pointing to the other proxy, while the host is still in the
-		// proxy list of the owner on the server
-		$this->startComponent($owner);
-		$this->reloadConfigurationCacheAndWaitForLogLine($owner);
-
-		// 4) server removes the host from the proxy list of the owner, the owner removes the host, the host_proxy
-		// row is not changed
-		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
-		$this->reloadConfigurationCacheAndWaitForLogLine($owner);
-		$this->reloadConfigurationCacheAndWaitForLogLine($other);
-
-		// 5) the former owner must redirect the host to the proxy it failed over to
-		$this->waitForRedirect(self::COMPONENT_SERVER, self::FAILOVER_HOSTNAME, $other_address,
-				'Server does not redirect the host to the proxy it failed over to');
-		$this->waitForRedirect($owner, self::FAILOVER_HOSTNAME, $other_address,
-				'Former owner proxy does not redirect the host to the proxy it failed over to');
-
-		// delete the host, the server and the former owner must stop redirecting it
+		// restore the proxy groups
 		$response = $this->call('host.delete', [self::$failover_hostid]);
 		$this->assertArrayHasKey('hostids', $response['result']);
 		self::$failover_hostid = null;
-
-		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
-
-		$this->waitForRedirect(self::COMPONENT_SERVER, self::FAILOVER_HOSTNAME, null,
-				'Server still redirects the deleted host');
-		$this->waitForRedirect($owner, self::FAILOVER_HOSTNAME, null,
-				'Former owner proxy still redirects the deleted host', true);
-
-		// restore the proxy groups
 
 		$response = $this->call('proxy.update', [
 			'proxyid' => self::$proxyid2,
@@ -1170,6 +1145,49 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY);
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY_HANODE1);
+	}
+
+	/**
+	 * Stop the proxy monitoring the failover host until the host fails over to the other proxy of the group, then
+	 * start it again and check that the host is monitored by the other proxy and redirected to it.
+	 *
+	 * @param string $from  proxy component monitoring the host
+	 * @param string $to    proxy component the host must fail over to
+	 */
+	private function failOverHost($from, $to) {
+		// stop the proxy, server configuration cache is not synced, so it keeps the host in the proxy list of $from
+		self::stopComponent($from);
+
+		$this->waitForAssignedProxy(self::$failover_hostid, $this->getProxyId($to));
+
+		// the stopped proxy gets the host_proxy row pointing to $to, while the host is still in its hosts table
+		$this->startComponent($from);
+		$this->reloadConfigurationCacheAndWaitForLogLine($from);
+
+		// server moves the host from the proxy list of $from to $to
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCacheAndWaitForLogLine($from);
+		$this->reloadConfigurationCacheAndWaitForLogLine($to);
+
+		$this->waitForProxyActiveCheck($to, self::FAILOVER_HOSTNAME, true,
+				'Host is not monitored by the proxy it failed over to');
+		$this->waitForProxyActiveCheck($from, self::FAILOVER_HOSTNAME, false,
+				'Host is still monitored by the proxy it failed over from');
+		$this->waitForRedirect(self::COMPONENT_SERVER, self::FAILOVER_HOSTNAME, self::getProxyAddress($to),
+				'Server does not redirect the host to the proxy it failed over to');
+		$this->waitForRedirect($from, self::FAILOVER_HOSTNAME, self::getProxyAddress($to),
+				'Proxy the host failed over from does not redirect it to the proxy it failed over to');
+	}
+
+	/**
+	 * Get proxy ID by proxy component.
+	 *
+	 * @param string $component
+	 *
+	 * @return string
+	 */
+	private function getProxyId($component) {
+		return ($component === self::COMPONENT_PROXY) ? self::$proxyid1 : self::$proxyid2;
 	}
 
 	/**
