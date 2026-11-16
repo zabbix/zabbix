@@ -403,6 +403,8 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		if (1 == found && 0 != strcmp(hp->host, host))
 			dc_deregister_host_proxy(hp);
 
+		dc_strpool_replace(found, &hp->host, host);
+
 		if (SUCCEED != zbx_db_is_null(row[5]))	/* server */
 		{
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -413,8 +415,6 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 				hp->tls_dc_psk = NULL;
 			}
 #endif
-
-			dc_strpool_replace(found, &hp->host, row[5]);
 
 			if (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&get_dc_config()->hosts, &hp->hostid)))
 			{
@@ -431,8 +431,6 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		}
 		else	/* proxy */
 		{
-			dc_strpool_replace(found, &hp->host, row[2]);
-
 			ZBX_STR2UCHAR(hp->tls_accept, row[6]);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 			dc_strpool_replace(found, &hp->tls_issuer, row[7]);
