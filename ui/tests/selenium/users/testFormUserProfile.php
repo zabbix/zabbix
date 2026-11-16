@@ -17,7 +17,7 @@
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
 
 /**
- * @backup users, media_type
+ * @backup users
  *
  * @onBefore prepareMediaTypeData
  */

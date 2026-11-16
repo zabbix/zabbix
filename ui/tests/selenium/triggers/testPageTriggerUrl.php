@@ -23,7 +23,7 @@ require_once __DIR__.'/../../include/CWebTest.php';
  *
  * @onBefore prepareTriggerData
  *
- * @backup profiles, problem, media_type
+ * @backup profiles, problem
  */
 class testPageTriggerUrl extends CWebTest {
 
