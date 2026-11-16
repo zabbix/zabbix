@@ -13,6 +13,7 @@
 **/
 
 #include "dbupgrade.h"
+
 #include "zbxdb.h"
 
 /*
@@ -23,10 +24,11 @@
 
 static int	DBpatch_8010000(void)
 {
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
 	if (ZBX_DB_OK > zbx_db_execute("delete from role_rule where name='ui.administration.data_source'"))
-	{
 		return FAIL;
-	}
 
 	return SUCCEED;
 }
