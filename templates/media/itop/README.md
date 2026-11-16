@@ -8,7 +8,7 @@ Please note that recovery and update operations are supported only for trigger-b
 
 ## Requirements
 
-Zabbix version: 8.0 and higher.
+Zabbix version: 8.2 and higher.
 
 ## Parameters
 
@@ -70,7 +70,7 @@ The following parameters are required:<br>
 Though a "Send to" field is not used in iTop webhook, it cannot be empty. To comply with frontend requirements, you can put any symbol there.
 Make sure this user has access to all hosts, for which you would like problem notifications to be converted into iTop tasks.
 
-For more information see [Zabbix](https://www.zabbix.com/documentation/8.0/manual/config/notifications) and [iTop](https://www.itophub.io/wiki/page) documentations.
+For more information see [Zabbix](https://www.zabbix.com/documentation/8.2/manual/config/notifications) and [iTop](https://www.itophub.io/wiki/page) documentations.
 
 ## Feedback
 

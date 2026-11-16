@@ -480,6 +480,11 @@ class testTriggerCEP extends CIntegrationTest {
 	// What the id of the scenario ends up with: the value that filled the window, the value that did not fit, and
 	// the one copy made of that second value.
 	const CEP_RULE_WINDOW_COPY_CAPACITY_EVENTS = 3;
+	// The capacity copy scenario with "copy first" and the "All events" scope (see
+	// prepareDataCepWindowCopyCapacityAllEvents()): the eviction operations then reach the event that filled the
+	// window, which is no copy, so it is the copy that reached the eviction that must keep them from running.
+	const CEP_RULE_WINDOW_COPY_CAPACITY_ALL_EVENTS = self::CEP_RULE_NAME_PREFIX
+		.'window simple copy capacity all events';
 	// The runaway copy scenario (see prepareDataCepWindowPatternCopyAlways()): a pattern whose script always
 	// reports a match. Its window is examined once a second and nothing ever leaves it, so the copy operation
 	// runs again on every examination - the rule keeps producing events for as long as it exists. The scenario
@@ -3171,6 +3176,42 @@ class testTriggerCEP extends CIntegrationTest {
 	 * again a moment later to see that it stayed.
 	 */
 	public function prepareDataCepWindowCopyCapacity() {
+		// An event evicted for not fitting is presented as the last event of the window, so "copy last" is the
+		// operation that acts on it - "copy first" would never fire here.
+		return $this->prepareCepWindowCopyCapacity(self::CEP_RULE_WINDOW_COPY_CAPACITY, [
+			'type' => CCepRuleHelper::OP_CLONE_LAST
+		]);
+	}
+
+	/**
+	 * Prepare the "All events" capacity copy scenario: prepareDataCepWindowCopyCapacity() with "copy first" in
+	 * place of "copy last" and the "All events" scope on it.
+	 *
+	 * With that scope the eviction operations are not run on the event that did not fit alone but on every event
+	 * of the window (cep_window_execute_operations() in cep_window.c), and the one at the first position is the
+	 * event that filled the window - a value the trigger sent, not a copy. So the second value copies the first,
+	 * and that copy does not fit either: its eviction runs the operations over the window once more, where the
+	 * first position still holds the same original event. The ZBX_EVENT_COPIED check in
+	 * cep_operation_event_copy() does not stop that, since the event it looks at is not a copy - only the event
+	 * that reached the eviction is, so it is the copy operations of that eviction that must not be run at all.
+	 * Without that the rule copies the first value again for every copy it makes, as fast as the server can
+	 * carry them round.
+	 *
+	 * The id ends up with the same CEP_RULE_WINDOW_COPY_CAPACITY_EVENTS events as in the "copy last" flavour - the
+	 * two values and the one copy, here of the first of them.
+	 */
+	public function prepareDataCepWindowCopyCapacityAllEvents() {
+		return $this->prepareCepWindowCopyCapacity(self::CEP_RULE_WINDOW_COPY_CAPACITY_ALL_EVENTS, [
+			'type' => CCepRuleHelper::OP_CLONE_FIRST,
+			'scope' => CCepRuleHelper::SCOPE_ALL_EVENTS
+		]);
+	}
+
+	/**
+	 * The rule both capacity copy flavours share, see prepareDataCepWindowCopyCapacity(): a single $operation at
+	 * the event evicted point of a window with room for one event, under the rule name $name.
+	 */
+	private function prepareCepWindowCopyCapacity(string $name, array $operation): bool {
 		$this->prepareCloseOnUpTriggerPrototypes($this->getWindowOperationsTriggerTags());
 
 		// Only this rule may add events; nothing may close a problem.
@@ -3187,18 +3228,15 @@ class testTriggerCEP extends CIntegrationTest {
 			'tags' => ['service']
 		];
 
-		// An event evicted for not fitting is presented as the last event of the window, so "copy last" is the
-		// operation that acts on it - "copy first" would never fire here.
 		$operations = [
 			[
 				'sortorder' => 0,
-				'execute_when' => CCepRuleHelper::WHEN_EVENT_EVICTED,
-				'type' => CCepRuleHelper::OP_CLONE_LAST
-			]
+				'execute_when' => CCepRuleHelper::WHEN_EVENT_EVICTED
+			] + $operation
 		];
 
-		$this->upsertCepRule($this->buildWindowNoneCepRuleParams(self::CEP_RULE_WINDOW_COPY_CAPACITY, [],
-			$operations, CONDITION_EVAL_TYPE_AND, '', CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE, $window
+		$this->upsertCepRule($this->buildWindowNoneCepRuleParams($name, [], $operations, CONDITION_EVAL_TYPE_AND, '',
+			CCepRuleHelper::WINDOW_SIMPLE_MULTIPLE, $window
 		));
 
 		$this->reloadConfigurationCacheAndWaitForLogLine();
@@ -12344,6 +12382,23 @@ HEREDOC;
 	}
 
 	/**
+	 * testTriggerCEP_CepWindowSimpleCopyCapacity with "copy first" and the "All events" scope: the eviction of the
+	 * second value then copies the event at the first position of the window, the first value, which is no copy.
+	 *
+	 * Each copy made of it is turned away by the full window in its turn and that eviction reaches the first value
+	 * again, so the ZBX_EVENT_COPIED check on the event being copied cannot end the chain here - the copy
+	 * operations have to be skipped for an eviction a copy has reached. The test is driven and held exactly as the
+	 * "copy last" one is, and fails on the first event past CEP_RULE_WINDOW_COPY_CAPACITY_EVENTS.
+	 * run as (testPrepareTriggerCEP_LLDDiscovery|testTriggerCEP_CepWindowSimpleCopyCapacityAllEvents$)
+	 * @depends testPrepareTriggerCEP_LLDDiscovery
+	 */
+	public function testTriggerCEP_CepWindowSimpleCopyCapacityAllEvents() {
+		$this->prepareDataCepWindowCopyCapacityAllEvents();
+
+		$this->runEventAssessmentTestCepWindowCopyCapacity();
+	}
+
+	/**
 	 * The same copy operation as testTriggerCEP_CepWindowPatternMatch, from a pattern whose script always
 	 * reports a match: the window is examined once a second and a match does not consume it, so the rule
 	 * copies its oldest event again at every examination and the copies never stop coming.
@@ -19381,8 +19436,9 @@ return;
 		//    by, so the second event lands in the very window the first one filled.
 		$send('down_'.$service);
 
-		// 3. Three events for the id: the two values and the one copy of the second. The copy did not fit either
-		//    and was turned away as it arrived, which is the eviction that would copy it again.
+		// 3. Three events for the id: the two values and the one copy - of the second, or of the first where the
+		//    operation has the "All events" scope, see prepareDataCepWindowCopyCapacityAllEvents(). The copy did not
+		//    fit either and was turned away as it arrived, which is the eviction that would copy again.
 		$this->waitForProblemEventCountByTag($all, 'service', $service,
 			self::CEP_RULE_WINDOW_COPY_CAPACITY_EVENTS
 		);
@@ -19398,7 +19454,7 @@ return;
 
 		$this->assertEquals(self::CEP_RULE_WINDOW_COPY_CAPACITY_EVENTS, $count,
 			'Expected the id to be left with '.self::CEP_RULE_WINDOW_COPY_CAPACITY_EVENTS.' problem event(s) - the'
-				.' two values and the one copy of the second - '.self::CEP_RULE_WINDOW_COPY_CAPACITY_SETTLE
+				.' two values and the one copy - '.self::CEP_RULE_WINDOW_COPY_CAPACITY_SETTLE
 				.'s after the copy was itself refused by the full window, got '.$count
 		);
 

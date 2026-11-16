@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '8.0'
+  version: '8.2'
   media_types:
     - name: VictorOps
       type: WEBHOOK
