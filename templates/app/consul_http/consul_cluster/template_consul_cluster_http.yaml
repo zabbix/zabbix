@@ -43,7 +43,7 @@ zabbix_export:
         *NOTE.* You maybe are interested in Envoy Proxy by HTTP [template](../../envoy_proxy_http).
       vendor:
         name: Zabbix
-        version: 8.2-0
+        version: 8.2-1
       groups:
         - name: Templates/Applications
       items:
@@ -148,7 +148,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 2400f78a5ada4a59b63fc049b6e3b3bf
-          name: 'Nodes: peers'
+          name: 'Nodes: Peers'
           type: HTTP_AGENT
           key: consul.get_peers
           description: 'The number of Raft peers for the datacenter in which the agent is running.'
@@ -171,7 +171,7 @@ zabbix_export:
             - tag: component
               value: raft
         - uuid: 31be2fd640a141279d41871df877a42c
-          name: 'Nodes: critical'
+          name: 'Nodes: Critical'
           type: DEPENDENT
           key: consul.nodes_critical
           description: 'Number of agents on current dc with serf health status ''critical''.'
@@ -197,7 +197,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 6303f2b128f64bec9760bc3807bb9a34
-          name: 'Nodes: passing'
+          name: 'Nodes: Passing'
           type: DEPENDENT
           key: consul.nodes_passing
           description: 'Number of agents on current dc with serf health status ''passing''.'
@@ -214,7 +214,7 @@ zabbix_export:
             - tag: component
               value: consul
         - uuid: 3eef4079f15d4db8852822ebda6d36fe
-          name: 'Nodes: total'
+          name: 'Nodes: Total'
           type: DEPENDENT
           key: consul.nodes_total
           description: 'Number of nodes on current dc.'
@@ -231,7 +231,7 @@ zabbix_export:
             - tag: component
               value: consul
         - uuid: b02337cc9a6b4c34a85d85a231c4e51f
-          name: 'Nodes: warning'
+          name: 'Nodes: Warning'
           type: DEPENDENT
           key: consul.nodes_warning
           description: 'Number of agents on current dc with serf health status ''warning''.'
@@ -257,7 +257,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 30101e37fce144bdacce0a58b4c9de0e
-          name: 'Services: total'
+          name: 'Services: Total'
           type: DEPENDENT
           key: consul.services_total
           description: 'Number of services on current dc.'
@@ -582,6 +582,240 @@ zabbix_export:
             priority: '2'
             label: Token
             description: 'Consul auth token.'
+      dashboards:
+        - uuid: 79b4b8c0f2ef408bab51f5ec00d37442
+          name: 'HashiCorp Consul Cluster by HTTP: Overview'
+          pages:
+            - name: Overview
+              widgets:
+                - type: item
+                  name: 'Cluster leader'
+                  width: '24'
+                  hide_header: 'YES'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 0D68FD
+                    - type: INTEGER
+                      name: decimal_size
+                      value: '25'
+                    - type: STRING
+                      name: description
+                      value: 'Cluster leader'
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
+                    - type: STRING
+                      name: desc_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: desc_h_pos
+                      value: '0'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'HashiCorp Consul Cluster by HTTP'
+                        key: consul.get_leader
+                    - type: INTEGER
+                      name: show.0
+                      value: '1'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
+                    - type: STRING
+                      name: value_color
+                      value: F3F4F7
+                    - type: INTEGER
+                      name: value_size
+                      value: '30'
+                - type: problems
+                  'y': '2'
+                  width: '72'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: reference
+                      value: CLPRB
+                - type: svggraph
+                  name: 'Cluster health'
+                  'y': '7'
+                  width: '72'
+                  height: '6'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 094EB3
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: 9BC2FF
+                    - type: STRING
+                      name: ds.0.color.2
+                      value: FFA059
+                    - type: STRING
+                      name: ds.0.color.3
+                      value: E45959
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'HashiCorp Consul Cluster by HTTP'
+                        key: consul.nodes_total
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'HashiCorp Consul Cluster by HTTP'
+                        key: consul.nodes_passing
+                    - type: ITEM
+                      name: ds.0.itemids.2
+                      value:
+                        host: 'HashiCorp Consul Cluster by HTTP'
+                        key: consul.nodes_warning
+                    - type: ITEM
+                      name: ds.0.itemids.3
+                      value:
+                        host: 'HashiCorp Consul Cluster by HTTP'
+                        key: consul.nodes_critical
+                    - type: INTEGER
+                      name: ds.0.transparency
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '4'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: CLHLT
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                - type: item
+                  name: 'Nodes: peers'
+                  x: '24'
+                  width: '24'
+                  hide_header: 'YES'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 0D68FD
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: decimal_size
+                      value: '25'
+                    - type: STRING
+                      name: description
+                      value: 'Nodes: Peers'
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
+                    - type: STRING
+                      name: desc_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: desc_h_pos
+                      value: '0'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
+                    - type: STRING
+                      name: down_color
+                      value: FFFFFF
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'HashiCorp Consul Cluster by HTTP'
+                        key: consul.get_peers
+                    - type: INTEGER
+                      name: show.0
+                      value: '1'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
+                    - type: INTEGER
+                      name: show.2
+                      value: '4'
+                    - type: STRING
+                      name: updown_color
+                      value: FFFFFF
+                    - type: STRING
+                      name: up_color
+                      value: FFFFFF
+                    - type: STRING
+                      name: value_color
+                      value: F3F4F7
+                    - type: INTEGER
+                      name: value_size
+                      value: '30'
+                - type: item
+                  name: 'Services: total'
+                  x: '48'
+                  width: '24'
+                  hide_header: 'YES'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 0D68FD
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: decimal_size
+                      value: '25'
+                    - type: STRING
+                      name: description
+                      value: 'Services: Total'
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
+                    - type: STRING
+                      name: desc_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
+                    - type: STRING
+                      name: down_color
+                      value: FFFFFF
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'HashiCorp Consul Cluster by HTTP'
+                        key: consul.services_total
+                    - type: INTEGER
+                      name: show.0
+                      value: '1'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
+                    - type: INTEGER
+                      name: show.2
+                      value: '4'
+                    - type: STRING
+                      name: updown_color
+                      value: FFFFFF
+                    - type: STRING
+                      name: up_color
+                      value: FFFFFF
+                    - type: STRING
+                      name: value_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: value_size
+                      value: '30'
       valuemaps:
         - uuid: 9c120a74ede844e6a410b7e2c2d712bb
           name: 'Consul health state'

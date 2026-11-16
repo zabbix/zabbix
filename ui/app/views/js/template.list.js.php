@@ -560,7 +560,7 @@
 
 				postMessageDetails('error', response.error.messages);
 
-				uncheckTableRows('template', response.keepids);
+				uncheckTableRows('templates', response.keepids);
 			}
 			else if ('success' in response) {
 				postMessageOk(response.success.title);
@@ -569,7 +569,7 @@
 					postMessageDetails('success', response.success.messages);
 				}
 
-				uncheckTableRows('template');
+				uncheckTableRows('templates');
 			}
 
 			location.href = location.href;

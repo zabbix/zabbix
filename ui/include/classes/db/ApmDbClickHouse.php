@@ -140,7 +140,6 @@ class ApmDbClickHouse {
 		finally {
 			curl_multi_remove_handle($curl_multi, $curl);
 			curl_multi_close($curl_multi);
-			curl_close($curl);
 		}
 	}
 
