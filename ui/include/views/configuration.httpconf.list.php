@@ -265,6 +265,8 @@ $html_page
 	->addItem($httpForm)
 	->show();
 
+(new CTemplateTag('filter-tag-row-tmpl', CTagFilterFieldHelper::getTemplate()))->show();
+
 zbx_add_post_js("history.replaceState({}, '');");
 
 (new CScriptTag('
