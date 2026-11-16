@@ -427,6 +427,9 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		}
 		else	/* proxy */
 		{
+			if (1 == found && 0 != strcmp(hp->host, row[2]) && SUCCEED == dc_host_proxy_is_current(hp))
+				dc_deregister_host_proxy(hp);
+
 			dc_strpool_replace(found, &hp->host, row[2]);
 
 			ZBX_STR2UCHAR(hp->tls_accept, row[6]);

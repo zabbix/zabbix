@@ -866,6 +866,8 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 				'Proxy that does not monitor the host does not redirect it by the new name');
 		$this->waitForRedirect(self::COMPONENT_SERVER, self::REDIRECT_HOSTNAME, null,
 				'Server still redirects the old host name');
+		$this->waitForRedirect($other, self::REDIRECT_HOSTNAME, null,
+				'Proxy still redirects the old host name');
 
 		// 4) remove the host from the proxy group, proxy group manager deletes its host_proxy row
 		$response = $this->call('host.update', [
