@@ -55,6 +55,7 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 	const SWAP_HOSTNAME_X = 'pg_reassign_swap_x';
 	const SWAP_HOSTNAME_Y = 'pg_reassign_swap_y';
 	const FAILOVER_HOSTNAME = 'pg_reassign_failover';
+	const REENTER_HOSTNAME = 'pg_reassign_reenter';
 	const ITEM_KEY = 'agent.ping';
 	const FAILOVER_DELAY = 10;
 	const USERNAME = 'pg_reassign_admin';
@@ -73,6 +74,7 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 	private static $swap_hostid_a;
 	private static $swap_hostid_b;
 	private static $failover_hostid;
+	private static $reenter_hostid;
 	private static $usrgrpid;
 	private static $roleid;
 	private static $userid;
@@ -243,7 +245,8 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 			'filter' => ['host' => [self::HOSTNAME, self::DIRECT_HOSTNAME, self::RENAME_HOSTNAME,
 				self::RENAMED_HOSTNAME, self::DIRECT_OTHER_HOSTNAME, self::REDIRECT_HOSTNAME,
 				self::REDIRECT_RENAMED_HOSTNAME, self::SWAP_HOSTNAME_W, self::SWAP_HOSTNAME_X,
-				self::SWAP_HOSTNAME_Y, self::FAILOVER_HOSTNAME
+				self::SWAP_HOSTNAME_Y, self::FAILOVER_HOSTNAME,
+				self::REENTER_HOSTNAME
 			]]
 		]);
 		$hostids = array_column($response['result'], 'hostid');
@@ -258,6 +261,7 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 		self::$swap_hostid_a = null;
 		self::$swap_hostid_b = null;
 		self::$failover_hostid = null;
+		self::$reenter_hostid = null;
 
 		if (self::$userid !== null) {
 			CAPIHelper::call('user.delete', [self::$userid]);
@@ -1148,6 +1152,121 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 	}
 
 	/**
+	 * Proxy that does not monitor a host must keep redirecting it when the host leaves the proxy group and enters
+	 * it again, and the proxy gets the removal of the old host_proxy row and the new row in the same sync:
+	 *   1) both proxies are in group 1, the host is assigned to proxy P by host_proxy row R1, the other proxy Q
+	 *      redirects it to P;
+	 *   2) Q is stopped, so it cannot get the following changes one by one;
+	 *   3) host is removed from group 1 - proxy group manager deletes R1;
+	 *   4) host is put back to group 1 - proxy group manager assigns it to P (the only online proxy of the group)
+	 *      by a new host_proxy row R2;
+	 *   5) Q is started and syncs R2 and the removal of R1 together - R2 takes over the host name in the
+	 *      host_proxy index first, so the R1 removal must leave the index entry alone;
+	 *   6) Q must redirect the host to P.
+	 *
+	 * @depends testProxyGroupHostReassign_reassignAfterGroupRecovery
+	 */
+	public function testProxyGroupHostReassign_reenterGroupRedirect() {
+		// 1) both proxies in group 1, the host is assigned to one of them
+		$response = $this->call('proxy.update', [
+			'proxyid' => self::$proxyid2,
+			'proxy_groupid' => self::$proxy_groupid1
+		]);
+		$this->assertArrayHasKey('proxyids', $response['result']);
+
+		$response = $this->call('host.create', [
+			'host' => self::REENTER_HOSTNAME,
+			'groups' => [['groupid' => 4]],
+			'monitored_by' => ZBX_MONITORED_BY_PROXY_GROUP,
+			'proxy_groupid' => self::$proxy_groupid1
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		self::$reenter_hostid = $response['result']['hostids'][0];
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		$row = $this->waitForHostProxyRow(self::$reenter_hostid, function ($row) {
+			return ($row !== false) ? true : 'Host is expected to be assigned to a proxy of group 1';
+		});
+		$old_hostproxyid = $row['hostproxyid'];
+
+		$owner = $this->getProxyComponent($row['proxyid']);
+		$other = ($owner === self::COMPONENT_PROXY) ? self::COMPONENT_PROXY_HANODE1 : self::COMPONENT_PROXY;
+		$owner_address = self::getProxyAddress($owner);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCacheAndWaitForLogLine($owner);
+		$this->reloadConfigurationCacheAndWaitForLogLine($other);
+
+		$this->waitForRedirect($other, self::REENTER_HOSTNAME, $owner_address,
+				'Proxy that does not monitor the host does not redirect it to the owner proxy');
+
+		// 2) stop the other proxy and wait until proxy group manager sees it offline, so the host cannot be
+		// assigned to it when it enters the group again
+		self::stopComponent($other);
+		$this->waitForProxyOffline($this->getProxyId($other));
+
+		// 3) remove the host from group 1, proxy group manager deletes R1
+		$response = $this->call('host.update', [
+			'hostid' => self::$reenter_hostid,
+			'monitored_by' => ZBX_MONITORED_BY_SERVER
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		$this->waitForHostProxyRow(self::$reenter_hostid, function ($row) {
+			return ($row === false) ? true : 'Host is expected to have no host_proxy row, got: '.json_encode($row);
+		});
+
+		// 4) put the host back to group 1, proxy group manager assigns it to the owner by R2
+		$response = $this->call('host.update', [
+			'hostid' => self::$reenter_hostid,
+			'monitored_by' => ZBX_MONITORED_BY_PROXY_GROUP,
+			'proxy_groupid' => self::$proxy_groupid1
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		$owner_proxyid = $this->getProxyId($owner);
+		$this->waitForHostProxyRow(self::$reenter_hostid, function ($row) use ($old_hostproxyid, $owner_proxyid) {
+			return ($row !== false && bccomp($row['hostproxyid'], $old_hostproxyid) != 0
+					&& bccomp($row['proxyid'], $owner_proxyid) == 0)
+				? true
+				: 'Host is expected to be assigned to the owner proxy by a new host_proxy row, got: '.
+					json_encode($row);
+		});
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		// 5) the other proxy gets R2 and the removal of R1 in the same configuration sync
+		$this->startComponent($other);
+		$this->reloadConfigurationCacheAndWaitForLogLine($other);
+
+		// 6) the other proxy must still redirect the host to the owner
+		$this->waitForRedirect(self::COMPONENT_SERVER, self::REENTER_HOSTNAME, $owner_address,
+				'Server does not redirect the host that entered the proxy group again');
+		$this->waitForRedirect($other, self::REENTER_HOSTNAME, $owner_address,
+				'Proxy that does not monitor the host does not redirect it after it entered the proxy group again');
+
+		// restore the proxy groups
+		$response = $this->call('host.delete', [self::$reenter_hostid]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		self::$reenter_hostid = null;
+
+		$response = $this->call('proxy.update', [
+			'proxyid' => self::$proxyid2,
+			'proxy_groupid' => self::$proxy_groupid2
+		]);
+		$this->assertArrayHasKey('proxyids', $response['result']);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_PROXY_HANODE1);
+	}
+
+	/**
 	 * Stop the proxy monitoring the failover host until the host fails over to the other proxy of the group, then
 	 * start it again and check that the host is monitored by the other proxy and redirected to it.
 	 *
@@ -1240,14 +1359,7 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 	private function takeGroup2Offline() {
 		self::stopComponent(self::COMPONENT_PROXY_HANODE1);
 
-		$this->callUntilDataIsPresent('proxy.get', [
-			'output' => ['proxyid', 'state'],
-			'proxyids' => [self::$proxyid2]
-		], 60, 1, function ($response) {
-			return ($response['result'][0]['state'] == ZBX_PROXY_STATE_OFFLINE)
-				? true
-				: 'Proxy "'.self::PROXY2_NAME.'" is not offline yet, state: '.$response['result'][0]['state'];
-		});
+		$this->waitForProxyOffline(self::$proxyid2);
 
 		$this->callUntilDataIsPresent('proxygroup.get', [
 			'output' => ['proxy_groupid', 'state'],
@@ -1256,6 +1368,23 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 			return ($response['result'][0]['state'] == ZBX_PROXYGROUP_STATE_OFFLINE)
 				? true
 				: 'Proxy group "'.self::PROXY_GROUP2_NAME.'" is not offline yet, state: '.
+					$response['result'][0]['state'];
+		});
+	}
+
+	/**
+	 * Wait until the proxy is offline.
+	 *
+	 * @param string $proxyid
+	 */
+	private function waitForProxyOffline($proxyid) {
+		$this->callUntilDataIsPresent('proxy.get', [
+			'output' => ['proxyid', 'name', 'state'],
+			'proxyids' => [$proxyid]
+		], 60, 1, function ($response) {
+			return ($response['result'][0]['state'] == ZBX_PROXY_STATE_OFFLINE)
+				? true
+				: 'Proxy "'.$response['result'][0]['name'].'" is not offline yet, state: '.
 					$response['result'][0]['state'];
 		});
 	}
