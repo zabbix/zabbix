@@ -86,7 +86,7 @@ if ($data['linked_templates']) {
 						: null
 				])
 			))
-				->addItem((new CVar('templates['.$template['templateid'].']', $template['templateid']))->removeId())
+				->addItem((new CVar('templates[]', $template['templateid']))->removeId())
 				->addClass(ZBX_STYLE_NOWRAP)
 		], null, 'conditions_'.$template['templateid']);
 	}
