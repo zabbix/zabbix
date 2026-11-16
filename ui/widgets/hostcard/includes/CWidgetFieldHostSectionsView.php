@@ -19,6 +19,7 @@ namespace Widgets\HostCard\Includes;
 use CButton,
 	CButtonLink,
 	CCol,
+	CColHeader,
 	CDiv,
 	CRow,
 	CSelect,
@@ -37,7 +38,7 @@ class CWidgetFieldHostSectionsView extends CWidgetFieldView {
 		return (new CDiv(
 			(new CTable())
 				->setId($this->field->getName().'-table')
-				->setHeader(['', '', (new CCol(_('Name')))->addStyle('width: 100%;'), ''])
+				->setHeader(['', '', (new CColHeader(_('Name')))->setWidth('100%'), ''])
 				->addClass(ZBX_STYLE_LIST_NUMBERED)
 				->setFooter(new CRow(
 					(new CCol(
