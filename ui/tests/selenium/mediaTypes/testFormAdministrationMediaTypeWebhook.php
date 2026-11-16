@@ -41,7 +41,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 
 	// SQL query to get media_type and media_type_param tables to compare hash values.
 	protected $sql = 'SELECT * FROM media_type mt LEFT JOIN media_type_param mtp ON mt.mediatypeid=mtp.mediatypeid'.
-			' ORDER BY mt.mediatypeid, mtp.mediatype_paramid, mtp.name';
+		' ORDER BY mt.mediatypeid, mtp.mediatype_paramid, mtp.name';
 
 	public function prepareWebhookData() {
 		// Default parameters of a new webhook media type.
@@ -864,7 +864,8 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 
 		// Check that the media type was actually created or updated.
 		$mediatype_count = CDBHelper::getCount('SELECT mediatypeid FROM media_type WHERE name='.
-				CDBHelper::escape($data['fields']['Name']));
+				CDBHelper::escape($data['fields']['Name'])
+		);
 		$this->assertEquals(1, $mediatype_count);
 		$this->assertNotEquals($old_hash, CDBHelper::getHash($this->sql));
 
@@ -890,8 +891,8 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 	public function testFormAdministrationMediaTypeWebhook_Clone() {
 		// SQL for collecting all webhook mediatype parameter values, both from media_type and media_type_param tables.
 		$mediatype_sql = 'SELECT type,status,maxsessions,maxattempts,attempt_interval,message_format,script,timeout,'.
-				'process_tags,show_event_menu,event_menu_name,event_menu_url,description,mtp.name,mtp.value'.
-				' FROM media_type mt INNER JOIN media_type_param mtp ON mt.mediatypeid=mtp.mediatypeid WHERE mt.name=';
+			'process_tags,show_event_menu,event_menu_name,event_menu_url,description,mtp.name,mtp.value'.
+			' FROM media_type mt INNER JOIN media_type_param mtp ON mt.mediatypeid=mtp.mediatypeid WHERE mt.name=';
 		$old_hash = CDBHelper::getHash($mediatype_sql.zbx_dbstr(self::REFERENCE_WEBHOOK).' ORDER BY mtp.name');
 
 		// Clone the reference media type.
@@ -1000,7 +1001,8 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 		if (CTestArrayHelper::get($data, 'concurrent_sessions', false)) {
 			$container = $form->getFieldContainer('Concurrent sessions');
 			$concurrent_sessions = is_array($data['concurrent_sessions'])
-					? array_key_first($data['concurrent_sessions']) : $data['concurrent_sessions'];
+				? array_key_first($data['concurrent_sessions'])
+				: $data['concurrent_sessions'];
 			$container->query('id:maxsessions_type')->asSegmentedRadio()->one()->select($concurrent_sessions);
 
 			if (is_array($data['concurrent_sessions'])) {
@@ -1097,7 +1099,8 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 		if (CTestArrayHelper::get($data, 'concurrent_sessions', false)) {
 			$container = $form->getFieldContainer('Concurrent sessions');
 			$concurrent_sessions = is_array($data['concurrent_sessions'])
-					? array_key_first($data['concurrent_sessions']) : $data['concurrent_sessions'];
+				? array_key_first($data['concurrent_sessions'])
+				: $data['concurrent_sessions'];
 			$this->assertEquals($concurrent_sessions,
 					$container->query('id:maxsessions_type')->asSegmentedRadio()->one()->getValue());
 
