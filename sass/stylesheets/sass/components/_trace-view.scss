@@ -79,6 +79,10 @@
 		border-block-end: 1px solid var(--trace-border-color);
 	}
 
+	.trace-view-alert .msg-warning span {
+		@extend %overflow-ellipsis;
+	}
+
 	.trace-overview {
 		display: block;
 		inline-size: 100%;
