@@ -1073,9 +1073,7 @@ class testDashboardItemCardWidget extends testWidgets {
 		$i = 1;
 		foreach ($show_rows as $row) {
 			$this->assertTrue($row->getColumn(0)->query('class:drag-icon')->one()->isEnabled());
-
-			// TODO: after ZBX-27000 is merged, change column index "2" to column name "Name".
-			$dropdown = $row->getColumn(2)->query('tag:z-select')->one()->asDropdown();
+			$dropdown = $row->getColumn('Name')->query('tag:z-select')->one()->asDropdown();
 			$options = $dropdown->getOptions();
 			$this->assertEquals($rows[$i], $dropdown->getText());
 			$this->assertEquals(array_keys($option_states), $options->asText());
@@ -1214,7 +1212,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						'Item' => STRING_255
 					],
 					'Show' => [
-						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'Name' => 'Latest data']
 					],
 					'Sparkline' => [
 						'id:sparkline_time_period_from' => '',
@@ -1235,7 +1233,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						'Item' => 'Item for item card widget'
 					],
 					'Show' => [
-						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'Name' => 'Latest data']
 					],
 					'Sparkline' => [
 						'id:sparkline_time_period_from' => 'now-1000d',
@@ -1256,7 +1254,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						'Item' => 'Item for item card widget'
 					],
 					'Show' => [
-						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'Name' => 'Latest data']
 					],
 					'Sparkline' => [
 						'id:sparkline_time_period_data_source' => 'Widget'
@@ -1277,7 +1275,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						'Item' => 'Item for item card widget'
 					],
 					'Show' => [
-						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'Name' => 'Latest data']
 					],
 					'Sparkline' => [
 						'id:sparkline_width' => 5000,
@@ -1298,7 +1296,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						'Item' => 'Item for item card widget'
 					],
 					'Show' => [
-						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'Name' => 'Latest data']
 					],
 					'Sparkline' => [
 						'id:sparkline_time_period_data_source' => 'Custom',
@@ -1322,19 +1320,19 @@ class testDashboardItemCardWidget extends testWidgets {
 					],
 					// Select Latest data in the first element, then delete elements 3-5, then select all elements.
 					'Show' => [
-						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data'],
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'Name' => 'Latest data'],
 						['action' => USER_ACTION_REMOVE, 'index' => 3],
 						['action' => USER_ACTION_REMOVE, 'index' => 2],
 						['action' => USER_ACTION_REMOVE, 'index' => 1],
-						['section' => 'Interval and storage'],
-						['section' => 'Error text'],
-						['section' => 'Description'],
-						['section' => 'Tags'],
-						['section' => 'Triggers'],
-						['section' => 'Host inventory'],
-						['section' => 'Type'],
-						['section' => 'Type of information'],
-						['section' => 'Host interface']
+						['Name' => 'Interval and storage'],
+						['Name' => 'Error text'],
+						['Name' => 'Description'],
+						['Name' => 'Tags'],
+						['Name' => 'Triggers'],
+						['Name' => 'Host inventory'],
+						['Name' => 'Type'],
+						['Name' => 'Type of information'],
+						['Name' => 'Host interface']
 					],
 					'Screenshot' => true,
 					'trim' => true
@@ -1366,7 +1364,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						'Item' => '<img src=\"x\" onerror=\"alert("ERROR");\"/>'
 					],
 					'Show' => [
-						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Description'],
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'Name' => 'Description'],
 						['action' => USER_ACTION_REMOVE, 'index' => 3],
 						['action' => USER_ACTION_REMOVE, 'index' => 2],
 						['action' => USER_ACTION_REMOVE, 'index' => 1]
@@ -1382,7 +1380,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						'Item' => '105\'; --DROP TABLE Users'
 					],
 					'Show' => [
-						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Description'],
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'Name' => 'Description'],
 						['action' => USER_ACTION_REMOVE, 'index' => 2],
 						['action' => USER_ACTION_REMOVE, 'index' => 1],
 						['action' => USER_ACTION_REMOVE, 'index' => 1]
@@ -1398,10 +1396,10 @@ class testDashboardItemCardWidget extends testWidgets {
 						'Item' => 'Item for item card widget'
 					],
 					'Show' => [
-						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Tags'],
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'Name' => 'Tags'],
 						['action' => USER_ACTION_REMOVE, 'index' => 3],
 						['action' => USER_ACTION_REMOVE, 'index' => 2],
-						['action' => USER_ACTION_UPDATE, 'index' => 1, 'section' => 'Host inventory'],
+						['action' => USER_ACTION_UPDATE, 'index' => 1, 'Name' => 'Host inventory'],
 						['action' => USER_ACTION_REMOVE, 'index' => 1]
 					]
 				]
@@ -1416,12 +1414,12 @@ class testDashboardItemCardWidget extends testWidgets {
 						'Override host' => 'Dashboard'
 					],
 					'Show' => [
-						['section' => 'Description'],
-						['section' => 'Error text'],
-						['section' => 'Latest data'],
-						['section' => 'Triggers'],
-						['section' => 'Host inventory'],
-						['section' => 'Tags']
+						['Name' => 'Description'],
+						['Name' => 'Error text'],
+						['Name' => 'Latest data'],
+						['Name' => 'Triggers'],
+						['Name' => 'Host inventory'],
+						['Name' => 'Tags']
 					],
 					'Sparkline' => [
 						'id:sparkline_width' => 5,
@@ -1442,12 +1440,12 @@ class testDashboardItemCardWidget extends testWidgets {
 						'Override host' => 'Geomap'
 					],
 					'Show' => [
-						['section' => 'Description'],
-						['section' => 'Error text'],
-						['section' => 'Latest data'],
-						['section' => 'Triggers'],
-						['section' => 'Host inventory'],
-						['section' => 'Tags']
+						['Name' => 'Description'],
+						['Name' => 'Error text'],
+						['Name' => 'Latest data'],
+						['Name' => 'Triggers'],
+						['Name' => 'Host inventory'],
+						['Name' => 'Tags']
 					],
 					'Sparkline' => [
 						'id:sparkline_width' => 5,
@@ -1467,15 +1465,15 @@ class testDashboardItemCardWidget extends testWidgets {
 						'Item' => 'Item for item card widget'
 					],
 					'Show' => [
-						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Description'],
-						['section' => 'Latest data'],
-						['action' => USER_ACTION_UPDATE, 'index' => 1, 'section' => 'Error text'],
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'Name' => 'Description'],
+						['Name' => 'Latest data'],
+						['action' => USER_ACTION_UPDATE, 'index' => 1, 'Name' => 'Error text'],
 						['action' => USER_ACTION_REMOVE, 'index' => 2],
-						['section' => 'Triggers'],
-						['action' => USER_ACTION_UPDATE, 'index' => 2, 'section' => 'Type of information'],
-						['section' => 'Tags'],
-						['section' => 'Host interface'],
-						['action' => USER_ACTION_UPDATE, 'index' => 4, 'section' => 'Type']
+						['Name' => 'Triggers'],
+						['action' => USER_ACTION_UPDATE, 'index' => 2, 'Name' => 'Type of information'],
+						['Name' => 'Tags'],
+						['Name' => 'Host interface'],
+						['action' => USER_ACTION_UPDATE, 'index' => 4, 'Name' => 'Type']
 					]
 				]
 			]
@@ -2295,13 +2293,13 @@ class testDashboardItemCardWidget extends testWidgets {
 
 		$data = [
 			'Show' => [
-				['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Tags'],
-				['action' => USER_ACTION_UPDATE, 'index' => 2, 'section' => 'Description'],
+				['action' => USER_ACTION_UPDATE, 'index' => 0, 'Name' => 'Tags'],
+				['action' => USER_ACTION_UPDATE, 'index' => 2, 'Name' => 'Description'],
 				['action' => USER_ACTION_REMOVE, 'index' => 1],
-				['section' => 'Error text']
+				['Name' => 'Error text']
 			]
 		];
-		$this->getShowTable()->fill($data['Show']);
+		$this->query('id:sections-table')->asMultifieldTable()->one()->fill($data['Show']);
 
 		// Save or cancel widget.
 		if (CTestArrayHelper::get($data, 'save_widget', false)) {
@@ -2388,7 +2386,7 @@ class testDashboardItemCardWidget extends testWidgets {
 		$form->fill($data['fields']);
 
 		if (array_key_exists('Show', $data)) {
-			$this->getShowTable()->fill($data['Show']);
+			$this->query('id:sections-table')->asMultifieldTable()->one()->fill($data['Show']);
 		}
 
 		if (array_key_exists('Sparkline', $data)) {
@@ -2427,7 +2425,7 @@ class testDashboardItemCardWidget extends testWidgets {
 		return $this->query('id:sections-table')->asMultifieldTable([
 			'mapping' => [
 				'' => [
-					'name' => 'section',
+					'name' => 'Name',
 					'selector' => 'xpath:./z-select',
 					'class' => 'CDropdownElement'
 				]
@@ -2478,7 +2476,8 @@ class testDashboardItemCardWidget extends testWidgets {
 			$this->assertEquals(self::$old_widget_count + (($action === 'create') ? 1 : 0), $dashboard->getWidgets()->count());
 
 			$dashboard->getWidget($header)->edit()->checkValue($data['fields']);
-			$this->getShowTable()->checkValue($this->calculateShowResult(CTestArrayHelper::get($data, 'Show', [])));
+			$this->query('id:sections-table')->asMultifieldTable()->one()
+					->checkValue($this->calculateShowResult(CTestArrayHelper::get($data, 'Show', [])));
 			COverlayDialogElement::find()->one()->close();
 			$dashboard->save();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
@@ -2492,10 +2491,10 @@ class testDashboardItemCardWidget extends testWidgets {
 	 */
 	protected function calculateShowResult($rows) {
 		$result = [
-			['section' => 'Interval and storage'],
-			['section' => 'Type of information'],
-			['section' => 'Host interface'],
-			['section' => 'Type']
+			['Name' => 'Interval and storage'],
+			['Name' => 'Type of information'],
+			['Name' => 'Host interface'],
+			['Name' => 'Type']
 		];
 
 		foreach ($rows as $row) {
@@ -2506,12 +2505,12 @@ class testDashboardItemCardWidget extends testWidgets {
 				}
 				elseif ($row['action'] === USER_ACTION_UPDATE) {
 					// Update existing element.
-					$result[$row['index']]['section'] = $row['section'];
+					$result[$row['index']]['Name'] = $row['Name'];
 				}
 			}
 			else {
 				// If no action is specified, it means we are adding a new section.
-				$result[] = ['section' => $row['section']];
+				$result[] = ['Name' => $row['Name']];
 			}
 		}
 
