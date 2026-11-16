@@ -94,7 +94,7 @@ class testLowLevelDiscovery extends CWebTest {
 			'Parameters' => ['value' => [['name' => '', 'value' => '']]],
 			'name:parameters[0][name]' => ['maxlength' => 255],
 			'name:parameters[0][value]' => ['maxlength' => 2048],
-			'xpath://div[@id="script"]/input[@type="text"]' => ['value' => '', 'placeholder' => 'script'],
+			'xpath:.//div[@id="script"]/span' => ['value' => '', 'data-placeholder' => 'script'],
 			'Request type' => ['options' => ['GET', 'POST', 'PUT', 'HEAD'], 'value' => 'GET'],
 			'Request body type' => ['labels' => ['Raw data', 'JSON data', 'XML data'], 'value' => 'Raw data'],
 			'Request body' => ['value' => ''],
@@ -2791,23 +2791,22 @@ class testLowLevelDiscovery extends CWebTest {
 
 		foreach ($fields_array as $id => $parameters) {
 			$error_output = 'Failed field: '.$id;
+			$field = $form->getField($id);
 
-			$this->assertEquals(CTestArrayHelper::get($parameters, 'value', ''),
-					$form->getField($id)->getValue(), $error_output
-			);
+			$this->assertEquals(CTestArrayHelper::get($parameters, 'value', ''), $field->getValue(), $error_output);
 
 			foreach (['placeholder', 'maxlength'] as $attribute) {
-				$this->assertEquals(CTestArrayHelper::get($parameters, $attribute),
-						$form->getField($id)->getAttribute($attribute), $error_output
+				$this->assertEquals(CTestArrayHelper::get($parameters, $attribute), $field->getAttribute($attribute),
+						$error_output
 				);
 			}
 
 			if (array_key_exists('options', $parameters)) {
-				$this->assertEquals($parameters['options'], $form->getField($id)->getOptions()->asText(), $error_output);
+				$this->assertEquals($parameters['options'], $field->getOptions()->asText(), $error_output);
 			}
 
 			if (array_key_exists('labels', $parameters)) {
-				$this->assertEquals($parameters['labels'], $form->getField($id)->getLabels()->asText(), $error_output);
+				$this->assertEquals($parameters['labels'], $field->getLabels()->asText(), $error_output);
 			}
 		}
 	}

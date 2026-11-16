@@ -202,12 +202,14 @@ class CControllerLatestViewData extends CControllerDataTable {
 				if ($item_delay[0] === '{') {
 					$item_delay = (new CSpan($item_delay))
 						->addClass(ZBX_STYLE_RED)
+						->addClass(ZBX_STYLE_WORDBREAK)
 						->toString();
 				}
 			}
 			else {
 				$item_delay = (new CSpan($item['delay']))
 					->addClass(ZBX_STYLE_RED)
+					->addClass(ZBX_STYLE_WORDBREAK)
 					->toString();
 			}
 
@@ -225,12 +227,14 @@ class CControllerLatestViewData extends CControllerDataTable {
 			if ($history_has_errors) {
 				$item['history'] = (new CSpan($item['history']))
 					->addClass(ZBX_STYLE_RED)
+					->addClass(ZBX_STYLE_WORDBREAK)
 					->toString();
 			}
 
 			if ($trends_has_errors) {
 				$item['trends'] = (new CSpan($item['trends']))
 					->addClass(ZBX_STYLE_RED)
+					->addClass(ZBX_STYLE_WORDBREAK)
 					->toString();
 			}
 
