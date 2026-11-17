@@ -18,11 +18,9 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 /**
  * Test suite for SNMPv3 engine ID caching in asynchronous SNMP poller.
  *
- * Requires SNMPv3 agent listening on localhost:161 with user "simulator" (authPriv, MD5 "auctoritas",
- * DES "privatus").
- *
- * Port tests also require snmpsim listening on 127.0.0.1:1024 with default user (same credentials as above),
- * serving "host/test/test" context, so that two devices with different engine IDs share the same address.
+ * Test suite starts two Net-SNMP agents (snmpd must be installed, root is not required) on the same address but
+ * different ports, each with its own engine ID and sysDescr, so that two devices with different engine IDs share
+ * the same address. Both agents have SNMPv3 user "simulator" (authPriv, MD5 "auctoritas", DES "privatus").
  *
  * @required-components server
  * @suite-components-reuse true
@@ -36,14 +34,24 @@ class testSnmpEngineIdCache extends CIntegrationTest {
 
 	private const SNMP_IP = '127.0.0.1';
 	private const SNMP_DNS = 'localhost';
-	private const SNMP_PORT = '161';
+	private const SNMP_PORT = '1161';
 
-	/* snmpsim on the same address, has its own engine ID */
-	private const SNMPSIM_PORT = '1024';
-	private const SNMPSIM_CONTEXT = 'host/test/test';
+	/* second agent on the same address, has its own engine ID */
+	private const SECOND_SNMP_PORT = '1162';
 
-	/* sysDescr from data/snmpsim/host/test/test.snmprec, tells snmpsim values apart from SNMP agent ones */
-	private const SNMPSIM_DESCR = 'Linux 2.6.25.5-smp SMP Tue Jun 19 14:58:11 CDT 2007 i686';
+	/* engine ID and sysDescr of each agent, sysDescr tells values of the agents apart */
+	private const SNMPD = [
+		self::SNMP_PORT => [
+			'engineid' => '0x80001f880400000001',
+			'descr' => 'Zabbix engine ID cache test agent 1'
+		],
+		self::SECOND_SNMP_PORT => [
+			'engineid' => '0x80001f880400000002',
+			'descr' => 'Zabbix engine ID cache test agent 2'
+		]
+	];
+	private const SNMPD_DIR = 'snmpd_engineid_cache';
+	private const SNMPD_START_TIMEOUT = 10;
 
 	/* number of alternating cached polls of both ports to check that engine IDs do not interfere */
 	private const PORT_POLL_ROUNDS = 3;
@@ -88,7 +96,92 @@ class testSnmpEngineIdCache extends CIntegrationTest {
 		];
 	}
 
+	private static function getSnmpdDir(): string {
+		return PHPUNIT_COMPONENT_DIR.self::SNMPD_DIR;
+	}
+
+	private static function getSnmpdBinary(): ?string {
+		foreach (['/usr/sbin/snmpd', '/usr/local/sbin/snmpd'] as $path) {
+			if (is_executable($path)) {
+				return $path;
+			}
+		}
+
+		$path = trim((string) shell_exec('command -v snmpd 2>/dev/null'));
+
+		return $path !== '' ? $path : null;
+	}
+
+	/**
+	 * Start both SNMP agents from scratch: without persistent data of previous runs.
+	 */
+	private function snmpdStart(): void {
+		$binary = self::getSnmpdBinary();
+		$this->assertNotNull($binary, 'snmpd is not installed');
+
+		self::snmpdStop();
+
+		foreach (self::SNMPD as $port => $agent) {
+			$dir = self::getSnmpdDir().'/'.$port;
+			shell_exec('rm -rf '.escapeshellarg($dir));
+			$this->assertTrue(mkdir($dir.'/persist', 0700, true), 'Cannot create directory '.$dir);
+
+			file_put_contents($dir.'/snmpd.conf', implode("\n", [
+				'[snmp] persistentDir '.$dir.'/persist',
+				'agentaddress udp:'.self::SNMP_IP.':'.$port.',udp6:[::1]:'.$port,
+				'exactEngineID '.$agent['engineid'],
+				'createUser '.self::SNMP_DETAILS['securityname'].' MD5 "'.self::SNMP_DETAILS['authpassphrase'].
+						'" DES "'.self::SNMP_DETAILS['privpassphrase'].'"',
+				'rouser '.self::SNMP_DETAILS['securityname'].' priv',
+				'sysDescr '.$agent['descr']
+			])."\n");
+
+			/* -C: do not read default configuration files, -I: do not load modules that require root */
+			shell_exec('SNMP_PERSISTENT_DIR='.escapeshellarg($dir.'/persist').' '.escapeshellarg($binary).
+				' -C -c '.escapeshellarg($dir.'/snmpd.conf').' -p '.escapeshellarg($dir.'/snmpd.pid').
+				' -Lf '.escapeshellarg($dir.'/snmpd.log').' -I -smux,mteTrigger,mteTriggerConf > /dev/null 2>&1'
+			);
+		}
+
+		foreach (array_keys(self::SNMPD) as $port) {
+			$log = self::getSnmpdDir().'/'.$port.'/snmpd.log';
+
+			for ($i = 0; $i < self::SNMPD_START_TIMEOUT * 10; $i++) {
+				if (is_readable($log) && strpos(file_get_contents($log), 'NET-SNMP version') !== false) {
+					continue 2;
+				}
+
+				usleep(100000);
+			}
+
+			$this->fail('snmpd on port '.$port.' did not start, see '.$log);
+		}
+	}
+
+	/**
+	 * Stop only SNMP agents started by this test suite.
+	 */
+	private static function snmpdStop(): void {
+		foreach (array_keys(self::SNMPD) as $port) {
+			$pid_file = self::getSnmpdDir().'/'.$port.'/snmpd.pid';
+
+			if (!is_readable($pid_file)) {
+				continue;
+			}
+
+			$pid = trim((string) file_get_contents($pid_file));
+
+			if (ctype_digit($pid)) {
+				posix_kill((int) $pid, SIGTERM);
+			}
+
+			unlink($pid_file);
+		}
+	}
+
 	public function prepareData(): bool {
+		$this->snmpdStart();
+
 		$response = $this->call('host.create', [
 			'host' => self::HOST_NAME,
 			'interfaces' => [self::getSnmpInterface()],
@@ -125,6 +218,8 @@ class testSnmpEngineIdCache extends CIntegrationTest {
 	}
 
 	public static function clearData(): void {
+		self::snmpdStop();
+
 		if (isset(self::$hostid)) {
 			CDataHelper::call('host.delete', [self::$hostid]);
 		}
@@ -161,10 +256,8 @@ class testSnmpEngineIdCache extends CIntegrationTest {
 		], $fields);
 	}
 
-	private static function getSnmpsimInterface(array $fields = []): array {
-		return self::getSnmpInterface(array_merge(['port' => self::SNMPSIM_PORT], $fields),
-			['contextname' => self::SNMPSIM_CONTEXT]
-		);
+	private static function getSecondSnmpInterface(array $fields = []): array {
+		return self::getSnmpInterface(array_merge(['port' => self::SECOND_SNMP_PORT], $fields));
 	}
 
 	/**
@@ -194,10 +287,10 @@ class testSnmpEngineIdCache extends CIntegrationTest {
 	/**
 	 * Wait for a new item value and available item and interface.
 	 *
-	 * @param bool|null $from_snmpsim  true - latest value must come from snmpsim, false - from SNMP agent on default
-	 *                                 port, null - any value
+	 * @param bool|null $from_second  true - latest value must come from the second agent, false - from the first
+	 *                                one, null - any value
 	 */
-	private function waitForItemValue(string $itemid, int $since, string $description, ?bool $from_snmpsim = null):
+	private function waitForItemValue(string $itemid, int $since, string $description, ?bool $from_second = null):
 			void {
 		$this->callUntilDataIsPresent('history.get', [
 			'output' => ['clock', 'value'],
@@ -207,18 +300,18 @@ class testSnmpEngineIdCache extends CIntegrationTest {
 			'sortfield' => 'clock',
 			'sortorder' => 'DESC',
 			'limit' => 1
-		], null, null, static function (array $response) use ($from_snmpsim, $description) {
-			if ($from_snmpsim === null) {
+		], null, null, static function (array $response) use ($from_second, $description) {
+			if ($from_second === null) {
 				return true;
 			}
 
 			$value = $response['result'][0]['value'];
 
-			if (($value === self::SNMPSIM_DESCR) === $from_snmpsim) {
+			if (($value === self::SNMPD[self::SECOND_SNMP_PORT]['descr']) === $from_second) {
 				return true;
 			}
 
-			return 'value "'.$value.'" is not from '.($from_snmpsim ? 'snmpsim' : 'SNMP agent').' with '.
+			return 'value "'.$value.'" is not from '.($from_second ? 'second agent' : 'first agent').' with '.
 				$description;
 		});
 
@@ -416,36 +509,41 @@ class testSnmpEngineIdCache extends CIntegrationTest {
 		$this->enableSnmpPollerDebugLog();
 
 		$since = $this->updateSnmpInterface(self::getSnmpInterface());
-		$this->waitForItemValue(self::$itemid, $since, 'SNMP agent port', false);
+		$this->waitForItemValue(self::$itemid, $since, 'first agent port', false);
 		$this->waitForEngineIdCached(self::$itemid);
 
-		$since = $this->updateSnmpInterface(self::getSnmpsimInterface());
-		$this->waitForItemValue(self::$itemid, $since, 'snmpsim port', true);
+		$since = $this->updateSnmpInterface(self::getSecondSnmpInterface());
+		$this->waitForItemValue(self::$itemid, $since, 'second agent port', true);
 		$this->waitForEngineIdCached(self::$itemid);
-		$this->assertEngineIdsStable([self::$itemid], 'snmpsim port');
+		$this->assertEngineIdsStable([self::$itemid], 'second agent port');
 
 		$since = $this->updateSnmpInterface(self::getSnmpInterface());
-		$this->waitForItemValue(self::$itemid, $since, 'SNMP agent port after snmpsim', false);
+		$this->waitForItemValue(self::$itemid, $since, 'first agent port after second', false);
 		$this->waitForEngineIdCached(self::$itemid);
-		$this->assertEngineIdsStable([self::$itemid], 'SNMP agent port after snmpsim');
+		$this->assertEngineIdsStable([self::$itemid], 'first agent port after second');
 	}
 
 	/**
-	 * Create host with two interfaces on the same address: SNMP agent on default port and snmpsim.
+	 * Create host with two interfaces on the same address: two agents with different engine IDs.
 	 *
 	 * Both interfaces are created by the same configuration sync and get the same revision, so if port was not
 	 * part of the cache key, engine ID of one device would be used for the other one.
 	 *
-	 * @return array  itemids of SNMP agent and snmpsim items
+	 * @return array  itemids of the first and the second agent items
 	 */
 	private function createPortsHost(): array {
+		/* left over by previous test if it has failed before cleanup */
+		if (self::$ports_hostid !== null) {
+			$this->deletePortsHost();
+		}
+
 		$since = time();
 
 		$response = $this->call('host.create', [
 			'host' => self::PORTS_HOST_NAME,
 			'interfaces' => [
 				self::getSnmpInterface(),
-				self::getSnmpsimInterface(['main' => INTERFACE_SECONDARY])
+				self::getSecondSnmpInterface(['main' => INTERFACE_SECONDARY])
 			],
 			'groups' => [
 				['groupid' => self::HOST_GROUP_ID]
@@ -464,7 +562,7 @@ class testSnmpEngineIdCache extends CIntegrationTest {
 
 		$items = [];
 
-		foreach ([self::SNMP_PORT, self::SNMPSIM_PORT] as $port) {
+		foreach ([self::SNMP_PORT, self::SECOND_SNMP_PORT] as $port) {
 			$items[] = [
 				'hostid' => self::$ports_hostid,
 				'name' => 'SNMPv3 engine ID cache port '.$port,
@@ -480,16 +578,16 @@ class testSnmpEngineIdCache extends CIntegrationTest {
 
 		$response = $this->call('item.create', $items);
 		$this->assertArrayHasKey('itemids', $response['result']);
-		[$agent_itemid, $snmpsim_itemid] = $response['result']['itemids'];
+		[$first_itemid, $second_itemid] = $response['result']['itemids'];
 
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
-		$this->waitForItemValue($agent_itemid, $since, 'SNMP agent port', false);
-		$this->waitForItemValue($snmpsim_itemid, $since, 'snmpsim port', true);
-		$this->waitForEngineIdCached($agent_itemid);
-		$this->waitForEngineIdCached($snmpsim_itemid);
+		$this->waitForItemValue($first_itemid, $since, 'first agent port', false);
+		$this->waitForItemValue($second_itemid, $since, 'second agent port', true);
+		$this->waitForEngineIdCached($first_itemid);
+		$this->waitForEngineIdCached($second_itemid);
 
-		return [$agent_itemid, $snmpsim_itemid];
+		return [$first_itemid, $second_itemid];
 	}
 
 	private function deletePortsHost(): void {
@@ -517,7 +615,7 @@ class testSnmpEngineIdCache extends CIntegrationTest {
 	public function testSnmpEngineIdCache_cacheReload(): void {
 		$this->enableSnmpPollerDebugLog();
 
-		[$agent_itemid, $snmpsim_itemid] = $this->createPortsHost();
+		[$first_itemid, $second_itemid] = $this->createPortsHost();
 
 		self::clearLog(self::COMPONENT_SERVER);
 		$since = time();
@@ -531,21 +629,21 @@ class testSnmpEngineIdCache extends CIntegrationTest {
 
 		$log = CLogHelper::readLog(self::getLogPath(self::COMPONENT_SERVER));
 
-		/* reported "devices" are engine IDs: at least SNMP agent and snmpsim ones */
+		/* reported "devices" are engine IDs: at least ones of both agents */
 		$this->assertSame(1, preg_match('/'.$reload_pattern.'/', $log, $matches), 'Cache reload line not found');
 		$this->assertGreaterThanOrEqual(2, (int) $matches[1], 'Unexpected device count: '.$matches[0]);
 
 		$this->assertSame(1, preg_match('/'.$identities_pattern.'/', $log, $matches), 'Identities line not found');
 		$this->assertSame(0, (int) $matches[1], 'Identities left after cache reload: '.$matches[0]);
 
-		/* snmpsim port is used only by this host, so its engine ID must be discovered again */
-		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'itemid:'.$snmpsim_itemid.' sending probe', false);
+		/* second agent port is used only by this host, so its engine ID must be discovered again */
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'itemid:'.$second_itemid.' sending probe', false);
 
-		$this->waitForItemValue($agent_itemid, $since, 'SNMP agent port after cache reload', false);
-		$this->waitForItemValue($snmpsim_itemid, $since, 'snmpsim port after cache reload', true);
-		$this->waitForEngineIdCached($agent_itemid);
-		$this->waitForEngineIdCached($snmpsim_itemid);
-		$this->assertEngineIdsStable([$agent_itemid, $snmpsim_itemid], 'cache reload');
+		$this->waitForItemValue($first_itemid, $since, 'first agent port after cache reload', false);
+		$this->waitForItemValue($second_itemid, $since, 'second agent port after cache reload', true);
+		$this->waitForEngineIdCached($first_itemid);
+		$this->waitForEngineIdCached($second_itemid);
+		$this->assertEngineIdsStable([$first_itemid, $second_itemid], 'cache reload');
 
 		$this->deletePortsHost();
 	}
