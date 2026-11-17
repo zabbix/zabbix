@@ -123,7 +123,10 @@ class testSnmpEngineIdCache extends CIntegrationTest {
 
 		foreach (self::SNMPD as $port => $agent) {
 			$dir = self::getSnmpdDir().'/'.$port;
-			shell_exec('rm -rf '.escapeshellarg($dir));
+			/* remove only agent directory of this test suite, never a symbolic link */
+			if (strpos($dir, self::getSnmpdDir().'/') === 0 && is_dir($dir) && !is_link($dir)) {
+				shell_exec('rm -rf '.escapeshellarg($dir));
+			}
 			$this->assertTrue(mkdir($dir.'/persist', 0700, true), 'Cannot create directory '.$dir);
 
 			file_put_contents($dir.'/snmpd.conf', implode("\n", [
