@@ -953,7 +953,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
 
 		if ($data['action'] === 'clone') {
-			$overlay->getFooter()->query('button:Clone')->one()->click();
+			$overlay->getFooter()->query('button:Clone')->one()->click()->waitUntilNotVisible();
 			$overlay->waitUntilReady();
 
 			// Check that the form switched to clone mode.
