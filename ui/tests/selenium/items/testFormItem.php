@@ -1024,6 +1024,7 @@ class testFormItem extends CLegacyWebTest {
 	// Returns create data
 	public static function create() {
 		return [
+			// #0.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1033,19 +1034,19 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// Duplicate item
+			// #1 Duplicate item
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Checksum of $1',
-					'key' => 'vfs.file.cksum[/sbin/shutdown]',
+					'name' => 'Duplicate - testFromItem',
+					'key' => 'test-item-reuse',
 					'error_msg' => 'Cannot add item',
 					'errors' => [
-						'An item with key "vfs.file.cksum[/sbin/shutdown]" already exists on'
+						'An item with key "test-item-reuse" already exists on'
 					]
 				]
 			],
-			// Item name is missing
+			// #2 Item name is missing
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1056,7 +1057,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Item key is missing
+			// #3 Item key is missing
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1067,7 +1068,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Empty timedelay
+			// #4 Empty timedelay
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1080,7 +1081,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Incorrect timedelay
+			// #5 Incorrect timedelay
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1093,7 +1094,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Incorrect timedelay
+			// #6 Incorrect timedelay
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1106,7 +1107,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Empty time flex period
+			// #7 Empty time flex period
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1121,7 +1122,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Incorrect flex period
+			// #8 Incorrect flex period
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1136,7 +1137,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Incorrect flex period
+			// #9 Incorrect flex period
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1151,7 +1152,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Incorrect flex period
+			// #10 Incorrect flex period
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1166,7 +1167,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Incorrect flex period
+			// #11 Incorrect flex period
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1181,7 +1182,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Multiple flex periods
+			// #12 Multiple flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1195,7 +1196,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Delay combined with flex periods
+			// #13 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1216,7 +1217,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Delay combined with flex periods
+			// #14 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1233,7 +1234,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Delay combined with flex periods
+			// #15 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1255,7 +1256,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Delay combined with flex periods
+			// #16 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1270,7 +1271,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// Delay combined with flex periods
+			// #17 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1286,7 +1287,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Delay combined with flex periods
+			// #18 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1298,7 +1299,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Delay combined with flex periods
+			// #19 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1310,7 +1311,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Delay combined with flex periods
+			// #20 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1325,7 +1326,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Delay combined with flex periods
+			// #21 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1336,7 +1337,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Delay combined with flex periods
+			// #22 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1354,7 +1355,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Delay combined with flex periods
+			// #23 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1372,7 +1373,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Delay combined with flex periods
+			// #24 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1388,7 +1389,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Delay combined with flex periods
+			// #25 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1404,7 +1405,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Delay combined with flex periods
+			// #26 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1428,7 +1429,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Delay combined with flex periods
+			// #27 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1440,7 +1441,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Delay combined with flex periods
+			// #28 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1456,7 +1457,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// Seven flexfields - save OK
+			// #29 Seven flexfields - save OK
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1475,7 +1476,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// History
+			// #30 History
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1488,7 +1489,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// History
+			// #31 History
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1501,7 +1502,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// History
+			// #32 History
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1514,7 +1515,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// History
+			// #33 History
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1527,7 +1528,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Trends
+			// #34 Trends
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1540,7 +1541,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Trends
+			// #35 Trends
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1553,7 +1554,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Trends
+			// #36 Trends
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1566,7 +1567,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Trends
+			// #37 Trends
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1579,6 +1580,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
+			// #38.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1588,7 +1590,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// List of all item types
+			// #39 List of all item types
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1599,7 +1601,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// Update and custom intervals are hidden if item key is mqtt.get
+			// #40 Update and custom intervals are hidden if item key is mqtt.get
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1610,6 +1612,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #41.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1620,6 +1623,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #42.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1630,6 +1634,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #43.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1641,6 +1646,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #44.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1650,6 +1656,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #45.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1660,6 +1667,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #46.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1670,6 +1678,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #47.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1681,6 +1690,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #48.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1692,6 +1702,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #49.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1702,6 +1713,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #50.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1713,6 +1725,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #51.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1724,7 +1737,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// IPMI sensor is optional if item key is ipmi.get
+			// #52 IPMI sensor is optional if item key is ipmi.get
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1735,6 +1748,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #53.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1747,6 +1761,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #54.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1759,6 +1774,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #55.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1770,6 +1786,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #56.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1780,6 +1797,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #57.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1792,6 +1810,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
+			// #58.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1805,6 +1824,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
+			// #59.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1819,6 +1839,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
+			// #60.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1832,6 +1853,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
+			// #61.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1844,6 +1866,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
+			// #62.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1855,6 +1878,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #63.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1867,6 +1891,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
+			// #64.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1879,6 +1904,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
+			// #65.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1889,6 +1915,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #66.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1900,6 +1927,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #67.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1911,6 +1939,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #68.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1923,7 +1952,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Default
+			// #69 Default
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1936,7 +1965,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Default
+			// #70 Default
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1950,7 +1979,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Default
+			// #71 Default
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1964,7 +1993,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// Default
+			// #72 Default
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1975,6 +2004,19 @@ class testFormItem extends CLegacyWebTest {
 					'errors' => [
 						'Incorrect value for field "key": cannot be empty.'
 					]
+				]
+			],
+			// #73 Item with Binary type of information.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'type' => 'Dependent item',
+					'name' => 'Value type - Binary',
+					'value_type' => 'Binary',
+					'key' => 'item-dependent-binary-value',
+					'master_item' => 'testFormItem',
+					'dbCheck' => true,
+					'formCheck' => true
 				]
 			]
 		];
@@ -2000,6 +2042,10 @@ class testFormItem extends CLegacyWebTest {
 		}
 		else {
 			$type = $this->zbxTestGetSelectedLabel('type');
+		}
+
+		if (isset($data['value_type'])) {
+			$form->getField('Type of information')->select($data['value_type']);
 		}
 
 		if (isset($data['name'])) {
@@ -2161,6 +2207,9 @@ class testFormItem extends CLegacyWebTest {
 						break;
 					case ITEM_VALUE_TYPE_TEXT:
 						$value_typeDB = 'Text';
+						break;
+					case ITEM_VALUE_TYPE_BINARY:
+						$value_typeDB = 'Binary';
 						break;
 				}
 				$this->assertEquals($value_typeDB, $value_type);
