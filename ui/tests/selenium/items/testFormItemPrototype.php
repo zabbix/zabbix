@@ -1181,8 +1181,8 @@ class testFormItemPrototype extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Checksum of $1',
-					'key' => 'vfs.file.cksum[/sbin/shutdown,{#KEY}]',
+					'name' => 'Test form item duplicate',
+					'key' => 'item-prototype-reuse[{#KEY}]',
 					'inline_errors' => [
 						'Key' => 'This object already exists.'
 					]
@@ -2245,6 +2245,31 @@ class testFormItemPrototype extends CLegacyWebTest {
 						'Key' => 'This field cannot be empty.'
 					]
 				]
+			],
+			// #84 Prototype with JSON type of information.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'type' => 'Zabbix trapper',
+					'value_type' => 'JSON',
+					'name' => 'JSON value type',
+					'key' => 'json[{#ID}]',
+					'dbCheck' => true,
+					'formCheck' => true
+				]
+			],
+			// #85 Prototype with Binary type of information.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'type' => 'Dependent item',
+					'value_type' => 'Binary',
+					'master_item' => 'testFormItem',
+					'name' => 'Binary value type',
+					'key' => 'binary[{#ID}]',
+					'dbCheck' => true,
+					'formCheck' => true
+				]
 			]
 		];
 	}
@@ -2274,6 +2299,14 @@ class testFormItemPrototype extends CLegacyWebTest {
 		}
 		else {
 			$type = $this->zbxTestGetSelectedLabel('type');
+		}
+
+		if (isset($data['value_type'])) {
+			$form->getField('Type of information')->select($data['value_type']);
+		}
+
+		if (array_key_exists('master_item', $data)) {
+			$form->getField('Master item')->fill($data['master_item']);
 		}
 
 		if (isset($data['name'])) {

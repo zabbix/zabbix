@@ -19,8 +19,6 @@ require_once __DIR__.'/../common/testWidgets.php';
 /**
  * @backup dashboard
  *
- * @dataSource AllItemValueTypes
- *
  * @onBefore prepareItemCardWidgetData
  */
 class testDashboardItemCardWidget extends testWidgets {
@@ -240,6 +238,13 @@ class testDashboardItemCardWidget extends testWidgets {
 						'delay' => '15m',
 						'history' => ITEM_STORAGE_OFF,
 						'trends' => ITEM_STORAGE_OFF
+					],
+					[
+						'name' => 'Item with JSON datatype',
+						'key_' => 'datatype_json',
+						'type' => ITEM_TYPE_ZABBIX,
+						'value_type' => ITEM_VALUE_TYPE_JSON,
+						'delay' => '1m'
 					]
 				],
 				'monitored_by' => ZBX_MONITORED_BY_SERVER,
@@ -272,7 +277,7 @@ class testDashboardItemCardWidget extends testWidgets {
 					'master_itemid' => self::$itemids['Item for item card widget'],
 					'type' => ITEM_TYPE_DEPENDENT,
 					'value_type' => ITEM_VALUE_TYPE_BINARY,
-					'history' => '0d'
+					'history' => '30d'
 				]
 			]
 		];
@@ -396,12 +401,20 @@ class testDashboardItemCardWidget extends testWidgets {
 				'name' => 'Item with text datatype',
 				'value' => 'QA team',
 				'time' => time() - 10368000 // -120 days.
+			],
+			[
+				'name' => 'Item with JSON datatype',
+				'value' => '{"test": "json1", "users": {"name1": "test1", "name2": "🙂"}}',
+				'time' => time() - 8640000 // -100 days.
 			]
 		];
 
 		foreach ($item_data as $params) {
 			CDataHelper::addItemData(self::$itemids[$params['name']], $params['value'], $params['time']);
 		}
+
+		// Add metrics to binary item.
+		CDataHelper::addItemData(self::$depend_items['Dependent item 2'], 'Test binary item', time() - 8640000);
 
 		$trigger_names = ['Not classified trigger', 'Information trigger', 'Warning trigger', 'Average trigger',
 				'High trigger', 'Disaster trigger', 'Disaster trigger', 'Trigger 1', 'Trigger 2'
@@ -969,6 +982,76 @@ class testDashboardItemCardWidget extends testWidgets {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'sections.3',
 										'value' => 7
+									]
+								]
+							],
+							[
+								'type' => 'itemcard',
+								'name' => 'Item JSON',
+								'x' => 18,
+								'y' => 10,
+								'width' => 18,
+								'height' => 8,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'itemid.0',
+										'value' => self::$itemids['Item with JSON datatype']
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'sections.1',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'sections.2',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'sections.3',
+										'value' => 3
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'sections.4',
+										'value' => 4
+									]
+								]
+							],
+							[
+								'type' => 'itemcard',
+								'name' => 'Item BINARY',
+								'x' => 36,
+								'y' => 10,
+								'width' => 18,
+								'height' => 8,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'itemid.0',
+										'value' => self::$depend_items['Dependent item 2']
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'sections.1',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'sections.2',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'sections.3',
+										'value' => 3
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'sections.4',
+										'value' => 4
 									]
 								]
 							]
@@ -1819,6 +1902,86 @@ class testDashboardItemCardWidget extends testWidgets {
 					'Host' => 'Visible host name for Item Card widget',
 					'Warning' => 'The item is not discovered anymore and will not be disabled, will not be deleted.'
 				]
+			],
+			// #6 Item with JSON type of information.
+			[
+				[
+					'Header' => 'Item JSON',
+					'Item' => 'Item with JSON datatype',
+					'Host' => 'Visible host name for Item Card widget',
+					'Interval and storage' => [
+						'column' => '1m',
+						'center-column' => '31d',
+						'right-column' => ''
+					],
+					'Type of information' => 'JSON',
+					'Latest data' => [
+						'column' => '3M 10d',
+						'center-column' => '{"test": "json1", "users": {"name1": "test1", "name2": "🙂"}}',
+						'right-column' => 'History'
+					],
+					'Context menu' => [
+						'VIEW' => [
+							'Latest data' => 'zabbix.php?action=latest.view&hostids%5B%5D={hostid}&'.
+									'name=Item%20with%20JSON%20datatype&filter_set=1',
+							'Graph' => '',
+							'Values' => 'history.php?action=showvalues&itemids%5B%5D={itemid}',
+							'500 latest values' => 'history.php?action=showlatest&itemids%5B%5D={itemid}'
+						],
+						'CONFIGURATION' => [
+							'Item' => 'zabbix.php?action=popup&popup=item.edit&context=host&itemid={itemid}',
+							'Host' => 'zabbix.php?action=popup&popup=host.edit&hostid={hostid}',
+							'Triggers' => '',
+							'Create trigger' => '',
+							'Create dependent item' => 'menu-popup-item',
+							'Create dependent discovery rule' => 'menu-popup-item'
+						],
+						'ACTIONS' => [
+							'Execute now' => 'menu-popup-item'
+						]
+					]
+				]
+			],
+			// #7 Item with Binary type of information.
+			[
+				[
+					'Header' => 'Item BINARY',
+					'Item' => 'Dependent item 2',
+					'Host' => 'Visible host name for Item Card widget',
+					'Depended entity' => 'Item for item card widget',
+					'Interval and storage' => [
+						'column' => '',
+						'center-column' => '30d',
+						'right-column' => ''
+					],
+					'Type of information' => 'Binary',
+					'Latest data' => [
+						'column' => '3M 10d',
+						'center-column' => 'binary value',
+						'right-column' => ''
+					],
+					'bin_value' => 'VGVzdCBiaW5hcnkgaXRlbQ==',
+					'Context menu' => [
+						'VIEW' => [
+							'Latest data' => 'zabbix.php?action=latest.view&hostids%5B%5D={hostid}&'.
+									'name=Dependent%20item%202&filter_set=1',
+							'Graph' => '',
+							'Values' => 'history.php?action=showvalues&itemids%5B%5D={itemid}',
+							'500 latest values' => 'history.php?action=showlatest&itemids%5B%5D={itemid}'
+						],
+						'CONFIGURATION' => [
+							'Item' => 'zabbix.php?action=popup&popup=item.edit&context=host&itemid={itemid}',
+							'Host' => 'zabbix.php?action=popup&popup=host.edit&hostid={hostid}',
+							'Triggers' => '',
+							'Create trigger' => '',
+							'Create dependent item' => 'menu-popup-item',
+							'Create dependent discovery rule' => 'menu-popup-item'
+						],
+						'ACTIONS' => [
+							'Execute now' => 'menu-popup-item'
+						]
+					]
+				]
 			]
 		];
 	}
@@ -1845,7 +2008,7 @@ class testDashboardItemCardWidget extends testWidgets {
 		if (array_key_exists('Context menu', $data)) {
 			$widget->query('link', $data['Item'])->one()->waitUntilClickable()->click();
 			$this->checkContextMenuLinks($data['Context menu'], self::$host_ids['hostids'][self::HOST_NAME],
-					($data['Item'] === 'Dependent item 1')
+					(str_contains($data['Item'], 'Dependent item'))
 						? self::$depend_items[$data['Item']]
 						: self::$itemids[$data['Item']]
 			);
@@ -1938,9 +2101,35 @@ class testDashboardItemCardWidget extends testWidgets {
 				}
 				// Check graph or history link in Latest data section.
 				elseif ($section === 'right-column') {
-					$this->assertTrue($widget->query('class:section-latest-data')->query('class', $section)
-							->query('class:column-value')->one()->isClickable()
-					);
+					// Check Show button for Binary data type.
+					if ($data['Type of information'] === 'Binary') {
+						$button = $widget->query('class:section-latest-data')->query('class', $section)
+								->query('button:Show')->one();
+						// Wait until the button is ready to open the hintbox.
+						$button->waitUntilAttributesPresent('data-hintbox-preload')->waitUntilClassesNotPresent('is-loading');
+						$button->click();
+
+						// Wait until the hintbox content is loaded.
+						$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()
+								->waitUntilReady()->one();
+						$hint->query('id:hintbox-preloader')->waitUntilNotPresent();
+
+						// Check that binary data is displayed in the hintbox.
+						$this->assertEquals($data['bin_value'], $button->getAttribute('data-hintbox-html'));
+						$this->assertEquals($data['bin_value'], $hint->getText());
+						$hint->close();
+					}
+					else {
+						$section_xpath = ($data['Latest data']['right-column'] === '')
+								? 'class:column-value'
+								: 'class:column-header';
+						$this->assertEquals($value, $widget->query('class:section-latest-data')->query('class', $section)
+								->query($section_xpath)->one()->getText()
+						);
+						$this->assertTrue($widget->query('class:section-latest-data')->query('class', $section)
+								->query($section_xpath)->one()->isClickable()
+						);
+					}
 				}
 				// Check Last value column value in Latest data section.
 				else {
