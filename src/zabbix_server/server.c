@@ -1194,7 +1194,7 @@ static void	server_sync_database_cache(void)
 static void	zbx_on_exit(int ret, void *on_exit_args)
 {
 	char	*error = NULL;
-	int	sync = ZBX_SYNC_ALL;
+	int	sync = ZBX_SYNC_ALL, unsynced_num;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
 
@@ -1230,6 +1230,9 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 		/* synchronize in child process, so that unavailable database cannot hang main process */
 		if (ZBX_SYNC_ALL == sync)
 			zbx_thread_exec_and_wait(server_sync_database_cache, zbx_hc_get_unsynced_num);
+
+		if (0 != (unsynced_num = zbx_hc_get_unsynced_num()))
+			zabbix_log(LOG_LEVEL_WARNING, "%d unsynced values left in history cache", unsynced_num);
 
 		zbx_free_database_cache(ZBX_SYNC_NONE, &events_cbs, config_history_storage_pipelines);
 
