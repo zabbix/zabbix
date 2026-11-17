@@ -1524,11 +1524,12 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 				return;
 			}
 
+			// changes reaching the proxies through the proxy group manager take at least one manager cycle,
+			// a reload alone takes only milliseconds, so always wait before the next attempt
+			sleep(1);
+
 			if ($reload) {
 				$this->reloadConfigurationCacheAndWaitForLogLine($component);
-			}
-			else {
-				sleep(1);
 			}
 		}
 
