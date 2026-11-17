@@ -264,7 +264,7 @@ static void	threads_kill(ZBX_THREAD_HANDLE *threads, int threads_num, const int 
 static int	threads_wait_or_kill(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num,
 		int priority, zbx_threads_progress_f progress_cb)
 {
-#define ZBX_THREADS_STOP_TIMEOUT	180
+#define ZBX_THREADS_STOP_TIMEOUT	120
 #define ZBX_THREADS_POLLS_PER_SEC	10
 	struct timespec	poll_delay = {0, 1000000000 / ZBX_THREADS_POLLS_PER_SEC};
 	int		ret = SUCCEED, idle_polls = 0, running_last = -1, progress_last = 0;
@@ -361,7 +361,13 @@ int	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_fla
 		threads_kill(threads, threads_num, threads_flags, j, ret);
 
 		if (SUCCEED != threads_wait_or_kill(threads, threads_flags, threads_num, j, progress_cb))
+		{
+			/* Processes were terminated because of no overall progress in saving data to DB. */
+			/* Most likely the remaining processes are stuck on the same problem, do not wait */
+			/* on them, terminate.                                                            */
 			wait_ret = FAIL;
+			break;
+		}
 	}
 
 	/* signal idle threads to exit */
