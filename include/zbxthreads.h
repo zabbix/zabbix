@@ -99,7 +99,7 @@ zbx_thread_args_t;
 void	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread_args_t *thread_args, ZBX_THREAD_HANDLE *thread);
 int	zbx_thread_wait(ZBX_THREAD_HANDLE thread);
 int	zbx_waitpid_nohang(ZBX_THREAD_HANDLE *threads, size_t threads_num);
-#define ZBX_THREADS_STOP_TIMEOUT	180
+#define ZBX_THREADS_STOP_TIMEOUT	120
 
 typedef int	(*zbx_threads_progress_f)(void);
 
