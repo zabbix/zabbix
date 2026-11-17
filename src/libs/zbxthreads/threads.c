@@ -195,7 +195,7 @@ int	zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 
 typedef struct
 {
-	int	threads_num;	/* number of running processes at last poll */
+	int	running_num;	/* number of running processes at last poll */
 	int	value;		/* value returned by progress callback at last poll */
 	int	idle_polls;	/* number of polls without progress */
 }
@@ -209,10 +209,10 @@ zbx_threads_progress_t;
  *                                    process has exited                      *
  *             threads_num - [IN] number of handles                           *
  *                                                                            *
- * Comments: Log mutex is held until killed processes have exited, so that    *
- *           process cannot be killed while one of its threads holds it,      *
- *           otherwise other processes would block on it forever. SIGKILL is  *
- *           used, because processes waiting for log mutex block SIGHUP.      *
+ * Comments: This function locks the log mutex first, so that processes to    *
+ *           be terminated cannot be holding that mutex and cause deadlock,   *
+ *           and keeps it locked until they have exited. SIGKILL is used,     *
+ *           because processes waiting for log mutex block SIGHUP.            *
  *                                                                            *
  ******************************************************************************/
 static void	threads_kill_fatal(ZBX_THREAD_HANDLE *threads, int threads_num)
@@ -349,7 +349,8 @@ static void	log_exit_status(pid_t pid, int status)
  *                                                                            *
  * Return value: number of polls without progress                             *
  *                                                                            *
- * Comments: Exit of any process is progress.                                 *
+ * Comments: Changed number of running processes (e.g. exit of any process)   *
+ *           also counts as progress.                                         *
  *                                                                            *
  ******************************************************************************/
 static int	threads_poll_progress(const ZBX_THREAD_HANDLE *threads, int threads_num,
@@ -363,9 +364,9 @@ static int	threads_poll_progress(const ZBX_THREAD_HANDLE *threads, int threads_n
 			running_num++;
 	}
 
-	if (running_num != progress->threads_num || value != progress->value)
+	if (running_num != progress->running_num || value != progress->value)
 	{
-		progress->threads_num = running_num;
+		progress->running_num = running_num;
 		progress->value = value;
 		progress->idle_polls = 0;
 	}
@@ -490,7 +491,7 @@ int	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_fla
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 	sigset_t		set;
 	int			supervisor_ret;
-	zbx_threads_progress_t	progress = {.threads_num = -1};
+	zbx_threads_progress_t	progress = {.running_num = -1, .value = 0, .idle_polls = 0};
 
 	/* ignore SIGCHLD signals in order for zbx_sleep() to work */
 	sigemptyset(&set);
@@ -500,7 +501,6 @@ int	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_fla
 	/* signal non priority threads to go into idle state and wait for threads with higher priority to exit */
 	threads_kill(threads, threads_num, threads_flags, ZBX_THREAD_PRIORITY_NONE, SUCCEED);
 
-	/* always try to exit gracefully */
 	if (TIMEOUT_ERROR == threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_COLLECTOR,
 			SUCCEED, timeout, progress_cb, &progress))
 	{
@@ -576,7 +576,7 @@ void	zbx_thread_exec_and_wait(void (*func)(void), int timeout, zbx_threads_progr
 {
 	ZBX_THREAD_HANDLE	pid;
 	int			flag = ZBX_THREAD_PRIORITY_COLLECTOR;
-	zbx_threads_progress_t	progress = {.threads_num = -1};
+	zbx_threads_progress_t	progress = {.running_num = -1, .value = 0, .idle_polls = 0};
 
 	zbx_child_fork(&pid);
 
