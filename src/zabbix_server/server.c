@@ -1333,7 +1333,7 @@ static void	server_sync_database_cache(void)
 static void	zbx_on_exit(int ret, void *on_exit_args)
 {
 	char	*error = NULL;
-	int	sync_mode = (0 == server_has_started ? ZBX_SYNC_NONE : ZBX_SYNC_ALL);
+	int	sync_mode = (0 == server_has_started ? ZBX_SYNC_NONE : ZBX_SYNC_ALL), unsynced_num;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
 
@@ -1372,6 +1372,9 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 			zbx_thread_exec_and_wait(server_sync_database_cache, ZBX_THREADS_STOP_TIMEOUT,
 					zbx_hc_get_unsynced_num);
 		}
+
+		if (0 != (unsynced_num = zbx_hc_get_unsynced_num()))
+			zabbix_log(LOG_LEVEL_WARNING, "%d unsynced values left in history cache", unsynced_num);
 
 		zbx_free_database_cache(ZBX_SYNC_NONE, &events_cbs);
 
