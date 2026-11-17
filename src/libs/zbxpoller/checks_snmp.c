@@ -4580,7 +4580,7 @@ out:
  ******************************************************************************/
 void	zbx_clear_cache_snmp(unsigned char process_type, int process_num)
 {
-	int	cached_dev_count;
+	int	cached_dev_count, identity_count;
 
 	if (0 == zbx_snmp_init_done)
 		return;
@@ -4590,7 +4590,10 @@ void	zbx_clear_cache_snmp(unsigned char process_type, int process_num)
 	shutdown_usm();
 
 	if (ZBX_PROCESS_TYPE_SNMP_POLLER == process_type)
+	{
 		cached_dev_count = zbx_clear_snmp_engineid_cache();
+		identity_count = identity_cache.num_data;
+	}
 
 	SNMP_MT_UNLOCK;
 
@@ -4603,6 +4606,9 @@ void	zbx_clear_cache_snmp(unsigned char process_type, int process_num)
 			zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the snmp cache on [%s #%d, "
 					"deleted %d device(s) from cache]", process_type_s, process_num,
 					cached_dev_count);
+
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() identities in net-snmp cache: remaining:%d", __func__,
+					identity_count);
 		}
 		else
 		{

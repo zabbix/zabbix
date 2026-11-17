@@ -81,7 +81,9 @@ class testSnmpEngineIdCache extends CIntegrationTest {
 				'LogFileSize' => 0,
 				'UnreachablePeriod' => 1,
 				'UnavailableDelay' => 1,
-				'UnreachableDelay' => 1
+				'UnreachableDelay' => 1,
+				/* single SNMP poller, so that all engine IDs are in one cache */
+				'StartSNMPPollers' => 1
 			]
 		];
 	}
@@ -429,14 +431,14 @@ class testSnmpEngineIdCache extends CIntegrationTest {
 	}
 
 	/**
-	 * Two devices with different engine IDs on the same address but different ports, polled at the same time.
+	 * Create host with two interfaces on the same address: SNMP agent on default port and snmpsim.
 	 *
 	 * Both interfaces are created by the same configuration sync and get the same revision, so if port was not
 	 * part of the cache key, engine ID of one device would be used for the other one.
+	 *
+	 * @return array  itemids of SNMP agent and snmpsim items
 	 */
-	public function testSnmpEngineIdCache_sameAddressDifferentPorts(): void {
-		$this->enableSnmpPollerDebugLog();
-
+	private function createPortsHost(): array {
 		$since = time();
 
 		$response = $this->call('host.create', [
@@ -486,10 +488,65 @@ class testSnmpEngineIdCache extends CIntegrationTest {
 		$this->waitForItemValue($snmpsim_itemid, $since, 'snmpsim port', true);
 		$this->waitForEngineIdCached($agent_itemid);
 		$this->waitForEngineIdCached($snmpsim_itemid);
-		$this->assertEngineIdsStable([$agent_itemid, $snmpsim_itemid], 'two devices on the same address');
 
+		return [$agent_itemid, $snmpsim_itemid];
+	}
+
+	private function deletePortsHost(): void {
 		$this->call('host.delete', [self::$ports_hostid]);
 		self::$ports_hostid = null;
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+	}
+
+	/**
+	 * Two devices with different engine IDs on the same address but different ports, polled at the same time.
+	 */
+	public function testSnmpEngineIdCache_sameAddressDifferentPorts(): void {
+		$this->enableSnmpPollerDebugLog();
+
+		$itemids = $this->createPortsHost();
+		$this->assertEngineIdsStable($itemids, 'two devices on the same address');
+
+		$this->deletePortsHost();
+	}
+
+	/**
+	 * Runtime command "snmp_cache_reload" must remove all engine IDs, devices and identities, after that engine IDs
+	 * must be discovered and cached again.
+	 */
+	public function testSnmpEngineIdCache_cacheReload(): void {
+		$this->enableSnmpPollerDebugLog();
+
+		[$agent_itemid, $snmpsim_itemid] = $this->createPortsHost();
+
+		self::clearLog(self::COMPONENT_SERVER);
+		$since = time();
+		$this->executeRuntimeControlCommand(self::COMPONENT_SERVER, 'snmp_cache_reload');
+
+		$reload_pattern = 'forced reloading of the snmp cache on \[snmp poller #1, deleted ([0-9]+) device\(s\)'.
+				' from cache\]';
+		$identities_pattern = 'zbx_clear_cache_snmp\(\) identities in [a-z -]+ cache: remaining:([0-9]+)';
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, $reload_pattern, false, null, null, true);
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, $identities_pattern, false, null, null, true);
+
+		$log = CLogHelper::readLog(self::getLogPath(self::COMPONENT_SERVER));
+
+		/* reported "devices" are engine IDs: at least SNMP agent and snmpsim ones */
+		$this->assertSame(1, preg_match('/'.$reload_pattern.'/', $log, $matches), 'Cache reload line not found');
+		$this->assertGreaterThanOrEqual(2, (int) $matches[1], 'Unexpected device count: '.$matches[0]);
+
+		$this->assertSame(1, preg_match('/'.$identities_pattern.'/', $log, $matches), 'Identities line not found');
+		$this->assertSame(0, (int) $matches[1], 'Identities left after cache reload: '.$matches[0]);
+
+		/* snmpsim port is used only by this host, so its engine ID must be discovered again */
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'itemid:'.$snmpsim_itemid.' sending probe', false);
+
+		$this->waitForItemValue($agent_itemid, $since, 'SNMP agent port after cache reload', false);
+		$this->waitForItemValue($snmpsim_itemid, $since, 'snmpsim port after cache reload', true);
+		$this->waitForEngineIdCached($agent_itemid);
+		$this->waitForEngineIdCached($snmpsim_itemid);
+		$this->assertEngineIdsStable([$agent_itemid, $snmpsim_itemid], 'cache reload');
+
+		$this->deletePortsHost();
 	}
 }
