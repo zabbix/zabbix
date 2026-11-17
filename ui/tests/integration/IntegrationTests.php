@@ -87,8 +87,10 @@ require_once dirname(__FILE__).'/testLLDTelemetrySyncAtScaleJsonPathTrigger.php'
 require_once dirname(__FILE__).'/testHousekeepingConfSync.php';
 require_once dirname(__FILE__).'/testBridgeAdapter.php';
 require_once dirname(__FILE__).'/testTelnetChecks.php';
+/*require_once dirname(__FILE__).'/testSnmpEngineIdCache.php';*/
 require_once dirname(__FILE__).'/testHashicorpVault.php';
 require_once dirname(__FILE__).'/testScheduledReports.php';
+require_once dirname(__FILE__).'/testInternalJavaItem.php';
 require_once dirname(__FILE__).'/testReportTest.php';
 /* require_once dirname(__FILE__).'/testTelemetryQueryItems.php'; */
 require_once dirname(__FILE__).'/testTelemetryQueryItemsWithProxyInput.php';
@@ -166,8 +168,10 @@ class IntegrationTests {
 		$suite->addTestSuite('testWebScenarioDynamicVariables');
 		$suite->addTestSuite('testBridgeAdapter');
 		$suite->addTestSuite('testTelnetChecks');
+		/*$suite->addTestSuite('testSnmpEngineIdCache');*/
 		$suite->addTestSuite('testHashicorpVault');
 		$suite->addTestSuite('testScheduledReports');
+		$suite->addTestSuite('testInternalJavaItem');
 		$suite->addTestSuite('testReportTest');
 		$suite->addTestSuite('testTriggerCEP');
 		$suite->addTestSuite('testTriggerCEPRestart');

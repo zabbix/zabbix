@@ -1222,24 +1222,43 @@ select {
 	display: flex;
 	width: 100%;
 
-	input[type=text] {
-		overflow: hidden;
+	.multilineinput-preview {
+		box-sizing: border-box;
+		flex: 1;
+		height: 24px;
+		padding: 0 5px;
+		line-height: 22px;
 		cursor: pointer;
-		white-space: nowrap;
-		text-overflow: ellipsis;
-		border-right: 0;
+		background-color: $form-bg-color;
+		border: 1px solid $form-border-color;
+		border-right-width: 0;
+		border-radius: var(--input-border-radius);
 		border-top-right-radius: 0;
 		border-bottom-right-radius: 0;
-		width: 100%;
-
-		&[readonly] {
-			background: $form-bg-color !important;
-			border-color: $form-border-color;
-			color: $form-font-color;
-		}
+		@extend %overflow-ellipsis;
 
 		&.monospace-font {
 			padding-top: 1px;
+		}
+
+		&.multilineinput-preview-placeholder::before {
+			content: attr(data-placeholder);
+			color: $input-placeholder-color;
+		}
+	}
+
+	&.multilineinput-readonly .multilineinput-preview {
+		background-color: $form-disabled-bg-color;
+	}
+
+	&.multilineinput-disabled .multilineinput-preview {
+		background-color: $form-disabled-bg-color;
+		border-color: $form-disabled-border-color;
+		color: $form-border-color;
+		cursor: default;
+
+		&.multilineinput-preview-placeholder::before {
+			color: $input-disabled-placeholder-color;
 		}
 	}
 
@@ -1265,17 +1284,7 @@ select {
 		}
 	}
 
-	&.multilineinput-readonly {
-		input[type=text][readonly] {
-			background-color: $form-disabled-bg-color !important;
-		}
-	}
-
 	&.multilineinput-disabled {
-		input[type=text] {
-			cursor: default;
-		}
-
 		button::after {
 			opacity: .5;
 		}

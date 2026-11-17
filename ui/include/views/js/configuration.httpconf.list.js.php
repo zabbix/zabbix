@@ -19,10 +19,6 @@
  */
 ?>
 
-<script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
-	<?= CTagFilterFieldHelper::getTemplate(); ?>
-</script>
-
 <script>
 	const view = {
 		init({checkbox_hash, form_name}) {

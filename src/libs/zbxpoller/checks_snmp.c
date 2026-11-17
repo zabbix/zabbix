@@ -253,7 +253,7 @@ zbx_snmp_engineid_record_t;
 
 typedef struct
 {
-	char		address[ZBX_INTERFACE_IP_LEN_MAX];
+	char		address[ZBX_INTERFACE_ADDR_LEN_MAX];
 	unsigned char	engineid[ZBX_SNMP_MAX_ENGINEID_LEN];
 	size_t		engineid_len;
 }
@@ -404,14 +404,14 @@ static zbx_uint64_t	zbx_snmp_engineid_record_revision(const zbx_snmp_engineid_re
 	return revision;
 }
 
-static zbx_snmp_identity_t	*zbx_get_snmp_identity(const char *ip, zbx_uint64_t revision)
+static zbx_snmp_identity_t	*zbx_get_snmp_identity(const char *address, zbx_uint64_t revision)
 {
 	zbx_snmp_identity_t	*identity_ptr, local_identity;
 
 	if (0 == engineid_cache_initialized)
 		return NULL;
 
-	zbx_strlcpy(local_identity.address, ip, sizeof(local_identity.address));
+	zbx_strlcpy(local_identity.address, address, sizeof(local_identity.address));
 
 	if (NULL == (identity_ptr = zbx_hashset_search(&identity_cache, &local_identity)))
 		return NULL;
@@ -3458,7 +3458,7 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 					snmp_sess_close(snmp_context->ssp);
 
 					if (1 == engineid_cache_initialized)
-						snmp_identity_remove(addresses->values[0].ip);
+						snmp_identity_remove(snmp_context->item.interface.addr);
 
 					SNMP_MT_UNLOCK;
 
@@ -3650,7 +3650,7 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 		size_t			securityPrivKeyLen = 0;
 
 		if (ZBX_IF_SNMP_VERSION_3 == snmp_context->snmp_version &&
-				NULL != (identity_ptr = zbx_get_snmp_identity(addresses->values[0].ip,
+				NULL != (identity_ptr = zbx_get_snmp_identity(snmp_context->item.interface.addr,
 				snmp_context->item.interface.revision)))
 		{
 				securityEngineID = identity_ptr->engineid;
@@ -3707,7 +3707,7 @@ stop:
 	if (ZBX_ASYNC_TASK_STOP == task_ret && ZBX_ISSET_MSG(&snmp_context->item.result))
 	{
 		if (1 == engineid_cache_initialized)
-			snmp_identity_remove(addresses->values[0].ip);
+			snmp_identity_remove(snmp_context->item.interface.addr);
 
 		if (ZBX_IF_SNMP_VERSION_3 == snmp_context->snmp_version &&
 				0 == snmp_context->probe_processed && 0 == snmp_context->probe)

@@ -49,6 +49,7 @@ class CIntegrationTest extends CAPITest {
 	const COMPONENT_AGENT			= 'agentd';
 	const COMPONENT_AGENT2			= 'agent2';
 	const COMPONENT_AGENT_3_0		= 'agentd_3.0';
+	const COMPONENT_JAVA			= 'java';
 
 	// Zabbix component port constants.
 	const AGENT_PORT_SUFFIX = '50';
@@ -299,7 +300,9 @@ class CIntegrationTest extends CAPITest {
 			}
 
 			foreach ($components as $component) {
-				self::prepareComponentConfiguration($component, self::$case_configuration);
+				if ($component !== self::COMPONENT_JAVA) {
+					self::prepareComponentConfiguration($component, self::$case_configuration);
+				}
 				self::startComponent($component);
 			}
 			self::$suite_components_running = true;
@@ -423,7 +426,8 @@ class CIntegrationTest extends CAPITest {
 	private static function getComponents() {
 		return [
 			self::COMPONENT_SERVER, self::COMPONENT_PROXY, self::COMPONENT_AGENT, self::COMPONENT_AGENT2,
-			self::COMPONENT_SERVER_HANODE1, self::COMPONENT_AGENT_3_0, self::COMPONENT_PROXY_HANODE1
+			self::COMPONENT_SERVER_HANODE1, self::COMPONENT_AGENT_3_0, self::COMPONENT_PROXY_HANODE1,
+			self::COMPONENT_JAVA
 		];
 	}
 	/**
@@ -472,6 +476,9 @@ class CIntegrationTest extends CAPITest {
 
 					case self::COMPONENT_AGENT2:
 						self::waitForLogLineToBePresent($component, 'Zabbix Agent2 hostname', false, 5, 1);
+						break;
+					case self::COMPONENT_JAVA:
+						self::waitForLogLineToBePresent($component, 'listening on', false, 10, 3);
 						break;
 				}
 
@@ -819,6 +826,16 @@ class CIntegrationTest extends CAPITest {
 	 */
 	protected function startComponent($component, $waitLogLineOverride = '', $skip_pid = false) {
 		self::validateComponent($component);
+
+		if ($component === self::COMPONENT_JAVA) {
+			$script = PHPUNIT_BINARY_DIR.'/zabbix_java/startup.sh';
+
+			self::clearLog($component);
+			self::executeCommand($script, []);
+			self::waitForStartup($component, $waitLogLineOverride, $skip_pid);
+
+			return;
+		}
 
 		$config = PHPUNIT_CONFIG_DIR.'zabbix_'.$component.'.conf';
 		if (!file_exists($config)) {
