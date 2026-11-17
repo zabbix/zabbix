@@ -4047,8 +4047,8 @@ abstract class testFormPreprocessing extends CWebTest {
 						'type' => 'JavaScript',
 						'parameters' => [
 							[
-								'selector' => 'xpath:.//div[@class="multilineinput-control has-error"]/input[@type="text"]',
-								'placeholder' => 'script'
+								'selector' => 'xpath:.//div[contains(@class, "multilineinput-control")]/span',
+								'data-placeholder' => 'script'
 							]
 						],
 						'on_fail_enabled' => false
@@ -4236,7 +4236,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					);
 					$field = $preprocessing_container->query($parameter['selector'])->waitUntilPresent()->one();
 
-					foreach (['maxlength', 'placeholder'] as $attribute) {
+					foreach (['maxlength', 'placeholder', 'data-placeholder'] as $attribute) {
 						if (array_key_exists($attribute, $parameter)) {
 							$this->assertEquals($parameter[$attribute], $field->getAttribute($attribute));
 						}

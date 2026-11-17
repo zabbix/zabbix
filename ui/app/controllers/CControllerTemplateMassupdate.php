@@ -404,7 +404,6 @@ class CControllerTemplateMassupdate extends CControllerPopupMassupdateAbstract {
 				'location_url' =>  (new CUrl('zabbix.php'))
 					->setArgument('action', 'template.list')
 					->setArgument('page', CPagerHelper::loadPage('template.list'))
-					->setArgument('uncheck', 1)
 					->getUrl()
 			];
 

@@ -98,5 +98,20 @@ void	cep_update_events_processed(zbx_cep_t *cep, zbx_uint64_t value);
 void	cep_update_events_discarded(zbx_cep_t *cep, zbx_uint64_t value);
 void	cep_get_stats(zbx_cep_t *cep, zbx_cep_stats_t *stats);
 
+/* window links */
+
+typedef struct
+{
+	zbx_cep_window_t	*window;
+	zbx_cep_event_handle_t	hevent;
+}
+zbx_cep_win_event_t;
+
+ZBX_VECTOR_LITE_DECL(cep_win_event, zbx_cep_win_event_t)
+
+void	cep_event_handle_link_window(zbx_cep_t *cep, zbx_cep_event_handle_t h, zbx_cep_window_t *window);
+void	cep_event_handle_unlink_window(zbx_cep_t *cep, zbx_cep_event_handle_t h, zbx_cep_window_t *window);
+void	cep_acquire_event_windows(zbx_cep_t *cep, const zbx_vector_cep_event_handle_t *handles,
+		zbx_vector_cep_win_event_t *win_events);
 
 #endif /* ZABBIX_CEP_H */

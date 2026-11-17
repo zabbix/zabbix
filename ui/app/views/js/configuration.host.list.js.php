@@ -18,10 +18,6 @@
  */
 ?>
 
-<script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
-	<?= CTagFilterFieldHelper::getTemplate() ?>
-</script>
-
 <script>
 	const view = new class {
 		#applied_filter_groupids = [];
@@ -51,12 +47,11 @@
 		}
 
 		enable(target, parameters, callback) {
-			const url_params = objectToSearchParams({action: 'host.enable'});
-			const url = new URL(`zabbix.php?${url_params}`, location.href);
+			const url = zabbixUrl({action: 'host.enable'});
 
 			target.classList.add(ZBX_STYLE_LOADING);
 
-			this.postAction(url.toString(), parameters)
+			this.postAction(url, parameters)
 				.then(response => callback(response))
 				.catch(() => {
 					target.classList.remove(ZBX_STYLE_LOADING);
@@ -65,12 +60,11 @@
 		}
 
 		disable(target, parameters, callback) {
-			const url_params = objectToSearchParams({action: 'host.disable'});
-			const url = new URL(`zabbix.php?${url_params}`, location.href);
+			const url = zabbixUrl({action: 'host.disable'});
 
 			target.classList.add(ZBX_STYLE_LOADING);
 
-			this.postAction(url.toString(), parameters)
+			this.postAction(url, parameters)
 				.then(response => callback(response))
 				.catch(() => {
 					target.classList.remove(ZBX_STYLE_LOADING);
@@ -119,7 +113,7 @@
 				uncheckTableRows('hosts');
 			}
 
-			location.href = location.href;
+			location.reload();
 		}
 
 		#initFilter() {
@@ -194,12 +188,18 @@
 			});
 
 			form.querySelector('.js-massupdate-host').addEventListener('click', e => {
-				openMassupdatePopup('popup.massupdate.host', {
+				const overlay = openMassupdatePopup('popup.massupdate.host', {
 					[CSRF_TOKEN_NAME]: this.#csrf_token
 				}, {
 					dialogue_class: 'modal-popup-static',
 					trigger_element: e.target
 				})
+
+				overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
+					chkbxRange.clearSelectedOnFilterChange();
+
+					this.reload({success: e.detail});
+				});
 			});
 
 			form.querySelector('.js-massdelete-host').addEventListener('click', e => {
@@ -224,13 +224,13 @@
 				},
 				callback: ({data, event}) => {
 					if (data.submit.redirect_latest) {
-						const url = new URL('zabbix.php', location.href);
+						const url = zabbixUrl({
+							action: 'latest.view',
+							hostids: [data.submit.hostid],
+							filter_set: 1
+						});
 
-						url.searchParams.set('action', 'latest.view');
-						url.searchParams.set('hostids[]', data.submit.hostid);
-						url.searchParams.set('filter_set', '1');
-
-						event.setRedirectUrl(url.href);
+						event.setRedirectUrl(url);
 					}
 				}
 			});
@@ -250,8 +250,7 @@
 				.setColumns([
 					new CDataTableColumn('name', <?= json_encode(_('Name')); ?>)
 						.setFields(['hostid', 'name', 'discovery', 'flags', 'maintenance', 'status', 'discoveryData',
-							'discoveryRule', 'is_discovery_rule_editable', 'maintenanceid', 'maintenance_type',
-							'maintenance_status'])
+							'discoveryRule', 'maintenanceid', 'maintenance_type', 'maintenance_status'])
 						.setRenderer('name')
 						.setSortable(true)
 						.setTogglable(false)
@@ -355,23 +354,25 @@
 					if (flags == ZBX_FLAG_DISCOVERY_CREATED) {
 						if (discovery.rule) {
 							if (discovery.editable) {
-								const host_prototype_url = new URL('zabbix.php', location.href);
-								host_prototype_url.searchParams.set('action', 'popup');
-								host_prototype_url.searchParams.set('popup', 'host.prototype.edit');
-								host_prototype_url.searchParams.set('parent_discoveryid', discovery.rule.itemid);
-								host_prototype_url.searchParams.set('hostid', discovery.data.parent_hostid);
-								host_prototype_url.searchParams.set('context', 'host');
+								const host_prototype_url = zabbixUrl({
+									action: 'popup',
+									popup: 'host.prototype.edit',
+									parent_discoveryid: discovery.rule.itemid,
+									hostid: discovery.data.parent_hostid,
+									context: 'host'
+								});
 
 								const discovery_rule_link = document.createElement('a');
-								discovery_rule_link.classList.add(ZBX_STYLE_LINK_ALT, ZBX_STYLE_ORANGE);
-								discovery_rule_link.setAttribute('href', host_prototype_url.toString());
+								discovery_rule_link.classList.add(ZBX_STYLE_LINK_ALT, ZBX_STYLE_ORANGE,
+									ZBX_STYLE_WORDBREAK);
+								discovery_rule_link.setAttribute('href', host_prototype_url);
 								discovery_rule_link.textContent = discovery.rule.name;
 
 								cell.appendChild(discovery_rule_link);
 							}
 							else {
 								const discovery_rule = document.createElement('span');
-								discovery_rule.classList.add(ZBX_STYLE_ORANGE);
+								discovery_rule.classList.add(ZBX_STYLE_ORANGE, ZBX_STYLE_WORDBREAK);
 								discovery_rule.textContent = discovery.rule.name;
 
 								cell.appendChild(discovery_rule);
@@ -379,7 +380,7 @@
 						}
 						else {
 							const discovery_rule = document.createElement('span');
-							discovery_rule.classList.add(ZBX_STYLE_ORANGE);
+							discovery_rule.classList.add(ZBX_STYLE_ORANGE, ZBX_STYLE_WORDBREAK);
 							discovery_rule.textContent = <?= json_encode(_('Inaccessible discovery rule')); ?>;
 
 							cell.appendChild(discovery_rule);
@@ -388,13 +389,15 @@
 						cell.innerHTML += NAME_DELIMITER;
 					}
 
-					const url = new URL('zabbix.php', location.href);
-					url.searchParams.set('action', 'popup');
-					url.searchParams.set('popup', 'host.edit');
-					url.searchParams.set('hostid', hostid);
+					const url = zabbixUrl({
+						action: 'popup',
+						popup: 'host.edit',
+						hostid
+					});
 
 					const edit_link = document.createElement('a');
-					edit_link.setAttribute('href', url.toString())
+					edit_link.classList.add(ZBX_STYLE_WORDBREAK);
+					edit_link.setAttribute('href', url);
 					edit_link.textContent = name;
 
 					cell.appendChild(edit_link);
@@ -434,183 +437,138 @@
 				.setCellRenderer('items', ({cell_data, cell}) => {
 					const [hostid, items] = cell_data;
 
-					const url = new URL('zabbix.php', location.href);
-					url.searchParams.set('action', 'item.list');
-					url.searchParams.set('filter_set', '1');
-					url.searchParams.set('filter_hostids[0]', hostid);
-					url.searchParams.set('context', 'host');
-
-					const flex_wrapper = document.createElement('div');
-					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+					const url = zabbixUrl({
+						action: 'item.list',
+						filter_set: 1,
+						filter_hostids: [hostid],
+						context: 'host'
+					});
 
 					const item_link = document.createElement('a');
-					item_link.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
-					item_link.setAttribute('href', url.toString());
+					item_link.classList.add(ZBX_STYLE_WORDBREAK);
+					item_link.setAttribute('href', url);
 					item_link.textContent = <?= json_encode(_('Items')); ?>;
 
-					const overflow_ellipsis = document.createElement('div');
-					overflow_ellipsis.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
-					overflow_ellipsis.appendChild(item_link);
-
-					flex_wrapper.appendChild(overflow_ellipsis);
+					cell.appendChild(item_link);
 
 					if (items > 0) {
 						const count = document.createElement('sup');
 						count.textContent = items;
 
-						flex_wrapper.appendChild(count);
+						cell.append(' ', count);
 					}
-
-					cell.appendChild(flex_wrapper);
 				})
 				.setCellRenderer('triggers', ({cell_data, cell}) => {
 					const [hostid, items] = cell_data;
 
-					const url = new URL('zabbix.php', location.href);
-					url.searchParams.set('action', 'trigger.list');
-					url.searchParams.set('filter_set', '1');
-					url.searchParams.set('filter_hostids[0]', hostid);
-					url.searchParams.set('context', 'host');
-
-					const flex_wrapper = document.createElement('div');
-					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+					const url = zabbixUrl({
+						action: 'trigger.list',
+						filter_set: 1,
+						filter_hostids: [hostid],
+						context: 'host'
+					});
 
 					const item_link = document.createElement('a');
-					item_link.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
-					item_link.setAttribute('href', url.toString());
+					item_link.classList.add(ZBX_STYLE_WORDBREAK);
+					item_link.setAttribute('href', url);
 					item_link.textContent = <?= json_encode(_('Triggers')); ?>;
 
-					const overflow_ellipsis = document.createElement('div');
-					overflow_ellipsis.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
-					overflow_ellipsis.appendChild(item_link);
-
-					flex_wrapper.appendChild(overflow_ellipsis);
+					cell.appendChild(item_link);
 
 					if (items > 0) {
 						const count = document.createElement('sup');
 						count.textContent = items;
 
-						flex_wrapper.appendChild(count);
+						cell.append(' ', count);
 					}
-
-					cell.appendChild(flex_wrapper);
 				})
 				.setCellRenderer('graphs', ({cell_data, cell}) => {
 					const [hostid, items] = cell_data;
 
-					const url = new URL('zabbix.php', location.href);
-					url.searchParams.set('action', 'graph.list');
-					url.searchParams.set('filter_set', '1');
-					url.searchParams.set('filter_hostids[0]', hostid);
-					url.searchParams.set('context', 'host');
-
-					const flex_wrapper = document.createElement('div');
-					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+					const url = zabbixUrl({
+						action: 'graph.list',
+						filter_set: 1,
+						filter_hostids: [hostid],
+						context: 'host'
+					});
 
 					const item_link = document.createElement('a');
-					item_link.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
-					item_link.setAttribute('href', url.toString());
+					item_link.classList.add(ZBX_STYLE_WORDBREAK);
+					item_link.setAttribute('href', url);
 					item_link.textContent = <?= json_encode(_('Graphs')); ?>;
 
-					const overflow_ellipsis = document.createElement('div');
-					overflow_ellipsis.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
-					overflow_ellipsis.appendChild(item_link);
-
-					flex_wrapper.appendChild(overflow_ellipsis);
+					cell.appendChild(item_link);
 
 					if (items > 0) {
 						const count = document.createElement('sup');
 						count.textContent = items;
 
-						flex_wrapper.appendChild(count);
+						cell.append(' ', count);
 					}
-
-					cell.appendChild(flex_wrapper);
 				})
 				.setCellRenderer('discovery', ({cell_data, cell}) => {
 					const [hostid, items] = cell_data;
 
-					const url_params = {
+					const url = zabbixUrl({
 						action: 'lldrule.list',
 						filter_set: 1,
 						filter_hostids: [hostid],
 						context: 'host'
-					};
-
-					const flex_wrapper = document.createElement('div');
-					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+					});
 
 					const item_link = document.createElement('a');
-
-					item_link.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
-					item_link.setAttribute('href', zabbixUrl(url_params));
+					item_link.classList.add(ZBX_STYLE_WORDBREAK);
+					item_link.setAttribute('href', url);
 					item_link.textContent = <?= json_encode(_('Discovery')); ?>;
 
-					const overflow_ellipsis = document.createElement('div');
-					overflow_ellipsis.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
-					overflow_ellipsis.appendChild(item_link);
-
-					flex_wrapper.appendChild(overflow_ellipsis);
+					cell.appendChild(item_link);
 
 					if (items > 0) {
 						const count = document.createElement('sup');
 						count.textContent = items;
 
-						flex_wrapper.appendChild(count);
+						cell.append(' ', count);
 					}
-
-					cell.appendChild(flex_wrapper);
 				})
 				.setCellRenderer('web', ({cell_data, cell}) => {
 					const [hostid, items] = cell_data;
 
-					const url = new URL('httpconf.php', location.href);
-					url.searchParams.set('filter_set', '1');
-					url.searchParams.set('filter_hostids[0]', hostid);
-					url.searchParams.set('context', 'host');
-
-					const flex_wrapper = document.createElement('div');
-					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+					const url = zabbixUrl({
+						filter_set: 1,
+						filter_hostids: [hostid],
+						context: 'host'
+					}, 'httpconf.php');
 
 					const item_link = document.createElement('a');
-					item_link.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
-					item_link.setAttribute('href', url.toString());
+					item_link.classList.add(ZBX_STYLE_WORDBREAK);
+					item_link.setAttribute('href', url);
 					item_link.textContent = <?= json_encode(_('Web')); ?>;
 
-					const overflow_ellipsis = document.createElement('div');
-					overflow_ellipsis.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
-					overflow_ellipsis.appendChild(item_link);
-
-					flex_wrapper.appendChild(overflow_ellipsis);
+					cell.appendChild(item_link);
 
 					if (items > 0) {
 						const count = document.createElement('sup');
 						count.textContent = items;
 
-						flex_wrapper.appendChild(count);
+						cell.append(' ', count);
 					}
-
-					cell.appendChild(flex_wrapper);
 				})
 				.setCellRenderer('interface', ({cell_data, cell}) => {
 					const [host_port] = cell_data;
 
-					const overflow_ellipsis = document.createElement('span');
-					overflow_ellipsis.classList.add(ZBX_STYLE_OVERFLOW_ELLIPSIS);
-					overflow_ellipsis.textContent = host_port;
+					const wordbreak = document.createElement('span');
+					wordbreak.classList.add(ZBX_STYLE_WORDBREAK);
+					wordbreak.textContent = host_port;
 
-					const flex_wrapper = document.createElement('div');
-					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
-					flex_wrapper.appendChild(overflow_ellipsis);
-
-					cell.appendChild(flex_wrapper);
+					cell.appendChild(wordbreak);
 				})
 				.setCellRenderer('status', ({cell_data, cell}) => {
 					const [hostid, status, disabled_by_lld] = cell_data;
 					const is_monitored = status == HOST_STATUS_MONITORED;
 
 					const status_link = document.createElement('a');
-					status_link.classList.add(ZBX_STYLE_LINK_ACTION, is_monitored ? ZBX_STYLE_GREEN : ZBX_STYLE_RED);
+					status_link.classList.add(ZBX_STYLE_LINK_ACTION, is_monitored ? ZBX_STYLE_GREEN : ZBX_STYLE_RED,
+						ZBX_STYLE_WORDBREAK);
 					status_link.setAttribute('href', 'javascript:void(0);');
 					status_link.textContent = is_monitored
 						? <?= json_encode(_('Enabled')); ?>
@@ -646,7 +604,8 @@
 
 					if (disabled_by_lld != 0) {
 						const description_icon = document.createElement('button');
-						description_icon.classList.add('btn-icon', ZBX_ICON_ALERT_WITH_CONTENT, ZBX_STYLE_HINTBOX_WRAP);
+						description_icon.classList.add('btn-icon', ZBX_ICON_ALERT_WITH_CONTENT, ZBX_STYLE_HINTBOX_WRAP,
+							ZBX_STYLE_NO_INDENT);
 						description_icon.setAttribute('role', 'button');
 						description_icon.setAttribute('data-content', '?');
 						description_icon.setAttribute('data-hintbox-html',
@@ -656,8 +615,7 @@
 						description_icon.setAttribute('data-hintbox-static', '1');
 						description_icon.setAttribute('aria-expanded', 'false');
 
-						cell.innerHTML += ' ';
-						cell.appendChild(description_icon);
+						cell.append(' ', description_icon);
 					}
 				})
 				.setCellRenderer('proxy', ({cell_data, cell, response}) => {
@@ -670,61 +628,75 @@
 
 					const {can_edit_proxies, can_edit_proxy_groups} = response;
 
-					const proxy_url = new URL('zabbix.php', location.href);
-					proxy_url.searchParams.set('action', 'popup');
-					proxy_url.searchParams.set('popup', 'proxy.edit');
-
 					if (monitored_by == ZBX_MONITORED_BY_PROXY) {
 						if (can_edit_proxies && !proxy.inaccessible) {
-							proxy_url.searchParams.set('proxyid', proxyid);
+							const proxy_url = zabbixUrl({
+								action: 'popup',
+								popup: 'proxy.edit',
+								proxyid
+							});
 
 							const proxy_link = document.createElement('a');
-							proxy_link.setAttribute('href', proxy_url.toString());
-							proxy_link.classList.add(ZBX_STYLE_LINK_ALT);
-							proxy_link.classList.add(ZBX_STYLE_GREY);
+							proxy_link.setAttribute('href', proxy_url);
+							proxy_link.classList.add(ZBX_STYLE_LINK_ALT, ZBX_STYLE_GREY, ZBX_STYLE_WORDBREAK);
 							proxy_link.textContent = proxy.name;
 
 							cell.appendChild(proxy_link);
 						}
 						else {
-							cell.innerHTML = escapeHtml(proxy.name);
+							const proxy_name = document.createElement('span');
+							proxy_name.classList.add(ZBX_STYLE_WORDBREAK);
+							proxy_name.textContent = proxy.name;
+
+							cell.appendChild(proxy_name);
 						}
 					}
 					else if (monitored_by == ZBX_MONITORED_BY_PROXY_GROUP) {
 						if (can_edit_proxy_groups && !proxy_group.inaccessible) {
-							const proxy_group_url = new URL('zabbix.php', location.href);
-							proxy_group_url.searchParams.set('action', 'popup');
-							proxy_group_url.searchParams.set('popup', 'proxygroup.edit');
-							proxy_group_url.searchParams.set('proxy_groupid', proxy_groupid);
+							const proxy_group_url = zabbixUrl({
+								action: 'popup',
+								popup: 'proxygroup.edit',
+								proxy_groupid
+							});
 
 							const proxy_group_link = document.createElement('a');
-							proxy_group_link.setAttribute('href', proxy_group_url.toString());
-							proxy_group_link.classList.add(ZBX_STYLE_LINK_ALT);
-							proxy_group_link.classList.add(ZBX_STYLE_GREY);
+							proxy_group_link.setAttribute('href', proxy_group_url);
+							proxy_group_link.classList.add(ZBX_STYLE_LINK_ALT, ZBX_STYLE_GREY, ZBX_STYLE_WORDBREAK);
 							proxy_group_link.textContent = proxy_group.name;
 
 							cell.appendChild(proxy_group_link);
 						}
 						else {
-							cell.innerHTML = escapeHtml(proxy_group.name);
+							const proxy_group_name = document.createElement('span');
+							proxy_group_name.classList.add(ZBX_STYLE_WORDBREAK);
+							proxy_group_name.textContent = proxy_group.name;
+
+							cell.appendChild(proxy_group_name);
 						}
 
 						if (assigned_proxyid != 0 && !proxy_group.inaccessible) {
 							cell.innerHTML += NAME_DELIMITER;
 
 							if (can_edit_proxies && !assigned_proxy.inaccessible) {
-								proxy_url.searchParams.set('proxyid', assigned_proxyid);
+								const proxy_url = zabbixUrl({
+									action: 'popup',
+									popup: 'proxy.edit',
+									proxyid: assigned_proxyid
+								});
 
 								const proxy_link = document.createElement('a');
-								proxy_link.setAttribute('href', proxy_url.toString());
-								proxy_link.classList.add(ZBX_STYLE_LINK_ALT);
-								proxy_link.classList.add(ZBX_STYLE_GREY);
+								proxy_link.setAttribute('href', proxy_url);
+								proxy_link.classList.add(ZBX_STYLE_LINK_ALT, ZBX_STYLE_GREY, ZBX_STYLE_WORDBREAK);
 								proxy_link.textContent = assigned_proxy.name;
 
 								cell.appendChild(proxy_link);
 							}
 							else {
-								cell.innerHTML += escapeHtml(assigned_proxy.name);
+								const assigned_proxy_name = document.createElement('span');
+								assigned_proxy_name.classList.add(ZBX_STYLE_WORDBREAK);
+								assigned_proxy_name.textContent = assigned_proxy.name;
+
+								cell.appendChild(assigned_proxy_name);
 							}
 						}
 					}
@@ -739,16 +711,17 @@
 						const element = editable ? document.createElement('a') : document.createElement('span');
 
 						if (editable) {
-							const url = new URL('zabbix.php', location.href);
-							url.searchParams.set('action', 'popup');
-							url.searchParams.set('popup', 'template.edit');
-							url.searchParams.set('templateid', templateid);
+							const url = zabbixUrl({
+								action: 'popup',
+								popup: 'template.edit',
+								templateid
+							});
 
 							element.classList.add(ZBX_STYLE_LINK_ALT);
-							element.setAttribute('href', url.toString());
+							element.setAttribute('href', url);
 						}
 
-						element.classList.add(ZBX_STYLE_GREY);
+						element.classList.add(ZBX_STYLE_GREY, ZBX_STYLE_WORDBREAK);
 						element.textContent = String(name);
 
 						cell.appendChild(element);
@@ -760,16 +733,17 @@
 								const element = editable ? document.createElement('a') : document.createElement('span');
 
 								if (editable) {
-									const url = new URL('zabbix.php', location.href);
-									url.searchParams.set('action', 'popup');
-									url.searchParams.set('popup', 'template.edit');
-									url.searchParams.set('templateid', templateid);
+									const url = zabbixUrl({
+										action: 'popup',
+										popup: 'template.edit',
+										templateid
+									});
 
 									element.classList.add(ZBX_STYLE_LINK_ALT);
-									element.setAttribute('href', url.toString());
+									element.setAttribute('href', url);
 								}
 
-								element.classList.add(ZBX_STYLE_GREY);
+								element.classList.add(ZBX_STYLE_GREY, ZBX_STYLE_WORDBREAK);
 								element.textContent = name;
 
 								cell.appendChild(element);
@@ -809,7 +783,7 @@
 						&& (tls_accept & HOST_ENCRYPTION_PSK) != HOST_ENCRYPTION_PSK
 						&& (tls_accept & HOST_ENCRYPTION_CERTIFICATE) != HOST_ENCRYPTION_CERTIFICATE) {
 
-						const none = document.createElement('span');
+						const none = document.createElement('div');
 						none.classList.add(ZBX_STYLE_STATUS_GREEN);
 						none.textContent = <?= json_encode(_('None')); ?>;
 
@@ -836,10 +810,10 @@
 
 						in_encryption.classList.add('in');
 
-						const out_encryption = document.createElement('span');
+						const out_encryption = document.createElement('div');
 						out_encryption.classList.add('out');
 
-						const none = document.createElement('span');
+						const none = document.createElement('div');
 						none.textContent = <?= json_encode(_('None')); ?>;
 
 						if ((tls_accept & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE) {
@@ -851,7 +825,7 @@
 
 						out_encryption.appendChild(none);
 
-						const psk = document.createElement('span');
+						const psk = document.createElement('div');
 						psk.textContent = <?= json_encode(_('PSK')); ?>;
 
 						if ((tls_accept & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK) {
@@ -863,7 +837,7 @@
 
 						out_encryption.appendChild(psk);
 
-						const cert = document.createElement('span');
+						const cert = document.createElement('div');
 						cert.textContent = <?= json_encode(_('CERT')); ?>;
 
 						if ((tls_accept & HOST_ENCRYPTION_CERTIFICATE) == HOST_ENCRYPTION_CERTIFICATE) {
@@ -876,7 +850,7 @@
 						out_encryption.appendChild(cert);
 
 						const encryption = document.createElement('div');
-						encryption.classList.add(ZBX_STYLE_STATUS_CONTAINER, ZBX_STYLE_NOWRAP);
+						encryption.classList.add(ZBX_STYLE_STATUS_CONTAINER);
 						encryption.appendChild(in_encryption);
 						encryption.innerHTML += ' ';
 						encryption.appendChild(out_encryption);
@@ -933,11 +907,12 @@
 
 			button.classList.add('is-loading');
 
-			const url = new URL('zabbix.php', location.href);
-			url.searchParams.set('action', 'host.massdelete');
-			url.searchParams.set(CSRF_TOKEN_NAME, this.#csrf_token);
+			const url = zabbixUrl({
+				action: 'host.massdelete',
+				[CSRF_TOKEN_NAME]: this.#csrf_token
+			});
 
-			fetch(url.toString(), {
+			fetch(url, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
 				body: urlEncodeData({hostids: Object.keys(chkbxRange.getSelectedIds())})

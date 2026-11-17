@@ -9,7 +9,7 @@ Currently the template supports Nomad servers and clients discovery.
 
 ## Requirements
 
-Zabbix version: 8.0 and higher.
+Zabbix version: 8.2 and higher.
 
 ## Tested versions
 
@@ -18,7 +18,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.2/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -101,7 +101,7 @@ It works without any external scripts.
 
 ## Requirements
 
-Zabbix version: 8.0 and higher.
+Zabbix version: 8.2 and higher.
 
 ## Tested versions
 
@@ -110,7 +110,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.2/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -136,7 +136,7 @@ This template has been tested on:
 * [HashiCorp Nomad metrics API reference](https://developer.hashicorp.com/nomad/api-docs/metrics)
 * [HashiCorp Nomad nodes API reference](https://developer.hashicorp.com/nomad/api-docs/nodes)
 * [HashiCorp Nomad allocations API reference](https://developer.hashicorp.com/nomad/api-docs/allocations)
-* [Zabbix user macros with context](https://www.zabbix.com/documentation/8.0/manual/config/macros/user_macros_context)
+* [Zabbix user macros with context](https://www.zabbix.com/documentation/8.2/manual/config/macros/user_macros_context)
 
 ### Macros used
 
@@ -301,7 +301,7 @@ It works without any external scripts.
 
 ## Requirements
 
-Zabbix version: 8.0 and higher.
+Zabbix version: 8.2 and higher.
 
 ## Tested versions
 
@@ -310,7 +310,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/8.2/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -331,7 +331,7 @@ This template has been tested on:
 * [HashiCorp Nomad metrics API reference](https://developer.hashicorp.com/nomad/api-docs/metrics)
 * [HashiCorp Nomad agent API reference](https://developer.hashicorp.com/nomad/api-docs/agent#query-self)
 * [HashiCorp Nomad cluster failure tolerance reference](https://developer.hashicorp.com/nomad/docs/concepts/consensus#deployment-table)
-* [Zabbix user macros with context](https://www.zabbix.com/documentation/8.0/manual/config/macros/user_macros_context)
+* [Zabbix user macros with context](https://www.zabbix.com/documentation/8.2/manual/config/macros/user_macros_context)
 
 ### Macros used
 

@@ -48,7 +48,7 @@
 			this.defaults = {
 				geomaps_tile_url: '',
 				geomaps_attribution: '',
-				geomaps_max_zoom: ''
+				geomaps_max_zoom: '0'
 			};
 			this.tile_providers = Object.assign(tile_providers, { other: this.defaults });
 
@@ -154,7 +154,7 @@
 							postMessageDetails('success', response.success.messages);
 						}
 
-						location.href = location.href;
+						location.reload();
 					}
 				})
 				.catch((exception) => this.#ajaxExceptionHandler(exception))

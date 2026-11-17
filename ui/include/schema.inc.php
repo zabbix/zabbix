@@ -2631,7 +2631,7 @@ return [
 			'opdata' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
+				'length' => 2048,
 				'default' => ''
 			],
 			'discover' => [
@@ -10280,6 +10280,41 @@ return [
 			]
 		]
 	],
+	'usrgrp_apm_filter' => [
+		'key' => 'usrgrp_apm_filterid',
+		'fields' => [
+			'usrgrp_apm_filterid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'usrgrpid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'usrgrp',
+				'ref_field' => 'usrgrpid'
+			],
+			'attribute_key' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'value' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'signal_type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '-1'
+			]
+		]
+	],
 	'mfa' => [
 		'key' => 'mfaid',
 		'fields' => [
@@ -11005,6 +11040,24 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			],
+			'scope' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'scope_evaltype' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'scope_formula' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
 			]
 		]
 	],
@@ -11012,6 +11065,47 @@ return [
 		'key' => 'cep_operation_conditionid',
 		'fields' => [
 			'cep_operation_conditionid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'cep_operationid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'cep_operation',
+				'ref_field' => 'cep_operationid'
+			],
+			'type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '29'
+			],
+			'operator' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '10'
+			],
+			'tag' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'tag_value' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			]
+		]
+	],
+	'cep_operation_scope_condition' => [
+		'key' => 'cep_operation_scope_conditionid',
+		'fields' => [
+			'cep_operation_scope_conditionid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20

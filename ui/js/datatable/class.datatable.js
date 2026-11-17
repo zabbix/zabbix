@@ -173,6 +173,20 @@ class CDataTable {
 	#resize_click_count = 0;
 
 	/**
+	 * Whether a reload has been requested while being delayed.
+	 *
+	 * @type {boolean}
+	 */
+	#reload_requested = false;
+
+	/**
+	 * Whether reload is currently delayed.
+	 *
+	 * @type {boolean}
+	 */
+	#reload_delayed = false;
+
+	/**
 	 * The reference to the custom scrollbar track element.
 	 *
 	 * @type {HTMLElement|null}
@@ -873,6 +887,10 @@ class CDataTable {
 		return this;
 	}
 
+	getCellRenderer(name) {
+		return this.#cell_renderers[name];
+	}
+
 	setCellRenderer(name, renderer) {
 		if (this.#initialized) {
 			return this;
@@ -1291,6 +1309,7 @@ class CDataTable {
 
 	onInit(e) {
 		this.#has_data = false;
+		this.#reload_requested = false;
 
 		const {loading, loading_fadein, check_changes, force_load, reset} = {
 			loading: true,
@@ -1333,10 +1352,15 @@ class CDataTable {
 				}
 
 				if ('error' in response) {
-					const title = response.error.title || t('Unexpected server error.');
+					const title = response.error.title || null;
 					const messages = response.error.messages || [];
 
-					CMessageHelper.error(this.#element, messages, title);
+					if (title === null && messages.length === 0) {
+						CMessageHelper.error(this.#element, [], t('Unexpected server error.'));
+					}
+					else {
+						CMessageHelper.error(this.#element, messages, title);
+					}
 				}
 
 				return response;
@@ -1356,7 +1380,7 @@ class CDataTable {
 				this.dispatchEvent(CDataTable.EVENT_AFTER_RENDER, {response});
 			})
 			.catch(error => {
-				CMessageHelper.error(this.#element, [error.message], error.name);
+				CMessageHelper.error(this.#element, [error.message], error.name || t('Unexpected server error.'));
 
 				onError(error);
 			})
@@ -1393,6 +1417,8 @@ class CDataTable {
 	}
 
 	onColumnResizeStart(e) {
+		this.#reload_delayed = true;
+
 		const {x, column_index, id} = e.detail;
 
 		this.#resize_click_count++;
@@ -1439,6 +1465,12 @@ class CDataTable {
 		this.#stopColumnResizing();
 
 		this.dispatchEvent(CDataTable.EVENT_SAVE);
+
+		this.#reload_delayed = false;
+
+		if (this.#reload_requested) {
+			this.dispatchEvent(CDataTable.EVENT_INIT, {force_load: true});
+		}
 	}
 
 	onDataSort(e) {
@@ -1577,7 +1609,12 @@ class CDataTable {
 		handle.classList.remove(CDataTable.ZBX_STYLE_OPTIONS_LINK_OPENED);
 
 		if (this.#options_popup.isForceLoadOnClose()) {
-			this.dispatchEvent(CDataTable.EVENT_INIT, {force_load: true});
+			if (this.#reload_delayed) {
+				this.#reload_requested = true;
+			}
+			else {
+				this.dispatchEvent(CDataTable.EVENT_INIT, {force_load: true});
+			}
 		}
 
 		this.#options_popup = null;
@@ -2144,6 +2181,18 @@ class CDataTable {
 			return;
 		}
 
+		if (this.#visible_columns.length === 0) {
+			this.#renderEmptyState({
+				icon: ZBX_ICON_SEARCH_LARGE,
+				message: t('No columns selected'),
+				description: t('Add columns in the Customize table panel'),
+			});
+
+			this.#footer.classList.add(ZBX_STYLE_HIDDEN);
+
+			return;
+		}
+
 		if (!('data' in response) || response.data.length === 0) {
 			this.#renderEmptyState({
 				icon: response.no_data_icon,
@@ -2368,9 +2417,18 @@ class CDataTable {
 		this.#applyColumnWidths('0px');
 
 		this.#raf_id = requestAnimationFrame(() => {
-			for (const column of this.#visible_columns.filter(column => column.getWidth() === 'auto')) {
+			const auto_columns = this.#visible_columns.filter(column => column.getWidth() === 'auto'
+				&& !column.isResized() && column.isResizable()
+			);
+			const fixed_width = this.#visible_columns
+				.filter(column => !auto_columns.includes(column))
+				.reduce((sum, column) => sum + (column.getHeaderCell()?.target?.offsetWidth ?? 0), 0);
+
+			for (const column of auto_columns) {
 				this.#calculateColumnWidth(column);
 			}
+
+			this.#fitAutoColumnWidths(auto_columns, this.#body.clientWidth - fixed_width);
 
 			this.#ghost_row?.remove();
 			this.#ghost_row = null;
@@ -2407,6 +2465,37 @@ class CDataTable {
 
 		column.setWidth(calculated_width)
 			.setOverrides({...overrides, width: calculated_width});
+	}
+
+	#fitAutoColumnWidths(columns, available_width) {
+		const widths = columns.map(column => parseInt(column.getWidth()));
+		const overflow = widths.reduce((sum, width) => sum + width, 0) - available_width;
+
+		if (overflow <= 0) {
+			return;
+		}
+
+		const min_widths = columns
+			.map(column => Math.max(CDataTable.COLUMN_MIN_ALLOWED_CALC_WIDTH, this.#getColumnMinWidth(column)));
+		const excesses = widths.map((width, i) => Math.max(0, width - min_widths[i]));
+		const excess_total = excesses.reduce((sum, excess) => sum + excess, 0);
+
+		if (excess_total === 0) {
+			return;
+		}
+
+		const ratio = Math.min(1, overflow / excess_total);
+
+		columns.forEach((column, i) => {
+			if (excesses[i] === 0) {
+				return;
+			}
+
+			const calculated_width = `${Math.max(min_widths[i], widths[i] - Math.ceil(excesses[i] * ratio))}px`;
+
+			column.setWidth(calculated_width)
+				.setOverrides({...column.getOverrides(), width: calculated_width});
+		});
 	}
 
 	#renderHeaderCells() {
