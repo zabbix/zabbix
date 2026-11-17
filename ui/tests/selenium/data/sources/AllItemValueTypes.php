@@ -44,7 +44,8 @@ class AllItemValueTypes {
 			'Character' => ITEM_VALUE_TYPE_STR,
 			'Log' => ITEM_VALUE_TYPE_LOG,
 			'Unsigned' =>ITEM_VALUE_TYPE_UINT64,
-			'Text' => ITEM_VALUE_TYPE_TEXT
+			'Text' => ITEM_VALUE_TYPE_TEXT,
+			'JSON' => ITEM_VALUE_TYPE_JSON
 		];
 
 		$dependent_items = [
