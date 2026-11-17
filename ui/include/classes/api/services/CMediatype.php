@@ -109,6 +109,9 @@ class CMediatype extends CApiService {
 			elseif (is_array($options['output'])) {
 				$options['output'] = array_intersect($options['output'], self::LIMITED_OUTPUT_FIELDS);
 			}
+			else {
+				$options['output'] = [];
+			}
 		}
 
 		// mediatypeids
