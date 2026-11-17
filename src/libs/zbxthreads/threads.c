@@ -252,6 +252,9 @@ static void	threads_kill_fatal(ZBX_THREAD_HANDLE *threads, int threads_num)
 }
 #endif
 
+#define ZBX_THREADS_STOP_GRACEFUL	0
+#define ZBX_THREADS_STOP_IMMEDIATE	1
+
 /******************************************************************************
  *                                                                            *
  * Purpose: sends termination signal to threads                               *
@@ -260,20 +263,21 @@ static void	threads_kill_fatal(ZBX_THREAD_HANDLE *threads, int threads_num)
  *             threads_num   - [IN] number of handles                         *
  *             threads_flags - [IN] thread priority flags                     *
  *             priority      - [IN] terminate threads with specified priority *
- *             ret           - [IN] terminate thread politely on SUCCEED or   *
- *                                  ask all threads to exit immediately on    *
- *                                  FAIL                                      *
+ *             stop_mode     - [IN] ZBX_THREADS_STOP_GRACEFUL - terminate     *
+ *                                  threads with specified priority politely, *
+ *                                  ZBX_THREADS_STOP_IMMEDIATE - ask all      *
+ *                                  threads to exit immediately               *
  *                                                                            *
  ******************************************************************************/
 static void	threads_kill(ZBX_THREAD_HANDLE *threads, int threads_num, const int *threads_flags, int priority,
-		int ret)
+		int stop_mode)
 {
 	for (int i = 0; i < threads_num; i++)
 	{
 		if (ZBX_THREAD_HANDLE_NULL == threads[i])
 			continue;
 
-		if (SUCCEED != ret)
+		if (ZBX_THREADS_STOP_IMMEDIATE == stop_mode)
 		{
 			zbx_thread_kill_fatal(threads[i]);
 			continue;
@@ -385,8 +389,12 @@ static int	threads_poll_progress(const ZBX_THREAD_HANDLE *threads, int threads_n
  *             threads_flags - [IN] thread priority flags                     *
  *             threads_num   - [IN] number of handles                         *
  *             priority      - [IN] priority of threads to wait for           *
- *             ret           - [IN] SUCCEED if threads were asked to exit     *
- *                                  politely, FAIL otherwise                  *
+ *             stop_mode     - [IN] ZBX_THREADS_STOP_GRACEFUL - threads were  *
+ *                                  asked to exit gracefully, exit status is  *
+ *                                  logged,                                   *
+ *                                  ZBX_THREADS_STOP_IMMEDIATE - threads were *
+ *                                  asked to exit immediately, exit status is *
+ *                                  not logged                                *
  *             timeout       - [IN] seconds without progress before giving    *
  *                                  up, 0 - wait without timeout              *
  *             progress_cb   - [IN] optional callback returning value that    *
@@ -394,7 +402,7 @@ static int	threads_poll_progress(const ZBX_THREAD_HANDLE *threads, int threads_n
  *             progress      - [IN/OUT] progress state, shared by waits of    *
  *                                      all priorities                        *
  *                                                                            *
- * Return value: ret           - threads exited                               *
+ * Return value: SUCCEED       - threads exited                               *
  *               TIMEOUT_ERROR - no progress was made for timeout seconds     *
  *                                                                            *
  * Comments: Time is counted in polling intervals, so that system clock       *
@@ -402,7 +410,7 @@ static int	threads_poll_progress(const ZBX_THREAD_HANDLE *threads, int threads_n
  *                                                                            *
  ******************************************************************************/
 static int	threads_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num, int priority,
-		int ret, int timeout, zbx_threads_progress_f progress_cb, zbx_threads_progress_t *progress)
+		int stop_mode, int timeout, zbx_threads_progress_f progress_cb, zbx_threads_progress_t *progress)
 {
 	pid_t	pid;
 
@@ -439,7 +447,7 @@ static int	threads_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, in
 			if (SUCCEED != zbx_child_cleanup(pid, threads, threads_num))
 				continue;
 
-			if (SUCCEED != ret)
+			if (ZBX_THREADS_STOP_IMMEDIATE == stop_mode)
 				continue;
 
 			log_exit_status(pid, status);
@@ -453,16 +461,17 @@ static int	threads_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, in
 		}
 	}
 
-	return ret;
+	return SUCCEED;
 }
 
 static int	threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num,
-		int priority, int ret, int timeout, zbx_threads_progress_f progress_cb,
+		int priority, int stop_mode, int timeout, zbx_threads_progress_f progress_cb,
 		zbx_threads_progress_t *progress)
 {
-	threads_kill(threads, threads_num, threads_flags, priority, ret);
+	threads_kill(threads, threads_num, threads_flags, priority, stop_mode);
 
-	return threads_wait(threads, threads_flags, threads_num, priority, ret, timeout, progress_cb, progress);
+	return threads_wait(threads, threads_flags, threads_num, priority, stop_mode, timeout, progress_cb,
+			progress);
 }
 #endif
 
@@ -499,10 +508,10 @@ int	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_fla
 	zbx_sigmask(SIG_BLOCK, &set, NULL);
 
 	/* signal non priority threads to go into idle state and wait for threads with higher priority to exit */
-	threads_kill(threads, threads_num, threads_flags, ZBX_THREAD_PRIORITY_NONE, SUCCEED);
+	threads_kill(threads, threads_num, threads_flags, ZBX_THREAD_PRIORITY_NONE, ZBX_THREADS_STOP_GRACEFUL);
 
 	if (TIMEOUT_ERROR == threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_COLLECTOR,
-			SUCCEED, timeout, progress_cb, &progress))
+			ZBX_THREADS_STOP_GRACEFUL, timeout, progress_cb, &progress))
 	{
 		threads_kill_fatal(threads, threads_num);
 		ret = FAIL;
@@ -510,37 +519,38 @@ int	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_fla
 
 	/* supervisor units wait for history syncers, so supervisor is killed only after them */
 	supervisor_ret = threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_SUPERVISOR,
-		SUCCEED, timeout, progress_cb, &progress);
+		ZBX_THREADS_STOP_GRACEFUL, timeout, progress_cb, &progress);
 
 	if (TIMEOUT_ERROR == threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_SYNCER,
-			SUCCEED, timeout, progress_cb, &progress))
+			ZBX_THREADS_STOP_GRACEFUL, timeout, progress_cb, &progress))
 	{
 		threads_kill_fatal(threads, threads_num);
 		ret = FAIL;
 	}
 
 	if (TIMEOUT_ERROR == threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_WORKER,
-			SUCCEED, timeout, progress_cb, &progress))
+			ZBX_THREADS_STOP_GRACEFUL, timeout, progress_cb, &progress))
 	{
 		threads_kill_fatal(threads, threads_num);
 		ret = FAIL;
 	}
 
-	if (SUCCEED != supervisor_ret)
+	if (TIMEOUT_ERROR == supervisor_ret)
 	{
 		threads_kill_fatal(threads, threads_num);
 		ret = FAIL;
 	}
 
 	/* signal idle threads to exit */
-	threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_NONE, FAIL, 0, NULL, &progress);
+	threads_kill_and_wait(threads, threads_flags, threads_num, ZBX_THREAD_PRIORITY_NONE, ZBX_THREADS_STOP_IMMEDIATE,
+			0, NULL, &progress);
 #else
 	ZBX_UNUSED(timeout);
 	ZBX_UNUSED(progress_cb);
 
 	/* wait for threads to finish first; although listener threads will never end */
 	WaitForMultipleObjectsEx(threads_num, threads, TRUE, 1000, FALSE);
-	threads_kill(threads, threads_num, threads_flags, ZBX_THREAD_PRIORITY_NONE, FAIL);
+	threads_kill(threads, threads_num, threads_flags, ZBX_THREAD_PRIORITY_NONE, ZBX_THREADS_STOP_IMMEDIATE);
 
 	for (int i = 0; i < threads_num; i++)
 	{
@@ -595,7 +605,8 @@ void	zbx_thread_exec_and_wait(void (*func)(void), int timeout, zbx_threads_progr
 		return;
 	}
 
-	if (TIMEOUT_ERROR == threads_wait(&pid, &flag, 1, flag, SUCCEED, timeout, progress_cb, &progress))
+	if (TIMEOUT_ERROR == threads_wait(&pid, &flag, 1, flag, ZBX_THREADS_STOP_GRACEFUL, timeout, progress_cb,
+			&progress))
 		threads_kill_fatal(&pid, 1);
 }
 
@@ -648,3 +659,6 @@ int	zbx_waitpid_nohang(ZBX_THREAD_HANDLE *threads, size_t threads_num)
 	return SUCCEED;
 }
 #endif
+
+#undef ZBX_THREADS_STOP_IMMEDIATE
+#undef ZBX_THREADS_STOP_GRACEFUL
