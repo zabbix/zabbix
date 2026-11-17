@@ -739,21 +739,6 @@ INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (
 INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100024,400630,100024,'last','$,#1');
 INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100025,400620,100025,'last','$,#1');
 
--- testFormMap.ZBX6840
-INSERT INTO hosts (hostid, host, name, status, description, readme) VALUES (50008, 'Host-map-test-zbx6840', 'Host-map-test-zbx6840', 0, '', '');
-INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50008, 50008, 4);
-INSERT INTO interface (type, ip, dns, useip, port, main, hostid, interfaceid) VALUES (1, '127.0.7.1', '', '1', '10071', '1', 50008, 50021);
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,query_fields,lifetime,posts,headers, query) VALUES (400650,0,50008,'Item-layout-test-zbx6840','item-layout-test-002','30s','90d','365d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,50021,'',0,'','30','','','{}');
-INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (400650, 'Item-layout-test-zbx6840', 'ITEM-LAYOUT-TEST-ZBX6840');
-INSERT INTO triggers (triggerid,expression,description,url,status,priority,comments,templateid,type,flags) VALUES (100026,'{100026}=0 and {100027}=0','Trigger-map-test-zbx6840','',0,0,'',NULL,0,0);
-INSERT INTO trigger_rtdata (triggerid, value, state, lastchange, error) VALUES (100026, 0, 0, 0, '');
-INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100026,400650,100026,'last','$,#1');
-INSERT INTO functions (functionid,itemid,triggerid,name,parameter) VALUES (100027,42237,100026,'last','$,#1');
-INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack, grid_size, grid_show, grid_align, label_format, label_type_host, label_type_hostgroup, label_type_trigger, label_type_map, label_type_image, label_string_host, label_string_hostgroup, label_string_trigger, label_string_map, label_string_image, iconmapid, expand_macros, severity_min, userid, private) VALUES (5, 'testZBX6840', 800, 600, NULL, 0, 0, 0, 0, 0, 0, 50, 1, 1, 0, 2, 2, 2, 2, 2, '', '', '', '', '', NULL, 0, 0, 1, 0);
-INSERT INTO sysmaps_elements (selementid,sysmapid,elementid,elementtype,iconid_off,iconid_on,label,label_location,x,y,iconid_disabled,iconid_maintenance,elementsubtype,areatype,width,height,viewtype,use_iconmap) VALUES (8,5,10084,0,19,NULL,'Host element (Zabbix Server)',-1,413,268,NULL,NULL,0,0,200,200,0,0);
-INSERT INTO sysmaps_elements (selementid,sysmapid,elementid,elementtype,iconid_off,iconid_on,label,label_location,x,y,iconid_disabled,iconid_maintenance,elementsubtype,areatype,width,height,viewtype,use_iconmap) VALUES (9,5,0,2,15,NULL,'Trigger element (zbx6840)',-1,213,218,NULL,NULL,0,0,200,200,0,0);
-INSERT INTO sysmap_element_trigger (selement_triggerid, selementid, triggerid) VALUES (2,9,100026);
-
 -- testPageHistory_CheckLayout
 
 INSERT INTO hosts (hostid, host, name, status, description, readme) VALUES (15003, 'testPageHistory_CheckLayout', 'testPageHistory_CheckLayout', 0, '', '');
@@ -1305,23 +1290,6 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99982, 99137, 1)
 
 INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags,query_fields, params, posts, headers, query) VALUES (99183, 2, 99137, 'Master item', '', 'master', NULL, 0,'', '', '', '', '{}');
 INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid, flags,query_fields, params, posts, headers, query) VALUES (99349, 0, 99137, 'Test discovery rule', '', 'test', NULL, 1,'', '', '', '', '{}');
-
--- testFormAdministrationMediaTypeWebhook
-INSERT INTO media_type (mediatypeid, type, name, status, script, description) VALUES (1111, 4, 'Reference webhook', 0, 'return 0;', 'Reference webhook media type');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (13000, 1111, 'URL', '');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (13001, 1111, 'To', '{ALERT.SENDTO}');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (13002, 1111, 'Subject', '{ALERT.SUBJECT}');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (13003, 1111, 'Message', '{ALERT.MESSAGE}');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (13004, 1111, 'HTTPProxy', '');
-INSERT INTO media_type (mediatypeid, type, name, status, script, description) VALUES (1002, 4, 'Validation webhook', 0, 'return 0;', 'Reference webhook media type for validation tests');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (13005, 1002, 'URL', '');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (13006, 1002, 'To', '{ALERT.SENDTO}');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (13007, 1002, 'Subject', '{ALERT.SUBJECT}');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (13008, 1002, 'Message', '{ALERT.MESSAGE}');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (13009, 1002, 'HTTPProxy', '');
-INSERT INTO media_type (mediatypeid, type, name, status, script, show_event_menu, event_menu_name, event_menu_url, description) VALUES (1031, 4, 'Webhook to delete', 0, 'return 0;', 1, 'Unique webhook url', 'zabbix.php?action=mediatype.list&ddreset={EVENT.TAGS.webhook}', 'Webhook media type to be deleted');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (13010, 1031, 'Parameter name to be deleted', 'Parameter value to be deleted');
-INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (13011, 1031, '2nd parameter name to be deleted', '2nd parameter value to be deleted');
 
 -- Session key used by CPage::login() to sign session cookie
 UPDATE settings SET value_str='caf1c06dcf802728c4cfc24d645e1e73' WHERE name='session_key';
