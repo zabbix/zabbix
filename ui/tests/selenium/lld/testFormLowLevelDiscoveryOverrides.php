@@ -13,16 +13,18 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+
 require_once __DIR__.'/../../include/CWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup items, ids
+ *
+ * @onBefore prepareOverridesData
  */
 class testFormLowLevelDiscoveryOverrides extends CWebTest {
 
-	const HOST_ID = 40001;
-	const UPDATED_ID = 133800;
+	const TEMPLATE_NAME = 'Template for LLD overrides';
 
 	const INTERVAL_MAPPING = [
 		'Type' => [
@@ -45,9 +47,9 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 		]
 	];
 
-
-	public static $created_id;
-	public static $old_hash;
+	protected static $created_id;
+	protected static $hostid;
+	protected static $lldid;
 
 	/**
 	 * Attach Behaviors to the test.
@@ -56,6 +58,130 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	 */
 	public function getBehaviors() {
 		return ['class' => CMessageBehavior::class];
+	}
+
+	/**
+	 * Create host with LLD rule, template for override operations and overrides for LLD rule used in update scenarios.
+	 */
+	public function prepareOverridesData() {
+		$host_name = 'Host for LLD overrides';
+		$lld_key = 'lld.overrides.update';
+
+		$hosts = CDataHelper::createHosts([
+			[
+				'host' => $host_name,
+				'groups' => ['groupid' => 4], // host group 'Zabbix servers'.
+				'interfaces' => [
+					[
+						'type' => INTERFACE_TYPE_AGENT,
+						'main' => INTERFACE_PRIMARY,
+						'useip' => INTERFACE_USE_IP,
+						'ip' => '127.0.0.1',
+						'dns' => '',
+						'port' => '10050'
+					]
+				],
+				'discoveryrules' => [
+					[
+						'name' => 'LLD for overrides update',
+						'key_' => $lld_key,
+						'type' => ITEM_TYPE_ZABBIX,
+						'delay' => '30s'
+					]
+				]
+			]
+		]);
+		self::$hostid = $hosts['hostids'][$host_name];
+		self::$lldid = $hosts['discoveryruleids'][$host_name.':'.$lld_key];
+
+		$templates = CDataHelper::createTemplates([
+			[
+				'host' => self::TEMPLATE_NAME,
+				'groups' => ['groupid' => 1] // template group 'Templates'.
+			]
+		]);
+		$templateid = $templates['templateids'][self::TEMPLATE_NAME];
+
+		CDataHelper::call('discoveryrule.update', [
+			'itemid' => self::$lldid,
+			'overrides' => [
+				[
+					'name' => 'Override for update 1',
+					'step' => 1,
+					'stop' => ZBX_LLD_OVERRIDE_STOP_NO,
+					'filter' => [
+						'evaltype' => CONDITION_EVAL_TYPE_AND,
+						'conditions' => [
+							[
+								'macro' => '{#MACRO1}',
+								'operator' => CONDITION_OPERATOR_REGEXP,
+								'value' => 'test expression_1'
+							],
+							[
+								'macro' => '{#MACRO2}',
+								'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+								'value' => 'test expression_2'
+							],
+							[
+								'macro' => '{#MACRO3}',
+								'operator' => CONDITION_OPERATOR_EXISTS
+							],
+							[
+								'macro' => '{#MACRO4}',
+								'operator' => CONDITION_OPERATOR_NOT_EXISTS
+							]
+						]
+					],
+					'operations' => [
+						[
+							'operationobject' => OPERATION_OBJECT_ITEM_PROTOTYPE,
+							'operator' => CONDITION_OPERATOR_EQUAL,
+							'value' => 'test item pattern',
+							'opstatus' => ['status' => ZBX_PROTOTYPE_STATUS_ENABLED],
+							'opdiscover' => ['discover' => ZBX_PROTOTYPE_DISCOVER],
+							'opperiod' => ['delay' => '1m;50s/1-7,00:00-24:00;wd1-5h9-18'],
+							'ophistory' => ['history' => 0],
+							'optrends' => ['trends' => 0]
+						],
+						[
+							'operationobject' => OPERATION_OBJECT_TRIGGER_PROTOTYPE,
+							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
+							'value' => 'test trigger pattern',
+							'opseverity' => ['severity' => TRIGGER_SEVERITY_WARNING],
+							'optag' => [
+								['tag' => 'tag1', 'value' => 'value1']
+							]
+						]
+					]
+				],
+				[
+					'name' => 'Override for update 2',
+					'step' => 2,
+					'stop' => ZBX_LLD_OVERRIDE_STOP_NO,
+					'operations' => [
+						[
+							'operationobject' => OPERATION_OBJECT_GRAPH_PROTOTYPE,
+							'operator' => CONDITION_OPERATOR_REGEXP,
+							'value' => 'test graph pattern',
+							'opdiscover' => ['discover' => ZBX_PROTOTYPE_DISCOVER]
+						],
+						[
+							'operationobject' => OPERATION_OBJECT_HOST_PROTOTYPE,
+							'operator' => CONDITION_OPERATOR_NOT_REGEXP,
+							'value' => 'test host pattern',
+							'optemplate' => [
+								['templateid' => $templateid]
+							],
+							'optag' => [
+								['tag' => 'name1', 'value' => 'value1'],
+								['tag' => 'name2', 'value' => 'value2']
+							],
+							'opinventory' => ['inventory_mode' => HOST_INVENTORY_AUTOMATIC]
+						]
+					]
+				]
+			]
+		]);
 	}
 
 	/*
@@ -625,7 +751,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 										'Condition' => ['operator' => 'does not match', 'value' => 'Host_Pattern'],
 										'Create enabled' => 'Yes',
 										'Discover' => 'Yes',
-										'Link templates' => 'Test Item Template',
+										'Link templates' => self::TEMPLATE_NAME,
 										'Host inventory' => 'Disabled'
 									]
 								]
@@ -650,7 +776,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 										'Condition' => ['operator' => 'does not match', 'value' => '2Host_Pattern'],
 										'Create enabled' => 'Yes',
 										'Discover' => 'No',
-										'Link templates' => 'Test Item Template',
+										'Link templates' => self::TEMPLATE_NAME,
 										'Host inventory' => 'Automatic'
 									]
 								]
@@ -670,8 +796,8 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 		$this->overridesCreate($data);
 	}
 
-	private function overridesCreate($data) {
-		$this->page->login()->open('zabbix.php?action=lldrule.list&filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID.
+	protected function overridesCreate($data) {
+		$this->page->login()->open('zabbix.php?action=lldrule.list&filter_set=1&filter_hostids%5B0%5D='.self::$hostid.
 				'&context=host'
 		);
 		$this->query('button:Create discovery rule')->waitUntilClickable()->one()->click();
@@ -697,6 +823,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 			if (array_key_exists('fields', $override)) {
 				$override_form->fill($override['fields']);
 			}
+
 			$this->fillOverrideFilter($override);
 			$this->fillOverrideOperations($data, $override);
 
@@ -707,6 +834,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 				$this->assertEquals(CTestArrayHelper::get($override, 'fields.Name'),
 						$override_container->getRow($i)->getColumn('Name')->getText()
 				);
+
 				// Check that Override in table has correct processing status.
 				$stop_processing = (CTestArrayHelper::get($override,
 						'fields.If filter matches') === 'Stop processing') ? 'Yes' : 'No';
@@ -1442,7 +1570,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 										'Condition' => ['operator' => 'contains', 'value' => 'new host pattern'],
 										'Create enabled' => 'No',
 										'Discover' => 'Yes',
-										'Link templates' => 'Test Item Template',
+										'Link templates' => self::TEMPLATE_NAME,
 										'Tags' => [
 											['tag' => 'added_name1', 'value' => 'added_value1']
 										],
@@ -1622,11 +1750,17 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 		$this->overridesUpdate($data);
 	}
 
-	private function overridesUpdate($data) {
-		self::$old_hash = CDBHelper::getHash('SELECT * FROM items WHERE flags=1 ORDER BY itemid');
-		$this->page->login()->open('zabbix.php?action=popup&popup=lldrule.edit&context=host&itemid='.self::UPDATED_ID);
+	protected function overridesUpdate($data) {
+		$sql = 'SELECT * FROM lld_override lo'.
+			' LEFT JOIN lld_override_condition loc ON loc.lld_overrideid=lo.lld_overrideid'.
+			' LEFT JOIN lld_override_operation loo ON loo.lld_overrideid=lo.lld_overrideid'.
+			' WHERE lo.itemid='.self::$lldid.
+			' ORDER BY lo.lld_overrideid, loc.lld_override_conditionid, loo.lld_override_operationid';
+		$old_hash = CDBHelper::getHash($sql);
+
+		$this->page->login()->open('zabbix.php?action=popup&popup=lldrule.edit&context=host&itemid='.self::$lldid);
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		$form = $dialog->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Overrides');
 		$form->invalidate();
 		$override_container = $form->getField('Overrides')->asTable();
@@ -1705,7 +1839,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 						'Condition' => ['operator' => 'does not match', 'value' => 'test host pattern'],
 						'Create enabled' => null,
 						'Discover' => null,
-						'Link templates' => 'Test Item Template',
+						'Link templates' => self::TEMPLATE_NAME,
 						'Tags' => [
 							['tag' => 'name1', 'value' => 'value1'],
 							['tag' => 'name2', 'value' => 'value2']
@@ -1786,11 +1920,9 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					$override_container->query('link', $override['name'])->one()->click();
 					$override_form = $this->query('id:lldoverride_form')->waitUntilPresent()->asCheckboxForm()->one();
 
-					// Get Operations Table.
-					$operations_container = $override_form->getField('Operations')->asTable();
-
-					foreach (CTestArrayHelper::get($override, 'Operations', []) as $j => $operation) {
+					foreach (CTestArrayHelper::get($override, 'Operations', []) as $operation) {
 						$operation_action = CTestArrayHelper::get($operation, 'action', USER_ACTION_ADD);
+
 						// Preparing reference data for Operations.
 						switch ($operation_action) {
 							case USER_ACTION_ADD:
@@ -1828,11 +1960,13 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					$override_container->query('button:Add')->one()->click();
 					$id = null;
 				case USER_ACTION_UPDATE:
+
 					// Fill Override name and what to do if Filter matches.
 					if (array_key_exists('fields', $override)) {
 						$override_form = $this->query('id:lldoverride_form')->waitUntilPresent()->asCheckboxForm()->one();
 						$override_form->fill($override['fields']);
 					}
+
 					$this->fillOverrideFilter($override);
 					$this->fillOverrideOperations($data, $override, $sources, $id);
 					$this->checkSubmittedOverlay($data['expected'], $override_form,
@@ -1865,10 +1999,14 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 			// Submit LLD update.
 			$form->submit();
 			$this->assertMessage(TEST_GOOD, 'Discovery rule updated');
-			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM items WHERE itemid ='.self::UPDATED_ID));
+			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM items WHERE itemid ='.self::$lldid));
 
-			self::$created_id = self::UPDATED_ID;
+			self::$created_id = self::$lldid;
 			$this->checkSavedState(['overrides' => $sources]);
+		}
+		else {
+			// Check that overrides are not changed in DB.
+			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 		}
 	}
 
@@ -1877,7 +2015,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	 *
 	 * @return CFormElement $override_form  override or condition form in overlay
 	 */
-	private function fillOverrideFilter($override) {
+	protected function fillOverrideFilter($override) {
 		$override_form = $this->query('id:lldoverride_form')->waitUntilPresent()->asCheckboxForm()->one();
 
 		// Add Filters to override.
@@ -1906,7 +2044,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	 *
 	 * @return CFormElement $override_form  override or condition form in overlay
 	 */
-	private function fillOverrideOperations($data, $override, $sources = null, $id = null) {
+	protected function fillOverrideOperations($data, $override, $sources = null, $id = null) {
 		$override_form = $this->query('id:lldoverride_form')->waitUntilPresent()->asCheckboxForm()->one();
 		$operation_container = $override_form->getField('Operations')->asTable();
 
@@ -2007,7 +2145,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	 * @param CFormElement	$overlay 	override or condition form in overlay
 	 * @param string	    $error		error message text
 	 */
-	private function checkSubmittedOverlay($expected, $overlay, $error) {
+	protected function checkSubmittedOverlay($expected, $overlay, $error) {
 		switch ($expected) {
 			case TEST_GOOD:
 				$overlay->waitUntilNotPresent();
@@ -2018,7 +2156,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 		}
 	}
 
-	private function checkSavedState($data) {
+	protected function checkSavedState($data) {
 		// Skip Bad cases.
 		if (CTestArrayHelper::get($data, 'expected') === TEST_BAD) {
 			return;
@@ -2030,6 +2168,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 		$form = $dialog->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		$form->selectTab('Overrides');
 		$override_container = $form->getField('Overrides')->asTable();
+
 		// Get Overrides count.
 		$overrides_count = $override_container->getRows()->count();
 
@@ -2090,7 +2229,6 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 			}
 
 			$operation_container = $override_form->getField('Operations')->asTable();
-			// Get Operations count.
 			$operation_count = $operation_container->getRows()->count();
 
 			if (array_key_exists('Operations', $override)) {
@@ -2137,7 +2275,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	 *
 	 * @return array
 	 */
-	private function setFiltersTableMapping($filters_table) {
+	protected function setFiltersTableMapping($filters_table) {
 		$mapping = $filters_table->detectFieldMapping(['Label', 'Macro', '', 'Regular expression', 'Action']);
 		$mapping['Regular expression']['name'] = 'value';
 		$mapping['Regular expression']['selector'] = 'xpath:./div/z-textarea-flexible';
