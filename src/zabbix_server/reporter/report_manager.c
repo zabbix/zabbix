@@ -2073,7 +2073,7 @@ static int	rm_process_jobs(zbx_rm_t *manager)
  ******************************************************************************/
 static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_message_t *message, char **error)
 {
-	zbx_uint64_t		dashboardid, userid, access_userid;
+	zbx_uint64_t		dashboardid, userid;
 	zbx_vector_ptr_pair_t	params;
 	int			report_time, ret, width, height, i;
 	unsigned char		period;
@@ -2082,8 +2082,7 @@ static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_m
 
 	zbx_vector_ptr_pair_create(&params);
 
-	report_deserialize_test_report(message->data, &name, &dashboardid, &userid, &access_userid, &report_time,
-			&period, &params);
+	report_deserialize_test_report(message->data, &name, &dashboardid, &userid, &report_time, &period, &params);
 
 	rm_get_report_dimensions(dashboardid, &width, &height);
 
@@ -2097,7 +2096,7 @@ static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_m
 		}
 	}
 
-	if (NULL != (job = rm_create_job(manager, name, dashboardid, access_userid, report_time, period, &userid, 1,
+	if (NULL != (job = rm_create_job(manager, name, dashboardid, userid, report_time, period, &userid, 1,
 			width, height, &params, error)))
 	{
 		zbx_ipc_client_addref(client);
