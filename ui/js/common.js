@@ -1120,10 +1120,10 @@ function openMassupdatePopup(action, parameters = {}, {
 	const form = trigger_element.closest('form');
 
 	if (action === 'popup.massupdate.host') {
-		parameters.hostids = chkbxRange.getSelectedIds();
+		parameters.hostids = Object.keys(chkbxRange.getSelectedIds());
 	}
 	else {
-		parameters.ids = chkbxRange.getSelectedIds();
+		parameters.ids = Object.keys(chkbxRange.getSelectedIds());
 	}
 
 	switch (action) {
