@@ -293,21 +293,21 @@ static void	snmp_identity_insert(const char *address, unsigned short port, const
 	identity_ptr = zbx_hashset_insert(&identity_cache, &identity, sizeof(identity));
 	if (num_data != identity_cache.num_data)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " EngineID added for address '%s'",
-				item_contex->itemid, address);
+		zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " EngineID added for address '[%s]:%hu'",
+				item_contex->itemid, address, port);
 	}
 	else if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
 		if (identity_ptr->engineid_len != engineid_len ||
 				0 != memcmp(identity_ptr->engineid, engineid, engineid_len))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " updated EngineID for address '%s'",
-					item_contex->itemid, address);
+			zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " updated EngineID for address '[%s]:%hu'",
+					item_contex->itemid, address, port);
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " EngineID for address '%s' already cached",
-				item_contex->itemid, address);
+			zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " EngineID for address '[%s]:%hu' already"
+					" cached", item_contex->itemid, address, port);
 		}
 	}
 
@@ -505,6 +505,19 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 
 		ptr->lastseen = time(NULL);
 
+		if (zbx_snmp_engineid_record_revision(ptr) < item_context->interface.revision)
+		{
+			for (int i = 0; i < ptr->devices.values_num; i++)
+			{
+				snmp_identity_remove(ptr->devices.values[i].address, ptr->devices.values[i].port);
+				zbx_free(ptr->devices.values[i].address);
+				zbx_free(ptr->devices.values[i].hostname);
+			}
+
+			zbx_vector_engineid_device_clear(&ptr->devices);
+			snmp_remove_user_by_engineid(ptr);
+		}
+
 		for (int i = 0; i < ptr->devices.values_num; i++)
 		{
 			if ((0 == strcmp(item_context->interface.addr, ptr->devices.values[i].address) &&
@@ -529,25 +542,10 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 				if (0 != hosts_alloc)
 					zbx_snprintf_alloc(&hosts, &hosts_alloc, &hosts_offset, ", ");
 
-				zbx_snprintf_alloc(&hosts, &hosts_alloc, &hosts_offset, "%s:%u (%s)",
+				zbx_snprintf_alloc(&hosts, &hosts_alloc, &hosts_offset, "[%s]:%hu (%s)",
 						ptr->devices.values[i].address, ptr->devices.values[i].port,
 						ptr->devices.values[i].hostname);
 			}
-		}
-
-		if (zbx_snmp_engineid_record_revision(ptr) < item_context->interface.revision)
-		{
-			for (int i = 0; i < ptr->devices.values_num; i++)
-			{
-				snmp_identity_remove(ptr->devices.values[i].address, ptr->devices.values[i].port);
-				zbx_free(ptr->devices.values[i].address);
-				zbx_free(ptr->devices.values[i].hostname);
-			}
-
-			zbx_vector_engineid_device_clear(&ptr->devices);
-			found = 0;
-
-			snmp_remove_user_by_engineid(ptr);
 		}
 
 		if (0 == found)
@@ -576,7 +574,7 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 			if (now >= ptr->lastlog + ZBX_SNMP_ENGINEID_WARNING_PERIOD)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "SNMP engineId is not unique across following "
-						"interfaces: %s:%u (%s), %s", item_context->interface.addr,
+						"interfaces: [%s]:%hu (%s), %s", item_context->interface.addr,
 						item_context->interface.port, item_context->host, hosts);
 
 				ptr->lastlog = now;
