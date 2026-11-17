@@ -2674,8 +2674,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 
 			case 'show_table':
 				$table = $field->asTable();
-				// TODO: Uncomment the below check after ZBX-27000 is merged.
-				// $this->assertEquals($field_details['headers'], $table->getHeadersText());
+				$this->assertEquals($field_details['headers'], $table->getHeadersText());
 				$this->assertTrue($table->query('id:add-row')->one()->isClickable());
 
 				// Check each default row in "Show" field and its contents.
@@ -2683,9 +2682,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 				$i = 1;
 				foreach ($show_rows as $row) {
 					$this->assertTrue($row->getColumn(0)->query('class:drag-icon')->one()->isEnabled());
-
-					// TODO: after ZBX-27000 is merged, change column index "2" to column name "Name".
-					$dropdown = $row->getColumn(2)->query('tag:z-select')->one()->asDropdown();
+					$dropdown = $row->getColumn('Name')->query('tag:z-select')->one()->asDropdown();
 					$options = $dropdown->getOptions();
 					$this->assertEquals($field_details['rows'][$i], $dropdown->getText());
 					$this->assertEquals(array_keys($field_details['option_states']), $options->asText());
@@ -3465,8 +3462,8 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Name' => 'Graph prototype widget with empty graph',
 						'Source' => 'Graph prototype',
 						'Graph prototype' => 'Template graph prototype {#KEY}',
-						'Columns' => '',
-						'Rows' => ''
+						'Columns' => 0,
+						'Rows' => 0
 					],
 					'swap_expected' => [
 						'Graph prototype' => self::TEMPLATE.': '.'Template graph prototype {#KEY}'
@@ -3604,10 +3601,10 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Name' => 'Item value with missing field values',
 						'Advanced configuration' => true,
 						'id:description' => '',
-						'id:desc_size' => '',
-						'id:decimal_size' => '',
-						'id:value_size' => '',
-						'id:units_size' => '',
+						'id:desc_size' => 0,
+						'id:decimal_size' => 0,
+						'id:value_size' => 0,
+						'id:units_size' => 0,
 						'Aggregation function' => 'min',
 						'Time period' => 'Custom',
 						'id:time_period_from' => '',
@@ -3847,7 +3844,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
 						'Name' => 'Item history widget with empty Items',
-						'Show lines' => ''
+						'Show lines' => 0
 					],
 					'error_message' => [
 						'Invalid parameter "Items": cannot be empty.',
@@ -3970,7 +3967,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Problems'),
 						'Name' => 'Problems widget with empty Show lines',
-						'Show lines' => ''
+						'Show lines' => 0
 					],
 					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-1000.'
 				]
@@ -4281,7 +4278,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Top triggers'),
 						'Name' => 'Top triggers widget with empty Trigger limit',
-						'Trigger limit' => ''
+						'Trigger limit' => 0
 					],
 					'page' => '2nd page',
 					'error_message' => 'Invalid parameter "Trigger limit": value must be one of 1-1000.'
@@ -4548,7 +4545,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
 					],
 					'Show' => [
-						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'Name' => 'Latest data']
 					],
 					'Sparkline' => [
 						'id:sparkline_time_period_from' => '',
@@ -4574,7 +4571,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
 					],
 					'Show' => [
-						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'Name' => 'Latest data']
 					],
 					'Sparkline' => [
 						'id:sparkline_time_period_from' => 'now-1000d',
@@ -4600,7 +4597,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
 					],
 					'Show' => [
-						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'Name' => 'Latest data']
 					],
 					'Sparkline' => [
 						'id:sparkline_time_period_data_source' => 'Widget'
@@ -4626,7 +4623,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
 					],
 					'Show' => [
-						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'Name' => 'Latest data']
 					],
 					'Sparkline' => [
 						'id:sparkline_width' => 5000,
@@ -4652,7 +4649,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
 					],
 					'Show' => [
-						['action' => USER_ACTION_UPDATE, 'index' => 0, 'section' => 'Latest data']
+						['action' => USER_ACTION_UPDATE, 'index' => 0, 'Name' => 'Latest data']
 					],
 					'Sparkline' => [
 						'id:sparkline_time_period_data_source' => 'Custom',
@@ -4679,12 +4676,12 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
 					],
 					'Show' => [
-						['section' => 'Description'],
-						['section' => 'Error text'],
-						['section' => 'Latest data'],
-						['section' => 'Triggers'],
-						['section' => 'Host inventory'],
-						['section' => 'Tags']
+						['Name' => 'Description'],
+						['Name' => 'Error text'],
+						['Name' => 'Latest data'],
+						['Name' => 'Triggers'],
+						['Name' => 'Host inventory'],
+						['Name' => 'Tags']
 					],
 					'Sparkline' => [
 						'id:sparkline_width' => 5,
@@ -4706,11 +4703,11 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Show suppressed problems' => true
 					],
 					'Show' => [
-						['section' => 'Host groups'],
-						['section' => 'Description'],
-						['section' => 'Templates'],
-						['section' => 'Inventory'],
-						['section' => 'Tags']
+						['Name' => 'Host groups'],
+						['Name' => 'Description'],
+						['Name' => 'Templates'],
+						['Name' => 'Inventory'],
+						['Name' => 'Tags']
 					],
 					'Inventory' => ['Location latitude', 'Location longitude', 'Tag', 'Type'],
 					'page' => '2nd page'
@@ -4826,15 +4823,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		}
 
 		if (array_key_exists('Show', $data)) {
-			$this->query('id:sections-table')->asMultifieldTable([
-				'mapping' => [
-					'' => [
-						'name' => 'section',
-						'selector' => 'xpath:./z-select',
-						'class' => 'CDropdownElement'
-					]
-				]
-			])->one()->fill($data['Show']);
+			$this->query('id:sections-table')->asMultifieldTable()->one()->fill($data['Show']);
 
 			if (array_key_exists('Inventory', $data)) {
 				$form->getField('Inventory fields')->fill($data['Inventory']);

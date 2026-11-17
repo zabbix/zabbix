@@ -1323,43 +1323,5 @@ INSERT INTO media_type (mediatypeid, type, name, status, script, show_event_menu
 INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (13010, 1031, 'Parameter name to be deleted', 'Parameter value to be deleted');
 INSERT INTO media_type_param (mediatype_paramid, mediatypeid, name, value) VALUES (13011, 1031, '2nd parameter name to be deleted', '2nd parameter value to be deleted');
 
--- Overrides for LLD Overrides test
-INSERT INTO lld_override (lld_overrideid, itemid, name, step, evaltype, stop) values (5000, 133800, 'Override for update 1', 1, 1, 0);
-INSERT INTO lld_override (lld_overrideid, itemid, name, step, evaltype, stop) values (5001, 133800, 'Override for update 2', 2, 0, 0);
-
-INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (34000, 5000, 8, '{#MACRO1}', 'test expression_1');
-INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (34001, 5000, 9, '{#MACRO2}', 'test expression_2');
-INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (34002, 5000, 12, '{#MACRO3}', '');
-INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (34003, 5000, 13, '{#MACRO4}', '');
-
-INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (40000, 5000, 0, 0, 'test item pattern');
-INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (40001, 5000, 1, 1, 'test trigger pattern');
-INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (40002, 5001, 2, 8, 'test graph pattern');
-INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (40003, 5001, 3, 9, 'test host pattern');
-
-INSERT INTO lld_override_opdiscover (lld_override_operationid, discover) values (40000, 0);
-INSERT INTO lld_override_opdiscover (lld_override_operationid, discover) values (40002, 0);
-
-INSERT INTO lld_override_ophistory (lld_override_operationid, history) values (40000, 0);
-
-INSERT INTO lld_override_opinventory (lld_override_operationid, inventory_mode) values (40003, 1);
-
-INSERT INTO lld_override_opperiod (lld_override_operationid, delay) values (40000, '1m;50s/1-7,00:00-24:00;wd1-5h9-18');
-
-INSERT INTO lld_override_opseverity (lld_override_operationid, severity) values (40001, 2);
-
-INSERT INTO lld_override_opstatus (lld_override_operationid, status) values (40000, 0);
-
-INSERT INTO lld_override_optag (lld_override_optagid, lld_override_operationid, tag, value) values (3000, 40001, 'tag1', 'value1');
-INSERT INTO lld_override_optag (lld_override_optagid, lld_override_operationid, tag, value) values (3001, 40003, 'name1', 'value1');
-INSERT INTO lld_override_optag (lld_override_optagid, lld_override_operationid, tag, value) values (3002, 40003, 'name2', 'value2');
-
-INSERT INTO lld_override_optemplate (lld_override_optemplateid, lld_override_operationid, templateid) values (3000, 40003, 99137);
-
-INSERT INTO lld_override_optrends (lld_override_operationid, trends) values (40000, 0);
-
+-- Session key used by CPage::login() to sign session cookie
 UPDATE settings SET value_str='caf1c06dcf802728c4cfc24d645e1e73' WHERE name='session_key';
-
--- testPageHostPrototypes
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (9450, 90002, 'host_proto_tag_1', 'value1');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (9451, 90002, 'host_proto_tag_2', 'value2');

@@ -448,7 +448,7 @@ class CDataHelper extends CAPIHelper {
 	public static function getItemDataTableSuffix($itemid) {
 		// Check item value type to set correct history table.
 		$value_type = CDBHelper::getValue('SELECT value_type FROM items where itemid='.zbx_dbstr($itemid));
-		$suffixes = ['', '_str', '_log', '_uint', '_text'];
+		$suffixes = ['', '_str', '_log', '_uint', '_text', '_bin', '_json'];
 
 		if (!array_key_exists($value_type, $suffixes)) {
 			throw new Exception('Unsupported item value type: '.$value_type);
