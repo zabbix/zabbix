@@ -18,6 +18,7 @@
 #include "../events/events.h"
 #include "../actions/actions.h"
 #include "../audit/audit_server.h"
+#include "permissions.h"
 
 #include "zbxtimekeeper.h"
 #include "zbxnix.h"
@@ -1636,7 +1637,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 	int			tasks_num, sleeptime, server_num = ((zbx_thread_args_t *)args)->info.server_num,
 				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	zbx_uint32_t		rtc_msgs[] = {ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD};
+	zbx_uint32_t		rtc_msgs[] = {ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD, ZBX_RTC_PERMISSIONS_REBUILD};
 
 	zbx_thread_taskmanager_args	*taskmanager_args_in = (zbx_thread_taskmanager_args *)
 			((((zbx_thread_args_t *)args))->args);
@@ -1670,6 +1671,8 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 		{
 			if (ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD == rtc_cmd)
 				tm_reload_proxy_cache_by_names(&rtc, rtc_data);
+			else if (ZBX_RTC_PERMISSIONS_REBUILD == rtc_cmd)
+				zbx_permissions_rebuild_start();
 
 			zbx_free(rtc_data);
 

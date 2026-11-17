@@ -118,7 +118,7 @@ int	zbx_macro_query_filter_resolv(zbx_macro_resolv_data_t *p, va_list args, char
 		}
 	}
 
-	if (NULL != replace_to)
+	if (NULL != *replace_to)
 	{
 		char	*esc = zbx_dyn_escape_string(*replace_to, "\\");
 

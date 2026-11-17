@@ -55,7 +55,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		if ($this->fields_values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH && $this->fields_values['graphid']) {
 			$resource_type = SCREEN_RESOURCE_GRAPH;
 			$resourceid = reset($this->fields_values['graphid']);
-			$graph_dims = getGraphDims($resourceid);
+			$graph_dims = getGraphDims($resourceid, [], $width);
 			$graph_dims['graphHeight'] = $height;
 			$graph_dims['width'] = $width;
 		}
@@ -64,7 +64,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			$resource_type = SCREEN_RESOURCE_SIMPLE_GRAPH;
 			$resourceid = $this->fields_values['itemid'][0];
-			$graph_dims = getGraphDims();
+			$graph_dims = getGraphDims(null, [$resourceid], $width);
 			$graph_dims['graphHeight'] = $height;
 			$graph_dims['width'] = $width;
 		}

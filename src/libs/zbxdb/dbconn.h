@@ -35,6 +35,12 @@
 #	include <zbxmutexs.h>
 #endif
 
+#if defined(HAVE_MYSQL)
+/* same server error code has different meaning in MySQL and MariaDB */
+#	define ZBX_MYSQL_ER_CLIENT_INTERACTION_TIMEOUT		4031
+#	define ZBX_MARIADB_ER_REFERENCED_TRG_DOES_NOT_EXIST	4031
+#endif
+
 typedef enum
 {
 	DBCONN_TYPE_UNMANAGED,
@@ -64,6 +70,7 @@ struct zbx_dbconn
 	MYSQL			*conn;
 	int			error_count;
 	int			txn_begin;		/* transaction begin statement is executed */
+	int			mariadb_fork;		/* connected to MariaDB server */
 #elif defined(HAVE_POSTGRESQL)
 	PGconn			*conn;
 #elif defined(HAVE_SQLITE3)

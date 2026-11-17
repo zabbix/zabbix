@@ -1153,4 +1153,3 @@ int	zbx_dc_config_get_hostid_by_name(const char *host, const zbx_socket_t *sock,
 
 
 #undef ZBX_CONNECTOR_STATUS_ENABLED
-
