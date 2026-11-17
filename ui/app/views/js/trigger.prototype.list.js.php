@@ -97,11 +97,17 @@
 		}
 
 		#massupdate(target) {
-			openMassupdatePopup('trigger.prototype.massupdate', {
+			const overlay = openMassupdatePopup('trigger.prototype.massupdate', {
 				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('trigger')) ?>
 			}, {
 				dialogue_class: 'modal-popup-static',
 				trigger_element: target
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
+				chkbxRange.clearSelectedOnFilterChange();
+
+				this.reload({success: e.detail});
 			});
 		}
 
@@ -140,28 +146,7 @@
 				body: JSON.stringify({...this.token, ...fields})
 			})
 				.then((response) => response.json())
-				.then((response) => {
-					if ('error' in response) {
-						if ('title' in response.error) {
-							postMessageError(response.error.title);
-						}
-
-						postMessageDetails('error', response.error.messages);
-
-						uncheckTableRows(`trigger_prototypes_${this.parent_discoveryid}`, response.keepids ?? []);
-					}
-					else if ('success' in response) {
-						postMessageOk(response.success.title);
-
-						if ('messages' in response.success) {
-							postMessageDetails('success', response.success.messages);
-						}
-
-						uncheckTableRows(`trigger_prototypes_${this.parent_discoveryid}`);
-					}
-
-					location.reload();
-				})
+				.then((response) => this.reload(response))
 				.catch(() => {
 					clearMessages();
 
@@ -172,6 +157,29 @@
 				.finally(() => {
 					target.classList.remove('is-loading');
 				});
+		}
+
+		reload(response) {
+			if ('error' in response) {
+				if ('title' in response.error) {
+					postMessageError(response.error.title);
+				}
+
+				postMessageDetails('error', response.error.messages);
+
+				uncheckTableRows(`trigger_prototypes_${this.parent_discoveryid}`, response.keepids ?? []);
+			}
+			else if ('success' in response) {
+				postMessageOk(response.success.title);
+
+				if ('messages' in response.success) {
+					postMessageDetails('success', response.success.messages);
+				}
+
+				uncheckTableRows(`trigger_prototypes_${this.parent_discoveryid}`);
+			}
+
+			location.href = location.href;
 		}
 
 		#initPopupListeners() {

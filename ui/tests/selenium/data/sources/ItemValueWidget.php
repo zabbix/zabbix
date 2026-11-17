@@ -77,6 +77,13 @@ class ItemValueWidget {
 						'value_type' => ITEM_VALUE_TYPE_FLOAT,
 						'units' => '%',
 						'delay' => '30'
+					],
+					[
+						'name' => 'Item with type of information - JSON',
+						'key_' => 'json',
+						'type' => ITEM_TYPE_ZABBIX,
+						'value_type' => ITEM_VALUE_TYPE_JSON,
+						'delay' => '30'
 					]
 				]
 			],
@@ -115,6 +122,12 @@ class ItemValueWidget {
 						'key_' => 'text',
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_TEXT
+					],
+					[
+						'name' => 'Indicator - JSON',
+						'key_' => 'json',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_JSON
 					]
 				]
 			],

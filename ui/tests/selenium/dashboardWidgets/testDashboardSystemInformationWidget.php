@@ -108,15 +108,46 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 		self::$widgets_dashboardid = $response['dashboardids'][1];
 	}
 
-	public function testDashboardSystemInformationWidget_checkDisabledHA() {
-		$this->page->login()->open(self::URL.self::$dashboardid)->waitUntilReady();
+	public static function getUserScreenshotData() {
+		return [
+			// #0 Super admin.
+			[
+				[
+					'role' => USER_TYPE_SUPER_ADMIN,
+					'suffix' => 'super_admin'
+				]
+			],
+			// #1 Admin.
+			[
+				[
+					'role' => USER_TYPE_ZABBIX_ADMIN,
+					'user' => 'admin for system information test',
+					'password' => 'z@$$ix!#%1',
+					'suffix' => 'admin'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getUserScreenshotData
+	 */
+	public function testDashboardSystemInformationWidget_checkDisabledHA($data) {
+		if (array_key_exists('user', $data)) {
+			$this->page->userLogin($data['user'], $data['password']);
+		}
+		else {
+			$this->page->login();
+		}
+
+		$this->page->open(self::URL.self::$dashboardid)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
 
 		// Remove zabbix version due to unstable screenshot which depends on column width with different version length.
 		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
 				[$this->query('xpath://table[@class="list-table sticky-header rounded-surface"]/tbody/tr[3]/td[1]')->one()]
 		);
-		$this->assertScreenshot($dashboard, 'widget_without_ha');
+		$this->assertScreenshot($dashboard, 'widget_without_ha_'.$data['suffix']);
 	}
 
 	public function testDashboardSystemInformationWidget_Create() {
@@ -172,18 +203,13 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 					]
 				]
 			],
-			// #1 Verify widget data that is available for user with admin role.
+			// #1 Verify user with admin role. Check field that is not checked in screenshot with disabled HA.
 			[
 				[
 					'type' => 'Admin',
 					'user' => 'admin for system information test',
 					'password' => 'z@$$ix!#%1',
 					'available_fields' => [
-						[
-							'Parameter' => 'Zabbix server is running',
-							'Value' => 'No',
-							'Details' => 'localhost:10051'
-						],
 						[
 							'Parameter' => 'Zabbix frontend version',
 							'Value' => ZABBIX_VERSION,
@@ -195,6 +221,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 			// #2 Verify widget data that is available for user with user role.
 			[
 				[
+					'type' => 'User',
 					'user' => 'user for system information test',
 					'password' => 'z@$$ix!#%2',
 					'available_fields' => [
@@ -243,39 +270,27 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 	}
 
 	/**
-	 * @onBefore prepareHANodeData
+	 * @onBeforeOnce prepareHANodeData
+	 *
+	 * @dataProvider getUserScreenshotData
 	 */
-	public function testDashboardSystemInformationWidget_checkEnabledHA() {
-		$this->assertEnabledHACluster(self::$dashboardid);
-		$this->assertScreenshotExcept(CDashboardElement::find()->one(), self::$skip_fields, 'widgets_with_ha');
+	public function testDashboardSystemInformationWidget_checkEnabledHA($data) {
+		if (array_key_exists('user', $data)) {
+			$this->assertEnabledHACluster(self::$dashboardid, $data['user'], $data['password'], $data['role']);
+		}
+		else {
+			$this->assertEnabledHACluster(self::$dashboardid);
+		}
+
+		$this->assertScreenshotExcept(CDashboardElement::find()->one(), self::$skip_fields, 'widgets_with_ha_'.$data['suffix']);
 	}
 
 	public static function getSystemInformationDataForRunningServer() {
 		/**
-		 * Note: Super admin role is checked within common class.
+		 * Note: Super admin and Admin roles are checked within common class.
 		 */
 		return [
-			// #0 Verify widget data that is available for user with admin role.
-			[
-				[
-					'type' => 'Admin',
-					'user' => 'admin for system information test',
-					'password' => 'z@$$ix!#%1',
-					'available_fields' => [
-						[
-							'Parameter' => 'Zabbix server is running',
-							'Value' => 'Yes',
-							'Details' => '{address}'
-						],
-						[
-							'Parameter' => 'Zabbix frontend version',
-							'Value' => ZABBIX_VERSION,
-							'Details' => ''
-						]
-					]
-				]
-			],
-			// #1 Verify widget data that is available for user with user role.
+			// #0 Verify widget data that is available for user with user role.
 			[
 				[
 					'user' => 'user for system information test',
@@ -294,7 +309,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 					]
 				]
 			],
-			// #2 Verify widget data that is available for user with guest role.
+			// #1 Verify widget data that is available for user with guest role.
 			[
 				[
 					'type' => 'Guest',
@@ -380,7 +395,7 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 	}
 
 	/**
-	 * Function performs widget creation of update with the given widget parameters.
+	 * Function performs widget creation or update with the given widget parameters.
 	 *
 	 * @param array $widgets	widget related information
 	 * @param string $action	operation to be performed with the widget
@@ -484,16 +499,6 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 		CDashboardElement::find()->one()->waitUntilReady();
 
 		if (in_array(CTestArrayHelper::get($data, 'type'), ['Super admin', 'Admin'])) {
-			if ($data['type'] === 'Admin') {
-				global $DB;
-
-				foreach ($data['available_fields'] as &$field) {
-					$field['Details'] = str_replace('{address}', $DB['SERVER'].':0', $field['Details']);
-				}
-
-			}
-
-
 			$this->assertTableHasData($data['available_fields']);
 		}
 		else {
