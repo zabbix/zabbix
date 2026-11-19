@@ -340,7 +340,7 @@ function PopUp(action, parameters, {
 				});
 
 				// Display the close button after the screen reader announces the dialog title.
-				overlay.$dialogue.$close_btn.show();
+				// overlay.$dialogue.$close_btn.show();
 			}
 			else {
 				var buttons = resp.buttons !== null ? resp.buttons : [];
@@ -380,7 +380,7 @@ function PopUp(action, parameters, {
 				});
 
 				// Display the close button after the screen reader announces the dialog title.
-				overlay.$dialogue.$head.$close_button.show();
+				// overlay.$dialogue.$head.$close_button.show();
 
 				overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 					for (const form of overlay.$dialogue.$body[0].querySelectorAll('form')) {
@@ -416,6 +416,7 @@ function PopUp(action, parameters, {
 			overlay.containFocus();
 		})
 		.fail((resp) => {
+			console.log(resp);
 			if (resp.statusText !== 'abort') {
 				const error = resp.responseJSON !== undefined && resp.responseJSON.error !== undefined
 					? resp.responseJSON.error
@@ -434,7 +435,7 @@ function PopUp(action, parameters, {
 				});
 
 				// Display the close button after the screen reader announces the dialog title.
-				overlay.$dialogue.$close_btn.show();
+				//overlay.$dialogue.$close_btn.show();
 
 				overlay.recoverFocus();
 				overlay.containFocus();

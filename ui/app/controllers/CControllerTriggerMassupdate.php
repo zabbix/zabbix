@@ -59,7 +59,7 @@ class CControllerTriggerMassupdate extends CController {
 
 		$parent_lld = [];
 
-		if ($this->hasInput('prototype')) {
+		if ($this->getInput('prototype') == 1) {
 			$options = [
 				'output' => [],
 				'itemids' => [$this->getInput('parent_discoveryid', 0)],
@@ -183,7 +183,7 @@ class CControllerTriggerMassupdate extends CController {
 				$triggers_to_update[] = $upd_trigger;
 			}
 
-			$result = $this->hasInput('prototype')
+			$result = $this->getInput('prototype') == 1
 				? API::TriggerPrototype()->update($triggers_to_update)
 				: API::Trigger()->update($triggers_to_update);
 
@@ -191,7 +191,7 @@ class CControllerTriggerMassupdate extends CController {
 
 			if ($result) {
 				$messages = CMessageHelper::getMessages();
-				$output = ['title' => $this->hasInput('prototype')
+				$output = ['title' => $this->getInput('prototype') == 1
 					? _n('Trigger prototype updated', 'Trigger prototypes updated', $triggers_count)
 					: _n('Trigger updated', 'Triggers updated', $triggers_count)
 				];
@@ -202,7 +202,7 @@ class CControllerTriggerMassupdate extends CController {
 			}
 			else {
 				CMessageHelper::setErrorTitle(
-					$this->hasInput('prototype')
+					$this->getInput('prototype') == 1
 						? _n('Cannot update trigger prototype', 'Cannot update trigger prototypes', $triggers_count)
 						: _n('Cannot update trigger', 'Cannot update triggers', $triggers_count)
 				);
@@ -225,11 +225,11 @@ class CControllerTriggerMassupdate extends CController {
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
 				],
-				'prototype' => $this->hasInput('prototype'),
+				'prototype' => $this->getInput('prototype') == 1,
 				'ids' => $this->getInput('ids', []),
 				'parent_discoveryid' => $this->getInput('parent_discoveryid', 0),
 				'context' => $this->getInput('context'),
-				'location_url' => $this->hasInput('prototype')
+				'location_url' => $this->getInput('prototype') == 1
 					? (new CUrl('zabbix.php'))
 						->setArgument('action', 'trigger.prototype.list')
 						->setArgument('parent_discoveryid', $this->getInput('parent_discoveryid', 0))
