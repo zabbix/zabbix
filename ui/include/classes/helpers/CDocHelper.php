@@ -59,7 +59,7 @@ class CDocHelper {
 	const DASHBOARDS_WIDGET_EDIT =								'web_interface/frontend_sections/dashboards/widgets';
 	const DATA_COLLECTION_CEPRULE_EDIT =						'events/complex_event_processing#configuration';
 	const DATA_COLLECTION_CEPRULE_LIST =						'web_interface/frontend_sections/data_collection/event_processing';
-	const DATA_COLLECTION_CORRELATION_EDIT =					'config/event_correlation/global#configuration';
+	const DATA_COLLECTION_CORRELATION_EDIT =					'events/event_correlation/global';
 	const DATA_COLLECTION_DISCOVERY_EDIT =						'discovery/network_discovery/rule#rule-attributes';
 	const DATA_COLLECTION_DISCOVERY_LIST =						'web_interface/frontend_sections/data_collection/discovery';
 	const DATA_COLLECTION_GRAPH_EDIT =							'config/visualization/graphs/custom#configuring-custom-graphs';
