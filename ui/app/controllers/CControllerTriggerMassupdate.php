@@ -225,7 +225,7 @@ class CControllerTriggerMassupdate extends CController {
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
 				],
-				'prototype' => $this->getInput('prototype') == 1,
+				'prototype' => $this->getInput('prototype'),
 				'ids' => $this->getInput('ids', []),
 				'parent_discoveryid' => $this->getInput('parent_discoveryid', 0),
 				'context' => $this->getInput('context'),
