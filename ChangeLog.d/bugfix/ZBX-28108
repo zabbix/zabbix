@@ -1,0 +1,1 @@
+...G...... [ZBX-28108] fixed docker.container_stats CPU percent usage overflow on counter reset and NaN for stopped containers (EGKrb)

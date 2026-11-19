@@ -120,10 +120,21 @@ func keyContainerStatsHandler(
 	return string(result), nil
 }
 
+// setCPUPercentUsage calculates CPU usage percentage, based on formula from docker api doc and docker cli.
+// Deltas are calculated as float64, as counters can be reset (e.g. container restart) and unsigned subtraction
+// would underflow. Non-positive deltas (counter reset, no previous sample, stopped container) result in 0.
 func (s *stats) setCPUPercentUsage() {
-	// based on formula from docker api doc.
-	delta := s.CPUStats.CPUUsage.TotalUsage - s.PreCPUStats.CPUUsage.TotalUsage
-	systemDelta := s.CPUStats.SystemUsage - s.PreCPUStats.SystemUsage
-	cpuNum := s.CPUStats.OnlineCPUs
-	s.CPUStats.CPUUsage.PercentUsage = (float64(delta) / float64(systemDelta)) * float64(cpuNum) * 100.0
+	s.CPUStats.CPUUsage.PercentUsage = 0
+
+	delta := float64(s.CPUStats.CPUUsage.TotalUsage) - float64(s.PreCPUStats.CPUUsage.TotalUsage)
+	systemDelta := float64(s.CPUStats.SystemUsage) - float64(s.PreCPUStats.SystemUsage)
+
+	cpuNum := float64(s.CPUStats.OnlineCPUs)
+	if cpuNum == 0 {
+		cpuNum = float64(len(s.CPUStats.CPUUsage.PercpuUsage))
+	}
+
+	if delta > 0 && systemDelta > 0 {
+		s.CPUStats.CPUUsage.PercentUsage = (delta / systemDelta) * cpuNum * 100.0
+	}
 }
