@@ -193,7 +193,7 @@ class CControllerTriggerMassupdate extends CController {
 
 			if ($result) {
 				$messages = CMessageHelper::getMessages();
-				$output = ['title' => $this->hasInput('prototype')
+				$output = ['title' => $this->getInput('prototype') == 1
 					? _n('Trigger prototype updated', 'Trigger prototypes updated', $triggers_count)
 					: _n('Trigger updated', 'Triggers updated', $triggers_count)
 				];
@@ -204,7 +204,7 @@ class CControllerTriggerMassupdate extends CController {
 			}
 			else {
 				CMessageHelper::setErrorTitle(
-					$this->hasInput('prototype')
+					$this->getInput('prototype') == 1
 						? _n('Cannot update trigger prototype', 'Cannot update trigger prototypes', $triggers_count)
 						: _n('Cannot update trigger', 'Cannot update triggers', $triggers_count)
 				);
