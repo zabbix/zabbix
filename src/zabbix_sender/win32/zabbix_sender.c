@@ -102,7 +102,7 @@ int	zabbix_sender_send_values(const char *address, unsigned short port, const ch
 	config_tls.connect_mode = ZBX_TCP_SEC_UNENCRYPTED;
 
 	ret = zbx_comms_exchange_with_redirect(source, &zbx_addrs, GET_SENDER_TIMEOUT, 30, 0, 0, &config_tls,
-			json.buffer, NULL, NULL, result, NULL);
+			ZBX_TCP_PROTOCOL, json.buffer, NULL, NULL, result, NULL);
 
 	if (SUCCEED != ret && NULL != result)
 		*result = zbx_strdup(NULL, zbx_socket_strerror());
