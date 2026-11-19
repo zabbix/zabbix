@@ -21,8 +21,14 @@ use Facebook\WebDriver\Exception\ElementNotInteractableException;
 
 /**
  * @backup media_type
+ *
+ * @onBefore prepareWebhookData
  */
 class testFormAdministrationMediaTypeWebhook extends CWebTest {
+
+	const REFERENCE_WEBHOOK = 'Reference webhook';
+	const VALIDATION_WEBHOOK = 'Validation webhook';
+	const DELETE_WEBHOOK = 'Webhook to delete';
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -34,8 +40,49 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 	}
 
 	// SQL query to get media_type and media_type_param tables to compare hash values.
-	private $sql = 'SELECT * FROM media_type mt INNER JOIN media_type_param mtp ON mt.mediatypeid=mtp.mediatypeid'.
-			' ORDER BY mt.mediatypeid, mtp.mediatype_paramid, mtp.name';
+	protected $sql = 'SELECT * FROM media_type mt LEFT JOIN media_type_param mtp ON mt.mediatypeid=mtp.mediatypeid'.
+		' ORDER BY mt.mediatypeid, mtp.mediatype_paramid, mtp.name';
+
+	public function prepareWebhookData() {
+		// Default parameters of a new webhook media type.
+		$parameters = [
+			['name' => 'URL'],
+			['name' => 'To', 'value' => '{ALERT.SENDTO}'],
+			['name' => 'Subject', 'value' => '{ALERT.SUBJECT}'],
+			['name' => 'Message', 'value' => '{ALERT.MESSAGE}'],
+			['name' => 'HTTPProxy']
+		];
+
+		CDataHelper::call('mediatype.create', [
+			[
+				'type' => MEDIA_TYPE_WEBHOOK,
+				'name' => self::REFERENCE_WEBHOOK,
+				'status' => MEDIA_TYPE_STATUS_ACTIVE,
+				'script' => 'return 0;',
+				'description' => 'Reference webhook media type',
+				'parameters' => $parameters
+			],
+			[
+				'type' => MEDIA_TYPE_WEBHOOK,
+				'name' => self::VALIDATION_WEBHOOK,
+				'status' => MEDIA_TYPE_STATUS_ACTIVE,
+				'script' => 'return 0;',
+				'description' => 'Reference webhook media type for validation tests',
+				'parameters' => $parameters
+			],
+			[
+				'type' => MEDIA_TYPE_WEBHOOK,
+				'name' => self::DELETE_WEBHOOK,
+				'status' => MEDIA_TYPE_STATUS_ACTIVE,
+				'script' => 'return 0;',
+				'description' => 'Webhook media type to be deleted',
+				'parameters' => [
+					['name' => 'Parameter name to be deleted', 'value' => 'Parameter value to be deleted'],
+					['name' => '2nd parameter name to be deleted', 'value' => '2nd parameter value to be deleted']
+				]
+			]
+		]);
+	}
 
 	public function getValidationWebhookData() {
 		return [
@@ -532,7 +579,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 					]
 				]
 			],
-			// Changing the name of a webhook media type to a name that is already taken.
+			// #32 Changing the name of a webhook media type to a name that is already taken.
 			[
 				[
 					'update' => true,
@@ -556,15 +603,19 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 		$old_hash = CDBHelper::getHash($this->sql);
 
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
-		$button = CTestArrayHelper::get($data, 'update', false) ? 'link:Validation webhook' : 'button:Create media type';
+		$button = CTestArrayHelper::get($data, 'update', false)
+			? 'link:'.self::VALIDATION_WEBHOOK
+			: 'button:Create media type';
 		$this->query($button)->one()->waitUntilClickable()->click();
 		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $overlay->asForm()->waitUntilVisible();
 		$form->fill($data['fields']);
+
 		// Fill webhook parameters if needed.
 		if (array_key_exists('parameters', $data)) {
 			$this->query('id:parameters_table')->asMultifieldTable()->one()->fill($data['parameters']);
 		}
+
 		// Fill fields in Operations tab if needed.
 		if (CTestArrayHelper::get($data, 'options', false) || CTestArrayHelper::get($data, 'concurrent_sessions', false)) {
 			$form->selectTab('Options');
@@ -577,6 +628,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 		 */
 		$submit = $overlay->getFooter()->query('button', CTestArrayHelper::get($data, 'update', false) ? 'Update' : 'Add')
 				->one();
+
 		try {
 			$submit->click();
 		}
@@ -776,24 +828,30 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 		$old_hash = CDBHelper::getHash($this->sql);
 
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
-		$button = CTestArrayHelper::get($data, 'update', false) ? 'link:Reference webhook' : 'button:Create media type';
-		$this->query($button)->one()->WaitUntilClickable()->click();
+		$button = CTestArrayHelper::get($data, 'update', false)
+			? 'link:'.self::REFERENCE_WEBHOOK
+			: 'button:Create media type';
+		$this->query($button)->one()->waitUntilClickable()->click();
 		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $overlay->asForm();
 		$form->fill($data['fields']);
+
 		// Fill webhook parameters if needed.
 		if (array_key_exists('parameters', $data)) {
 			$this->query('id:parameters_table')->asMultifieldTable()->one()->fill($data['parameters']);
 		}
+
 		// Remove all parameters if corresponding flag exists.
 		if (array_key_exists('remove_parameters', $data)) {
 			$this->query('id:parameters_table')->asMultifieldTable()->one()->clear();
 		}
+
 		// Fill fields in Operations tab if needed.
 		if (CTestArrayHelper::get($data, 'options', false) || CTestArrayHelper::get($data, 'concurrent_sessions', false)) {
 			$form->selectTab('Options');
 			$this->fillOperationsTab($data, $form);
 		}
+
 		$form->submit();
 		COverlayDialogElement::ensureNotPresent();
 		$this->page->waitUntilReady();
@@ -803,10 +861,13 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 		$message = CMessageElement::find()->one();
 		$this->assertTrue($message->isGood());
 		$this->assertEquals($message_title, $message->getTitle());
+
 		// Check that the media type was actually created or updated.
 		$mediatype_count = CDBHelper::getCount('SELECT mediatypeid FROM media_type WHERE name='.
-				CDBHelper::escape($data['fields']['Name']));
+				CDBHelper::escape($data['fields']['Name'])
+		);
 		$this->assertEquals(1, $mediatype_count);
+		$this->assertNotEquals($old_hash, CDBHelper::getHash($this->sql));
 
 		// Check the values of created or updated media type fields.
 		$this->checkMediaTypeFields($data);
@@ -817,27 +878,26 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 		$old_hash = CDBHelper::getHash($this->sql);
 
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
-		$this->query('link:Reference webhook')->one()->WaitUntilClickable()->click();
+		$this->query('link:'.self::REFERENCE_WEBHOOK)->one()->waitUntilClickable()->click();
 		COverlayDialogElement::find()->one()->waitUntilReady()->asForm()->submit();
 		COverlayDialogElement::ensureNotPresent();
 
 		$message = CMessageElement::find()->one();
 		$this->assertTrue($message->isGood());
 		$this->assertEquals('Media type updated', $message->getTitle());
-
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
 	}
 
 	public function testFormAdministrationMediaTypeWebhook_Clone() {
 		// SQL for collecting all webhook mediatype parameter values, both from media_type and media_type_param tables.
 		$mediatype_sql = 'SELECT type,status,maxsessions,maxattempts,attempt_interval,message_format,script,timeout,'.
-				'process_tags,show_event_menu,event_menu_name,event_menu_url,description,mtp.name,mtp.value'.
-				' FROM media_type mt INNER JOIN media_type_param mtp ON mt.mediatypeid=mtp.mediatypeid WHERE mt.name=';
-		$old_hash = CDBHelper::getHash($mediatype_sql.'\'Reference webhook\' ORDER BY mtp.name');
+			'process_tags,show_event_menu,event_menu_name,event_menu_url,description,mtp.name,mtp.value'.
+			' FROM media_type mt INNER JOIN media_type_param mtp ON mt.mediatypeid=mtp.mediatypeid WHERE mt.name=';
+		$old_hash = CDBHelper::getHash($mediatype_sql.zbx_dbstr(self::REFERENCE_WEBHOOK).' ORDER BY mtp.name');
 
 		// Clone the reference media type.
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
-		$this->query('link:Reference webhook')->one()->WaitUntilClickable()->click();
+		$this->query('link:'.self::REFERENCE_WEBHOOK)->one()->waitUntilClickable()->click();
 		$form = COverlayDialogElement::find()->one()->waitUntilReady()->asForm()->waitUntilVisible();
 		$this->query('button:Clone')->one()->click();
 		$form->fill(['Name' => 'Webhook clone']);
@@ -848,25 +908,29 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 		$message = CMessageElement::find()->one();
 		$this->assertTrue($message->isGood());
 		$this->assertEquals('Media type added', $message->getTitle());
+
 		// Check that the parameters of the clone and of the cloned media types are equal.
 		$this->assertEquals($old_hash, CDBHelper::getHash($mediatype_sql.'\'Webhook clone\' ORDER BY mtp.name'));
 	}
 
 	public function getCancelActionData() {
 		return [
+			// #0 Cancel creation of a new webhook.
 			[
 				[
-					'create'
+					'action' => 'create'
 				]
 			],
+			// #1 Cancel update of an existing webhook.
 			[
 				[
-					'update'
+					'action' => 'update'
 				]
 			],
+			// #2 Cancel cloning of an existing webhook.
 			[
 				[
-					'clone'
+					'action' => 'clone'
 				]
 			]
 		];
@@ -884,35 +948,44 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 		$old_hash = CDBHelper::getHash($this->sql);
 
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
-		$button = ($data === 'create') ? 'button:Create media type' : 'link:Reference webhook';
-		$this->query($button)->one()->WaitUntilClickable()->click();
-		if ($data === 'clone') {
-			$this->query('button:Clone')->one()->click();
-		}
+		$button = ($data['action'] === 'create') ? 'button:Create media type' : 'link:'.self::REFERENCE_WEBHOOK;
+		$this->query($button)->one()->waitUntilClickable()->click();
 		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
+
+		if ($data['action'] === 'clone') {
+			$overlay->getFooter()->query('button:Clone')->one()->click()->waitUntilNotVisible();
+			$overlay->waitUntilReady();
+
+			// Check that the form switched to clone mode.
+			$this->assertEquals('New media type', $overlay->getTitle());
+		}
+
 		$form = $overlay->asForm();
 		$form->fill($fields);
 		$overlay->query('button:Cancel')->one()->click();
 		COverlayDialogElement::ensureNotPresent();
 		$this->page->waitUntilReady();
+
 		// Make sure no changes took place.
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
 	}
 
 	public function testFormAdministrationMediaTypeWebhook_Delete() {
-		$name = 'Webhook to delete';
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
-		$this->query('link', $name)->one()->waitUntilClickable()->click();
+		$this->query('link', self::DELETE_WEBHOOK)->one()->waitUntilClickable()->click();
 		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
 		$overlay->query('button:Delete')->one()->waitUntilClickable()->click();
 		$this->page->acceptAlert();
 		$overlay->ensureNotPresent();
 		$this->page->waitUntilReady();
-		// Verify that media type was deleted
+
+		// Verify that media type was deleted.
 		$message = CMessageElement::find()->one();
 		$this->assertTrue($message->isGood());
 		$this->assertEquals('Media type deleted', $message->getTitle());
-		$this->assertEquals(0, CDBHelper::getCount('SELECT mediatypeid FROM media_type WHERE name='.zbx_dbstr($name)));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT mediatypeid FROM media_type WHERE name='.
+				zbx_dbstr(self::DELETE_WEBHOOK))
+		);
 	}
 
 	/**
@@ -920,15 +993,18 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 	 * Field concurrent sessions has two input elements - one of them is displayed only if concurrent sessions = Custom.
 	 * Therefore, fill() method cannot be used for this field, and it needs to be populated separately.
 	 */
-	private function fillOperationsTab($data, $form) {
+	protected function fillOperationsTab($data, $form) {
 		if (CTestArrayHelper::get($data, 'options', false)) {
 			$form->fill($data['options']);
 		}
+
 		if (CTestArrayHelper::get($data, 'concurrent_sessions', false)) {
 			$container = $form->getFieldContainer('Concurrent sessions');
 			$concurrent_sessions = is_array($data['concurrent_sessions'])
-					? array_key_first($data['concurrent_sessions']) : $data['concurrent_sessions'];
+				? array_key_first($data['concurrent_sessions'])
+				: $data['concurrent_sessions'];
 			$container->query('id:maxsessions_type')->asSegmentedRadio()->one()->select($concurrent_sessions);
+
 			if (is_array($data['concurrent_sessions'])) {
 				$container->query('id:maxsessions')->one()->fill(array_values($data['concurrent_sessions']));
 			}
@@ -938,26 +1014,28 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 	/**
 	 * Check the field values after creating or updating a media type.
 	 */
-	private function checkMediaTypeFields($data) {
-		CDBHelper::getValue('SELECT mediatypeid FROM media_type WHERE name='.zbx_dbstr($data['fields']['Name']));
+	protected function checkMediaTypeFields($data) {
 		$this->page->open('zabbix.php?action=mediatype.list');
-		$this->query('link', $data['fields']['Name'])->one()->WaitUntilClickable()->click();
+		$this->query('link', $data['fields']['Name'])->one()->waitUntilClickable()->click();
 		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $overlay->query('id:media-type-form')->asForm()->waitUntilVisible()->one();
 
 		// Check that fields in Media type tab are updated.
 		$form->checkValue($data['fields']);
-		// Check webhook parameters
+
+		// Check webhook parameters.
 		if (CTestArrayHelper::get($data, 'check_parameters', true)) {
 			$this->checkParameters($data);
 		}
+
 		// Check that "Menu entry name" and "Menu entry URL" fields are enabled only if "Include event menu entry" is set.
 		$menu_enabled = CTestArrayHelper::get($data, 'fields.Include event menu entry', false);
 		$this->assertTrue($form->getField('Menu entry name')->isEnabled($menu_enabled));
 		$this->assertTrue($form->getField('Menu entry URL')->isEnabled($menu_enabled));
+
 		// Check that fields in Options tab are updated.
 		if (CTestArrayHelper::get($data, 'options', false) || CTestArrayHelper::get($data, 'concurrent_sessions', false)) {
-			$this->checkmediaTypeOptions($data, $form);
+			$this->checkMediaTypeOptions($data, $form);
 		}
 	}
 
@@ -965,7 +1043,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 	 * Function prepares a reference parameters array based on parameter actions in data provider and compares it with
 	 * the values obtained from the media type configuration form.
 	 */
-	private function checkParameters($data) {
+	protected function checkParameters($data) {
 		// Check creation, update and deletion of webhook parameters, or check that all default parameters are present.
 		$expected_params = [
 			['Name' => 'HTTPProxy', 'Value' => ''],
@@ -974,30 +1052,34 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 			['Name' => 'To', 'Value' => '{ALERT.SENDTO}'],
 			['Name' => 'URL', 'Value' => '']
 		];
+
 		// Add, substitute or remove parameters from the reference array based on parameter actions in data provider.
 		if (CTestArrayHelper::get($data, 'parameters', false)) {
 			foreach ($data['parameters'] as $parameter) {
 				$action = CTestArrayHelper::get($parameter, 'action', USER_ACTION_ADD);
+
 				switch ($action) {
 					case USER_ACTION_ADD:
-						array_push($expected_params, $parameter);
+						$expected_params[] = $parameter;
 						break;
 					case USER_ACTION_UPDATE:
 						$replacement = [$parameter['index'] => ['Name' => $parameter['Name'], 'Value' => $parameter['Value']]];
 						$expected_params = array_replace($expected_params, $replacement);
 						break;
 					case USER_ACTION_REMOVE:
-						$expected_params = array_filter($expected_params, function($p) use ($parameter){
-							return $p['Name'] != $parameter['Name'];
+						$expected_params = array_filter($expected_params, function ($p) use ($parameter) {
+							return $p['Name'] !== $parameter['Name'];
 						});
 						break;
 				}
 			}
 		}
+
 		// Sort the parameters in reference array alphabetically.
 		usort($expected_params, function ($a, $b) {
 			return strcmp($a['Name'], $b['Name']);
 		});
+
 		// If parameters were not deleted from the media type, compare them with the reference array.
 		$this->query('id:parameters_table')->asMultifieldTable()->one()->checkValue(
 				(CTestArrayHelper::get($data, 'remove_parameters', false)) ? [] : $expected_params
@@ -1007,17 +1089,21 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 	/**
 	 * Check the values of fields located in the Operations tab.
 	 */
-	private function checkMediaTypeOptions($data, $form) {
+	protected function checkMediaTypeOptions($data, $form) {
 		$form->selectTab('Options');
+
 		if (CTestArrayHelper::get($data, 'options', false)) {
 			$form->checkValue($data['options']);
 		}
+
 		if (CTestArrayHelper::get($data, 'concurrent_sessions', false)) {
 			$container = $form->getFieldContainer('Concurrent sessions');
 			$concurrent_sessions = is_array($data['concurrent_sessions'])
-					? array_key_first($data['concurrent_sessions']) : $data['concurrent_sessions'];
+				? array_key_first($data['concurrent_sessions'])
+				: $data['concurrent_sessions'];
 			$this->assertEquals($concurrent_sessions,
 					$container->query('id:maxsessions_type')->asSegmentedRadio()->one()->getValue());
+
 			// If concurrent sessions type is Custom then value should be checked for this field.
 			if ($concurrent_sessions === 'Custom') {
 				$this->assertEquals($data['concurrent_sessions']['Custom'], $container->query('id:maxsessions')->one()->getValue());

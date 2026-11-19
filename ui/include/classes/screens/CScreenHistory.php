@@ -547,7 +547,7 @@ class CScreenHistory extends CScreenBase {
 
 		// time control
 		if (str_in_array($this->action, [HISTORY_VALUES, HISTORY_GRAPH, HISTORY_BATCH_GRAPH])) {
-			$graphDims = getGraphDims();
+			$graphDims = getGraphDims(null, $this->itemids);
 
 			$this->dataId = 'historyGraph';
 

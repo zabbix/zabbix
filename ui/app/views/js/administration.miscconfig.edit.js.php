@@ -135,7 +135,7 @@ const view = new class {
 								postMessageDetails('success', response.success.messages);
 							}
 
-							location.href = location.href;
+							location.reload();
 						}
 					})
 					.catch((exception) => this.#ajaxExceptionHandler(exception))

@@ -146,65 +146,84 @@ class testSystemInformation extends CWebTest {
 	 * Function that checks how a running HA cluster info is displayed in system information widget or report.
 	 *
 	 * @param integer $dashboardid	id of the dashboard that the widgets are located in.
+	 * @param string  $username		optional username to log in with.
+	 * @param string  $password		optional password for the user (defaults to 'zabbix').
+	 * @param integer $user_type    user role type (defaults to USER_TYPE_SUPER_ADMIN).
 	 */
-	public function assertEnabledHACluster($dashboardid = null) {
+	public function assertEnabledHACluster($dashboardid, $username = null, $password = 'zabbix', $user_type = USER_TYPE_SUPER_ADMIN) {
 		global $DB;
 		self::$skip_fields = [];
-		$url = (!$dashboardid) ? 'zabbix.php?action=report.status' : 'zabbix.php?action=dashboard.view&dashboardid='.$dashboardid;
+		$url = ($dashboardid) ? 'zabbix.php?action=dashboard.view&dashboardid='.$dashboardid : 'zabbix.php?action=report.status';
 
 		// Wait for frontend to get the new config from updated zabbix.conf.php file.
 		sleep((int) ini_get('opcache.revalidate_freq') + 1);
 
-		$this->page->login()->open($url)->waitUntilReady();
-		$current_time = time();
-
-		if (!$dashboardid) {
-			$nodes_table = $this->query('xpath://table[@class="list-table sticky-header rounded-surface sticky-footer"]')->asTable()->one();
-			$server_address = $this->query('xpath://th[text()="Zabbix server is running"]/../td[2]')->one();
+		if ($username) {
+			$this->page->userLogin($username, $password);
+			$this->page->open($url)->waitUntilReady();
 		}
 		else {
+			$this->page->login()->open($url)->waitUntilReady();
+		}
+		$current_time = time();
+
+		if ($dashboardid) {
 			$dashboard = CDashboardElement::find()->waitUntilReady()->one();
-			$nodes_table = $dashboard->getWidget('High availability nodes view')->query('xpath:.//table')->asTable()->one();
 			$server_address = $dashboard->getWidget('System stats view')->query('xpath:.//tbody/tr[1]/td[2]')->one();
 		}
+		else {
+			$server_address = $this->query('xpath://th[text()="Zabbix server is running"]/../td[2]')->one();
+		}
 
-		// Define expected absolute timestamps for calculating the lastaccess value.
-		$nodes = [
-			'Active node' => self::$active_lastaccess,
-			'Unavailable node' => self::$unavailable_lastaccess,
-			'Stopped node' => self::$stopped_lastaccess,
-			'Standby node' => self::$standby_lastaccess
-		];
+		// In report both Super admin and Admin see the HA nodes table, in widgets only Super admin sees it.
+		if (!$dashboardid || $user_type === USER_TYPE_SUPER_ADMIN) {
+			$nodes_table = (!$dashboardid)
+				? $this->query('xpath:(//table)[2]')->asTable()->one()
+				: $dashboard->getWidget('High availability nodes view')->query('xpath:.//table')->asTable()->one();
 
-		/**
-		 * The below foreach cycle compares lastaccess as time difference for each node in the widget or part of report
-		 * that displays the list of nodes and excludes corresponding element from screenshot.
-		 */
-		foreach ($nodes as $name => $lastaccess_db) {
-			$row = $nodes_table->findRow('Name', $name);
-			$last_seen = $row->getColumn('Last access');
-			self::$skip_fields[] = $last_seen;
+			// Define expected absolute timestamps for calculating the lastaccess value.
+			$nodes = [
+				'Active node' => self::$active_lastaccess,
+				'Unavailable node' => self::$unavailable_lastaccess,
+				'Stopped node' => self::$stopped_lastaccess,
+				'Standby node' => self::$standby_lastaccess
+			];
 
 			/**
-			 * Converting unix timestamp difference into difference in time units and creating an array of such reference
-			 * values. This is required because several seconds might have passed from defining $current_time and
-			 * loading the page. Afterwards, the presence of the actual last access value in this array is determined.
+			 * The below foreach cycle compares lastaccess as time difference for each node in the widget or part of report
+			 * that displays the list of nodes and excludes corresponding element from screenshot.
 			 */
-			$last_expected = [];
+			foreach ($nodes as $name => $lastaccess_db) {
+				$row = $nodes_table->findRow('Name', $name);
+				$last_seen = $row->getColumn('Last access');
+				self::$skip_fields[] = $last_seen;
 
-			// Negative $i values are considered because current_time may be defined before data in sysinfo widget gets displayed.
-			for ($i = -2; $i <= 6; $i++) {
-				$last_expected[] = convertUnitsS($current_time - $lastaccess_db - $i);
+				/**
+				 * Converting unix timestamp difference into difference in time units and creating an array of such reference
+				 * values. This is required because several seconds might have passed from defining $current_time and
+				 * loading the page. Afterwards, the presence of the actual last access value in this array is determined.
+				 */
+				$last_expected = [];
+
+				// Negative $i values are considered because current_time may be defined before data in sysinfo widget gets displayed.
+				for ($i = -2; $i <= 6; $i++) {
+					$last_expected[] = convertUnitsS($current_time - $lastaccess_db - $i);
+				}
+
+				$last_actual = $last_seen->getText();
+				$this->assertContains($last_actual, $last_expected, $last_actual.' not in ['.implode(', ', $last_expected).']');
+
+				// Check Zabbix server address and port for each record in the HA cluster nodes table.
+				if ($name === 'Active node') {
+					self::$skip_fields[] = $row->getColumn('Address');
+					$this->assertEquals($DB['SERVER'].':0', $row->getColumn('Address')->getText());
+				}
 			}
-
-			$last_actual = $last_seen->getText();
-			$this->assertContains($last_actual, $last_expected, $last_actual.' not in ['.implode(', ', $last_expected).']');
-
-			// Check Zabbix server address and port for each record in the HA cluster nodes table.
-			if ($name === 'Active node') {
-				self::$skip_fields[] = $row->getColumn('Address');
-				$this->assertEquals($DB['SERVER'].':0', $row->getColumn('Address')->getText());
-			}
+		}
+		else {
+			$this->assertEquals('No permissions to referred object or it does not exist!',
+					$dashboard->getWidget('High availability nodes view')->query('tag:table')->one()->getText()
+			);
 		}
 
 		// Check fields that are not checked in screenshot with enabled HA.

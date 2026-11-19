@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '8.0'
+  version: '8.2'
   template_groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -29,7 +29,7 @@ zabbix_export:
         1U rackmount, 8x Gigabit Ethernet, 2xSFP+ cages, LCD, 36 cores x 1.2GHz CPU, 8GB RAM, 41.5mpps fastpath, Up to 28Gbit/s throughput, RouterOS L6, Dual PSU
       vendor:
         name: Zabbix
-        version: 8.0-5
+        version: 8.2-0
       groups:
         - name: 'Templates/Network devices'
       items:

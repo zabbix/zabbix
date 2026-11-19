@@ -11,7 +11,7 @@ This guide describes how to integrate your Zabbix installation with ((OTRS)) Com
 
 ## Requirements
 
-Zabbix version: 8.0 and higher.
+Zabbix version: 8.2 and higher.
 
 ## Parameters
 
@@ -141,7 +141,7 @@ Internal parameters are reserved for predefined macros that are not meant to be 
 
 10. Done! You can now start using this media type in actions and create tickets.
 
-For more information, please see [Zabbix](https://www.zabbix.com/documentation/8.0/manual/config/notifications) and [((OTRS)) CE](https://otrscommunityedition.com/doc/) documentation.
+For more information, please see [Zabbix](https://www.zabbix.com/documentation/8.2/manual/config/notifications) and [((OTRS)) CE](https://otrscommunityedition.com/doc/) documentation.
 
 ## Feedback
 

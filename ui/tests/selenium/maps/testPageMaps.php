@@ -319,7 +319,6 @@ class testPageMaps extends CWebTest {
 						'Public map with image',
 						self::SYSMAP_TO_DELETE,
 						'Test map for Properties',
-						'testZBX6840',
 						self::SYSMAP_FIRST_Z
 					]
 				]

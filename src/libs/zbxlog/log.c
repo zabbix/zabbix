@@ -366,109 +366,27 @@ void	zbx_close_log(void)
 	log_type = ZBX_LOG_TYPE_UNDEFINED;
 }
 
-static void	log_impl(int level, const char *component, const char *fmt, va_list args)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Formats fmt/args into a MAX_BUFFER_LEN message and dispatches it  *
+ *          to syslog/Windows Event Log (ZBX_LOG_TYPE_SYSTEM) or, if logging  *
+ *          has not been configured yet, to stderr (ZBX_LOG_TYPE_UNDEFINED).  *
+ *                                                                            *
+ * Comments: It is required to reduce consumption of limited thread stack     *
+ *           space. Therefore the formatting functionality is kept here, in   *
+ *           a dedicated function, marked with ZBX_ATTR_NOINLINE and called   *
+ *           only for ZBX_LOG_TYPE_SYSTEM and ZBX_LOG_TYPE_UNDEFINED log      *
+ *           types.                                                           *
+ *                                                                            *
+ ******************************************************************************/
+static ZBX_ATTR_NOINLINE void	zbx_log_dispatch_formatted(int level, const char *component, const char *fmt,
+		va_list args)
 {
 	char		message[MAX_BUFFER_LEN];
 #ifdef _WINDOWS
 	WORD		wType;
 	wchar_t		thread_id[20], *strings[2];
-#else
-	zabbix_report_log_level_change();
 #endif
-
-#ifndef ZBX_ZABBIX_LOG_CHECK
-	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(level))
-		return;
-#endif
-
-	if (ZBX_LOG_TYPE_FILE == log_type)
-	{
-		FILE	*log_file;
-
-		LOCK_LOG;
-
-		if (0 != get_config_log_file_size())
-			rotate_log(log_filename);
-
-#ifndef _WINDOWS
-		mode_t	old_umask = umask(0026);
-#endif
-		log_file = fopen(log_filename, "a+");
-#ifndef _WINDOWS
-		umask(old_umask);
-#endif
-		if (NULL != log_file)
-		{
-			long		milliseconds;
-			struct tm	tm;
-
-			zbx_get_time(&tm, &milliseconds, NULL);
-
-			fprintf(log_file,
-					"%6li:%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld %s",
-					zbx_get_thread_id(),
-					tm.tm_year + 1900,
-					tm.tm_mon + 1,
-					tm.tm_mday,
-					tm.tm_hour,
-					tm.tm_min,
-					tm.tm_sec,
-					milliseconds,
-					component
-					);
-
-			vfprintf(log_file, fmt, args);
-
-			fprintf(log_file, "\n");
-
-			zbx_fclose(log_file);
-		}
-		else
-		{
-			zbx_error("failed to open log file: %s", zbx_strerror(errno));
-
-			zbx_vsnprintf(message, sizeof(message), fmt, args);
-
-			zbx_error("failed to write [%s] into log file", message);
-		}
-
-		UNLOCK_LOG;
-
-		return;
-	}
-
-	if (ZBX_LOG_TYPE_CONSOLE == log_type)
-	{
-		long		milliseconds;
-		struct tm	tm;
-
-		LOCK_LOG;
-
-		zbx_get_time(&tm, &milliseconds, NULL);
-
-		fprintf(stdout,
-				"%6li:%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld %s",
-				zbx_get_thread_id(),
-				tm.tm_year + 1900,
-				tm.tm_mon + 1,
-				tm.tm_mday,
-				tm.tm_hour,
-				tm.tm_min,
-				tm.tm_sec,
-				milliseconds,
-				component
-				);
-
-		vfprintf(stdout, fmt, args);
-
-		fprintf(stdout, "\n");
-
-		fflush(stdout);
-
-		UNLOCK_LOG;
-
-		return;
-	}
 
 	zbx_vsnprintf(message, sizeof(message), fmt, args);
 
@@ -562,6 +480,111 @@ static void	log_impl(int level, const char *component, const char *fmt, va_list 
 
 		UNLOCK_LOG;
 	}
+}
+
+static void	log_impl(int level, const char *component, const char *fmt, va_list args)
+{
+#ifndef _WINDOWS
+	zabbix_report_log_level_change();
+#endif
+
+#ifndef ZBX_ZABBIX_LOG_CHECK
+	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(level))
+		return;
+#endif
+
+	if (ZBX_LOG_TYPE_FILE == log_type)
+	{
+		FILE	*log_file;
+
+		LOCK_LOG;
+
+		if (0 != get_config_log_file_size())
+			rotate_log(log_filename);
+
+#ifndef _WINDOWS
+		mode_t	old_umask = umask(0026);
+#endif
+		log_file = fopen(log_filename, "a+");
+#ifndef _WINDOWS
+		umask(old_umask);
+#endif
+		if (NULL != log_file)
+		{
+			long		milliseconds;
+			struct tm	tm;
+
+			zbx_get_time(&tm, &milliseconds, NULL);
+
+			fprintf(log_file,
+					"%6li:%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld %s",
+					zbx_get_thread_id(),
+					tm.tm_year + 1900,
+					tm.tm_mon + 1,
+					tm.tm_mday,
+					tm.tm_hour,
+					tm.tm_min,
+					tm.tm_sec,
+					milliseconds,
+					component
+					);
+
+			vfprintf(log_file, fmt, args);
+
+			fprintf(log_file, "\n");
+
+			zbx_fclose(log_file);
+		}
+		else
+		{
+			char	message[ZBX_MESSAGE_BUF_SIZE];
+
+			zbx_error("failed to open log file: %s", zbx_strerror(errno));
+
+			zbx_vsnprintf(message, sizeof(message), fmt, args);
+
+			zbx_error("failed to write [%s] into log file", message);
+		}
+
+		UNLOCK_LOG;
+
+		return;
+	}
+
+	if (ZBX_LOG_TYPE_CONSOLE == log_type)
+	{
+		long		milliseconds;
+		struct tm	tm;
+
+		LOCK_LOG;
+
+		zbx_get_time(&tm, &milliseconds, NULL);
+
+		fprintf(stdout,
+				"%6li:%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld %s",
+				zbx_get_thread_id(),
+				tm.tm_year + 1900,
+				tm.tm_mon + 1,
+				tm.tm_mday,
+				tm.tm_hour,
+				tm.tm_min,
+				tm.tm_sec,
+				milliseconds,
+				component
+				);
+
+		vfprintf(stdout, fmt, args);
+
+		fprintf(stdout, "\n");
+
+		fflush(stdout);
+
+		UNLOCK_LOG;
+
+		return;
+	}
+
+	zbx_log_dispatch_formatted(level, component, fmt, args);
 }
 
 void	zabbix_log_impl(int level, const char *fmt, va_list args)
