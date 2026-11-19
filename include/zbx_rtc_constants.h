@@ -42,6 +42,7 @@
 #define ZBX_RTC_STATUS				27
 #define ZBX_RTC_MW_GET_WORKER_COUNT		28
 #define ZBX_RTC_MW_GET_WORKER_LOAD		29
+#define ZBX_RTC_PERMISSIONS_REBUILD		30
 
 /* internal rtc messages */
 #define ZBX_RTC_SUBSCRIBE			100
@@ -85,5 +86,6 @@
 #define ZBX_DBPOOL_SET_IDLE_TIMEOUT	"dbpool_set_idle_timeout"
 #define ZBX_DBPOOL_STATUS		"dbpool_status"
 #define ZBX_STATUS			"status"
+#define ZBX_PERMISSIONS_REBUILD		"permissions_rebuild"
 
 #endif
