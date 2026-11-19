@@ -103,7 +103,7 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: openshift.state.node.metrics
+            key: openshift.state.node.metrics.get
           tags:
             - tag: component
               value: cpu
@@ -122,7 +122,7 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: openshift.pod.resource.active.metrics
+            key: openshift.pod.resource.active.metrics.get
           tags:
             - tag: component
               value: cpu
@@ -141,7 +141,7 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: openshift.pod.resource.active.metrics
+            key: openshift.pod.resource.active.metrics.get
           tags:
             - tag: component
               value: cpu
@@ -157,7 +157,7 @@ zabbix_export:
                 - '$.data.result[?(@.metric.__name__==''container_cpu_usage_seconds_total'' && @.metric.scope==''namespace'')].value[1].sum()'
               error_handler: DISCARD_VALUE
           master_item:
-            key: openshift.resource.usage.metrics
+            key: openshift.resource.usage.metrics.get
           tags:
             - tag: component
               value: cpu
@@ -212,7 +212,7 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: openshift.state.node.metrics
+            key: openshift.state.node.metrics.get
           tags:
             - tag: component
               value: filesystem
@@ -232,7 +232,7 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: openshift.state.node.metrics
+            key: openshift.state.node.metrics.get
           tags:
             - tag: component
               value: filesystem
@@ -298,7 +298,7 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: openshift.state.node.metrics
+            key: openshift.state.node.metrics.get
           tags:
             - tag: component
               value: memory
@@ -318,7 +318,7 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: openshift.pod.resource.active.metrics
+            key: openshift.pod.resource.active.metrics.get
           tags:
             - tag: component
               value: memory
@@ -338,7 +338,7 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: openshift.pod.resource.active.metrics
+            key: openshift.pod.resource.active.metrics.get
           tags:
             - tag: component
               value: memory
@@ -358,7 +358,7 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: openshift.resource.usage.metrics
+            key: openshift.resource.usage.metrics.get
           tags:
             - tag: component
               value: memory
@@ -410,7 +410,7 @@ zabbix_export:
                 - '$.data.result[?(@.metric.__name__==''network_receive'' && @.metric.scope==''cluster'')].value[1].first()'
               error_handler: DISCARD_VALUE
           master_item:
-            key: openshift.network.usage.metrics
+            key: openshift.network.usage.metrics.get
           tags:
             - tag: component
               value: network
@@ -427,7 +427,7 @@ zabbix_export:
                 - '$.data.result[?(@.metric.__name__==''network_transmit'' && @.metric.scope==''cluster'')].value[1].first()'
               error_handler: DISCARD_VALUE
           master_item:
-            key: openshift.network.usage.metrics
+            key: openshift.network.usage.metrics.get
           tags:
             - tag: component
               value: network
@@ -442,7 +442,7 @@ zabbix_export:
                 - '$.data.result[?(@.metric.__name__==''kube_configmap_info'')].length()'
               error_handler: DISCARD_VALUE
           master_item:
-            key: openshift.state.workload.metrics
+            key: openshift.state.workload.metrics.get
           tags:
             - tag: component
               value: configmap
@@ -459,7 +459,7 @@ zabbix_export:
                 - '$.data.result[?(@.metric.__name__==''apiserver_request_success_rate'')].value[1].first()'
               error_handler: DISCARD_VALUE
           master_item:
-            key: openshift.platform.controlplane.metrics
+            key: openshift.platform.controlplane.metrics.get
           tags:
             - tag: component
               value: controlplane
@@ -486,7 +486,7 @@ zabbix_export:
                 - '$.data.result[?(@.metric.__name__==''apiserver_response_rate'')].value[1].first()'
               error_handler: DISCARD_VALUE
           master_item:
-            key: openshift.platform.controlplane.metrics
+            key: openshift.platform.controlplane.metrics.get
           tags:
             - tag: component
               value: controlplane
@@ -514,7 +514,7 @@ zabbix_export:
                 - '$.data.result[?(@.metric.__name__==''controller_manager_response_rate'')].value[1].first()'
               error_handler: DISCARD_VALUE
           master_item:
-            key: openshift.platform.controlplane.metrics
+            key: openshift.platform.controlplane.metrics.get
           tags:
             - tag: component
               value: controlplane
@@ -542,7 +542,7 @@ zabbix_export:
                 - '$.data.result[?(@.metric.__name__==''scheduler_response_rate'')].value[1].first()'
               error_handler: DISCARD_VALUE
           master_item:
-            key: openshift.platform.controlplane.metrics
+            key: openshift.platform.controlplane.metrics.get
           tags:
             - tag: component
               value: controlplane
@@ -568,7 +568,7 @@ zabbix_export:
                 - '$.data.result[?(@.metric.__name__==''kube_cronjob_info'')].length()'
               error_handler: DISCARD_VALUE
           master_item:
-            key: openshift.state.workload.metrics
+            key: openshift.state.workload.metrics.get
           tags:
             - tag: component
               value: cronjob
@@ -583,7 +583,7 @@ zabbix_export:
                 - '$.data.result[?(@.metric.__name__==''kube_daemonset_status_desired_number_scheduled'')].length()'
               error_handler: DISCARD_VALUE
           master_item:
-            key: openshift.state.workload.metrics
+            key: openshift.state.workload.metrics.get
           tags:
             - tag: component
               value: daemonset
@@ -598,7 +598,7 @@ zabbix_export:
                 - '$.data.result[?(@.metric.__name__==''kube_deployment_metadata_generation'')].length()'
               error_handler: DISCARD_VALUE
           master_item:
-            key: openshift.state.workload.metrics
+            key: openshift.state.workload.metrics.get
           tags:
             - tag: component
               value: deployment
@@ -613,14 +613,14 @@ zabbix_export:
                 - '$.data.result[?(@.metric.__name__==''kube_namespace_labels'')].length()'
               error_handler: DISCARD_VALUE
           master_item:
-            key: openshift.state.workload.metrics
+            key: openshift.state.workload.metrics.get
           tags:
             - tag: component
               value: namespace
         - uuid: 6b8d0f3e9c2a4b7d8e1f2a3b4c5d6e7f
           name: 'Get network usage metrics'
           type: HTTP_AGENT
-          key: openshift.network.usage.metrics
+          key: openshift.network.usage.metrics.get
           history: '0'
           value_type: JSON
           description: 'Collecting cluster-wide and namespace-level pod network throughput from the Thanos Querier API, distinguished by the `scope` label (`cluster` = cluster-wide total, `namespace` = per-namespace total). Restricted to `interface="eth0"` (the pod''s primary interface): on OVN-Kubernetes clusters cAdvisor also misattributes host-level bridge/tunnel interfaces (br-ex, br-int, veth pairs, etc.) onto every pod''s network stats, which would otherwise inflate the sum.'
@@ -644,7 +644,7 @@ zabbix_export:
         - uuid: 8aa4d1074bb94abda00b4f9e371828cd
           name: 'Get network usage metrics check'
           type: DEPENDENT
-          key: openshift.network.usage.metrics.check
+          key: openshift.network.usage.metrics.get.check
           value_type: CHAR
           description: 'Check that the network usage data has been received correctly from Thanos.'
           preprocessing:
@@ -656,13 +656,13 @@ zabbix_export:
               parameters:
                 - 3h
           master_item:
-            key: openshift.network.usage.metrics
+            key: openshift.network.usage.metrics.get
           tags:
             - tag: component
               value: status
           triggers:
             - uuid: b5f61c4ffc0a4d66a9e36dbbbf2e5ef7
-              expression: 'length(last(/OpenShift Cluster by HTTP/openshift.network.usage.metrics.check))>0'
+              expression: 'length(last(/OpenShift Cluster by HTTP/openshift.network.usage.metrics.get.check))>0'
               name: 'OpenShift Cluster: Failed to get network usage metrics'
               event_name: 'OpenShift Cluster: Failed to get network usage metrics'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -682,7 +682,7 @@ zabbix_export:
                 - '$.data.result[?(@.metric.__name__==''kube_node_info'')].length()'
               error_handler: DISCARD_VALUE
           master_item:
-            key: openshift.state.node.metrics
+            key: openshift.state.node.metrics.get
           tags:
             - tag: component
               value: node
@@ -697,7 +697,7 @@ zabbix_export:
                 - '$.data.result[?(@.metric.__name__==''kube_node_status_condition'' && @.metric.condition==''Ready'' && @.metric.status==''false'')].value[1].sum()'
               error_handler: DISCARD_VALUE
           master_item:
-            key: openshift.state.node.metrics
+            key: openshift.state.node.metrics.get
           tags:
             - tag: component
               value: node
@@ -712,7 +712,7 @@ zabbix_export:
                 - '$.data.result[?(@.metric.__name__==''kube_node_status_condition'' && @.metric.condition==''Ready'' && @.metric.status==''true'')].value[1].sum()'
               error_handler: DISCARD_VALUE
           master_item:
-            key: openshift.state.node.metrics
+            key: openshift.state.node.metrics.get
           tags:
             - tag: component
               value: node
@@ -727,7 +727,7 @@ zabbix_export:
                 - '$.data.result[?(@.metric.__name__==''kube_persistentvolume_info'')].length()'
               error_handler: DISCARD_VALUE
           master_item:
-            key: openshift.state.workload.metrics
+            key: openshift.state.workload.metrics.get
           tags:
             - tag: component
               value: pv
@@ -742,7 +742,7 @@ zabbix_export:
                 - '$.data.result[?(@.metric.__name__==''kube_persistentvolumeclaim_info'')].length()'
               error_handler: DISCARD_VALUE
           master_item:
-            key: openshift.state.workload.metrics
+            key: openshift.state.workload.metrics.get
           tags:
             - tag: component
               value: pvc
@@ -757,7 +757,7 @@ zabbix_export:
                 - '$.data.result[?(@.metric.__name__==''cluster_operator_conditions'' && @.metric.condition==''Degraded'' && @.value[1]==''1'')].length()'
               error_handler: DISCARD_VALUE
           master_item:
-            key: openshift.platform.health.metrics
+            key: openshift.platform.health.metrics.get
           tags:
             - tag: component
               value: platform
@@ -788,7 +788,7 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: openshift.platform.health.metrics
+            key: openshift.platform.health.metrics.get
           tags:
             - tag: component
               value: platform
@@ -806,7 +806,7 @@ zabbix_export:
         - uuid: 1b3c5d7e9f1a4b6c8d0e1f2a3b4c5d6e
           name: 'Get control plane metrics'
           type: HTTP_AGENT
-          key: openshift.platform.controlplane.metrics
+          key: openshift.platform.controlplane.metrics.get
           history: '0'
           value_type: JSON
           description: 'Collecting control plane component health (API servers, controller managers, schedulers, each as a percentage of instances reporting `up`) and the overall API request success rate from the Thanos Querier API.'
@@ -830,7 +830,7 @@ zabbix_export:
         - uuid: 98305d09e99d48a19f6ad04a5bc3aeb5
           name: 'Get control plane metrics check'
           type: DEPENDENT
-          key: openshift.platform.controlplane.metrics.check
+          key: openshift.platform.controlplane.metrics.get.check
           value_type: CHAR
           description: 'Check that the control plane data has been received correctly from Thanos.'
           preprocessing:
@@ -842,13 +842,13 @@ zabbix_export:
               parameters:
                 - 3h
           master_item:
-            key: openshift.platform.controlplane.metrics
+            key: openshift.platform.controlplane.metrics.get
           tags:
             - tag: component
               value: status
           triggers:
             - uuid: 2a694d9a7f2242fdb13e1e38d665f24e
-              expression: 'length(last(/OpenShift Cluster by HTTP/openshift.platform.controlplane.metrics.check))>0'
+              expression: 'length(last(/OpenShift Cluster by HTTP/openshift.platform.controlplane.metrics.get.check))>0'
               name: 'OpenShift Cluster: Failed to get control plane metrics'
               event_name: 'OpenShift Cluster: Failed to get control plane metrics'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -860,7 +860,7 @@ zabbix_export:
         - uuid: 3ca73125fa41441794d791ec5f409b84
           name: 'Get platform health metrics'
           type: HTTP_AGENT
-          key: openshift.platform.health.metrics
+          key: openshift.platform.health.metrics.get
           history: '0'
           value_type: JSON
           description: 'Collecting ClusterOperator status (and per-condition detail), ClusterVersion status, infrastructure provider/topology, and currently firing Prometheus alerts from the Thanos Querier API.'
@@ -880,7 +880,7 @@ zabbix_export:
         - uuid: 26ba8afcda7746e684b90e7952e2be25
           name: 'Get platform health metrics check'
           type: DEPENDENT
-          key: openshift.platform.health.metrics.check
+          key: openshift.platform.health.metrics.get.check
           value_type: CHAR
           description: 'Check that the platform health data has been received correctly from Thanos.'
           preprocessing:
@@ -892,13 +892,13 @@ zabbix_export:
               parameters:
                 - 3h
           master_item:
-            key: openshift.platform.health.metrics
+            key: openshift.platform.health.metrics.get
           tags:
             - tag: component
               value: status
           triggers:
             - uuid: 1df18d75b92b4e279120cc079d048bde
-              expression: 'length(last(/OpenShift Cluster by HTTP/openshift.platform.health.metrics.check))>0'
+              expression: 'length(last(/OpenShift Cluster by HTTP/openshift.platform.health.metrics.get.check))>0'
               name: 'OpenShift Cluster: Failed to get platform health metrics'
               event_name: 'OpenShift Cluster: Failed to get platform health metrics'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -923,7 +923,7 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: openshift.platform.health.metrics
+            key: openshift.platform.health.metrics.get
           tags:
             - tag: component
               value: platform
@@ -943,7 +943,7 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: openshift.platform.health.metrics
+            key: openshift.platform.health.metrics.get
           tags:
             - tag: component
               value: platform
@@ -967,7 +967,7 @@ zabbix_export:
                 - '$.data.result[?(@.metric.__name__==''kube_pod_status_phase'' && @.metric.phase==''Failed'')].value[1].sum()'
               error_handler: DISCARD_VALUE
           master_item:
-            key: openshift.state.pod.metrics
+            key: openshift.state.pod.metrics.get
           tags:
             - tag: component
               value: pod
@@ -993,7 +993,7 @@ zabbix_export:
                 - '$.data.result[?(@.metric.__name__==''kube_pod_status_phase'' && @.metric.phase==''Pending'')].value[1].sum()'
               error_handler: DISCARD_VALUE
           master_item:
-            key: openshift.state.pod.metrics
+            key: openshift.state.pod.metrics.get
           tags:
             - tag: component
               value: pod
@@ -1011,7 +1011,7 @@ zabbix_export:
         - uuid: c2df21c233fc4661bba4544dfadfe6fe
           name: 'Get active pod resource metrics'
           type: HTTP_AGENT
-          key: openshift.pod.resource.active.metrics
+          key: openshift.pod.resource.active.metrics.get
           history: '0'
           value_type: JSON
           description: 'Collecting namespace-level CPU/memory requests and limits, pre-aggregated server-side by PromQL, summed only over pods currently in the Pending or Running phase (joined against `kube_pod_status_phase` so completed/evicted pods don''t inflate the totals).'
@@ -1035,7 +1035,7 @@ zabbix_export:
         - uuid: f42064c04db140d7bdc99a1b14108965
           name: 'Get active pod resource metrics check'
           type: DEPENDENT
-          key: openshift.pod.resource.active.metrics.check
+          key: openshift.pod.resource.active.metrics.get.check
           value_type: CHAR
           description: 'Check that the active pod resource data has been received correctly from Thanos.'
           preprocessing:
@@ -1047,13 +1047,13 @@ zabbix_export:
               parameters:
                 - 3h
           master_item:
-            key: openshift.pod.resource.active.metrics
+            key: openshift.pod.resource.active.metrics.get
           tags:
             - tag: component
               value: status
           triggers:
             - uuid: a58deaba21164bc795a670e046cda463
-              expression: 'length(last(/OpenShift Cluster by HTTP/openshift.pod.resource.active.metrics.check))>0'
+              expression: 'length(last(/OpenShift Cluster by HTTP/openshift.pod.resource.active.metrics.get.check))>0'
               name: 'OpenShift Cluster: Failed to get active pod resource metrics'
               event_name: 'OpenShift Cluster: Failed to get active pod resource metrics'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1073,7 +1073,7 @@ zabbix_export:
                 - '$.data.result[?(@.metric.__name__==''kube_pod_status_phase'' && @.metric.phase==''Running'')].value[1].sum()'
               error_handler: DISCARD_VALUE
           master_item:
-            key: openshift.state.pod.metrics
+            key: openshift.state.pod.metrics.get
           tags:
             - tag: component
               value: pod
@@ -1088,14 +1088,14 @@ zabbix_export:
                 - '$.data.result[?(@.metric.__name__==''kube_replicaset_owner'')].length()'
               error_handler: DISCARD_VALUE
           master_item:
-            key: openshift.state.workload.metrics
+            key: openshift.state.workload.metrics.get
           tags:
             - tag: component
               value: replicaset
         - uuid: 1f7db9a51d9d48fd84dc13f984518b88
           name: 'Get resource usage metrics'
           type: HTTP_AGENT
-          key: openshift.resource.usage.metrics
+          key: openshift.resource.usage.metrics.get
           history: '0'
           value_type: JSON
           description: 'Collecting namespace- and pod-level CPU/memory usage, and namespace-level ephemeral filesystem usage, from the Thanos Querier API, pre-aggregated server-side by PromQL instead of client-side, distinguished by the `scope` label (`namespace` = per-namespace total, `pod` = per-pod total used to roll up per-deployment totals).'
@@ -1120,7 +1120,7 @@ zabbix_export:
         - uuid: 653bf25bc1d24183be1b2df9d957f837
           name: 'Get resource usage metrics check'
           type: DEPENDENT
-          key: openshift.resource.usage.metrics.check
+          key: openshift.resource.usage.metrics.get.check
           value_type: CHAR
           description: 'Check that the resource usage data has been received correctly from Thanos.'
           preprocessing:
@@ -1132,13 +1132,13 @@ zabbix_export:
               parameters:
                 - 3h
           master_item:
-            key: openshift.resource.usage.metrics
+            key: openshift.resource.usage.metrics.get
           tags:
             - tag: component
               value: status
           triggers:
             - uuid: a0e72a13b72348f4bd3dd23d8ea78e05
-              expression: 'length(last(/OpenShift Cluster by HTTP/openshift.resource.usage.metrics.check))>0'
+              expression: 'length(last(/OpenShift Cluster by HTTP/openshift.resource.usage.metrics.get.check))>0'
               name: 'OpenShift Cluster: Failed to get resource usage metrics'
               event_name: 'OpenShift Cluster: Failed to get resource usage metrics'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1158,7 +1158,7 @@ zabbix_export:
                 - '$.data.result[?(@.metric.__name__==''kube_secret_info'')].length()'
               error_handler: DISCARD_VALUE
           master_item:
-            key: openshift.state.workload.metrics
+            key: openshift.state.workload.metrics.get
           tags:
             - tag: component
               value: secret
@@ -1173,14 +1173,14 @@ zabbix_export:
                 - '$.data.result[?(@.metric.__name__==''kube_service_info'')].length()'
               error_handler: DISCARD_VALUE
           master_item:
-            key: openshift.state.workload.metrics
+            key: openshift.state.workload.metrics.get
           tags:
             - tag: component
               value: service
         - uuid: 2eaf4cde301a4728ad54a59281853c85
           name: 'Get node state metrics'
           type: HTTP_AGENT
-          key: openshift.state.node.metrics
+          key: openshift.state.node.metrics.get
           history: '0'
           value_type: JSON
           description: 'Collecting node-level kube-state-metrics and node-exporter filesystem metrics (restricted to the mountpoint, which backs kubelet/crio storage) from the Thanos Querier API.'
@@ -1200,7 +1200,7 @@ zabbix_export:
         - uuid: ad057cd288034d86a9b52b076cecf587
           name: 'Get node state metrics check'
           type: DEPENDENT
-          key: openshift.state.node.metrics.check
+          key: openshift.state.node.metrics.get.check
           value_type: CHAR
           description: 'Check that the node state data has been received correctly from Thanos.'
           preprocessing:
@@ -1212,13 +1212,13 @@ zabbix_export:
               parameters:
                 - 3h
           master_item:
-            key: openshift.state.node.metrics
+            key: openshift.state.node.metrics.get
           tags:
             - tag: component
               value: status
           triggers:
             - uuid: 62439e91d2e5457cbc8fa8cbddbbf4d4
-              expression: 'length(last(/OpenShift Cluster by HTTP/openshift.state.node.metrics.check))>0'
+              expression: 'length(last(/OpenShift Cluster by HTTP/openshift.state.node.metrics.get.check))>0'
               name: 'OpenShift Cluster: Failed to get node state metrics'
               event_name: 'OpenShift Cluster: Failed to get node state metrics'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1230,7 +1230,7 @@ zabbix_export:
         - uuid: 5a7c9e2d8b1f4a6c9d0e1f2a3b4c5d6e
           name: 'Get OpenShift object metrics'
           type: HTTP_AGENT
-          key: openshift.state.objects.metrics
+          key: openshift.state.objects.metrics.get
           history: '0'
           value_type: JSON
           description: 'Collecting OpenShift-specific object metrics (Route, BuildConfig, Build, ClusterResourceQuota) from `openshift-state-metrics`, federated via the Thanos Querier API.'
@@ -1250,7 +1250,7 @@ zabbix_export:
         - uuid: 7c1d9e3f5a2b4c6d8e0f1a2b3c4d5e6f
           name: 'Get OpenShift object metrics check'
           type: DEPENDENT
-          key: openshift.state.objects.metrics.check
+          key: openshift.state.objects.metrics.get.check
           value_type: CHAR
           description: 'Check that the OpenShift object data has been received correctly from Thanos.'
           preprocessing:
@@ -1262,13 +1262,13 @@ zabbix_export:
               parameters:
                 - 3h
           master_item:
-            key: openshift.state.objects.metrics
+            key: openshift.state.objects.metrics.get
           tags:
             - tag: component
               value: status
           triggers:
             - uuid: 1e9bc415121a45d0b7cf4a45f64916c5
-              expression: 'length(last(/OpenShift Cluster by HTTP/openshift.state.objects.metrics.check))>0'
+              expression: 'length(last(/OpenShift Cluster by HTTP/openshift.state.objects.metrics.get.check))>0'
               name: 'OpenShift Cluster: Failed to get OpenShift object metrics'
               event_name: 'OpenShift Cluster: Failed to get OpenShift object metrics'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1280,7 +1280,7 @@ zabbix_export:
         - uuid: f72e18969cbb4f238f948f7b7fa1f611
           name: 'Get pod state metrics'
           type: HTTP_AGENT
-          key: openshift.state.pod.metrics
+          key: openshift.state.pod.metrics.get
           history: '0'
           value_type: JSON
           description: 'Collecting pod-level kube-state-metrics from the Thanos Querier API. Pod metrics are collected separately from workload metrics because pods change more often, so a slow query does not affect the other items.'
@@ -1300,7 +1300,7 @@ zabbix_export:
         - uuid: f904a6e6446b4a6194207ceaf63484b5
           name: 'Get pod state metrics check'
           type: DEPENDENT
-          key: openshift.state.pod.metrics.check
+          key: openshift.state.pod.metrics.get.check
           value_type: CHAR
           description: 'Check that the pod state data has been received correctly from Thanos.'
           preprocessing:
@@ -1312,13 +1312,13 @@ zabbix_export:
               parameters:
                 - 3h
           master_item:
-            key: openshift.state.pod.metrics
+            key: openshift.state.pod.metrics.get
           tags:
             - tag: component
               value: status
           triggers:
             - uuid: 6f0a3e6bf71c4498aebd0a249e1d91d2
-              expression: 'length(last(/OpenShift Cluster by HTTP/openshift.state.pod.metrics.check))>0'
+              expression: 'length(last(/OpenShift Cluster by HTTP/openshift.state.pod.metrics.get.check))>0'
               name: 'OpenShift Cluster: Failed to get pod state metrics'
               event_name: 'OpenShift Cluster: Failed to get pod state metrics'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1330,7 +1330,7 @@ zabbix_export:
         - uuid: 188b61a99b3144ddaa903460b1f61a91
           name: 'Get workload state metrics'
           type: HTTP_AGENT
-          key: openshift.state.workload.metrics
+          key: openshift.state.workload.metrics.get
           history: '0'
           value_type: JSON
           description: 'Collecting namespace, deployment, statefulset, persistent volume/claim and ownership-chain kube-state-metrics from the Thanos Querier API.'
@@ -1350,7 +1350,7 @@ zabbix_export:
         - uuid: 5165e452402e4741a12e90a0e4564bc2
           name: 'Get workload state metrics check'
           type: DEPENDENT
-          key: openshift.state.workload.metrics.check
+          key: openshift.state.workload.metrics.get.check
           value_type: CHAR
           description: 'Check that the workload state data has been received correctly from Thanos.'
           preprocessing:
@@ -1362,13 +1362,13 @@ zabbix_export:
               parameters:
                 - 3h
           master_item:
-            key: openshift.state.workload.metrics
+            key: openshift.state.workload.metrics.get
           tags:
             - tag: component
               value: status
           triggers:
             - uuid: 446a133eeb644da28ffaa47f734f7a7f
-              expression: 'length(last(/OpenShift Cluster by HTTP/openshift.state.workload.metrics.check))>0'
+              expression: 'length(last(/OpenShift Cluster by HTTP/openshift.state.workload.metrics.get.check))>0'
               name: 'OpenShift Cluster: Failed to get workload state metrics'
               event_name: 'OpenShift Cluster: Failed to get workload state metrics'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -1388,7 +1388,7 @@ zabbix_export:
                 - '$.data.result[?(@.metric.__name__==''kube_statefulset_replicas'')].length()'
               error_handler: DISCARD_VALUE
           master_item:
-            key: openshift.state.workload.metrics
+            key: openshift.state.workload.metrics.get
           tags:
             - tag: component
               value: statefulset
@@ -1427,7 +1427,7 @@ zabbix_export:
                       var idx = {firing: 1, pending: 2};
                       return typeof idx[value] === 'undefined' ? 0 : idx[value];
               master_item:
-                key: openshift.platform.health.metrics
+                key: openshift.platform.health.metrics.get
               tags:
                 - tag: alertname
                   value: '{#ALERTNAME}'
@@ -1445,7 +1445,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
           master_item:
-            key: openshift.platform.health.metrics
+            key: openshift.platform.health.metrics.get
           lld_macro_paths:
             - lld_macro: '{#ALERTNAME}'
               path: $.alertname
@@ -1592,7 +1592,7 @@ zabbix_export:
                   parameters:
                     - 3h
               master_item:
-                key: openshift.state.objects.metrics
+                key: openshift.state.objects.metrics.get
               tags:
                 - tag: build
                   value: '{#NAME}'
@@ -1620,7 +1620,7 @@ zabbix_export:
                       var idx = {complete: 1, cancelled: 2, new: 3, pending: 4, running: 5, failed: 6, error: 7};
                       return typeof idx[value] === 'undefined' ? 0 : idx[value];
               master_item:
-                key: openshift.state.objects.metrics
+                key: openshift.state.objects.metrics.get
               tags:
                 - tag: build
                   value: '{#NAME}'
@@ -1639,7 +1639,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
           master_item:
-            key: openshift.state.objects.metrics
+            key: openshift.state.objects.metrics.get
           lld_macro_paths:
             - lld_macro: '{#NAMESPACE}'
               path: $.namespace
@@ -1682,7 +1682,7 @@ zabbix_export:
                   parameters:
                     - 3h
               master_item:
-                key: openshift.state.objects.metrics
+                key: openshift.state.objects.metrics.get
               tags:
                 - tag: buildconfig
                   value: '{#NAME}'
@@ -1703,7 +1703,7 @@ zabbix_export:
                     - '$.data.result[?(@.metric.__name__==''openshift_buildconfig_metadata_generation'' && @.metric.namespace==''{#NAMESPACE}'' && @.metric.buildconfig==''{#NAME}'')].value[1].first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: openshift.state.objects.metrics
+                key: openshift.state.objects.metrics.get
               tags:
                 - tag: buildconfig
                   value: '{#NAME}'
@@ -1727,7 +1727,7 @@ zabbix_export:
                   parameters:
                     - 3h
               master_item:
-                key: openshift.state.objects.metrics
+                key: openshift.state.objects.metrics.get
               tags:
                 - tag: buildconfig
                   value: '{#NAME}'
@@ -1738,7 +1738,7 @@ zabbix_export:
                 - tag: namespace
                   value: '{#NAMESPACE}'
           master_item:
-            key: openshift.state.objects.metrics
+            key: openshift.state.objects.metrics.get
           lld_macro_paths:
             - lld_macro: '{#NAMESPACE}'
               path: $.namespace
@@ -1778,7 +1778,7 @@ zabbix_export:
                     - '$.data.result[?(@.metric.__name__==''openshift_clusterresourcequota_usage'' && @.metric.name==''{#NAME}'' && @.metric.resource==''limits.cpu'' && @.metric.type==''hard'')].value[1].first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: openshift.state.objects.metrics
+                key: openshift.state.objects.metrics.get
               tags:
                 - tag: component
                   value: cpu
@@ -1800,7 +1800,7 @@ zabbix_export:
                     - '$.data.result[?(@.metric.__name__==''openshift_clusterresourcequota_usage'' && @.metric.name==''{#NAME}'' && @.metric.resource==''limits.cpu'' && @.metric.type==''used'')].value[1].first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: openshift.state.objects.metrics
+                key: openshift.state.objects.metrics.get
               tags:
                 - tag: component
                   value: cpu
@@ -1822,7 +1822,7 @@ zabbix_export:
                     - '$.data.result[?(@.metric.__name__==''openshift_clusterresourcequota_usage'' && @.metric.name==''{#NAME}'' && @.metric.resource==''requests.cpu'' && @.metric.type==''hard'')].value[1].first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: openshift.state.objects.metrics
+                key: openshift.state.objects.metrics.get
               tags:
                 - tag: component
                   value: cpu
@@ -1844,7 +1844,7 @@ zabbix_export:
                     - '$.data.result[?(@.metric.__name__==''openshift_clusterresourcequota_usage'' && @.metric.name==''{#NAME}'' && @.metric.resource==''requests.cpu'' && @.metric.type==''used'')].value[1].first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: openshift.state.objects.metrics
+                key: openshift.state.objects.metrics.get
               tags:
                 - tag: component
                   value: cpu
@@ -1867,7 +1867,7 @@ zabbix_export:
                     - '$.data.result[?(@.metric.__name__==''openshift_clusterresourcequota_usage'' && @.metric.name==''{#NAME}'' && @.metric.resource==''limits.memory'' && @.metric.type==''hard'')].value[1].first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: openshift.state.objects.metrics
+                key: openshift.state.objects.metrics.get
               tags:
                 - tag: component
                   value: memory
@@ -1890,7 +1890,7 @@ zabbix_export:
                     - '$.data.result[?(@.metric.__name__==''openshift_clusterresourcequota_usage'' && @.metric.name==''{#NAME}'' && @.metric.resource==''limits.memory'' && @.metric.type==''used'')].value[1].first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: openshift.state.objects.metrics
+                key: openshift.state.objects.metrics.get
               tags:
                 - tag: component
                   value: memory
@@ -1913,7 +1913,7 @@ zabbix_export:
                     - '$.data.result[?(@.metric.__name__==''openshift_clusterresourcequota_usage'' && @.metric.name==''{#NAME}'' && @.metric.resource==''requests.memory'' && @.metric.type==''hard'')].value[1].first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: openshift.state.objects.metrics
+                key: openshift.state.objects.metrics.get
               tags:
                 - tag: component
                   value: memory
@@ -1936,7 +1936,7 @@ zabbix_export:
                     - '$.data.result[?(@.metric.__name__==''openshift_clusterresourcequota_usage'' && @.metric.name==''{#NAME}'' && @.metric.resource==''requests.memory'' && @.metric.type==''used'')].value[1].first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: openshift.state.objects.metrics
+                key: openshift.state.objects.metrics.get
               tags:
                 - tag: component
                   value: memory
@@ -1957,7 +1957,7 @@ zabbix_export:
                     - '$.data.result[?(@.metric.__name__==''openshift_clusterresourcequota_usage'' && @.metric.name==''{#NAME}'' && @.metric.resource==''pods'' && @.metric.type==''hard'')].value[1].first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: openshift.state.objects.metrics
+                key: openshift.state.objects.metrics.get
               tags:
                 - tag: component
                   value: openshift
@@ -1978,7 +1978,7 @@ zabbix_export:
                     - '$.data.result[?(@.metric.__name__==''openshift_clusterresourcequota_usage'' && @.metric.name==''{#NAME}'' && @.metric.resource==''pods'' && @.metric.type==''used'')].value[1].first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: openshift.state.objects.metrics
+                key: openshift.state.objects.metrics.get
               tags:
                 - tag: component
                   value: openshift
@@ -1989,7 +1989,7 @@ zabbix_export:
                 - tag: type
                   value: used
           master_item:
-            key: openshift.state.objects.metrics
+            key: openshift.state.objects.metrics.get
           lld_macro_paths:
             - lld_macro: '{#NAME}'
               path: $.name
@@ -2080,7 +2080,7 @@ zabbix_export:
                       var idx = {Available: 1, Progressing: 2, Degraded: 3};
                       return typeof idx[value] === 'undefined' ? 0 : idx[value];
               master_item:
-                key: openshift.platform.health.metrics
+                key: openshift.platform.health.metrics.get
               tags:
                 - tag: clusteroperator
                   value: '{#NAME}'
@@ -2096,7 +2096,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
           master_item:
-            key: openshift.platform.health.metrics
+            key: openshift.platform.health.metrics.get
           lld_macro_paths:
             - lld_macro: '{#NAME}'
               path: $.name
@@ -2134,7 +2134,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: openshift.resource.usage.metrics
+                key: openshift.resource.usage.metrics.get
               tags:
                 - tag: component
                   value: cpu
@@ -2231,7 +2231,7 @@ zabbix_export:
                       
                       return String(sum);
               master_item:
-                key: openshift.state.pod.metrics
+                key: openshift.state.pod.metrics.get
               tags:
                 - tag: component
                   value: cpu
@@ -2312,7 +2312,7 @@ zabbix_export:
                       
                       return String(sum);
               master_item:
-                key: openshift.state.pod.metrics
+                key: openshift.state.pod.metrics.get
               tags:
                 - tag: component
                   value: deployment
@@ -2336,7 +2336,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: openshift.resource.usage.metrics
+                key: openshift.resource.usage.metrics.get
               tags:
                 - tag: component
                   value: deployment
@@ -2374,7 +2374,7 @@ zabbix_export:
                     - '$.data.result[?(@.metric.__name__==''kube_deployment_status_replicas_available'' && @.metric.namespace==''{#NAMESPACE}'' && @.metric.deployment==''{#DEPLOYMENT}'')].value[1].first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: openshift.state.workload.metrics
+                key: openshift.state.workload.metrics.get
               tags:
                 - tag: component
                   value: deployment
@@ -2395,7 +2395,7 @@ zabbix_export:
                     - '$.data.result[?(@.metric.__name__==''kube_deployment_spec_replicas'' && @.metric.namespace==''{#NAMESPACE}'' && @.metric.deployment==''{#DEPLOYMENT}'')].value[1].first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: openshift.state.workload.metrics
+                key: openshift.state.workload.metrics.get
               tags:
                 - tag: component
                   value: deployment
@@ -2486,7 +2486,7 @@ zabbix_export:
                       
                       return String(sum);
               master_item:
-                key: openshift.state.pod.metrics
+                key: openshift.state.pod.metrics.get
               tags:
                 - tag: component
                   value: cpu
@@ -2567,7 +2567,7 @@ zabbix_export:
                       
                       return String(sum);
               master_item:
-                key: openshift.state.pod.metrics
+                key: openshift.state.pod.metrics.get
               tags:
                 - tag: component
                   value: deployment
@@ -2593,7 +2593,7 @@ zabbix_export:
           parent_discovery_rule:
             key: openshift.namespace.discovery
           master_item:
-            key: openshift.state.workload.metrics
+            key: openshift.state.workload.metrics.get
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -2728,7 +2728,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: openshift.resource.usage.metrics
+                key: openshift.resource.usage.metrics.get
               tags:
                 - tag: component
                   value: cpu
@@ -2765,7 +2765,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: openshift.resource.usage.metrics
+                key: openshift.resource.usage.metrics.get
               tags:
                 - tag: component
                   value: filesystem
@@ -2800,7 +2800,7 @@ zabbix_export:
                     - '$.data.result[?(@.metric.__name__==''openshift_active_pod_limits_cpu'' && @.metric.namespace==''{#NAMESPACE}'')].value[1].first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: openshift.pod.resource.active.metrics
+                key: openshift.pod.resource.active.metrics.get
               tags:
                 - tag: component
                   value: cpu
@@ -2821,7 +2821,7 @@ zabbix_export:
                     - '$.data.result[?(@.metric.__name__==''openshift_active_pod_limits_memory'' && @.metric.namespace==''{#NAMESPACE}'')].value[1].first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: openshift.pod.resource.active.metrics
+                key: openshift.pod.resource.active.metrics.get
               tags:
                 - tag: component
                   value: memory
@@ -2843,7 +2843,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: openshift.resource.usage.metrics
+                key: openshift.resource.usage.metrics.get
               tags:
                 - tag: component
                   value: memory
@@ -2880,7 +2880,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: openshift.network.usage.metrics
+                key: openshift.network.usage.metrics.get
               tags:
                 - tag: component
                   value: namespace
@@ -2902,7 +2902,7 @@ zabbix_export:
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
               master_item:
-                key: openshift.network.usage.metrics
+                key: openshift.network.usage.metrics.get
               tags:
                 - tag: component
                   value: namespace
@@ -2921,7 +2921,7 @@ zabbix_export:
                     - '$.data.result[?(@.metric.__name__==''kube_pod_status_phase'' && @.metric.namespace==''{#NAMESPACE}'' && @.metric.phase==''Failed'')].value[1].sum()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: openshift.state.pod.metrics
+                key: openshift.state.pod.metrics.get
               tags:
                 - tag: component
                   value: namespace
@@ -2940,7 +2940,7 @@ zabbix_export:
                     - '$.data.result[?(@.metric.__name__==''kube_pod_status_phase'' && @.metric.namespace==''{#NAMESPACE}'' && @.metric.phase==''Pending'')].value[1].sum()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: openshift.state.pod.metrics
+                key: openshift.state.pod.metrics.get
               tags:
                 - tag: component
                   value: namespace
@@ -2970,7 +2970,7 @@ zabbix_export:
                     - '$.data.result[?(@.metric.__name__==''kube_pod_status_phase'' && @.metric.namespace==''{#NAMESPACE}'' && @.metric.phase==''Running'')].value[1].sum()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: openshift.state.pod.metrics
+                key: openshift.state.pod.metrics.get
               tags:
                 - tag: component
                   value: namespace
@@ -2990,7 +2990,7 @@ zabbix_export:
                     - '$.data.result[?(@.metric.__name__==''openshift_active_pod_requests_cpu'' && @.metric.namespace==''{#NAMESPACE}'')].value[1].first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: openshift.pod.resource.active.metrics
+                key: openshift.pod.resource.active.metrics.get
               tags:
                 - tag: component
                   value: cpu
@@ -3011,7 +3011,7 @@ zabbix_export:
                     - '$.data.result[?(@.metric.__name__==''openshift_active_pod_requests_memory'' && @.metric.namespace==''{#NAMESPACE}'')].value[1].first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: openshift.pod.resource.active.metrics
+                key: openshift.pod.resource.active.metrics.get
               tags:
                 - tag: component
                   value: memory
@@ -3037,7 +3037,7 @@ zabbix_export:
                       var idx = {Active: 1, Terminating: 2};
                       return typeof idx[value] === 'undefined' ? 0 : idx[value];
               master_item:
-                key: openshift.state.workload.metrics
+                key: openshift.state.workload.metrics.get
               tags:
                 - tag: component
                   value: namespace
@@ -3055,7 +3055,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
           master_item:
-            key: openshift.state.workload.metrics
+            key: openshift.state.workload.metrics.get
           lld_macro_paths:
             - lld_macro: '{#LABELS}'
               path: $.labels_joined
@@ -3129,7 +3129,7 @@ zabbix_export:
                 - tag: os-image
                   value: '{#OS.IMAGE}'
           master_item:
-            key: openshift.state.node.metrics
+            key: openshift.state.node.metrics.get
           lld_macro_paths:
             - lld_macro: '{#KERNEL}'
               path: $.kernel_version
@@ -3239,7 +3239,7 @@ zabbix_export:
                     - '$.data.result[?(@.metric.__name__==''kube_pod_container_status_restarts_total'' && @.metric.namespace==''{#NAMESPACE}'' && @.metric.pod==''{#NAME}'')].value[1].sum()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: openshift.state.pod.metrics
+                key: openshift.state.pod.metrics.get
               tags:
                 - tag: component
                   value: pod
@@ -3287,7 +3287,7 @@ zabbix_export:
                       var idx = {Pending: 1, Succeeded: 2, Failed: 3, Unknown: 4, Running: 5};
                       return typeof idx[value] === 'undefined' ? 0 : idx[value];
               master_item:
-                key: openshift.state.pod.metrics
+                key: openshift.state.pod.metrics.get
               tags:
                 - tag: component
                   value: phase
@@ -3323,7 +3323,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
           master_item:
-            key: openshift.state.pod.metrics
+            key: openshift.state.pod.metrics.get
           lld_macro_paths:
             - lld_macro: '{#NAMESPACE}'
               path: $.namespace
@@ -3364,7 +3364,7 @@ zabbix_export:
                     - '$.data.result[?(@.metric.__name__==''kube_persistentvolume_capacity_bytes'' && @.metric.persistentvolume==''{#NAME}'')].value[1].first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: openshift.state.workload.metrics
+                key: openshift.state.workload.metrics.get
               tags:
                 - tag: component
                   value: pv
@@ -3388,7 +3388,7 @@ zabbix_export:
                       var idx = {Available: 1, Bound: 2, Failed: 3, Lost: 4, Pending: 5, Released: 6};
                       return typeof idx[value] === 'undefined' ? 0 : idx[value];
               master_item:
-                key: openshift.state.workload.metrics
+                key: openshift.state.workload.metrics.get
               tags:
                 - tag: component
                   value: phase
@@ -3406,7 +3406,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
           master_item:
-            key: openshift.state.workload.metrics
+            key: openshift.state.workload.metrics.get
           lld_macro_paths:
             - lld_macro: '{#NAME}'
               path: $.persistentvolume
@@ -3445,7 +3445,7 @@ zabbix_export:
                     - '$.data.result[?(@.metric.__name__==''kube_persistentvolumeclaim_resource_requests_storage_bytes'' && @.metric.namespace==''{#NAMESPACE}'' && @.metric.persistentvolumeclaim==''{#NAME}'')].value[1].first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: openshift.state.workload.metrics
+                key: openshift.state.workload.metrics.get
               tags:
                 - tag: component
                   value: pvc
@@ -3471,7 +3471,7 @@ zabbix_export:
                       var idx = {Available: 1, Bound: 2, Failed: 3, Lost: 4, Pending: 5, Released: 6};
                       return typeof idx[value] === 'undefined' ? 0 : idx[value];
               master_item:
-                key: openshift.state.workload.metrics
+                key: openshift.state.workload.metrics.get
               tags:
                 - tag: component
                   value: phase
@@ -3499,7 +3499,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
           master_item:
-            key: openshift.state.workload.metrics
+            key: openshift.state.workload.metrics.get
           lld_macro_paths:
             - lld_macro: '{#NAMESPACE}'
               path: $.namespace
@@ -3542,7 +3542,7 @@ zabbix_export:
                   parameters:
                     - 3h
               master_item:
-                key: openshift.state.objects.metrics
+                key: openshift.state.objects.metrics.get
               tags:
                 - tag: component
                   value: openshift
@@ -3568,7 +3568,7 @@ zabbix_export:
                   error_handler: DISCARD_VALUE
                 - type: BOOL_TO_DECIMAL
               master_item:
-                key: openshift.state.objects.metrics
+                key: openshift.state.objects.metrics.get
               tags:
                 - tag: component
                   value: openshift
@@ -3589,7 +3589,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
           master_item:
-            key: openshift.state.objects.metrics
+            key: openshift.state.objects.metrics.get
           lld_macro_paths:
             - lld_macro: '{#HOST}'
               path: $.host
@@ -9243,7 +9243,7 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: openshift.node.state.metrics
+            key: openshift.node.state.metrics.get
           tags:
             - tag: component
               value: cpu
@@ -9262,7 +9262,7 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: openshift.node.usage.metrics
+            key: openshift.node.usage.metrics.get
           tags:
             - tag: component
               value: cpu
@@ -9279,7 +9279,7 @@ zabbix_export:
                 - '$.data.result[?(@.metric.__name__==''node_cpu_utilization'')].value[1].first()'
               error_handler: DISCARD_VALUE
           master_item:
-            key: openshift.node.usage.metrics
+            key: openshift.node.usage.metrics.get
           tags:
             - tag: component
               value: cpu
@@ -9297,7 +9297,7 @@ zabbix_export:
         - uuid: 1a0796f2f10e415bbe2e8a31a52dce5b
           name: 'Get node-exporter metrics'
           type: HTTP_AGENT
-          key: openshift.node.exporter.metrics
+          key: openshift.node.exporter.metrics.get
           history: '0'
           value_type: TEXT
           description: 'Collecting node-exporter load, memory, boot time and filesystem metrics of the node from the Thanos Querier API. Filesystem metrics are restricted to the mountpoint, which backs kubelet/crio storage.'
@@ -9317,7 +9317,7 @@ zabbix_export:
         - uuid: 42c7829faead4b569e99a77d7db17cd5
           name: 'Get node-exporter metrics check'
           type: DEPENDENT
-          key: openshift.node.exporter.metrics.check
+          key: openshift.node.exporter.metrics.get.check
           value_type: CHAR
           description: 'Check that the node-exporter data has been received correctly from Thanos.'
           preprocessing:
@@ -9329,13 +9329,13 @@ zabbix_export:
               parameters:
                 - 3h
           master_item:
-            key: openshift.node.exporter.metrics
+            key: openshift.node.exporter.metrics.get
           tags:
             - tag: component
               value: status
           triggers:
             - uuid: 3fb85a6abac44dbb81577b66baa2ec91
-              expression: 'length(last(/OpenShift Node by HTTP/openshift.node.exporter.metrics.check))>0'
+              expression: 'length(last(/OpenShift Node by HTTP/openshift.node.exporter.metrics.get.check))>0'
               name: 'OpenShift Node: Failed to get node-exporter metrics'
               event_name: 'OpenShift Node: Failed to get node-exporter metrics'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -9360,7 +9360,7 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: openshift.node.exporter.metrics
+            key: openshift.node.exporter.metrics.get
           tags:
             - tag: component
               value: filesystem
@@ -9380,7 +9380,7 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: openshift.node.exporter.metrics
+            key: openshift.node.exporter.metrics.get
           tags:
             - tag: component
               value: filesystem
@@ -9435,7 +9435,7 @@ zabbix_export:
                 - '$.data.result[?(@.metric.__name__==''node_load1'')].value[1].first()'
               error_handler: DISCARD_VALUE
           master_item:
-            key: openshift.node.exporter.metrics
+            key: openshift.node.exporter.metrics.get
           tags:
             - tag: component
               value: cpu
@@ -9451,7 +9451,7 @@ zabbix_export:
                 - '$.data.result[?(@.metric.__name__==''node_load5'')].value[1].first()'
               error_handler: DISCARD_VALUE
           master_item:
-            key: openshift.node.exporter.metrics
+            key: openshift.node.exporter.metrics.get
           tags:
             - tag: component
               value: cpu
@@ -9467,7 +9467,7 @@ zabbix_export:
                 - '$.data.result[?(@.metric.__name__==''node_load15'')].value[1].first()'
               error_handler: DISCARD_VALUE
           master_item:
-            key: openshift.node.exporter.metrics
+            key: openshift.node.exporter.metrics.get
           tags:
             - tag: component
               value: cpu
@@ -9487,7 +9487,7 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: openshift.node.state.metrics
+            key: openshift.node.state.metrics.get
           tags:
             - tag: component
               value: memory
@@ -9507,7 +9507,7 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: openshift.node.exporter.metrics
+            key: openshift.node.exporter.metrics.get
           tags:
             - tag: component
               value: memory
@@ -9527,7 +9527,7 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: openshift.node.exporter.metrics
+            key: openshift.node.exporter.metrics.get
           tags:
             - tag: component
               value: memory
@@ -9568,7 +9568,7 @@ zabbix_export:
                 - '$.data.result[?(@.metric.__name__==''node_network_receive'')].value[1].first()'
               error_handler: DISCARD_VALUE
           master_item:
-            key: openshift.node.usage.metrics
+            key: openshift.node.usage.metrics.get
           tags:
             - tag: component
               value: network
@@ -9585,7 +9585,7 @@ zabbix_export:
                 - '$.data.result[?(@.metric.__name__==''node_network_transmit'')].value[1].first()'
               error_handler: DISCARD_VALUE
           master_item:
-            key: openshift.node.usage.metrics
+            key: openshift.node.usage.metrics.get
           tags:
             - tag: component
               value: network
@@ -9607,7 +9607,7 @@ zabbix_export:
                   var idx = {'true': 1, unknown: 2, 'false': 3};
                   return typeof idx[value] === 'undefined' ? 0 : idx[value];
           master_item:
-            key: openshift.node.state.metrics
+            key: openshift.node.state.metrics.get
           tags:
             - tag: component
               value: node
@@ -9637,14 +9637,14 @@ zabbix_export:
                 - '$.data.result[?(@.metric.__name__==''kube_node_spec_unschedulable'')].value[1].first()'
               error_handler: DISCARD_VALUE
           master_item:
-            key: openshift.node.state.metrics
+            key: openshift.node.state.metrics.get
           tags:
             - tag: component
               value: node
         - uuid: 91317a9b43df4c1d987ccd04198a3ddb
           name: 'Get node state metrics'
           type: HTTP_AGENT
-          key: openshift.node.state.metrics
+          key: openshift.node.state.metrics.get
           history: '0'
           value_type: TEXT
           description: 'Collecting kube-state-metrics of the node from the Thanos Querier API.'
@@ -9664,7 +9664,7 @@ zabbix_export:
         - uuid: 13268e39a4954678be8198485f08e285
           name: 'Get node state metrics check'
           type: DEPENDENT
-          key: openshift.node.state.metrics.check
+          key: openshift.node.state.metrics.get.check
           value_type: CHAR
           description: 'Check that the node state data has been received correctly from Thanos.'
           preprocessing:
@@ -9676,13 +9676,13 @@ zabbix_export:
               parameters:
                 - 3h
           master_item:
-            key: openshift.node.state.metrics
+            key: openshift.node.state.metrics.get
           tags:
             - tag: component
               value: status
           triggers:
             - uuid: 79544601cc844605926b846581b13da8
-              expression: 'length(last(/OpenShift Node by HTTP/openshift.node.state.metrics.check))>0'
+              expression: 'length(last(/OpenShift Node by HTTP/openshift.node.state.metrics.get.check))>0'
               name: 'OpenShift Node: Failed to get node state metrics'
               event_name: 'OpenShift Node: Failed to get node state metrics'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -9706,7 +9706,7 @@ zabbix_export:
               parameters:
                 - 'return Math.floor(Date.now() / 1000 - Number(value));'
           master_item:
-            key: openshift.node.exporter.metrics
+            key: openshift.node.exporter.metrics.get
           tags:
             - tag: component
               value: node
@@ -9725,7 +9725,7 @@ zabbix_export:
         - uuid: 61a0c42a143443fda1760b13d9ffe8cb
           name: 'Get node usage metrics'
           type: HTTP_AGENT
-          key: openshift.node.usage.metrics
+          key: openshift.node.usage.metrics.get
           history: '0'
           value_type: TEXT
           description: 'Collecting the node CPU utilization, number of CPU cores, and network receive/transmit throughput from the Thanos Querier API, pre-aggregated server-side by PromQL. Network totals exclude loopback and virtual interfaces via `{$OPENSHIFT.NODE.NETWORK.IF.EXCLUDE}`.'
@@ -9749,7 +9749,7 @@ zabbix_export:
         - uuid: a5b1d29b1d4444ceaedcde2583e3eb5b
           name: 'Get node usage metrics check'
           type: DEPENDENT
-          key: openshift.node.usage.metrics.check
+          key: openshift.node.usage.metrics.get.check
           value_type: CHAR
           description: 'Check that the node usage data has been received correctly from Thanos.'
           preprocessing:
@@ -9761,13 +9761,13 @@ zabbix_export:
               parameters:
                 - 3h
           master_item:
-            key: openshift.node.usage.metrics
+            key: openshift.node.usage.metrics.get
           tags:
             - tag: component
               value: status
           triggers:
             - uuid: 751a1f85f73544bda3acef465ca84370
-              expression: 'length(last(/OpenShift Node by HTTP/openshift.node.usage.metrics.check))>0'
+              expression: 'length(last(/OpenShift Node by HTTP/openshift.node.usage.metrics.get.check))>0'
               name: 'OpenShift Node: Failed to get node usage metrics'
               event_name: 'OpenShift Node: Failed to get node usage metrics'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
