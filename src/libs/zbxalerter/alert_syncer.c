@@ -179,8 +179,8 @@ static int	am_db_get_alerts(zbx_vector_am_db_alert_ptr_t *alerts)
 		if (SUCCEED == zbx_db_is_null(row[7]))
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"update alerts set status=%d,retries=0,error='Related event was removed.';\n",
-					ALERT_STATUS_FAILED);
+					"update alerts set status=%d,retries=0,error='Related event was removed.'"
+					" where alertid=" ZBX_FS_UI64 ";\n", ALERT_STATUS_FAILED, alertid);
 			if (FAIL == (ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 				break;
 			continue;
@@ -204,7 +204,6 @@ static int	am_db_get_alerts(zbx_vector_am_db_alert_ptr_t *alerts)
 	{
 		if (0 != alertids.values_num)
 		{
-			sql_offset = 0;
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update alerts set status=%d where",
 					ALERT_STATUS_NOT_SENT);
 			zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "alertid", alertids.values,
