@@ -33,25 +33,6 @@ void	zbx_backtrace(void)
 {
 }
 
-static zbx_uint64_t	pb_mock_nextid;
-
-void	zbx_pb_mock_set_nextid(zbx_uint64_t id)
-{
-	pb_mock_nextid = id;
-}
-
-zbx_uint64_t	zbx_dc_get_nextid(const char *table, int num);
-
-zbx_uint64_t	zbx_dc_get_nextid(const char *table, int num)
-{
-	zbx_uint64_t	id = pb_mock_nextid;
-
-	ZBX_UNUSED(table);
-	pb_mock_nextid += (zbx_uint64_t)num;
-
-	return id;
-}
-
 void	zbx_dc_config_get_items_by_itemids(void *items, const zbx_uint64_t *itemids, int *errcodes, size_t num);
 
 void	zbx_dc_config_get_items_by_itemids(void *items, const zbx_uint64_t *itemids, int *errcodes, size_t num)
