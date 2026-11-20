@@ -1,1 +1,0 @@
-A......... [ZBX-28291] removed unnecessary curl_close() call deprecated in PHP 8.5 (wczerneha)
