@@ -492,6 +492,14 @@ static int	threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_
  *               FAIL    - threads made no progress for timeout seconds and   *
  *                         were killed                                        *
  *                                                                            *
+ * Comments: Timeout case only: if no progress is made for timeout seconds,   *
+ *           all remaining processes are killed at once, ignoring priority    *
+ *           order, and FAIL is returned so that history cache is not synced. *
+ *           Killed process may have left shared memory half-updated or lock  *
+ *           held (pthread mutexes may deadlock, with SysV semaphores lock is *
+ *           released, but subsequent sync could read inconsistent caches and *
+ *           write them to database).                                         *
+ *                                                                            *
  ******************************************************************************/
 int	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num, int timeout,
 		zbx_threads_progress_f progress_cb)
