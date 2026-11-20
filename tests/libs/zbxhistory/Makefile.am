@@ -19,7 +19,6 @@ zbx_history_get_values_SOURCES = \
 
 zbx_history_get_values_WRAP = \
 	-Wl,--wrap=zbx_sleep_loop \
-	-Wl,--wrap=zbx_dc_get_nextid \
 	-Wl,--wrap=zbx_interface_availability_is_set \
 	-Wl,--wrap=zbx_add_event \
 	-Wl,--wrap=zbx_process_events \
@@ -49,7 +48,6 @@ history_clickhouse_parse_response_SOURCES = \
 
 history_clickhouse_parse_response_WRAP = \
 	-Wl,--wrap=zbx_sleep_loop \
-	-Wl,--wrap=zbx_dc_get_nextid \
 	-Wl,--wrap=zbx_interface_availability_is_set \
 	-Wl,--wrap=zbx_add_event \
 	-Wl,--wrap=zbx_process_events \
@@ -80,7 +78,6 @@ history_provider_parse_options_SOURCES = \
 
 history_provider_parse_options_WRAP = \
 	-Wl,--wrap=zbx_sleep_loop \
-	-Wl,--wrap=zbx_dc_get_nextid \
 	-Wl,--wrap=zbx_interface_availability_is_set \
 	-Wl,--wrap=zbx_add_event \
 	-Wl,--wrap=zbx_process_events \
