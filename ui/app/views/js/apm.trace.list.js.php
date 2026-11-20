@@ -159,7 +159,7 @@
 						.setVisible(false)
 						.setWidth('auto'),
 					new CDataTableColumn('service_name', <?= json_encode(_('Service name')); ?>)
-						.setFields(['service_name', 'span_count', 'error_count'])
+						.setFields(['service_name', 'span_count', 'error_count', 'has_root_span'])
 						.setRenderer('service_name')
 						.setSortable(true)
 						.setWidth('auto'),
@@ -250,9 +250,21 @@
 					cell.appendChild(this.#prepareTextCell(data));
 				})
 				.setCellRenderer('service_name', ({cell, cell_data}) => {
-					const [service_name, span_count, error_count] = cell_data;
+					const [service_name, span_count, error_count, has_root_span] = cell_data;
 
-					const flex_wrapper = this.#prepareTextCell(service_name);
+					let flex_wrapper;
+					if (has_root_span == 1) {
+						flex_wrapper = this.#prepareTextCell(service_name);
+					}
+					else {
+						const missing_span = document.createElement('div');
+						missing_span.classList.add('missing-span');
+						missing_span.textContent = <?= json_encode(_('Missing span')); ?>;
+
+						flex_wrapper = document.createElement('div');
+						flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+						flex_wrapper.appendChild(missing_span);
+					}
 
 					const spans = document.createElement('div');
 					spans.classList.add(ZBX_STYLE_SPAN_COUNT);
@@ -579,9 +591,30 @@
 		#collectSpanDetailsGroups(span) {
 			const groups = [];
 
-			const main_info = {
-				title: <?= json_encode(_('Basic information')); ?>,
-				items: [
+			const items = span.missing
+				? [
+					{
+						name: <?= json_encode(_('Span ID')); ?>,
+						value: span.id
+					},
+					{
+						name: <?= json_encode(_('Operation')); ?>,
+						value: ''
+					},
+					{
+						name: <?= json_encode(_('Name')); ?>,
+						value: span.name
+					},
+					{
+						name: <?= json_encode(_('Duration')); ?>,
+						value: span.duration
+					},
+					{
+						name: <?= json_encode(_('Start time')); ?>,
+						value: span.timestamp
+					}
+				]
+				: [
 					{
 						name: <?= json_encode(_('Parent span ID')); ?>,
 						value: span.parent_id
@@ -610,7 +643,11 @@
 						name: <?= json_encode(_('Start time')); ?>,
 						value: span.timestamp
 					}
-				]
+				];
+
+			const main_info = {
+				title: <?= json_encode(_('Basic information')); ?>,
+				items
 			};
 
 			if (span.status_code) {
