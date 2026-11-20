@@ -1803,9 +1803,10 @@ const char	*zbx_db_sql_id_cmp(zbx_uint64_t id)
  * Purpose: execute a set of SQL statements IF it is big enough               *
  *                                                                            *
  ******************************************************************************/
-static int	db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *clause)
+static int	db_execute_overflowed_sql(int connect_options, char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const char *clause)
 {
-	int	ret = SUCCEED;
+	int	ret = SUCCEED, rc;
 
 	if (ZBX_MAX_OVERFLOW_SQL_SIZE < *sql_offset)
 	{
@@ -1839,7 +1840,12 @@ static int	db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_
 #endif
 		/* For Oracle with max_overflow_sql_size == 0, jump over "begin\n" */
 		/* before execution. ZBX_SQL_EXEC_FROM is 0 for all other cases. */
-		if (ZBX_DB_OK > zbx_db_execute("%s", *sql + ZBX_SQL_EXEC_FROM))
+		if (ZBX_DB_CONNECT_NORMAL == connect_options)
+			rc = zbx_db_execute("%s", *sql + ZBX_SQL_EXEC_FROM);
+		else
+			rc = zbx_db_execute_once("%s", *sql + ZBX_SQL_EXEC_FROM);
+
+		if (ZBX_DB_OK > rc)
 			ret = FAIL;
 
 		*sql_offset = 0;
@@ -1857,7 +1863,7 @@ static int	db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_
  ******************************************************************************/
 int	zbx_db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
 {
-	return db_execute_overflowed_sql(sql, sql_alloc, sql_offset, NULL);
+	return db_execute_overflowed_sql(ZBX_DB_CONNECT_NORMAL, sql, sql_alloc, sql_offset, NULL);
 }
 
 /******************************************************************************
@@ -2878,6 +2884,7 @@ void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const zbx_db_table_t *tabl
 	self->autoincrement = -1;
 	self->lastid = 0;
 	self->clause = NULL;
+	self->connect_options = ZBX_DB_CONNECT_NORMAL;
 
 	zbx_vector_db_field_ptr_create(&self->fields);
 	zbx_vector_db_value_ptr_create(&self->rows);
@@ -2894,17 +2901,16 @@ void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const zbx_db_table_t *tabl
  *                                                                            *
  * Parameters: self  - [IN] the bulk insert data                              *
  *             table - [IN] the target table name                             *
- *             ...   - [IN] names of the fields to insert                     *
+ *                   - [IN] names of the fields to insert                     *
  *             NULL  - [IN] terminating NULL pointer                          *
  *                                                                            *
  * Comments: This is a convenience wrapper for zbx_db_insert_prepare_dyn()    *
- *           function.                                                        *
+ *           function. The caller is responsible for va_start()/va_end().     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...)
+static void	db_insert_prepare(zbx_db_insert_t *self, const char *table, va_list args)
 {
 	zbx_vector_ptr_t	fields;
-	va_list			args;
 	char			*field;
 	const zbx_db_table_t	*ptable;
 	const zbx_db_field_t	*pfield;
@@ -2915,8 +2921,6 @@ void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...)
 		THIS_SHOULD_NEVER_HAPPEN;
 		exit(EXIT_FAILURE);
 	}
-
-	va_start(args, table);
 
 	zbx_vector_ptr_create(&fields);
 
@@ -2932,11 +2936,57 @@ void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...)
 		zbx_vector_ptr_append(&fields, (zbx_db_field_t *)pfield);
 	}
 
-	va_end(args);
-
 	zbx_db_insert_prepare_dyn(self, ptable, (const zbx_db_field_t **)fields.values, fields.values_num);
 
 	zbx_vector_ptr_destroy(&fields);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepare for database bulk insert operation                        *
+ *                                                                            *
+ * Parameters: self  - [IN] the bulk insert data                              *
+ *             table - [IN] the target table name                             *
+ *             ...   - [IN] names of the fields to insert                     *
+ *             NULL  - [IN] terminating NULL pointer                          *
+ *                                                                            *
+ * Comments: This is a convenience wrapper for zbx_db_insert_prepare_dyn()    *
+ *           function.                                                        *
+ *           Intended for connections opened with ZBX_DB_CONNECT_NORMAL.      *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...)
+{
+	va_list	args;
+
+	va_start(args, table);
+	db_insert_prepare(self, table, args);
+	va_end(args);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepare for database bulk insert operation                        *
+ *                                                                            *
+ * Parameters: self  - [IN] the bulk insert data                              *
+ *             table - [IN] the target table name                             *
+ *             ...   - [IN] names of the fields to insert                     *
+ *             NULL  - [IN] terminating NULL pointer                          *
+ *                                                                            *
+ * Comments: This is a convenience wrapper for zbx_db_insert_prepare_dyn()    *
+ *           function.                                                        *
+ *           Intended for connections opened with ZBX_DB_CONNECT_ONCE.        *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_insert_prepare_once(zbx_db_insert_t *self, const char *table, ...)
+{
+	va_list	args;
+
+	va_start(args, table);
+	db_insert_prepare(self, table, args);
+	va_end(args);
+
+	self->connect_options = ZBX_DB_CONNECT_ONCE;
 }
 
 /******************************************************************************
@@ -3111,7 +3161,7 @@ static void	decode_and_escape_binary_value_for_sql(char **sql_insert_data)
  ******************************************************************************/
 int	zbx_db_insert_execute(zbx_db_insert_t *self)
 {
-	int			ret = FAIL, i, j;
+	int			ret = FAIL, i, j, rc;
 	const zbx_db_field_t	*field;
 	char			*sql_command, delim[2] = {',', '('};
 	size_t			sql_command_alloc = 512, sql_command_offset = 0;
@@ -3126,7 +3176,7 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 #	endif
 #else
 	zbx_db_bind_context_t	*contexts;
-	int			rc, tries = 0;
+	int			tries = 0;
 #endif
 
 	if (0 == self->rows.values_num)
@@ -3136,6 +3186,12 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 	if (-1 != self->autoincrement)
 	{
 		zbx_uint64_t	id;
+
+		if (ZBX_DB_CONNECT_NORMAL != self->connect_options)
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+		}
 
 		id = zbx_db_get_maxid_num(self->table->table, self->rows.values_num);
 
@@ -3220,7 +3276,10 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 	contexts = (zbx_db_bind_context_t *)zbx_malloc(NULL, sizeof(zbx_db_bind_context_t) * self->fields.values_num);
 
 retry_oracle:
-	zbx_db_statement_prepare(sql_command);
+	if (ZBX_DB_CONNECT_NORMAL == self->connect_options)
+		zbx_db_statement_prepare(sql_command);
+	else if (ZBX_DB_OK > zbx_db_statement_prepare_basic(sql_command))
+		goto out;
 
 	for (j = 0; j < self->fields.values_num; j++)
 	{
@@ -3266,7 +3325,7 @@ retry_oracle:
 	for (j = 0; j < self->fields.values_num; j++)
 		zbx_db_clean_bind_context(&contexts[j]);
 
-	if (ZBX_DB_DOWN == rc)
+	if (ZBX_DB_DOWN == rc && ZBX_DB_CONNECT_NORMAL == self->connect_options)
 	{
 		if (0 < tries++)
 		{
@@ -3361,8 +3420,11 @@ retry_oracle:
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ")" ZBX_ROW_DL);
 
-		if (SUCCEED != (ret = db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset, self->clause)))
+		if (SUCCEED != (ret = db_execute_overflowed_sql(self->connect_options, &sql, &sql_alloc, &sql_offset,
+				self->clause)))
+		{
 			goto out;
+		}
 	}
 
 	if (16 < sql_offset)
@@ -3379,7 +3441,12 @@ retry_oracle:
 #	endif
 		zbx_db_end_multiple_update(sql, sql_alloc, sql_offset);
 
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+		if (ZBX_DB_CONNECT_NORMAL == self->connect_options)
+			rc = zbx_db_execute("%s", sql);
+		else
+			rc = zbx_db_execute_once("%s", sql);
+
+		if (ZBX_DB_OK > rc)
 			ret = FAIL;
 	}
 #endif

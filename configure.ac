@@ -2196,6 +2196,7 @@ AC_CONFIG_FILES([
 	src/zabbix_server/taskmanager/Makefile
 	src/zabbix_server/timer/Makefile
 	src/zabbix_server/trapper/Makefile
+	src/zabbix_server/permissions/Makefile
 	man/Makefile
 	])
 AC_OUTPUT
