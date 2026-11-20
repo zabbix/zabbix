@@ -127,9 +127,8 @@ class testScriptItems extends CIntegrationTest {
 				'timeout' => '3s',
 				"value_type" => ITEM_VALUE_TYPE_TEXT,
 				"params" => "return value;",
-				"parameters" => ['111111' => "2"],
-			],
-
+				"parameters" => ['111111' => "2"]
+			]
 		];
 
 		$result = $this->getClient(self::COMPONENT_SERVER)->testItem($item_test_data, self::$sid);
@@ -151,9 +150,8 @@ class testScriptItems extends CIntegrationTest {
 				'timeout' => '3s',
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'params' => 'return value;',
-				'parameters' => ['123' => self::LONG_2340_CHAR_LINE],
-			],
-
+				'parameters' => ['123' => self::LONG_2340_CHAR_LINE]
+			]
 		];
 
 		$result = $this->getClient(self::COMPONENT_SERVER)->testItem($item_test_data, self::$sid);
@@ -175,9 +173,8 @@ class testScriptItems extends CIntegrationTest {
 				'timeout' => '3s',
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'params' => 'return value;',
-				'parameters' => [self::LONG_260_CHAR_LINE => "2"],
-			],
-
+				'parameters' => [self::LONG_260_CHAR_LINE => "2"]
+			]
 		];
 
 		$result = $this->getClient(self::COMPONENT_SERVER)->testItem($item_test_data, self::$sid);
