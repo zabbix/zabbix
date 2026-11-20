@@ -28,14 +28,9 @@ class testScriptItems extends CIntegrationTest {
 	const HOST_NAME = 'test_hostconn';
 	const MACRO_PASSWORD_VALUE = 'badger_pa$$"\word';
 	const MACRO_PASSWORD_VALUE_ESCAPED = 'badger_pa$$\"\\\\word';
-	const LONG_260_CHAR_LINE = '11111111111111111111111111111111111111111111111111111'.
-				'111111111111111111111111111111111111111111111111111111'.
-				'111111111111111111111111111111111111111111111111111111'.
-				'111111111111111111111111111111111111111111111111111111'.
-				'111111111111111111111111111111111111111111111';
-	const LONG_2340_CHAR_LINE = self::LONG_260_CHAR_LINE.self::LONG_260_CHAR_LINE.self::LONG_260_CHAR_LINE.
-				self::LONG_260_CHAR_LINE.self::LONG_260_CHAR_LINE.self::LONG_260_CHAR_LINE.
-				self::LONG_260_CHAR_LINE.self::LONG_260_CHAR_LINE.self::LONG_260_CHAR_LINE;
+	// Maximum item_parameter name and value lengths allowed by database schema and API.
+	const PARAMETER_NAME_MAX_LENGTH = 255;
+	const PARAMETER_VALUE_MAX_LENGTH = 2048;
 
 	private static $hostid;
 	private static $sid;
@@ -118,30 +113,92 @@ class testScriptItems extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "[ BADGER X ] Debug auth: \"".self::MACRO_PASSWORD_VALUE_ESCAPED, true, 60, 1);
 	}
 
-	public function testScriptItems_testItem() {
-		$item_test_data = [
-			'item' => [
-				'hostid' => self::$hostid,
-				'type' => ITEM_TYPE_SCRIPT,
-				'key' => 'test_script_item',
-				'timeout' => '3s',
-				"value_type" => ITEM_VALUE_TYPE_TEXT,
-				"params" => "return value;",
-				"parameters" => ['111111' => "2"]
-			]
-		];
-
-		$result = $this->getClient(self::COMPONENT_SERVER)->testItem($item_test_data, self::$sid);
-
-		$this->assertFalse($result === false);
-		$this->assertArrayHasKey('item', $result);
-		$this->assertArrayNotHasKey('error', $result['item']);
-		$this->assertArrayHasKey('result', $result['item']);
-		$this->assertEquals($result['item']['result'], '{"111111":"2"}');
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'zbx_es_execute() output:\'{"111111":"2"}\'');
+	/**
+	 * Returns string of exact length in characters, built by repeating given pattern.
+	 *
+	 * @param string $pattern
+	 * @param int    $length
+	 *
+	 * @return string
+	 */
+	private static function repeatToLength(string $pattern, int $length): string {
+		return mb_substr(str_repeat($pattern, (int) ceil($length / mb_strlen($pattern))), 0, $length);
 	}
 
-	public function testScriptItems_testItemWithLongValue() {
+	/**
+	 * Data provider for item test with script parameters.
+	 *
+	 * @return array
+	 */
+	public static function getTestItemParametersData(): array {
+		$max_name = str_repeat('1', self::PARAMETER_NAME_MAX_LENGTH);
+		$max_value = str_repeat('2', self::PARAMETER_VALUE_MAX_LENGTH);
+
+		// Characters which must be escaped in JSON (quote, backslash, control characters) and solidus.
+		$json_special = "\"\\/\n\r\t\x08\x0c\x01\x1f\x7f";
+
+		// 2, 3 and 4 byte UTF-8 characters, 4 byte ones are sent as surrogate pairs by json_encode().
+		$multibyte = "Ж€中😀";
+
+		// Characters known to cause trouble: line/paragraph separators (JS line terminators), BOM,
+		// right-to-left override, zero width joiner, combining mark and noncharacter.
+		$unicode_special = "\u{2028}\u{2029}\u{FEFF}\u{202E}\u{200D}e\u{0301}\u{FFFF}";
+
+		return [
+			'short parameter' => [
+				['111111' => '2']
+			],
+			'parameter name of maximum length' => [
+				[$max_name => '2']
+			],
+			'parameter value of maximum length' => [
+				['123' => $max_value]
+			],
+			'parameter name and value of maximum length' => [
+				[$max_name => $max_value]
+			],
+			'parameters following parameter with name of maximum length' => [
+				[$max_name => '1', 'second' => '2', 'third' => '3']
+			],
+			'empty value and whitespace' => [
+				[' ' => '', ' name ' => ' value ']
+			],
+			'JSON special characters' => [
+				['name'.$json_special => 'value'.$json_special]
+			],
+			'JSON injection attempt' => [
+				['a":"b' => '"},{"x":"y', '\\u0041\\' => '\\"']
+			],
+			'macro-like strings are not expanded' => [
+				['{$MACRO}' => '{HOST.HOST}', '{#LLD}' => '{{HOST.HOST}.regsub("(.*)", \1)}', '$1' => '{ITEM.VALUE}']
+			],
+			'Unicode special characters' => [
+				[$unicode_special => $unicode_special]
+			],
+			'multibyte name and value of maximum length' => [
+				[
+					self::repeatToLength($multibyte, self::PARAMETER_NAME_MAX_LENGTH) =>
+						self::repeatToLength($multibyte, self::PARAMETER_VALUE_MAX_LENGTH)
+				]
+			],
+			'4 byte characters of maximum length' => [
+				[
+					str_repeat('😀', self::PARAMETER_NAME_MAX_LENGTH) =>
+						str_repeat('😀', self::PARAMETER_VALUE_MAX_LENGTH),
+					'next' => $multibyte
+				]
+			]
+		];
+	}
+
+	/**
+	 * Test script item parameters are passed to script during item test.
+	 *
+	 * @dataProvider getTestItemParametersData
+	 *
+	 * @param array $parameters  Script parameters (name => value).
+	 */
+	public function testScriptItems_testItemParameters(array $parameters) {
 		$item_test_data = [
 			'item' => [
 				'hostid' => self::$hostid,
@@ -150,7 +207,7 @@ class testScriptItems extends CIntegrationTest {
 				'timeout' => '3s',
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'params' => 'return value;',
-				'parameters' => ['123' => self::LONG_2340_CHAR_LINE]
+				'parameters' => $parameters
 			]
 		];
 
@@ -158,32 +215,12 @@ class testScriptItems extends CIntegrationTest {
 
 		$this->assertFalse($result === false);
 		$this->assertArrayHasKey('item', $result);
-		$this->assertArrayNotHasKey('error', $result['item']);
+		$this->assertArrayNotHasKey('error', $result['item'],
+			'Unexpected item test error: '.($result['item']['error'] ?? '')
+		);
 		$this->assertArrayHasKey('result', $result['item']);
-		$this->assertEquals($result['item']['result'], '{"123":"'.self::LONG_2340_CHAR_LINE.'"}');
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'zbx_es_execute() output:\'{"123":"'.self::LONG_2340_CHAR_LINE.'"}\'');
-	}
-
-	public function testScriptItems_testItemWithLongName() {
-		$item_test_data = [
-			'item' => [
-				'hostid' => self::$hostid,
-				'type' => ITEM_TYPE_SCRIPT,
-				'key' => 'test_script_item',
-				'timeout' => '3s',
-				'value_type' => ITEM_VALUE_TYPE_TEXT,
-				'params' => 'return value;',
-				'parameters' => [self::LONG_260_CHAR_LINE => "2"]
-			]
-		];
-
-		$result = $this->getClient(self::COMPONENT_SERVER)->testItem($item_test_data, self::$sid);
-
-		$this->assertFalse($result === false);
-		$this->assertArrayHasKey('item', $result);
-		$this->assertArrayNotHasKey('error', $result['item']);
-		$this->assertArrayHasKey('result', $result['item']);
-		$this->assertEquals($result['item']['result'], '{"'.self::LONG_260_CHAR_LINE.'":"2"}');
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'zbx_es_execute() output:\'{"'.self::LONG_260_CHAR_LINE.'":"2"}\'');
+		$this->assertSame($parameters, json_decode($result['item']['result'], true),
+			'Unexpected script value: '.$result['item']['result']
+		);
 	}
 }
