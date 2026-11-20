@@ -150,6 +150,8 @@ foreach ($data['triggers'] as $triggerid => $trigger) {
 	->addItem($table)
 	->show();
 
+(new CTemplateTag('filter-tag-row-tmpl', CTagFilterFieldHelper::getTemplate()))->show();
+
 (new CScriptTag('
 	view.init('.json_encode([
 		'timeline' => $data['filter']['timeline']

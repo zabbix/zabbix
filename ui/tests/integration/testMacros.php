@@ -3135,7 +3135,7 @@ const SUBJECT_INTERNAL = "Internal";
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of add_object_msg()', true);
 
-		$response = $this->call('alert.get', [
+		$response = $this->callUntilDataIsPresent('alert.get', [
 			'hostids' => [self::$host_id],
 			'actionids' => self::$discovery_action_id,
 			'sortfield' => 'alertid',

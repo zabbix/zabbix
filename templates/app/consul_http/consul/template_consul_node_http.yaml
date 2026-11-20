@@ -46,12 +46,12 @@ zabbix_export:
         *NOTE.* You maybe are interested in Envoy Proxy by HTTP [template](../../envoy_proxy_http).
       vendor:
         name: Zabbix
-        version: 8.2-0
+        version: 8.2-1
       groups:
         - name: Templates/Applications
       items:
         - uuid: 9f90fe43daaa43369b000754e1630e41
-          name: 'ACL: resolves, rate'
+          name: 'ACL: Resolves, rate'
           type: DEPENDENT
           key: consul.acl.resolves.rate
           value_type: FLOAT
@@ -69,8 +69,65 @@ zabbix_export:
           tags:
             - tag: component
               value: acl
+        - uuid: 0d19f75eceb5408f9ef61b35d46c8593
+          name: 'Cache: Bypass, per second'
+          type: DEPENDENT
+          key: consul.cache.bypass.rate
+          value_type: FLOAT
+          units: Rps
+          description: 'Number of times per second a request bypassed the cache because no cache-key was provided.'
+          preprocessing:
+            - type: PROMETHEUS_PATTERN
+              parameters:
+                - consul_cache_bypass
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            - type: CHANGE_PER_SECOND
+          master_item:
+            key: consul.get_metrics
+          tags:
+            - tag: component
+              value: cache
+        - uuid: 8a2d1dc91339470a964212f65118c4c5
+          name: 'Cache: Entries count'
+          type: DEPENDENT
+          key: consul.cache.entries_count
+          description: 'Represents the number of entries in the agent''s cache.'
+          preprocessing:
+            - type: PROMETHEUS_PATTERN
+              parameters:
+                - consul_cache_entries_count
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: consul.get_metrics
+          tags:
+            - tag: component
+              value: cache
+        - uuid: 54f3ed674a7642a6b27e0c0e3a59df15
+          name: 'Cache: Fetch errors, per second'
+          type: DEPENDENT
+          key: consul.cache.fetch_error.rate
+          value_type: FLOAT
+          units: Rps
+          description: 'Number of failed fetches by the cache per second.'
+          preprocessing:
+            - type: PROMETHEUS_PATTERN
+              parameters:
+                - consul_cache_fetch_error
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            - type: CHANGE_PER_SECOND
+          master_item:
+            key: consul.get_metrics
+          tags:
+            - tag: component
+              value: cache
         - uuid: 1c969d5d7546444e91e883661d63890b
-          name: 'Catalog: deregister, rate'
+          name: 'Catalog: Deregister, rate'
           type: DEPENDENT
           key: consul.catalog.deregister.rate
           value_type: FLOAT
@@ -89,7 +146,7 @@ zabbix_export:
             - tag: component
               value: catalog
         - uuid: 8f01480896f8426688aee08e2ee0fc20
-          name: 'Catalog: register, rate'
+          name: 'Catalog: Register, rate'
           type: DEPENDENT
           key: consul.catalog.register.rate
           value_type: FLOAT
@@ -164,8 +221,28 @@ zabbix_export:
           tags:
             - tag: component
               value: rpc
+        - uuid: 42bf9305934249108de767972e2b2ec0
+          name: 'Client RPC exceeded, per second'
+          type: DEPENDENT
+          key: consul.client_rpc_exceeded
+          value_type: FLOAT
+          units: Rps
+          description: 'Number of times per second whenever a Consul agent makes an RPC request to a Consul server and gets rate limited by that agent''s limits configuration.'
+          preprocessing:
+            - type: PROMETHEUS_PATTERN
+              parameters:
+                - consul_client_rpc_exceeded
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            - type: CHANGE_PER_SECOND
+          master_item:
+            key: consul.get_metrics
+          tags:
+            - tag: component
+              value: rpc
         - uuid: 3fd30bfd7c324c53a346974c9f38e9db
-          name: 'Client RPC failed ,per second'
+          name: 'Client RPC failed, per second'
           type: DEPENDENT
           key: consul.client_rpc_failed
           value_type: FLOAT
@@ -480,7 +557,7 @@ zabbix_export:
             - tag: component
               value: goroutines
         - uuid: 6613be65c0794e76a210263810a4692d
-          name: 'KV store: apply, p50'
+          name: 'KV store: Apply, p50'
           type: DEPENDENT
           key: consul.kvs.apply.p50
           value_type: FLOAT
@@ -502,7 +579,7 @@ zabbix_export:
             - tag: component
               value: kvs
         - uuid: 2dc05550018c4d67bab58bd8f86bc365
-          name: 'KV store: apply, p90'
+          name: 'KV store: Apply, p90'
           type: DEPENDENT
           key: consul.kvs.apply.p90
           value_type: FLOAT
@@ -524,7 +601,7 @@ zabbix_export:
             - tag: component
               value: kvs
         - uuid: 978bf96102d0411f8c18e92652a003c4
-          name: 'KV store: apply, rate'
+          name: 'KV store: Apply, rate'
           type: DEPENDENT
           key: consul.kvs.apply.rate
           value_type: FLOAT
@@ -542,28 +619,113 @@ zabbix_export:
           tags:
             - tag: component
               value: kvs
-        - uuid: 1b21a53ce7144350af8b50e57c3acf6b
-          name: 'Memberlist: degraded'
+        - uuid: 9d0d981f4254471492dd2c78ecb0c7b5
+          name: 'Leaf certificate expiry'
           type: DEPENDENT
-          key: consul.memberlist.degraded
-          description: |
-            This metric counts the number of times the Consul agent has performed failure detection on another agent at a slower probe rate.
-            The agent uses its own health metric as an indicator to perform this action.
-            If its health score is low, it means that the node is healthy, and vice versa.
+          key: consul.leaf_cert_expiry
+          value_type: FLOAT
+          units: s
+          description: 'Seconds until the soonest-expiring Connect leaf certificate across all registered services expires. Leaf certificates are short-lived and renewed automatically well before expiry.'
           preprocessing:
             - type: PROMETHEUS_PATTERN
               parameters:
-                - consul_memberlist_degraded
-                - value
-                - ''
+                - consul_leaf_certs_cert_expiry
+                - function
+                - min
               error_handler: DISCARD_VALUE
           master_item:
             key: consul.get_metrics
           tags:
             - tag: component
-              value: health
+              value: security
+          triggers:
+            - uuid: a6276c6dc93b4efca7eb44a1ca843d94
+              expression: 'last(/HashiCorp Consul Node by HTTP/consul.leaf_cert_expiry)>0 and last(/HashiCorp Consul Node by HTTP/consul.leaf_cert_expiry)<{$CONSUL.LEAF.CERT.EXPIRY.MIN}'
+              name: 'HashiCorp Consul Node: Leaf certificate expires soon'
+              event_name: 'HashiCorp Consul Node: Leaf certificate expires in less than {$CONSUL.LEAF.CERT.EXPIRY.MIN}'
+              priority: WARNING
+              description: 'Connect leaf certificate will expire soon and has not been renewed in time. This may indicate a problem with automatic certificate renewal.'
+              tags:
+                - tag: scope
+                  value: security
+            - uuid: bd3271f6ec164964983816c07acc86e1
+              expression: 'last(/HashiCorp Consul Node by HTTP/consul.leaf_cert_expiry)<0'
+              name: 'HashiCorp Consul Node: Leaf certificate has already expired'
+              event_name: 'HashiCorp Consul Node: Leaf certificate has already expired'
+              priority: HIGH
+              description: 'Connect leaf certificate has expired. Services in the mesh relying on it have likely lost connectivity.'
+              tags:
+                - tag: scope
+                  value: security
+        - uuid: 29427826f5e945d5908c1abf5720a1cd
+          name: 'Leaf certificate renewal failures'
+          type: DEPENDENT
+          key: consul.leaf_cert_renewal_failure
+          description: 'Number of failures to renew the Connect leaf certificate.'
+          preprocessing:
+            - type: PROMETHEUS_PATTERN
+              parameters:
+                - consul_leaf_certs_cert_renewal_failure
+                - function
+                - sum
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: consul.get_metrics
+          tags:
+            - tag: component
+              value: security
+          triggers:
+            - uuid: 1a6b35752c134bbe83410198d0056181
+              expression: 'last(/HashiCorp Consul Node by HTTP/consul.leaf_cert_renewal_failure)>0'
+              name: 'HashiCorp Consul Node: Leaf certificate renewal failed'
+              priority: WARNING
+              description: 'Connect leaf certificate renewal has failed. Services in the mesh may lose connectivity once the current certificate expires.'
+              tags:
+                - tag: scope
+                  value: security
+        - uuid: b4f1f08d386e43b5876c0acb4d0f7ebb
+          name: 'License expiry'
+          type: DEPENDENT
+          key: consul.license_expiry
+          value_type: FLOAT
+          units: s
+          description: 'Seconds until the Consul Enterprise license expires. Enterprise only.'
+          preprocessing:
+            - type: PROMETHEUS_PATTERN
+              parameters:
+                - consul_system_licenseExpiration
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            - type: MULTIPLIER
+              parameters:
+                - '3600'
+          master_item:
+            key: consul.get_metrics
+          tags:
+            - tag: component
+              value: security
+          triggers:
+            - uuid: 7ba33cef9709491e875b876a910b36fe
+              expression: 'last(/HashiCorp Consul Node by HTTP/consul.license_expiry)>0 and last(/HashiCorp Consul Node by HTTP/consul.license_expiry)<{$CONSUL.LICENSE.EXPIRY.MIN}'
+              name: 'HashiCorp Consul Node: License expires soon'
+              event_name: 'HashiCorp Consul Node: License expires in less than {$CONSUL.LICENSE.EXPIRY.MIN}'
+              priority: WARNING
+              description: 'Consul Enterprise license will expire soon. Renew it to avoid Enterprise features being disabled.'
+              tags:
+                - tag: scope
+                  value: security
+            - uuid: 9b47c226d7ff480ea62829eaf8397abd
+              expression: 'last(/HashiCorp Consul Node by HTTP/consul.license_expiry)<0'
+              name: 'HashiCorp Consul Node: License has already expired'
+              event_name: 'HashiCorp Consul Node: License has already expired'
+              priority: HIGH
+              description: 'Consul Enterprise license has expired.'
+              tags:
+                - tag: scope
+                  value: security
         - uuid: 0a3b25abf7de4212bda5c92c13341593
-          name: 'Memberlist: gossip, p90'
+          name: 'Memberlist: Gossip, p90'
           type: DEPENDENT
           key: consul.memberlist.dispatch_log.p90
           value_type: FLOAT
@@ -584,7 +746,7 @@ zabbix_export:
             - tag: component
               value: gossip
         - uuid: 592fb528d5c14491892c496f7ce9a60b
-          name: 'Memberlist: gossip, p50'
+          name: 'Memberlist: Gossip, p50'
           type: DEPENDENT
           key: consul.memberlist.gossip.p50
           value_type: FLOAT
@@ -605,106 +767,8 @@ zabbix_export:
           tags:
             - tag: component
               value: gossip
-        - uuid: 32259a799f6949e4be4f7d8722a2dbbe
-          name: 'Memberlist: health score'
-          type: DEPENDENT
-          key: consul.memberlist.health_score
-          description: |
-            This metric describes a node's perception of its own health based on how well it is meeting the soft real-time requirements of the protocol.
-            This metric ranges from 0 to 8, where 0 indicates "totally healthy".
-          preprocessing:
-            - type: PROMETHEUS_PATTERN
-              parameters:
-                - consul_memberlist_health_score
-                - value
-                - ''
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: consul.get_metrics
-          tags:
-            - tag: component
-              value: health
-          triggers:
-            - uuid: f964a907c55148bf80991352c7f2ae83
-              expression: 'max(/HashiCorp Consul Node by HTTP/consul.memberlist.health_score,#3)>{$CONSUL.NODE.HEALTH_SCORE.MAX.HIGH}'
-              name: 'HashiCorp Consul Node: Node''s health score is critical'
-              event_name: 'HashiCorp Consul Node: Node''s health score is over {$CONSUL.NODE.HEALTH_SCORE.MAX.HIGH}'
-              priority: AVERAGE
-              description: |
-                This metric ranges from 0 to 8, where 0 indicates "totally healthy".
-                This health score is used to scale the time between outgoing probes, and higher scores translate into longer probing intervals.
-                For more details see section IV of the Lifeguard paper: https://arxiv.org/pdf/1707.00788.pdf
-              tags:
-                - tag: scope
-                  value: availability
-            - uuid: 1fedc58f33ed4b9797fb37acfceba192
-              expression: 'max(/HashiCorp Consul Node by HTTP/consul.memberlist.health_score,#3)>{$CONSUL.NODE.HEALTH_SCORE.MAX.WARN}'
-              name: 'HashiCorp Consul Node: Node''s health score is warning'
-              event_name: 'HashiCorp Consul Node: Node''s health score is too high (over {$CONSUL.NODE.HEALTH_SCORE.MAX.WARN} for 3m)'
-              priority: WARNING
-              description: |
-                This metric ranges from 0 to 8, where 0 indicates "totally healthy".
-                This health score is used to scale the time between outgoing probes, and higher scores translate into longer probing intervals.
-                For more details see section IV of the Lifeguard paper: https://arxiv.org/pdf/1707.00788.pdf
-              dependencies:
-                - name: 'HashiCorp Consul Node: Node''s health score is critical'
-                  expression: 'max(/HashiCorp Consul Node by HTTP/consul.memberlist.health_score,#3)>{$CONSUL.NODE.HEALTH_SCORE.MAX.HIGH}'
-              tags:
-                - tag: scope
-                  value: availability
-        - uuid: 1ebba76d809b415488fb0591afeaef6f
-          name: 'Memberlist: msg alive'
-          type: DEPENDENT
-          key: consul.memberlist.msg.alive
-          description: 'This metric counts the number of alive Consul agents, that the agent has mapped out so far, based on the message information given by the network layer.'
-          preprocessing:
-            - type: PROMETHEUS_PATTERN
-              parameters:
-                - consul_memberlist_msg_alive
-                - value
-                - ''
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: consul.get_metrics
-          tags:
-            - tag: component
-              value: health
-        - uuid: 9768a2ce01de4bfe92a17935791b4da4
-          name: 'Memberlist: msg dead'
-          type: DEPENDENT
-          key: consul.memberlist.msg.dead
-          description: 'This metric counts the number of times a Consul agent has marked another agent to be a dead node.'
-          preprocessing:
-            - type: PROMETHEUS_PATTERN
-              parameters:
-                - consul_memberlist_msg_dead
-                - value
-                - ''
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: consul.get_metrics
-          tags:
-            - tag: component
-              value: health
-        - uuid: 43ea04dd91ba4c208e9ad09bbc0016af
-          name: 'Memberlist: msg suspect'
-          type: DEPENDENT
-          key: consul.memberlist.msg.suspect
-          description: 'The number of times a Consul agent suspects another as failed while probing during gossip protocol.'
-          preprocessing:
-            - type: PROMETHEUS_PATTERN
-              parameters:
-                - consul_memberlist_msg_suspect
-                - value
-                - ''
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: consul.get_metrics
-          tags:
-            - tag: component
-              value: health
         - uuid: 8b3ee806fcf34a46aa61cbfee460d9f7
-          name: 'Memberlist: probe node, p50'
+          name: 'Memberlist: Probe node, p50'
           type: DEPENDENT
           key: consul.memberlist.probe_node.p50
           value_type: FLOAT
@@ -726,7 +790,7 @@ zabbix_export:
             - tag: component
               value: memberlist
         - uuid: 9a178ba5f7fa4d9a8ecfddfe84257ab6
-          name: 'Memberlist: probe node, p90'
+          name: 'Memberlist: Probe node, p90'
           type: DEPENDENT
           key: consul.memberlist.probe_node.p90
           value_type: FLOAT
@@ -748,7 +812,7 @@ zabbix_export:
             - tag: component
               value: memberlist
         - uuid: ef688e2ad7494a08a535c019fe19c0a9
-          name: 'Memberlist: push pull node, p50'
+          name: 'Memberlist: Push pull node, p50'
           type: DEPENDENT
           key: consul.memberlist.push_pull_node.p50
           value_type: FLOAT
@@ -769,7 +833,7 @@ zabbix_export:
             - tag: component
               value: memberlist
         - uuid: ae085470652242ba8a2077bebee7a2c7
-          name: 'Memberlist: push pull node, p90'
+          name: 'Memberlist: Push pull node, p90'
           type: DEPENDENT
           key: consul.memberlist.push_pull_node.p90
           value_type: FLOAT
@@ -890,6 +954,90 @@ zabbix_export:
           tags:
             - tag: component
               value: udp
+        - uuid: 00c051c1f6794a5b814ad40a05305b79
+          name: 'Mesh root CA expiry'
+          type: DEPENDENT
+          key: consul.mesh_root_ca_expiry
+          value_type: FLOAT
+          units: s
+          description: 'Seconds until the service mesh root certificate expires. Updated every hour.'
+          preprocessing:
+            - type: PROMETHEUS_PATTERN
+              parameters:
+                - consul_mesh_active_root_ca_expiry
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            - type: MULTIPLIER
+              parameters:
+                - '1'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: consul.get_metrics
+          tags:
+            - tag: component
+              value: security
+          triggers:
+            - uuid: 0744cea5f3234fb3bac51ceabd860a36
+              expression: 'last(/HashiCorp Consul Node by HTTP/consul.mesh_root_ca_expiry)>0 and last(/HashiCorp Consul Node by HTTP/consul.mesh_root_ca_expiry)<{$CONSUL.MESH.ROOT_CA.EXPIRY.MIN}'
+              name: 'HashiCorp Consul Node: Mesh root CA expires soon'
+              event_name: 'HashiCorp Consul Node: Mesh root CA expires in less than {$CONSUL.MESH.ROOT_CA.EXPIRY.MIN}'
+              priority: WARNING
+              description: 'Service mesh root CA certificate will expire soon. Root CA rotation requires planning across the whole mesh — do not leave this until the last moment.'
+              tags:
+                - tag: scope
+                  value: security
+            - uuid: c058ff452f3a446eb22eb7f35399374a
+              expression: 'last(/HashiCorp Consul Node by HTTP/consul.mesh_root_ca_expiry)<0'
+              name: 'HashiCorp Consul Node: Mesh root CA has already expired'
+              event_name: 'HashiCorp Consul Node: Mesh root CA has already expired'
+              priority: HIGH
+              description: 'Service mesh root CA certificate has expired. This is likely causing a mesh-wide outage.'
+              tags:
+                - tag: scope
+                  value: security
+        - uuid: fbb3f288b1774757baf30a82efd64313
+          name: 'Mesh signing CA expiry'
+          type: DEPENDENT
+          key: consul.mesh_signing_ca_expiry
+          value_type: FLOAT
+          units: s
+          description: 'Seconds until the service mesh signing (intermediate) certificate expires. Updated every hour.'
+          preprocessing:
+            - type: PROMETHEUS_PATTERN
+              parameters:
+                - consul_mesh_active_signing_ca_expiry
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+            - type: MULTIPLIER
+              parameters:
+                - '1'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: consul.get_metrics
+          tags:
+            - tag: component
+              value: security
+          triggers:
+            - uuid: 37c145f20f9f42a99b3e921616ddfdb1
+              expression: 'last(/HashiCorp Consul Node by HTTP/consul.mesh_signing_ca_expiry)>0 and last(/HashiCorp Consul Node by HTTP/consul.mesh_signing_ca_expiry)<{$CONSUL.MESH.SIGNING_CA.EXPIRY.MIN}'
+              name: 'HashiCorp Consul Node: Mesh signing CA expires soon'
+              event_name: 'HashiCorp Consul Node: Mesh signing CA expires in less than {$CONSUL.MESH.SIGNING_CA.EXPIRY.MIN}'
+              priority: WARNING
+              description: 'Service mesh signing CA certificate will expire soon.'
+              tags:
+                - tag: scope
+                  value: security
+            - uuid: 92737f5a98ad46e1bc764f92659aff65
+              expression: 'last(/HashiCorp Consul Node by HTTP/consul.mesh_signing_ca_expiry)<0'
+              name: 'HashiCorp Consul Node: Mesh signing CA has already expired'
+              event_name: 'HashiCorp Consul Node: Mesh signing CA has already expired'
+              priority: HIGH
+              description: 'Service mesh signing CA certificate has expired. This is likely causing a mesh-wide outage.'
+              tags:
+                - tag: scope
+                  value: security
         - uuid: 59b28123e8154318aca6a283a1b18391
           name: 'Open file descriptors, max'
           type: DEPENDENT
@@ -962,19 +1110,17 @@ zabbix_export:
           tags:
             - tag: component
               value: consul
-        - uuid: e311c5bdba3e45b68887bc924c7dc206
-          name: 'Serf member: failed, rate'
+        - uuid: 70bca71c83ba484bb3b0b0b81ae3b17f
+          name: 'RPC: Rate limit exceeded, per second'
           type: DEPENDENT
-          key: consul.serf.member.failed.rate
+          key: consul.rpc.rate_limit_exceeded.rate
           value_type: FLOAT
-          description: |
-            Increments when an agent is marked dead.
-            This can be an indicator of overloaded agents, network problems, or configuration errors where agents cannot connect to each other on the required ports.
-            Shown as events per second.
+          units: Rps
+          description: 'Number of times per second an RPC is over a configured rate limit. Note: in permissive mode, the RPC will have still been allowed to proceed.'
           preprocessing:
             - type: PROMETHEUS_PATTERN
               parameters:
-                - consul_serf_member_failed
+                - consul_rpc_rate_limit_exceeded
                 - value
                 - ''
               error_handler: DISCARD_VALUE
@@ -983,20 +1129,18 @@ zabbix_export:
             key: consul.get_metrics
           tags:
             - tag: component
-              value: serf
-        - uuid: 11ba84beb3494504bd514500ef663cff
-          name: 'Serf member: flap, rate'
+              value: rpc
+        - uuid: a9b6e15b6880484b9e8a226d0716cfc7
+          name: 'RPC: Request errors, per second'
           type: DEPENDENT
-          key: consul.serf.member.flap.rate
+          key: consul.rpc.request_error.rate
           value_type: FLOAT
-          description: |
-            Increments when an agent is marked dead and then recovers within a short time period.
-            This can be an indicator of overloaded agents, network problems, or configuration errors where agents cannot connect to each other on the required ports.
-            Shown as events per second.
+          units: Rps
+          description: 'Number of times per second a server returns an error from an RPC request.'
           preprocessing:
             - type: PROMETHEUS_PATTERN
               parameters:
-                - consul_serf_member_flap
+                - consul_rpc_request_error
                 - value
                 - ''
               error_handler: DISCARD_VALUE
@@ -1005,66 +1149,7 @@ zabbix_export:
             key: consul.get_metrics
           tags:
             - tag: component
-              value: serf
-        - uuid: f4c224ffb17d49029fef6647dde22c90
-          name: 'Serf member: join, rate'
-          type: DEPENDENT
-          key: consul.serf.member.join.rate
-          value_type: FLOAT
-          description: |
-            Increments when an agent joins the cluster. If an agent flapped or failed this counter also increments when it re-joins.
-            Shown as events per second.
-          preprocessing:
-            - type: PROMETHEUS_PATTERN
-              parameters:
-                - consul_serf_member_join
-                - value
-                - ''
-              error_handler: DISCARD_VALUE
-            - type: CHANGE_PER_SECOND
-          master_item:
-            key: consul.get_metrics
-          tags:
-            - tag: component
-              value: serf
-        - uuid: 3264823eb6774c2092b4ffe4638b61a5
-          name: 'Serf member: left, rate'
-          type: DEPENDENT
-          key: consul.serf.member.left.rate
-          value_type: FLOAT
-          description: 'Increments when an agent leaves the cluster. Shown as events per second.'
-          preprocessing:
-            - type: PROMETHEUS_PATTERN
-              parameters:
-                - consul_serf_member_left
-                - value
-                - ''
-              error_handler: DISCARD_VALUE
-            - type: CHANGE_PER_SECOND
-          master_item:
-            key: consul.get_metrics
-          tags:
-            - tag: component
-              value: serf
-        - uuid: 53bb4e76cd1840e8ae9a129d592e202e
-          name: 'Serf member: update, rate'
-          type: DEPENDENT
-          key: consul.serf.member.update.rate
-          value_type: FLOAT
-          description: 'Increments when a Consul agent updates. Shown as events per second.'
-          preprocessing:
-            - type: PROMETHEUS_PATTERN
-              parameters:
-                - consul_serf_member_update
-                - value
-                - ''
-              error_handler: DISCARD_VALUE
-            - type: CHANGE_PER_SECOND
-          master_item:
-            key: consul.get_metrics
-          tags:
-            - tag: component
-              value: serf
+              value: rpc
         - uuid: 614e63c6eb254b45a5fb3dbb985c5c3c
           name: 'Number of services'
           type: DEPENDENT
@@ -1082,136 +1167,44 @@ zabbix_export:
           tags:
             - tag: component
               value: consul
-        - uuid: d9988aeda27f4fb09ececcde13efc71a
-          name: 'Snapshot: append line, p50'
+        - uuid: 875f3dcf468446ae876ed7ba2e004f1c
+          name: 'TLS certificate expiry'
           type: DEPENDENT
-          key: consul.snapshot.append_line.p50
+          key: consul.tls_cert_expiry
           value_type: FLOAT
-          units: ms
-          description: 'The 50 percentile (median) for the time taken by the Consul agent to append an entry into the existing log.'
+          units: s
+          description: 'Seconds until the agent TLS certificate expires. Updated every hour.'
           preprocessing:
             - type: PROMETHEUS_PATTERN
               parameters:
-                - 'consul_serf_snapshot_appendLine{quantile="0.5"}'
+                - consul_agent_tls_cert_expiry
                 - value
                 - ''
               error_handler: DISCARD_VALUE
-            - type: JAVASCRIPT
-              parameters:
-                - 'return (isNaN(value)) ? 0 : value;'
           master_item:
             key: consul.get_metrics
           tags:
             - tag: component
-              value: snapshot
-        - uuid: 0b701ec082e64eb19e60650c13cd44fd
-          name: 'Snapshot: append line, p90'
-          type: DEPENDENT
-          key: consul.snapshot.append_line.p90
-          value_type: FLOAT
-          units: ms
-          description: 'The 90 percentile for the time taken by the Consul agent to append an entry into the existing log.'
-          preprocessing:
-            - type: PROMETHEUS_PATTERN
-              parameters:
-                - 'consul_serf_snapshot_appendLine{quantile="0.9"}'
-                - value
-                - ''
-              error_handler: DISCARD_VALUE
-            - type: JAVASCRIPT
-              parameters:
-                - 'return (isNaN(value)) ? 0 : value;'
-          master_item:
-            key: consul.get_metrics
-          tags:
-            - tag: component
-              value: snapshot
-        - uuid: d56de8b09978421c9703fe327d03a32b
-          name: 'Snapshot: append line, rate'
-          type: DEPENDENT
-          key: consul.snapshot.append_line.rate
-          value_type: FLOAT
-          description: 'The number of snapshot appendLine operations per second.'
-          preprocessing:
-            - type: PROMETHEUS_PATTERN
-              parameters:
-                - consul_serf_snapshot_appendLine_count
-                - value
-                - ''
-              error_handler: DISCARD_VALUE
-            - type: CHANGE_PER_SECOND
-          master_item:
-            key: consul.get_metrics
-          tags:
-            - tag: component
-              value: snapshot
-        - uuid: 12e1a4538f124c4281106b9033b1592d
-          name: 'Snapshot: compact, p50'
-          type: DEPENDENT
-          key: consul.snapshot.compact.p50
-          value_type: FLOAT
-          units: ms
-          description: |
-            The 50 percentile (median) for the time taken by the Consul agent to compact a log.
-            This operation occurs only when the snapshot becomes large enough to justify the compaction.
-          preprocessing:
-            - type: PROMETHEUS_PATTERN
-              parameters:
-                - 'consul_serf_snapshot_compact{quantile="0.5"}'
-                - value
-                - ''
-              error_handler: DISCARD_VALUE
-            - type: JAVASCRIPT
-              parameters:
-                - 'return (isNaN(value)) ? 0 : value;'
-          master_item:
-            key: consul.get_metrics
-          tags:
-            - tag: component
-              value: snapshot
-        - uuid: c55de444dd30484eb116abfd6f28a9a0
-          name: 'Snapshot: compact, p90'
-          type: DEPENDENT
-          key: consul.snapshot.compact.p90
-          value_type: FLOAT
-          units: ms
-          description: |
-            The 90 percentile for the time taken by the Consul agent to compact a log.
-            This operation occurs only when the snapshot becomes large enough to justify the compaction.
-          preprocessing:
-            - type: PROMETHEUS_PATTERN
-              parameters:
-                - 'consul_serf_snapshot_compact{quantile="0.9"}'
-                - value
-                - ''
-              error_handler: DISCARD_VALUE
-            - type: JAVASCRIPT
-              parameters:
-                - 'return (isNaN(value)) ? 0 : value;'
-          master_item:
-            key: consul.get_metrics
-          tags:
-            - tag: component
-              value: snapshot
-        - uuid: 586be345685b4f0dbbb31f2062bebc01
-          name: 'Snapshot: compact, rate'
-          type: DEPENDENT
-          key: consul.snapshot.compact.rate
-          value_type: FLOAT
-          description: 'The number of snapshot compact operations per second.'
-          preprocessing:
-            - type: PROMETHEUS_PATTERN
-              parameters:
-                - consul_serf_snapshot_compact_count
-                - value
-                - ''
-              error_handler: DISCARD_VALUE
-            - type: CHANGE_PER_SECOND
-          master_item:
-            key: consul.get_metrics
-          tags:
-            - tag: component
-              value: snapshot
+              value: security
+          triggers:
+            - uuid: daabceea9e9c45f8af86b40b9bae8adb
+              expression: 'last(/HashiCorp Consul Node by HTTP/consul.tls_cert_expiry)>0 and last(/HashiCorp Consul Node by HTTP/consul.tls_cert_expiry)<{$CONSUL.TLS.CERT.EXPIRY.MIN}'
+              name: 'HashiCorp Consul Node: TLS certificate expires soon'
+              event_name: 'HashiCorp Consul Node: TLS certificate expires in less than {$CONSUL.TLS.CERT.EXPIRY.MIN}'
+              priority: WARNING
+              description: 'Agent''s TLS certificate will expire soon. Renew it before expiration to avoid connectivity issues.'
+              tags:
+                - tag: scope
+                  value: security
+            - uuid: 4773074c471e498a8c3b009e635e3012
+              expression: 'last(/HashiCorp Consul Node by HTTP/consul.tls_cert_expiry)<0'
+              name: 'HashiCorp Consul Node: TLS certificate has already expired'
+              event_name: 'HashiCorp Consul Node: TLS certificate has already expired'
+              priority: HIGH
+              description: 'Agent''s TLS certificate has expired. Connectivity relying on this certificate is likely broken.'
+              tags:
+                - tag: scope
+                  value: security
         - uuid: 777e8cdd1cfc4f4bba613ef08320f1bb
           name: Version
           type: DEPENDENT
@@ -1407,7 +1400,7 @@ zabbix_export:
                 - uuid: 661551e1e9e94b25b7bd6ea876640b6d
                   expression: 'last(/HashiCorp Consul Node by HTTP/consul.service.aggregated_state["{#SERVICE_ID}"]) = 2'
                   name: 'HashiCorp Consul Node: Aggregated status is ''critical'''
-                  event_name: 'HashiCorp Consul Node: Node''s health score is over {$CONSUL.NODE.HEALTH_SCORE.MAX.HIGH}'
+                  event_name: 'HashiCorp Consul Node: Aggregated status is ''critical'''
                   priority: AVERAGE
                   description: 'Aggregated state of service on the local agent is ''critical''.'
                   tags:
@@ -1550,6 +1543,23 @@ zabbix_export:
           key: consul.raft.leader.discovery
           description: 'Discover raft metrics for leader nodes.'
           item_prototypes:
+            - uuid: 4e74d2d8d0e74abcaafed3b361cc03c5
+              name: 'Autopilot: Failure tolerance'
+              type: DEPENDENT
+              key: 'consul.autopilot.failure_tolerance[{#SINGLETON}]'
+              description: 'Tracks the number of voting servers that the cluster can lose while continuing to function.'
+              preprocessing:
+                - type: PROMETHEUS_PATTERN
+                  parameters:
+                    - consul_autopilot_failure_tolerance
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: consul.get_metrics
+              tags:
+                - tag: component
+                  value: health
             - uuid: 440e2a259cd64b918ebfb607961da2c8
               name: 'Autopilot healthy'
               type: DEPENDENT
@@ -1571,7 +1581,7 @@ zabbix_export:
                 - tag: component
                   value: health
             - uuid: 2e4fd6c5aac84054aef867fc9d8cb3c5
-              name: 'Raft state: commit time, p50'
+              name: 'Raft state: Commit time, p50'
               type: DEPENDENT
               key: 'consul.raft.commit_time.p50[{#SINGLETON}]'
               value_type: FLOAT
@@ -1593,7 +1603,7 @@ zabbix_export:
                 - tag: component
                   value: raft
             - uuid: 9428c07a23364967aef060cf3303b996
-              name: 'Raft state: commit time, p90'
+              name: 'Raft state: Commit time, p90'
               type: DEPENDENT
               key: 'consul.raft.commit_time.p90[{#SINGLETON}]'
               value_type: FLOAT
@@ -1615,7 +1625,7 @@ zabbix_export:
                 - tag: component
                   value: raft
             - uuid: d54c97e8c4204f8c9f79911440f1bd13
-              name: 'Raft state: commit, rate'
+              name: 'Raft state: Commit, rate'
               type: DEPENDENT
               key: 'consul.raft.commit_time.rate[{#SINGLETON}]'
               value_type: FLOAT
@@ -1635,7 +1645,7 @@ zabbix_export:
                 - tag: component
                   value: raft
             - uuid: 3c56ebe6e022430e861488873ac6f716
-              name: 'Raft state: dispatch log, p50'
+              name: 'Raft state: Dispatch log, p50'
               type: DEPENDENT
               key: 'consul.raft.dispatch_log.p50[{#SINGLETON}]'
               value_type: FLOAT
@@ -1657,7 +1667,7 @@ zabbix_export:
                 - tag: component
                   value: raft
             - uuid: fd1e6c33254b467f8355491dc96889eb
-              name: 'Raft state: dispatch log, p90'
+              name: 'Raft state: Dispatch log, p90'
               type: DEPENDENT
               key: 'consul.raft.dispatch_log.p90[{#SINGLETON}]'
               value_type: FLOAT
@@ -1679,7 +1689,7 @@ zabbix_export:
                 - tag: component
                   value: raft
             - uuid: bc73aeda20a543ac957d1531f25fd5a9
-              name: 'Raft state: dispatch log, rate'
+              name: 'Raft state: Dispatch log, rate'
               type: DEPENDENT
               key: 'consul.raft.dispatch_log.rate[{#SINGLETON}]'
               value_type: FLOAT
@@ -1698,7 +1708,7 @@ zabbix_export:
                 - tag: component
                   value: raft
             - uuid: 526a787732224555adde561ec86844fb
-              name: 'Raft state: leader last contact, p50'
+              name: 'Raft state: Leader last contact, p50'
               type: DEPENDENT
               key: 'consul.raft.leader_last_contact.p50[{#SINGLETON}]'
               value_type: FLOAT
@@ -1720,7 +1730,7 @@ zabbix_export:
                 - tag: component
                   value: raft
             - uuid: 1ae3d9e4647b4972b1572946a2794715
-              name: 'Raft state: leader last contact, p90'
+              name: 'Raft state: Leader last contact, p90'
               type: DEPENDENT
               key: 'consul.raft.leader_last_contact.p90[{#SINGLETON}]'
               value_type: FLOAT
@@ -1758,8 +1768,42 @@ zabbix_export:
           key: consul.raft.server.discovery
           description: 'Discover raft metrics for server nodes.'
           item_prototypes:
+            - uuid: ace11a3b456f4cc684f9920b26567f2b
+              name: 'gRPC: Active connections'
+              type: DEPENDENT
+              key: 'consul.grpc.server_connections[{#SINGLETON}]'
+              description: 'Measures the number of active gRPC connections open on the server.'
+              preprocessing:
+                - type: PROMETHEUS_PATTERN
+                  parameters:
+                    - consul_grpc_server_connections
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: consul.get_metrics
+              tags:
+                - tag: component
+                  value: grpc
+            - uuid: 47e2001b91764dd7bd7619830b5a97c8
+              name: 'gRPC: Active streams'
+              type: DEPENDENT
+              key: 'consul.grpc.server_streams[{#SINGLETON}]'
+              description: 'Measures the number of active gRPC streams handled by the server.'
+              preprocessing:
+                - type: PROMETHEUS_PATTERN
+                  parameters:
+                    - consul_grpc_server_streams
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: consul.get_metrics
+              tags:
+                - tag: component
+                  value: grpc
             - uuid: 428f1d7924634383aabcd5b37f561a41
-              name: 'Raft: apply, rate'
+              name: 'Raft: Apply, rate'
               type: DEPENDENT
               key: 'consul.raft.apply.rate[{#SINGLETON}]'
               value_type: FLOAT
@@ -1799,7 +1843,7 @@ zabbix_export:
                 - tag: component
                   value: raft
             - uuid: 7b030c4eac68464e8c454577ab0f0f53
-              name: 'Raft state: candidate'
+              name: 'Raft state: Candidate'
               type: DEPENDENT
               key: 'consul.raft.state_candidate[{#SINGLETON}]'
               description: 'The number of initiated leader elections.'
@@ -1816,7 +1860,7 @@ zabbix_export:
                 - tag: component
                   value: raft
             - uuid: e89157e341d8409c96e31a9d541a7fe8
-              name: 'Raft state: leader'
+              name: 'Raft state: Leader'
               type: DEPENDENT
               key: 'consul.raft.state_leader[{#SINGLETON}]'
               description: 'Increments when a server becomes a leader.'
@@ -1832,6 +1876,42 @@ zabbix_export:
               tags:
                 - tag: component
                   value: raft
+            - uuid: f31faa4c30754354ac1ef8bfab0bb9fe
+              name: 'Server: Is leader'
+              type: DEPENDENT
+              key: 'consul.server.is_leader[{#SINGLETON}]'
+              description: 'Tracks if the server is a leader.'
+              valuemap:
+                name: 'Consul server is leader'
+              preprocessing:
+                - type: PROMETHEUS_PATTERN
+                  parameters:
+                    - consul_server_isLeader
+                    - value
+                    - ''
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: consul.get_metrics
+              tags:
+                - tag: component
+                  value: raft
+            - uuid: c6f79085bdc3433184fe027b6c1d4512
+              name: 'xDS: Active streams'
+              type: DEPENDENT
+              key: 'consul.xds.server_streams[{#SINGLETON}]'
+              description: 'Measures the number of active xDS streams handled by the server, split by protocol version.'
+              preprocessing:
+                - type: PROMETHEUS_PATTERN
+                  parameters:
+                    - consul_xds_server_streams
+                    - function
+                    - sum
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: consul.get_metrics
+              tags:
+                - tag: component
+                  value: grpc
           master_item:
             key: consul.get_node_info
           preprocessing:
@@ -1853,12 +1933,30 @@ zabbix_export:
         - tag: target
           value: consul
       macros:
+        - macro: '{$CONSUL.LEAF.CERT.EXPIRY.MIN}'
+          value: 6h
+          description: 'Minimum acceptable time before Connect leaf certificate expiry for the trigger expression. Leaf certs typically rotate much more often than the agent TLS cert (hours, not days).'
+          config:
+            type: TEXT
+            priority: '6'
+            section_name: Thresholds
+            label: 'Min leaf certificate expiry time'
+            description: 'Minimum acceptable time before Connect leaf certificate expiry for the trigger expression. Leaf certs typically rotate much more often than the agent TLS cert (hours, not days).'
+        - macro: '{$CONSUL.LICENSE.EXPIRY.MIN}'
+          value: 30d
+          description: 'Minimum acceptable time before Consul Enterprise license expiry for the trigger expression. Enterprise only.'
+          config:
+            type: TEXT
+            priority: '9'
+            section_name: Thresholds
+            label: 'Min license expiry time'
+            description: 'Minimum acceptable time before Consul Enterprise license expiry for the trigger expression. Enterprise only.'
         - macro: '{$CONSUL.LLD.FILTER.LOCAL_SERVICE_NAME.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable discovered services on local node.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '10'
             section_name: Filters
             label: 'Services on local node filter (include)'
             description: 'Filter of discoverable discovered services on local node.'
@@ -1867,7 +1965,7 @@ zabbix_export:
           description: 'Filter to exclude discovered services on local node.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '11'
             section_name: Filters
             label: 'Services on local node filter (exclude)'
             description: 'Filter to exclude discovered services on local node.'
@@ -1876,7 +1974,7 @@ zabbix_export:
           description: 'Filter of discoverable discovered service by namespace on local node. Enterprise only, in case of Open Source version Namespace will be set to ''None''.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '12'
             section_name: Filters
             label: 'Services by namespace on local node filter (include)'
             description: 'Filter of discoverable discovered service by namespace on local node. Enterprise only, in case of Open Source version Namespace will be set to ''None''.'
@@ -1885,10 +1983,28 @@ zabbix_export:
           description: 'Filter to exclude discovered service by namespace on local node. Enterprise only, in case of Open Source version Namespace will be set to ''None''.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '13'
             section_name: Filters
             label: 'Services by namespace on local node filter (exclude)'
             description: 'Filter to exclude discovered service by namespace on local node. Enterprise only, in case of Open Source version Namespace will be set to ''None''.'
+        - macro: '{$CONSUL.MESH.ROOT_CA.EXPIRY.MIN}'
+          value: 30d
+          description: 'Minimum acceptable time before service mesh root CA certificate expiry for the trigger expression. Root CA rotation is a rare, planned operation — keep this threshold generous.'
+          config:
+            type: TEXT
+            priority: '7'
+            section_name: Thresholds
+            label: 'Min mesh root CA expiry time'
+            description: 'Minimum acceptable time before service mesh root CA certificate expiry for the trigger expression. Root CA rotation is a rare, planned operation — keep this threshold generous.'
+        - macro: '{$CONSUL.MESH.SIGNING_CA.EXPIRY.MIN}'
+          value: 30d
+          description: 'Minimum acceptable time before service mesh signing CA certificate expiry for the trigger expression.'
+          config:
+            type: TEXT
+            priority: '8'
+            section_name: Thresholds
+            label: 'Min mesh signing CA expiry time'
+            description: 'Minimum acceptable time before service mesh signing CA certificate expiry for the trigger expression.'
         - macro: '{$CONSUL.NODE.API.URL}'
           value: 'http://localhost:8500'
           description: 'Consul instance URL.'
@@ -1898,26 +2014,6 @@ zabbix_export:
             label: Address
             description: 'Consul instance URL.'
             required: 'YES'
-        - macro: '{$CONSUL.NODE.HEALTH_SCORE.MAX.HIGH}'
-          value: '4'
-          description: 'Maximum acceptable value of node''s health score for AVERAGE trigger expression.'
-          config:
-            type: TEXT
-            priority: '10'
-            section_name: Thresholds
-            label: 'Max node health score for average trigger'
-            description: 'Maximum acceptable value of node''s health score for AVERAGE trigger expression.'
-            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
-        - macro: '{$CONSUL.NODE.HEALTH_SCORE.MAX.WARN}'
-          value: '2'
-          description: 'Maximum acceptable value of node''s health score for WARNING trigger expression.'
-          config:
-            type: TEXT
-            priority: '9'
-            section_name: Thresholds
-            label: 'Max node health score for warning trigger'
-            description: 'Maximum acceptable value of node''s health score for WARNING trigger expression.'
-            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$CONSUL.OPEN.FDS.MAX.WARN}'
           value: '90'
           description: 'Maximum percentage of used file descriptors.'
@@ -1928,6 +2024,15 @@ zabbix_export:
             label: 'Maximum percentage of used file descriptors'
             description: 'Maximum percentage of used file descriptors. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$CONSUL.TLS.CERT.EXPIRY.MIN}'
+          value: 7d
+          description: 'Minimum acceptable time before TLS certificate expiry for the trigger expression.'
+          config:
+            type: TEXT
+            priority: '5'
+            section_name: Thresholds
+            label: 'Min TLS certificate expiry time'
+            description: 'Minimum acceptable time before TLS certificate expiry for the trigger expression.'
         - macro: '{$CONSUL.TOKEN}'
           type: SECRET_TEXT
           description: 'Consul auth token.'
@@ -1953,6 +2058,622 @@ zabbix_export:
                 text: 'Certificate chain only'
               - value: none
                 text: Disabled
+      dashboards:
+        - uuid: 0eead9891eee4c019d0f9ece0e68a686
+          name: 'Consul: Overview'
+          pages:
+            - name: Overview
+              widgets:
+                - type: item
+                  name: 'Consul node role'
+                  width: '12'
+                  hide_header: 'YES'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 0D68FD
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: decimal_size
+                      value: '25'
+                    - type: STRING
+                      name: description
+                      value: 'Consul node role'
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
+                    - type: STRING
+                      name: desc_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: desc_h_pos
+                      value: '0'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'HashiCorp Consul Node by HTTP'
+                        key: consul.role
+                    - type: INTEGER
+                      name: time_bold
+                      value: '1'
+                    - type: STRING
+                      name: time_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: time_size
+                      value: '10'
+                    - type: INTEGER
+                      name: time_v_pos
+                      value: '2'
+                    - type: STRING
+                      name: value_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: value_size
+                      value: '30'
+                - type: topitems
+                  name: 'Raft status'
+                  'y': '2'
+                  width: '36'
+                  fields:
+                    - type: STRING
+                      name: columns.0.base_color
+                      value: 0D68FD
+                    - type: STRING
+                      name: columns.0.items.0
+                      value: 'Raft state'
+                    - type: STRING
+                      name: columns.1.base_color
+                      value: 0D68FD
+                    - type: INTEGER
+                      name: columns.1.decimal_places
+                      value: '0'
+                    - type: STRING
+                      name: columns.1.items.0
+                      value: 'Server: Is leader'
+                    - type: INTEGER
+                      name: host_ordering_limit
+                      value: '1'
+                    - type: INTEGER
+                      name: item_ordering_limit
+                      value: '2'
+                    - type: INTEGER
+                      name: problems
+                      value: '2'
+                    - type: INTEGER
+                      name: show_column_header
+                      value: '1'
+                - type: svggraph
+                  name: 'Memory usage'
+                  'y': '4'
+                  width: '36'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 094EB3
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: 9BC2FF
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'HashiCorp Consul Node by HTTP'
+                        key: consul.virtual_memory_bytes
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'HashiCorp Consul Node by HTTP'
+                        key: consul.resident_memory_bytes
+                    - type: INTEGER
+                      name: ds.0.transparency
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: GRHVK
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                - type: svggraph
+                  name: 'Catalog operations'
+                  'y': '9'
+                  width: '72'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 094EB3
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: 9BC2FF
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'HashiCorp Consul Node by HTTP'
+                        key: consul.catalog.register.rate
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'HashiCorp Consul Node by HTTP'
+                        key: consul.catalog.deregister.rate
+                    - type: INTEGER
+                      name: ds.0.transparency
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: GRHAC
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                - type: item
+                  name: Version
+                  x: '12'
+                  width: '24'
+                  hide_header: 'YES'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 0D68FD
+                    - type: INTEGER
+                      name: decimal_size
+                      value: '25'
+                    - type: STRING
+                      name: description
+                      value: Version
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
+                    - type: STRING
+                      name: desc_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: desc_h_pos
+                      value: '0'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'HashiCorp Consul Node by HTTP'
+                        key: consul.version
+                    - type: INTEGER
+                      name: show.0
+                      value: '1'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
+                    - type: INTEGER
+                      name: show.2
+                      value: '3'
+                    - type: INTEGER
+                      name: time_bold
+                      value: '1'
+                    - type: STRING
+                      name: time_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: time_size
+                      value: '10'
+                    - type: INTEGER
+                      name: time_v_pos
+                      value: '2'
+                    - type: STRING
+                      name: value_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: value_size
+                      value: '30'
+                - type: problems
+                  x: '36'
+                  width: '36'
+                  height: '4'
+                  fields:
+                    - type: STRING
+                      name: reference
+                      value: LBHIU
+                - type: svggraph
+                  name: 'File descriptors'
+                  x: '36'
+                  'y': '4'
+                  width: '36'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 094EB3
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: 9BC2FF
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'HashiCorp Consul Node by HTTP'
+                        key: consul.process_open_fds
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'HashiCorp Consul Node by HTTP'
+                        key: consul.process_max_fds
+                    - type: INTEGER
+                      name: ds.0.transparency
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: GRHAB
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                    - type: INTEGER
+                      name: simple_triggers
+                      value: '1'
+                    - type: INTEGER
+                      name: working_time
+                      value: '1'
+            - name: 'Security & Mesh'
+              widgets:
+                - type: item
+                  name: 'TLS certificate expiry'
+                  width: '24'
+                  hide_header: 'YES'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: E45959
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: decimal_size
+                      value: '25'
+                    - type: STRING
+                      name: description
+                      value: 'TLS certificate expiry'
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
+                    - type: STRING
+                      name: desc_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: desc_h_pos
+                      value: '0'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'HashiCorp Consul Node by HTTP'
+                        key: consul.tls_cert_expiry
+                    - type: INTEGER
+                      name: show.0
+                      value: '1'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
+                    - type: INTEGER
+                      name: show.2
+                      value: '3'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 0D68FD
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: INTEGER
+                      name: time_bold
+                      value: '1'
+                    - type: STRING
+                      name: time_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: time_size
+                      value: '10'
+                    - type: INTEGER
+                      name: time_v_pos
+                      value: '2'
+                    - type: STRING
+                      name: value_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: value_size
+                      value: '30'
+                - type: svggraph
+                  name: 'RPC activity'
+                  'y': '2'
+                  width: '72'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 094EB3
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: D40000
+                    - type: STRING
+                      name: ds.0.color.2
+                      value: FFA059
+                    - type: STRING
+                      name: ds.0.color.3
+                      value: '900000'
+                    - type: STRING
+                      name: ds.0.color.4
+                      value: FFBF59
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'HashiCorp Consul Node by HTTP'
+                        key: consul.client_rpc
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'HashiCorp Consul Node by HTTP'
+                        key: consul.client_rpc_failed
+                    - type: ITEM
+                      name: ds.0.itemids.2
+                      value:
+                        host: 'HashiCorp Consul Node by HTTP'
+                        key: consul.client_rpc_exceeded
+                    - type: ITEM
+                      name: ds.0.itemids.3
+                      value:
+                        host: 'HashiCorp Consul Node by HTTP'
+                        key: consul.rpc.request_error.rate
+                    - type: ITEM
+                      name: ds.0.itemids.4
+                      value:
+                        host: 'HashiCorp Consul Node by HTTP'
+                        key: consul.rpc.rate_limit_exceeded.rate
+                    - type: INTEGER
+                      name: ds.0.transparency
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: RPCGP
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                - type: svggraph
+                  name: 'Mesh connectivity'
+                  'y': '7'
+                  width: '72'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: ds.0.color_palette
+                      value: '6'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '0'
+                    - type: STRING
+                      name: ds.0.items.0
+                      value: 'gRPC: Active*'
+                    - type: STRING
+                      name: ds.0.items.1
+                      value: 'xDS: Active*'
+                    - type: INTEGER
+                      name: ds.0.transparency
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_columns
+                      value: '3'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: EEDPA
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                - type: item
+                  name: 'Leaf certificate expiry'
+                  x: '24'
+                  width: '24'
+                  hide_header: 'YES'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: E45959
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: decimal_size
+                      value: '25'
+                    - type: STRING
+                      name: description
+                      value: 'Leaf certificate expiry'
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
+                    - type: STRING
+                      name: desc_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: desc_h_pos
+                      value: '0'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'HashiCorp Consul Node by HTTP'
+                        key: consul.leaf_cert_expiry
+                    - type: INTEGER
+                      name: show.0
+                      value: '1'
+                    - type: INTEGER
+                      name: show.1
+                      value: '2'
+                    - type: INTEGER
+                      name: show.2
+                      value: '3'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 0D68FD
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: INTEGER
+                      name: time_bold
+                      value: '1'
+                    - type: STRING
+                      name: time_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: time_size
+                      value: '10'
+                    - type: INTEGER
+                      name: time_v_pos
+                      value: '2'
+                    - type: STRING
+                      name: value_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: value_size
+                      value: '30'
+                - type: item
+                  name: 'Leaf certificate renewal failures'
+                  x: '48'
+                  width: '24'
+                  hide_header: 'YES'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 0D68FD
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: INTEGER
+                      name: decimal_size
+                      value: '25'
+                    - type: STRING
+                      name: description
+                      value: 'Leaf certificate renewal failures'
+                    - type: INTEGER
+                      name: desc_bold
+                      value: '1'
+                    - type: STRING
+                      name: desc_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: desc_h_pos
+                      value: '0'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
+                    - type: STRING
+                      name: down_color
+                      value: FFFFFF
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'HashiCorp Consul Node by HTTP'
+                        key: consul.leaf_cert_renewal_failure
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: E45959
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '1'
+                    - type: INTEGER
+                      name: time_bold
+                      value: '1'
+                    - type: STRING
+                      name: time_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: time_size
+                      value: '10'
+                    - type: INTEGER
+                      name: time_v_pos
+                      value: '2'
+                    - type: STRING
+                      name: updown_color
+                      value: FFFFFF
+                    - type: STRING
+                      name: up_color
+                      value: FFFFFF
+                    - type: STRING
+                      name: value_color
+                      value: FFFFFF
+                    - type: INTEGER
+                      name: value_size
+                      value: '30'
       valuemaps:
         - uuid: 92638a6d5a9347edb011a8c999a9895e
           name: 'Consul Autopilot healthy'
@@ -1979,6 +2700,13 @@ zabbix_export:
               newvalue: Agent
             - value: '1'
               newvalue: Server
+        - uuid: 4479ebef0d1b4ca984405b83a09ecf4f
+          name: 'Consul server is leader'
+          mappings:
+            - value: '0'
+              newvalue: 'No'
+            - value: '1'
+              newvalue: 'Yes'
   triggers:
     - uuid: 9e1a0b7f49844d1db525d00d5f1060f0
       expression: 'min(/HashiCorp Consul Node by HTTP/consul.process_open_fds,5m)/last(/HashiCorp Consul Node by HTTP/consul.process_max_fds)*100>{$CONSUL.OPEN.FDS.MAX.WARN}'
@@ -2028,30 +2756,3 @@ zabbix_export:
           item:
             host: 'HashiCorp Consul Node by HTTP'
             key: consul.resident_memory_bytes
-    - uuid: ba792478fe3140709a06a852560307fd
-      name: 'Consul: Serf member operations'
-      graph_items:
-        - color: 199C0D
-          item:
-            host: 'HashiCorp Consul Node by HTTP'
-            key: consul.serf.member.update.rate
-        - sortorder: '1'
-          color: F63100
-          item:
-            host: 'HashiCorp Consul Node by HTTP'
-            key: consul.serf.member.left.rate
-        - sortorder: '2'
-          color: 00611C
-          item:
-            host: 'HashiCorp Consul Node by HTTP'
-            key: consul.serf.member.join.rate
-        - sortorder: '3'
-          color: F7941D
-          item:
-            host: 'HashiCorp Consul Node by HTTP'
-            key: consul.serf.member.failed.rate
-        - sortorder: '4'
-          color: FC6EA3
-          item:
-            host: 'HashiCorp Consul Node by HTTP'
-            key: consul.serf.member.flap.rate

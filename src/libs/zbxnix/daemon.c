@@ -190,6 +190,9 @@ void	zbx_set_sigusr_handler(zbx_signal_handler_f handler)
  ******************************************************************************/
 static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
+	/* signal redirection (sigqueue(), logging) may change errno that interrupted code relies on */
+	int	saved_errno = errno;
+
 	ZBX_UNUSED(sig);
 	ZBX_UNUSED(context);
 
@@ -199,15 +202,17 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	if (!SIG_PARENT_PROCESS)
 	{
 		common_sigusr_handler(flags);
-		return;
+		goto out;
 	}
 
 	if (NULL == get_threads_func_cb())
-		return;
+		goto out;
 
 	if (signal_redirect_handler != NULL)
 		signal_redirect_handler(flags, sigusr_handler);
+out:
 #endif
+	errno = saved_errno;
 }
 
 /******************************************************************************

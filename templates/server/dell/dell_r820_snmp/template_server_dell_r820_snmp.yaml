@@ -25,7 +25,7 @@ zabbix_export:
         This is a template for monitoring DELL PowerEdge R820 servers with iDRAC version 7 (and later) via Zabbix SNMP agent that works without any external scripts.
       vendor:
         name: Zabbix
-        version: 8.2-0
+        version: 8.2-1
       groups:
         - name: 'Templates/Server hardware'
       items:
@@ -294,7 +294,6 @@ zabbix_export:
           description: |
             MIB: SNMPv2-MIB
             An administratively-assigned name for this managed node. By convention, this is the node's fully-qualified domain name. If the name is unknown, the value is a zero-length string.
-          inventory_link: NAME
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -437,7 +436,6 @@ zabbix_export:
           description: |
             MIB: IDRAC-MIB-SMIv2
             This attribute defines the name of the operating system that the host is running.
-          inventory_link: OS
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -798,6 +796,95 @@ zabbix_export:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+        - uuid: ec7f3a6a75da48d69a5178a3acdeec2d
+          name: 'Network interface discovery'
+          type: DEPENDENT
+          key: dell.server.net.if.discovery
+          description: 'Discovery of network interfaces.'
+          item_prototypes:
+            - uuid: 71c070e0a1c7471989f2cebb89f1adcf
+              name: 'NIC [{#NIC_FQDD}/{#NIC_MAC}]: Link status'
+              type: DEPENDENT
+              key: 'dell.server.net.if.link[{#NIC_FQDD}]'
+              description: 'This attribute defines the connection status of the network device.'
+              valuemap:
+                name: 'IDRAC-MIB-SMIv2::NetworkDeviceConnectionStatusEnum'
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.674.10892.5.4.1100.90.1.4.1.{#SNMPINDEX}'
+                    - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: dell.server.net.if.walk
+              tags:
+                - tag: component
+                  value: network
+              trigger_prototypes:
+                - uuid: df1c4ad1e9a1481db69cee6ca8651674
+                  expression: '{$DELL.SNMP.IFCONTROL:"{#NIC_FQDD}"}=1 and last(/DELL PowerEdge R820 by SNMP/dell.server.net.if.link[{#NIC_FQDD}],#1)<>1 and last(/DELL PowerEdge R820 by SNMP/dell.server.net.if.link[{#NIC_FQDD}],#1)<>last(/DELL PowerEdge R820 by SNMP/dell.server.net.if.link[{#NIC_FQDD}],#2)'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.net.if.link[{#NIC_FQDD}],#1)=1 or {$DELL.SNMP.IFCONTROL:"{#NIC_FQDD}"}=0'
+                  name: 'Dell R820: NIC [{#NIC_FQDD}/{#NIC_MAC}]: Link down'
+                  opdata: 'Current status: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: |
+                    This trigger expression works as follows:
+                    1. It can be triggered if the operations status is Down.
+                    2. `{$DELL.SNMP.IFCONTROL:"{#NIC_FQDD}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is Down.
+                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for the "eternal off" interfaces.)
+                  manual_close: 'YES'
+                  tags:
+                    - tag: scope
+                      value: availability
+            - uuid: 15743aecf8f046559094380f25617c03
+              name: 'NIC [{#NIC_FQDD}/{#NIC_MAC}]: Status'
+              type: DEPENDENT
+              key: 'dell.server.net.if.status[{#NIC_FQDD}]'
+              description: 'This attribute defines the status of the network device.'
+              valuemap:
+                name: 'IDRAC-MIB-SMIv2::ObjectStatusEnum'
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.674.10892.5.4.1100.90.1.3.1.{#SNMPINDEX}'
+                    - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: dell.server.net.if.walk
+              tags:
+                - tag: component
+                  value: network
+              trigger_prototypes:
+                - uuid: 386e1c9194904163b6e42030e4ae357b
+                  expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.net.if.status[{#NIC_FQDD}],#1)<>3'
+                  name: 'Dell R820: NIC [{#NIC_FQDD}/{#NIC_MAC}]: Status is not OK'
+                  opdata: 'Current status: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: |
+                    MIB: IDRAC-MIB-SMIv2
+                    Network interface status is not OK.
+                  tags:
+                    - tag: scope
+                      value: availability
+          master_item:
+            key: dell.server.net.if.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#NIC_FQDD}'
+                - 1.3.6.1.4.1.674.10892.5.4.1100.90.1.30.1
+                - '0'
+                - '{#NIC_MAC}'
+                - 1.3.6.1.4.1.674.10892.5.4.1100.90.1.15.1
+                - '2'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
         - uuid: 9b755a619c074bd1a99737f1fbf97708
           name: 'Fan discovery'
           type: DEPENDENT
@@ -966,95 +1053,6 @@ zabbix_export:
                 - '{#SNMPVALUE}'
                 - 1.3.6.1.4.1.674.10892.5.4.1100.50.1.8.1
                 - '0'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 6h
-        - uuid: ec7f3a6a75da48d69a5178a3acdeec2d
-          name: 'Network interface discovery'
-          type: DEPENDENT
-          key: net.if.discovery
-          description: 'Discovery of network interfaces.'
-          item_prototypes:
-            - uuid: 71c070e0a1c7471989f2cebb89f1adcf
-              name: 'NIC [{#NIC_FQDD}/{#NIC_MAC}]: Link status'
-              type: DEPENDENT
-              key: 'dell.server.net.if.link[{#NIC_FQDD}]'
-              description: 'This attribute defines the connection status of the network device.'
-              valuemap:
-                name: 'IDRAC-MIB-SMIv2::NetworkDeviceConnectionStatusEnum'
-              preprocessing:
-                - type: SNMP_WALK_VALUE
-                  parameters:
-                    - '1.3.6.1.4.1.674.10892.5.4.1100.90.1.4.1.{#SNMPINDEX}'
-                    - '0'
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 6h
-              master_item:
-                key: dell.server.net.if.walk
-              tags:
-                - tag: component
-                  value: network
-              trigger_prototypes:
-                - uuid: df1c4ad1e9a1481db69cee6ca8651674
-                  expression: '{$DELL.SNMP.IFCONTROL:"{#NIC_FQDD}"}=1 and last(/DELL PowerEdge R820 by SNMP/dell.server.net.if.link[{#NIC_FQDD}],#1)<>1 and last(/DELL PowerEdge R820 by SNMP/dell.server.net.if.link[{#NIC_FQDD}],#1)<>last(/DELL PowerEdge R820 by SNMP/dell.server.net.if.link[{#NIC_FQDD}],#2)'
-                  recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.net.if.link[{#NIC_FQDD}],#1)=1 or {$DELL.SNMP.IFCONTROL:"{#NIC_FQDD}"}=0'
-                  name: 'Dell R820: NIC [{#NIC_FQDD}/{#NIC_MAC}]: Link down'
-                  opdata: 'Current status: {ITEM.LASTVALUE1}'
-                  priority: AVERAGE
-                  description: |
-                    This trigger expression works as follows:
-                    1. It can be triggered if the operations status is Down.
-                    2. `{$DELL.SNMP.IFCONTROL:"{#NIC_FQDD}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is Down.
-                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for the "eternal off" interfaces.)
-                  manual_close: 'YES'
-                  tags:
-                    - tag: scope
-                      value: availability
-            - uuid: 15743aecf8f046559094380f25617c03
-              name: 'NIC [{#NIC_FQDD}/{#NIC_MAC}]: Status'
-              type: DEPENDENT
-              key: 'dell.server.net.if.status[{#NIC_FQDD}]'
-              description: 'This attribute defines the status of the network device.'
-              valuemap:
-                name: 'IDRAC-MIB-SMIv2::ObjectStatusEnum'
-              preprocessing:
-                - type: SNMP_WALK_VALUE
-                  parameters:
-                    - '1.3.6.1.4.1.674.10892.5.4.1100.90.1.3.1.{#SNMPINDEX}'
-                    - '0'
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 6h
-              master_item:
-                key: dell.server.net.if.walk
-              tags:
-                - tag: component
-                  value: network
-              trigger_prototypes:
-                - uuid: 386e1c9194904163b6e42030e4ae357b
-                  expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.net.if.status[{#NIC_FQDD}],#1)<>3'
-                  name: 'Dell R820: NIC [{#NIC_FQDD}/{#NIC_MAC}]: Status is not OK'
-                  opdata: 'Current status: {ITEM.LASTVALUE1}'
-                  priority: AVERAGE
-                  description: |
-                    MIB: IDRAC-MIB-SMIv2
-                    Network interface status is not OK.
-                  tags:
-                    - tag: scope
-                      value: availability
-          master_item:
-            key: dell.server.net.if.walk
-          preprocessing:
-            - type: SNMP_WALK_TO_JSON
-              parameters:
-                - '{#NIC_FQDD}'
-                - 1.3.6.1.4.1.674.10892.5.4.1100.90.1.30.1
-                - '0'
-                - '{#NIC_MAC}'
-                - 1.3.6.1.4.1.674.10892.5.4.1100.90.1.15.1
-                - '2'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h

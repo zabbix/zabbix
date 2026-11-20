@@ -119,7 +119,8 @@
 					new CDataTableColumn('recovery', <?= json_encode(_('Recovery time')); ?>)
 						.setFields(['recovery']),
 					new CDataTableColumn('status', <?= json_encode(_('Status')); ?>)
-						.setFields(['status']),
+						.setFields(['status'])
+						.setRenderer('status'),
 					new CDataTableColumn('info', <?= json_encode(_('Info')); ?>)
 						.setFields(['info']),
 					new CDataTableColumn('host', <?= json_encode(_('Host')); ?>)
@@ -139,6 +140,7 @@
 						.setWidth('auto'),
 					new CDataTableColumn('duration', <?= json_encode(_('Duration')); ?>)
 						.setFields(['duration'])
+						.setRenderer('duration')
 						.setWidth('94px'),
 					new CDataTableColumn('update', <?= json_encode(_('Update')); ?>)
 						.setFields(['can_be_closed', 'eventid'])
@@ -315,16 +317,23 @@
 				})
 				.setCellRenderer('time', ({column, cell_data, cell}) => {
 					const [clock, eventid, triggerid] = cell_data;
+					const compact_view = this.#datatable.getOption('compact_view');
 
 					cell.innerHTML = '';
 
 					if (clock && eventid && triggerid) {
-						const url = new URL('tr_events.php', location.href);
-						url.searchParams.set('triggerid', triggerid);
-						url.searchParams.set('eventid', eventid);
+						const url = zabbixUrl({
+							triggerid,
+							eventid
+						}, 'tr_events.php');
 
 						const clock_link = document.createElement('a');
-						clock_link.setAttribute('href', url.toString());
+
+						if (!compact_view.checked) {
+							clock_link.classList.add(ZBX_STYLE_WORDBREAK);
+						}
+
+						clock_link.setAttribute('href', url);
 						clock_link.textContent = clock;
 
 						const timeline = document.createElement('div');
@@ -335,7 +344,6 @@
 						cell.append(timeline);
 					}
 
-					const compact_view = this.#datatable.getOption('compact_view');
 					const column_options = column.getColumnOptions();
 					const sort_field = this.#datatable.getSortField();
 
@@ -380,13 +388,35 @@
 				.setCellRenderer('severity', ({cell_data, cell}) => {
 					const [severity] = cell_data;
 					const severity_data = severities.find(data => data.value == severity);
+					const compact_view = this.#datatable.getOption('compact_view');
 
 					cell.classList.add(CDataTable.ZBX_STYLE_CELL_BG);
 
 					if (severity_data) {
+						const wordbreak = document.createElement('span');
+						wordbreak.classList.add(compact_view.checked ? ZBX_STYLE_OVERFLOW_ELLIPSIS : ZBX_STYLE_WORDBREAK);
+						wordbreak.textContent = severity_data.label;
+
+						const flex_wrapper = document.createElement('div');
+
+						if (compact_view.checked) {
+							flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+						}
+
+						flex_wrapper.appendChild(wordbreak);
+
 						cell.classList.add(severity_data.style);
-						cell.textContent = severity_data.label;
+						cell.appendChild(flex_wrapper);
 					}
+				})
+				.setCellRenderer('status', ({cell_data, cell}) => {
+					const [status] = cell_data;
+
+					const flex_wrapper = document.createElement('div');
+					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+					flex_wrapper.innerHTML = status;
+
+					cell.appendChild(flex_wrapper);
 				})
 				.setCellRenderer('host', ({cell_data, cell}) => {
 					const [hosts] = cell_data;
@@ -396,19 +426,19 @@
 					}
 
 					const compact_view = this.#datatable.getOption('compact_view');
-					const host_link_style = compact_view.checked ? ZBX_STYLE_OVERFLOW_ELLIPSIS : ZBX_STYLE_WORDBREAK;
 
 					const flex_wrapper = document.createElement('div');
-					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER, 'wrap');
+
+					if (compact_view.checked) {
+						flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+					}
 
 					for (const [index, host] of hosts.entries()) {
-						const flex_item = document.createElement('div');
-						flex_item.classList.add('flex-item');
-
 						const {hostid, name, maintenance_type, maintenance_status} = host;
 
 						const host_link = document.createElement('a');
-						host_link.classList.add(ZBX_STYLE_LINK_ACTION, host_link_style);
+						host_link.classList.add(ZBX_STYLE_LINK_ACTION,
+							compact_view.checked ? ZBX_STYLE_OVERFLOW_ELLIPSIS : ZBX_STYLE_WORDBREAK);
 						host_link.setAttribute('data-menu-popup', JSON.stringify({
 							type: 'host',
 							data: {
@@ -421,7 +451,7 @@
 						host_link.setAttribute('href', 'javascript:void(0)');
 						host_link.textContent = name;
 
-						flex_item.appendChild(host_link);
+						flex_wrapper.appendChild(host_link);
 
 						if (maintenance_status == HOST_MAINTENANCE_STATUS_ON) {
 							let maintenance_name, maintenance_description;
@@ -454,7 +484,7 @@
 							maintenance_icon.setAttribute('data-hintbox-static', '1');
 							maintenance_icon.setAttribute('aria-expanded', 'false');
 
-							flex_item.appendChild(maintenance_icon);
+							flex_wrapper.appendChild(maintenance_icon);
 						}
 
 						if (index + 1 < hosts.length) {
@@ -462,11 +492,23 @@
 							separator.classList.add(ZBX_STYLE_SEPARATOR);
 							separator.textContent = ',';
 
-							flex_item.appendChild(separator);
+							flex_wrapper.appendChild(separator);
 						}
-
-						flex_wrapper.appendChild(flex_item);
 					}
+
+					cell.appendChild(flex_wrapper);
+				})
+				.setCellRenderer('duration', ({cell_data, cell}) => {
+					const [duration] = cell_data;
+					const compact_view = this.#datatable.getOption('compact_view');
+
+					const wordbreak = document.createElement('span');
+					wordbreak.classList.add(compact_view.checked ? ZBX_STYLE_OVERFLOW_ELLIPSIS : ZBX_STYLE_WORDBREAK);
+					wordbreak.textContent = duration;
+
+					const flex_wrapper = document.createElement('div');
+					flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+					flex_wrapper.appendChild(wordbreak);
 
 					cell.appendChild(flex_wrapper);
 				})
@@ -482,29 +524,39 @@
 						return;
 					}
 
+					const compact_view = this.#datatable.getOption('compact_view');
+
 					let update_link;
 
 					if (allowed.add_comments || allowed.change_severity || allowed.acknowledge || can_be_closed
 							|| allowed.suppress_problems || allowed.rank_change) {
 
-						const url_params = objectToSearchParams({
+						const url = zabbixUrl({
 							action: 'popup',
 							popup: 'acknowledge.edit',
-							'eventids[]': eventid
+							eventids: [eventid]
 						});
-						const url = new URL(`zabbix.php?${url_params}`, location.href);
 
 						update_link = document.createElement('a');
 						update_link.classList.add(ZBX_STYLE_LINK_ALT);
-						update_link.setAttribute('href', url.toString());
+						update_link.setAttribute('href', url);
 					}
 					else {
 						update_link = document.createElement('span');
 					}
 
+					update_link.classList.add(compact_view.checked ? ZBX_STYLE_OVERFLOW_ELLIPSIS : ZBX_STYLE_WORDBREAK);
 					update_link.textContent = <?= json_encode(_('Update')); ?>;
 
-					cell.appendChild(update_link);
+					const flex_wrapper = document.createElement('div');
+
+					if (compact_view.checked) {
+						flex_wrapper.classList.add(ZBX_STYLE_FLEX_WRAPPER);
+					}
+
+					flex_wrapper.appendChild(update_link);
+
+					cell.appendChild(flex_wrapper);
 				})
 				.setCellRenderer('symptom_limit', ({cell, cell_data}) => {
 					const [paging] = cell_data;
