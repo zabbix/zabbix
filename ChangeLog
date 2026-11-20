@@ -1,9 +1,13 @@
 Changes for 7.4.17rc1
 
 New features:
+A.......S. [ZBXNEXT-10866] updated maximum supported TimescaleDB version to 2.31 (mprihodko)
+.D......S. [ZBXNEXT-10621] added new runtime control option permissions_rebuild to rebuild user and host group permission cache (mprihodko)
 A......PS. [ZBXNEXT-10796] updated maximum supported MariaDB version to 13.0 (mprihodko)
 
 Bug fixes:
+.......P.. [ZBX-27656] fixed missed history when switching to disk mode from hybrid mode (vso)
+..F....... [ZBX-28213] fixed inline validation for array fields (ggrigorjevs)
 .........T [ZBX-23192] added JS script for job discovery with configurable folder depth in Jenkins by HTTP template (mruszczyk)
 .........T [ZBX-23148] fixed uniqueness of Dell template items (kflorowski)
 ........S. [ZBX-28284] fixed Zabbix server crash if database connection is lost during startup (vso)
@@ -1686,6 +1690,8 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.33rc1
 
 New features:
+A.......S. [ZBXNEXT-10866] updated maximum supported TimescaleDB version to 2.31 (mprihodko)
+.D......S. [ZBXNEXT-10621] added new runtime control option permissions_rebuild to rebuild user and host group permission cache (mprihodko)
 A......PS. [ZBXNEXT-10796] updated maximum supported MariaDB version to 13.0 (mprihodko)
 
 Bug fixes:
@@ -5980,6 +5986,7 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.50rc1
 
 New features:
+A.......S. [ZBXNEXT-10866] updated maximum supported TimescaleDB version to 2.31 (mprihodko)
 A......PS. [ZBXNEXT-10796] updated maximum supported MariaDB version to 13.0 (mprihodko)
 
 Bug fixes:
