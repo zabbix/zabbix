@@ -129,7 +129,7 @@ class testScriptItems extends CIntegrationTest {
 				"params" => "return value;",
 				"parameters" => ['111111' => "2"],
 			],
-			
+
 		];
 
 		$result = $this->getClient(self::COMPONENT_SERVER)->testItem($item_test_data, self::$sid);
@@ -153,7 +153,7 @@ class testScriptItems extends CIntegrationTest {
 				'params' => 'return value;',
 				'parameters' => ['123' => self::LONG_2340_CHAR_LINE],
 			],
-			
+
 		];
 
 		$result = $this->getClient(self::COMPONENT_SERVER)->testItem($item_test_data, self::$sid);
@@ -177,7 +177,7 @@ class testScriptItems extends CIntegrationTest {
 				'params' => 'return value;',
 				'parameters' => [self::LONG_260_CHAR_LINE => "2"],
 			],
-			
+
 		];
 
 		$result = $this->getClient(self::COMPONENT_SERVER)->testItem($item_test_data, self::$sid);
