@@ -92,6 +92,16 @@ class testFormUser extends CWebTest {
 				'pages' => [[]]
 			]
 		]);
+
+		// Enabled media type that is selected by default in the New media dialog (first enabled one by name).
+		CDataHelper::call('mediatype.create', [
+			[
+				'type' => MEDIA_TYPE_WEBHOOK,
+				'name' => 'Reference webhook',
+				'status' => MEDIA_TYPE_STATUS_ACTIVE,
+				'script' => 'return 0;'
+			]
+		]);
 	}
 
 	public function getLayoutData() {
@@ -979,7 +989,7 @@ class testFormUser extends CWebTest {
 	/**
 	 * Check the field values after creating or updating user.
 	 */
-	private function assertFormFields($data) {
+	protected function assertFormFields($data) {
 		$userid = CDBHelper::getValue('SELECT userid FROM users WHERE username='.zbx_dbstr($data['fields']['Username']));
 		$this->page->open('zabbix.php?action=user.edit&userid='.$userid);
 		$form_update = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
@@ -1010,7 +1020,7 @@ class testFormUser extends CWebTest {
 	/**
 	 * Login as user and check user profile parameters in UI.
 	 */
-	private function assertUserParameters($data) {
+	protected function assertUserParameters($data) {
 		try {
 			$this->page->logout();
 			// Log in with the created or updated user.
@@ -1787,7 +1797,7 @@ class testFormUser extends CWebTest {
 		$this->assertEquals($user_hash, CDBHelper::getHash($sql_users));
 	}
 
-	private function setAutoLogout($data) {
+	protected function setAutoLogout($data) {
 		$form = $this->query('name:user_form')->asForm()->one();
 		$auto_logout = $form->getFieldContainer('Auto-logout');
 		$auto_logout->query('id:autologout_visible')->asCheckbox()->one()->set($data['checked']);
