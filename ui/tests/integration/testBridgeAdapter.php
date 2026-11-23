@@ -2520,7 +2520,22 @@ class testBridgeAdapter extends CIntegrationTest {
 			'SELECT NULL FROM dpop_jti_cache WHERE jti='.zbx_dbstr(self::HOUSEKEEPER_TEST_JTI)
 		));
 
-		$this->executeHousekeeper(self::COMPONENT_SERVER);
+		// housekeeper may not be subscribed to runtime control commands yet right after server startup
+		for ($attempt = 1;; $attempt++) {
+			$this->executeHousekeeper(self::COMPONENT_SERVER);
+
+			try {
+				self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'forced execution of the housekeeper', true,
+					3, 3
+				);
+				break;
+			}
+			catch (Exception $e) {
+				if ($attempt >= 5) {
+					throw $e;
+				}
+			}
+		}
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of housekeeping_dpop_jti_cache()', true,
 			30, 1

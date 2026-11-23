@@ -46,7 +46,20 @@ class testPageTriggerUrl extends CWebTest {
 		CDataHelper::call('trigger.update', [
 			[
 				'triggerid' => self::$triggerids['1_trigger_Not_classified'],
-				'url_name' => 'URL name for menu'
+				'url_name' => self::$custom_name
+			]
+		]);
+
+		// Menu entry is displayed only for events with tag "webhook".
+		CDataHelper::call('mediatype.create', [
+			[
+				'type' => MEDIA_TYPE_WEBHOOK,
+				'name' => 'Webhook for trigger URL test',
+				'status' => MEDIA_TYPE_STATUS_ACTIVE,
+				'script' => 'return 0;',
+				'show_event_menu' => ZBX_EVENT_MENU_SHOW,
+				'event_menu_name' => 'Unique webhook url',
+				'event_menu_url' => 'zabbix.php?action=mediatype.list&ddreset={EVENT.TAGS.webhook}'
 			]
 		]);
 
@@ -230,7 +243,7 @@ class testPageTriggerUrl extends CWebTest {
 	 * @param array $data		data provider with fields values
 	 * @param array $titles		titles in context menu
 	 */
-	private function checkTriggerUrl($data, $titles = ['VIEW', 'CONFIGURATION', 'PROBLEM', 'MAINTENANCE', 'LINKS']) {
+	protected function checkTriggerUrl($data, $titles = ['VIEW', 'CONFIGURATION', 'PROBLEM', 'MAINTENANCE', 'LINKS']) {
 		$option = array_key_exists('Trigger URL', $data['links']) ? 'Trigger URL' : self::$custom_name;
 
 		// Check trigger popup menu.

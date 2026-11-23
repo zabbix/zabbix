@@ -51,13 +51,7 @@ int	zbx_init_thread_signal_handler(sigjmp_buf *jmp_ret)
 
 	sig_jmp_ret = jmp_ret;
 
-	sigemptyset(&mask);
-	sigaddset(&mask, SIGTERM);
-	sigaddset(&mask, SIGUSR1);
-	sigaddset(&mask, SIGUSR2);
-	sigaddset(&mask, SIGHUP);
-	sigaddset(&mask, SIGQUIT);
-	sigaddset(&mask, SIGINT);
+	ZBX_SIGSET_THREAD_SIGNALS(&mask);
 
 	if (0 != (err = pthread_sigmask(SIG_BLOCK, &mask, NULL)))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
@@ -246,6 +240,9 @@ void	zbx_log_exit_signal(void)
  ******************************************************************************/
 static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
+	/* logging and exit callback may change errno that interrupted code relies on */
+	int	saved_errno = errno;
+
 	ZBX_UNUSED(context);
 
 	if (!SIG_PARENT_PROCESS)
@@ -278,6 +275,8 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 				zbx_on_exit_cb(FAIL, zbx_on_exit_args);
 		}
 	}
+
+	errno = saved_errno;
 }
 
 /******************************************************************************
@@ -287,6 +286,9 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
  ******************************************************************************/
 static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
+	/* waitpid() may change errno that interrupted code relies on */
+	int	saved_errno = errno;
+
 	SIG_CHECK_PARAMS(sig, siginfo, context);
 
 	pid_t	pid;
@@ -295,11 +297,11 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	if (0 < (pid = waitpid((pid_t)-1, &status, WNOHANG)))
 	{
 		if (FAIL == zbx_child_cleanup(pid, child_pids, child_pid_count))
-			return;
+			goto out;
 	}
 
 	if (0 >= pid)
-		return;
+		goto out;
 
 	if (!SIG_PARENT_PROCESS)
 		exit_with_failure();
@@ -318,6 +320,8 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 		zbx_tls_free_on_signal();
 #endif
 	}
+out:
+	errno = saved_errno;
 }
 
 #undef ZBX_EXIT_NONE
@@ -422,13 +426,7 @@ void	zbx_block_thread_signals(sigset_t *orig_mask)
 {
 	sigset_t	mask;
 
-	sigemptyset(&mask);
-	sigaddset(&mask, SIGTERM);
-	sigaddset(&mask, SIGUSR1);
-	sigaddset(&mask, SIGUSR2);
-	sigaddset(&mask, SIGHUP);
-	sigaddset(&mask, SIGQUIT);
-	sigaddset(&mask, SIGINT);
+	ZBX_SIGSET_THREAD_SIGNALS(&mask);
 
 	if (0 > zbx_sigmask(SIG_BLOCK, &mask, orig_mask))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot set signal mask to block the signal");

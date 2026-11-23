@@ -72,7 +72,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					'Tile provider' => 'Other',
 					'Tile URL' => '',
 					'Attribution text' => '',
-					'Max zoom level' => ''
+					'Max zoom level' => 0
 				]
 			]
 		];
@@ -175,7 +175,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					],
 					'errors' => [
 						'Tile URL' => 'This field cannot be empty.',
-						'Max zoom level' => 'This value is not a valid integer.'
+						'Max zoom level' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -189,7 +189,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 						'Max zoom level' => ''
 					],
 					'errors' => [
-						'Max zoom level' => 'This value is not a valid integer.'
+						'Max zoom level' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],

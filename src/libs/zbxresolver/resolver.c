@@ -49,6 +49,10 @@ static void	ares_event_thread_init(void)
 
 	struct ares_options	options = {0};
 	int			optmask = ARES_OPT_EVENT_THREAD|ARES_OPT_QUERY_CACHE, status;
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+	int			err;
+	sigset_t		mask, orig_mask;
+#endif
 
 	options.evsys = ARES_EVSYS_DEFAULT;
 	options.qcache_max_ttl = SEC_PER_HOUR;
@@ -59,8 +63,22 @@ static void	ares_event_thread_init(void)
 		return;
 	}
 
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+	/* block asynchronous signals while c-ares event thread is created, so that it inherits the blocked */
+	/* signal mask and signals are always handled by the main thread of the process                     */
+	ZBX_SIGSET_THREAD_SIGNALS(&mask);
+	sigaddset(&mask, SIGALRM);
+	sigaddset(&mask, SIGCHLD);
+
+	if (0 != (err = pthread_sigmask(SIG_BLOCK, &mask, &orig_mask)))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
+#endif
 	if (ARES_SUCCESS != (status = ares_init_options(&zbx_channel, &options, optmask)))
 		zabbix_log(LOG_LEVEL_ERR, "cannot set c-ares library options: %s", ares_strerror(status));
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+	if (0 == err && 0 != (err = pthread_sigmask(SIG_SETMASK, &orig_mask, NULL)))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot restore signal mask: %s", zbx_strerror(err));
+#endif
 }
 
 typedef struct
