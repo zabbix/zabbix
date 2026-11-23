@@ -2399,11 +2399,11 @@ class CUser extends CApiService {
 
 		$db_users = self::findLoginUsersByUsername($data['username']);
 
-		$created = !$db_users && $data['username'] !== ZBX_GUEST_USER
-			? $this->tryToCreateLdapProvisionedUser($data, $db_users)
-			: false;
-
 		try {
+			$created = !$db_users && $data['username'] !== ZBX_GUEST_USER
+				? $this->tryToCreateLdapProvisionedUser($data, $db_users)
+				: false;
+
 			self::checkSingleUserExists($data['username'], $db_users);
 
 			$db_user = $db_users[0];

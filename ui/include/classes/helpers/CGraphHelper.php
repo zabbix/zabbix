@@ -251,14 +251,20 @@ class CGraphHelper extends CGraphGeneralHelper {
 
 			$metric['delay'] = self::getItemMaxDelay($metric);
 
-			if (strpos($metric['units'], ',') === false) {
-				$metric['units_long'] = '';
-			}
-			else {
-				list($metric['units'], $metric['units_long']) = explode(',', $metric['units'], 2);
-			}
+			[$metric['units'], $metric['units_long']] = self::splitUnits($metric['units']);
 		}
 		unset($metric);
+	}
+
+	/**
+	 * Splits item units into the units shown with the Y axis values and the title of the vertical axis.
+	 *
+	 * @param string $units
+	 *
+	 * @return array
+	 */
+	public static function splitUnits(string $units): array {
+		return strpos($units, ',') === false ? [$units, ''] : explode(',', $units, 2);
 	}
 
 	/**

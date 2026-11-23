@@ -752,6 +752,10 @@ class CElement extends CBaseElement implements IWaitable {
 			if (in_array('datatable', $class)) {
 				return $this->asDatatableGroup($options);
 			}
+
+			if (in_array('multilineinput-preview', $class)) {
+				return $this->asElement($options);
+			}
 		}
 
 		CTest::zbxAddWarning('No specific element was detected');
