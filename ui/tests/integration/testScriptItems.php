@@ -20,6 +20,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * Test suite for script items.
  *
  * @required-components server
+ * @suite-components-reuse true
  * @configurationDataProvider serverConfigurationProvider
  * @hosts test_script_items
  * @onAfter clearData
