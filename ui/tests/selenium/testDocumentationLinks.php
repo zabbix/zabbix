@@ -1599,7 +1599,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/config/notifications/action#configuring-an-action'
 				]
 			],
-			// #155 Event correlation list view.
+			// #155 Event processing list view.
 			[
 				[
 					'url' => 'zabbix.php?action=ceprule.list',
