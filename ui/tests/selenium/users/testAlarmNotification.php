@@ -25,8 +25,6 @@ require_once dirname(__FILE__) . '/../../include/CWebTest.php';
  * @backup profiles
  *
  * @onBefore prepareAlarmData
- *
- * @onAfterEach closeAndAcknowledgeEvents
  */
 class testAlarmNotification extends CWebTest {
 
@@ -224,6 +222,7 @@ class testAlarmNotification extends CWebTest {
 	/**
 	 * Check Alarm notification overlay dialog layout.
 	 *
+	 * @onAfter closeAndAcknowledgeEvents
 	 * @onAfter openResetedPage
 	 */
 	public function testAlarmNotification_Layout() {
@@ -317,6 +316,7 @@ class testAlarmNotification extends CWebTest {
 	/**
 	 * Check that colors displayed in alarm notification overlay are the same as in configuration.
 	 *
+	 * @onAfter closeAndAcknowledgeEvents
 	 * @onAfter deleteEvents
 	 */
 	public function testAlarmNotification_CheckColorChange() {
@@ -446,6 +446,7 @@ class testAlarmNotification extends CWebTest {
 	/**
 	 * Check that correct problems displayed in alarm notification overlay.
 	 *
+	 * @onAfter closeAndAcknowledgeEvents
 	 * @dataProvider getDisplayedProblemsData
 	 */
 	public function testAlarmNotification_DisplayedProblems($data) {
