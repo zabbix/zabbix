@@ -30,6 +30,9 @@ class CIntegrationTest extends CAPITest {
 	const WAIT_ITERATIONS			= 60;
 	const WAIT_ITERATIONS_STARTUP		= 15;
 
+	// Used for the SANITIZER=memory and SANITIZER=thread builds.
+	const WAIT_ITERATIONS_SHUTDOWN_SANITIZED	= 180;
+
 	// Default delays (in seconds):
 	const WAIT_ITERATION_DELAY			= 1;
 	const WAIT_ITERATION_DELAY_FOR_SHUTDOWN		= 1;
@@ -497,6 +500,26 @@ class CIntegrationTest extends CAPITest {
 	}
 
 	/**
+	 * Check whether the components under test were built with sanitizers (SANITIZER=memory or thread).
+	 *
+	 * @return bool
+	 */
+	private static function isSanitizedBuild(): bool {
+		return in_array(getenv('SANITIZER'), ['memory', 'thread'], true);
+	}
+
+	/**
+	 * Number of iterations to wait for a component to stop, extended for slower sanitizer builds.
+	 *
+	 * @return int
+	 */
+	private static function shutdownWaitIterations(): int {
+		return self::isSanitizedBuild()
+			? self::WAIT_ITERATIONS_SHUTDOWN_SANITIZED
+			: self::WAIT_ITERATIONS;
+	}
+
+	/**
 	 * Checks absence of pid file after kill.
 	 *
 	 * @param string $parent_pid
@@ -504,7 +527,7 @@ class CIntegrationTest extends CAPITest {
 	private static function waitComponentStopped($parent_pid) {
 		$usleep_total = 0;
 
-		for ($i = 0; $i < self::WAIT_ITERATIONS; $i++) {
+		for ($i = 0; $i < self::shutdownWaitIterations(); $i++) {
 			if (!posix_kill($parent_pid, 0)) {
 				return;
 			}

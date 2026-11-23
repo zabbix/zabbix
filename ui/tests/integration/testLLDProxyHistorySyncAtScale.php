@@ -60,7 +60,7 @@ class testLLDProxyHistorySyncAtScale extends testLLDHistorySyncAtScale {
 			'HistoryIndexCacheSize' => '32M',
 			'StartDBSyncers' => '4',
 			'ProxyBufferMode' => 'hybrid',
-			'ProxyMemoryBufferSize' => '64M'
+			'ProxyMemoryBufferSize' => '16M'
 		];
 
 		return $config;

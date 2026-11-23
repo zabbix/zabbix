@@ -85,6 +85,11 @@ z-navigation-tree {
 
 	.z-navigation-tree-title {
 		font-weight: 600;
+
+		&.missing {
+			font-style: italic;
+			font-weight: 400;
+		}
 	}
 
 	.z-navigation-tree-subtitle {

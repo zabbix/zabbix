@@ -14,7 +14,6 @@
 
 #include "pb_discovery.h"
 #include "proxybuffer.h"
-#include "zbxcachehistory.h"
 #include "zbxstr.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
@@ -226,7 +225,7 @@ static void	pb_discovery_set_row_ids(zbx_list_t *rows, int rows_num, zbx_uint64_
 	zbx_pb_discovery_t	*row;
 	zbx_list_iterator_t	li;
 
-	id = zbx_dc_get_nextid("proxy_dhistory", rows_num);
+	id = zbx_db_get_maxid_num("proxy_dhistory", rows_num);
 	zbx_list_iterator_init(rows, &li);
 
 	while (SUCCEED == zbx_list_iterator_next(&li))

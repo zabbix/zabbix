@@ -32,7 +32,7 @@ zabbix_export:
          Create API token for monitoring user according [official documentations](https://www.jenkins.io/doc/book/system-administration/authenticating-scripted-clients/) and change host wizard configuration field `Username`, `Token` and `URL`.
       vendor:
         name: Zabbix
-        version: 8.2-0
+        version: 8.2-1
       groups:
         - name: Templates/Applications
       items:
@@ -50,6 +50,7 @@ zabbix_export:
               parameters:
                 - '-1'
           url: '{$JENKINS.URL}/computer/api/json'
+          http_proxy: '{$JENKINS.HTTP_PROXY}'
           tags:
             - tag: component
               value: computers
@@ -194,6 +195,7 @@ zabbix_export:
               parameters:
                 - '-1'
           url: '{$JENKINS.URL}/metrics/{$JENKINS.API.KEY}/metrics'
+          http_proxy: '{$JENKINS.HTTP_PROXY}'
           tags:
             - tag: component
               value: raw
@@ -208,6 +210,7 @@ zabbix_export:
               parameters:
                 - '-1'
           url: '{$JENKINS.URL}/metrics/{$JENKINS.API.KEY}/healthcheck'
+          http_proxy: '{$JENKINS.HTTP_PROXY}'
           tags:
             - tag: component
               value: health
@@ -888,27 +891,226 @@ zabbix_export:
               value: jobs
         - uuid: dc47555812a0485e9d77da3e5a1c1227
           name: 'Get jobs info'
-          type: HTTP_AGENT
+          type: SCRIPT
           key: jenkins.job_info
           delay: 5m
           history: '0'
           value_type: TEXT
-          authtype: BASIC
-          username: '{$JENKINS.USER}'
-          password: '{$JENKINS.API.TOKEN}'
-          preprocessing:
-            - type: CHECK_NOT_SUPPORTED
-              parameters:
-                - '-1'
-          url: '{$JENKINS.URL}/api/json'
-          query_fields:
-            - name: tree
-              value: 'jobs[name,description,url,healthReport[score],lastBuild[number,result,duration,timestamp],lastSuccessfulBuild[number,result,duration,timestamp],lastFailedBuild[number,result,duration,timestamp]]'
+          params: |
+            const CTlsConfig = function (raw_value) {
+            	raw_value = String(raw_value).trim().toLowerCase();
+            
+            	if (['none', 'peer', 'full'].indexOf(raw_value) === -1) {
+            		raw_value = 'full';
+            	}
+            
+            	this.options = {
+            		SSLVerifyPeer: (raw_value === 'peer' || raw_value === 'full'),
+            		SSLVerifyHost: (raw_value === 'full')
+            	};
+            
+            	this.enabled = (raw_value !== 'none');
+            
+            	this.checkURL = function (url) {
+            		if (this.enabled && !/^https:\/\//i.test(url)) {
+            			throw 'TLS certificate verification is enabled by {$' + 'HTTP.TLS.VERIFY}, but the URL uses plain HTTP: ' + url +
+            			'. Use an "https://" URL, or set {$' + 'HTTP.TLS.VERIFY} to `none` to disable verification.';
+            		}
+            
+            		return url;
+            	};
+            }
+            
+            
+            var Jenkins = {
+            	params: {},
+            	leaf_fields: 'name,description,fullName,url,_class,' +
+            		'healthReport[score],' +
+            		'lastBuild[number,result,duration,timestamp],' +
+            		'lastSuccessfulBuild[number,result,duration,timestamp],' +
+            		'lastFailedBuild[number,result,duration,timestamp]',
+            
+            	setParams: function (params) {
+            		['url', 'jobs_depth'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            				throw 'Required param is not set: ' + field + '.';
+            			}
+            		});
+            
+            		if ((params.user !== '' && typeof params.user !== 'undefined') !== (params.password !== '' && typeof params.password !== 'undefined')) {
+            			throw 'Both "{$' + 'JENKINS.USER}" and "{$' + 'JENKINS.API.TOKEN}" must be set together for authentication, or both left empty for anonymous access.';
+            		}
+            
+            		params.jobs_depth = parseInt(params.jobs_depth, 10);
+            
+            		if (isNaN(params.jobs_depth) || params.jobs_depth < 1 || params.jobs_depth > 10) {
+            			throw 'Check the value of the macro "{$' + 'JENKINS.JOBS.MAX.DEPTH}".';
+            		}
+            
+            		Jenkins.params = params;
+            		Jenkins.tls = new CTlsConfig(params.tls_verify);
+            		Jenkins.tls.checkURL(params.url);
+            	},
+            
+            	request: function (url) {
+            		var request = new HttpRequest(Jenkins.tls.options);
+            
+            		if (typeof Jenkins.params.http_proxy !== 'undefined' && Jenkins.params.http_proxy !== '') {
+            			request.setProxy(Jenkins.params.http_proxy);
+            		}
+            
+            		if (Jenkins.params.user !== '') {
+            			request.setHttpAuth(HTTPAUTH_BASIC, Jenkins.params.user, Jenkins.params.password);
+            		}
+            
+            		var response = request.get(url);
+            
+            		return { status: request.getStatus(), response: response };
+            	},
+            
+            	getField: function (data, path, separator, default_value) {
+            		if (typeof separator === 'undefined') {
+            			separator = '.';
+            		}
+            		var steps = path.split(separator);
+            		for (var i = 0; i < steps.length; i++) {
+            			var step = steps[i];
+            			if (typeof data !== 'object' || data === null || typeof data[step] === 'undefined') {
+            				if (typeof default_value === 'undefined') {
+            					throw 'Required field was not found: "' + path + '". Data: ' + JSON.stringify(data);
+            				}
+            				return default_value;
+            			}
+            
+            			data = data[step];
+            		}
+            
+            		return data;
+            	},
+            
+            	buildTree: function (depth) {
+            		var fields = Jenkins.leaf_fields;
+            
+            		for (var i = 0; i < depth; i++) {
+            			fields = Jenkins.leaf_fields + ',jobs[' + fields + ']';
+            		}
+            
+            		return 'jobs[' + fields + ']';
+            	},
+            
+            	flattenJobs: function (items) {
+            		var result = [];
+            
+            		if (typeof items === 'undefined' || items === null) {
+            			return result;
+            		}
+            
+            		for (var i = 0; i < items.length; i++) {
+            			var item = items[i],
+            				item_class = Jenkins.getField(item, '_class', '.', ''),
+            				item_name = Jenkins.getField(item, 'name', '.', ''),
+            				item_full_name = Jenkins.getField(item, 'fullName', '.', item_name),
+            				is_container = (item_class.indexOf('Folder') !== -1 || item_class.indexOf('MultiBranch') !== -1);
+            
+            			if (is_container) {
+            				if (typeof item.jobs !== 'undefined' && item.jobs !== null) {
+            					result = result.concat(Jenkins.flattenJobs(item.jobs));
+            				}
+            			} else {
+            				result.push({
+            					name: item_name,
+            					description: Jenkins.getField(item, 'description', '.', ''),
+            					fullName: item_full_name,
+            					url: Jenkins.getField(item, 'url', '.', ''),
+            					healthReport: Jenkins.getField(item, 'healthReport', '.', null),
+            					lastBuild: Jenkins.getField(item, 'lastBuild', '.', null),
+            					lastSuccessfulBuild: Jenkins.getField(item, 'lastSuccessfulBuild', '.', null),
+            					lastFailedBuild: Jenkins.getField(item, 'lastFailedBuild', '.', null)
+            				});
+            			}
+            		}
+            
+            		return result;
+            	},
+            
+            	getData: function () {
+            		var tree_query = Jenkins.buildTree(Jenkins.params.jobs_depth),
+            			url = Jenkins.params.url + '/api/json?tree=' + encodeURIComponent(tree_query),
+            			result = Jenkins.request(url);
+            
+            		if (result.status != 200) {
+            			throw 'Jenkins API request failed with HTTP status: ' + result.status
+            				+ '. Check Jenkins URL and credentials.';
+            		}
+            
+            		var data = JSON.parse(result.response),
+            			jobs = Jenkins.getField(data, 'jobs', '.', []);
+            
+            		return Jenkins.flattenJobs(jobs);
+            	}
+            };
+            
+            var result = { error: '' };
+            
+            try {
+            	Jenkins.setParams(JSON.parse(value));
+            	result.jobs = Jenkins.getData();
+            }
+            catch (error) {
+            	error += (String(error).slice(-1) === '.') ? '' : '.';
+            	Zabbix.log(3, '[ Jenkins ] ERROR: ' + error);
+            	result.error = error;
+            }
+            
+            return JSON.stringify(result);
+          description: 'The result of API requests is returned as JSON.'
+          timeout: 10s
+          parameters:
+            - name: http_proxy
+              value: '{$JENKINS.HTTP_PROXY}'
+            - name: jobs_depth
+              value: '{$JENKINS.JOBS.MAX.DEPTH}'
+            - name: password
+              value: '{$JENKINS.API.TOKEN}'
+            - name: tls_verify
+              value: '{$HTTP.TLS.VERIFY:"Jenkins"}'
+            - name: url
+              value: '{$JENKINS.URL}'
+            - name: user
+              value: '{$JENKINS.USER}'
           tags:
             - tag: component
               value: jobs
             - tag: component
               value: raw
+        - uuid: fba46853f22f4fb0a9825243276eedbd
+          name: 'Get jobs info errors'
+          type: DEPENDENT
+          key: jenkins.job_info.errors
+          value_type: TEXT
+          description: 'A list of errors from API requests for Jenkins metrics.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.error
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: jenkins.job_info
+          tags:
+            - tag: component
+              value: error
+          triggers:
+            - uuid: 297566711d734805acc168ed0582515d
+              expression: 'length(last(/Jenkins by HTTP/jenkins.job_info.errors))>0'
+              name: 'Jenkins: There are errors in requests to API'
+              priority: WARNING
+              description: 'An error occurred while attempting to retrieve values for the `Get jobs info` item.'
+              tags:
+                - tag: scope
+                  value: availability
         - uuid: dd8237e43a0d494394da664bc58a5fec
           name: 'Get meters'
           type: DEPENDENT
@@ -1006,6 +1208,7 @@ zabbix_export:
               parameters:
                 - 30m
           url: '{$JENKINS.URL}/metrics/{$JENKINS.API.KEY}/ping'
+          http_proxy: '{$JENKINS.HTTP_PROXY}'
           tags:
             - tag: component
               value: health
@@ -1733,6 +1936,7 @@ zabbix_export:
           query_fields:
             - name: tree
               value: 'computer[description,displayName,monitorData]'
+          http_proxy: '{$JENKINS.HTTP_PROXY}'
           lld_macro_paths:
             - lld_macro: '{#DESCRIPTION}'
               path: $.description
@@ -1744,17 +1948,13 @@ zabbix_export:
                 - '$.computer.[*]'
         - uuid: 25949e5e452e4fa384ec4aa2088375aa
           name: 'Jobs discovery'
-          type: HTTP_AGENT
+          type: DEPENDENT
           key: jenkins.jobs
-          delay: 1h
-          authtype: BASIC
-          username: '{$JENKINS.USER}'
-          password: '{$JENKINS.API.TOKEN}'
           item_prototypes:
             - uuid: b2a99bad873046cda1d5b839aa43ba91
-              name: 'Job [{#NAME}]: Health score'
+              name: 'Job [{#FULL_NAME}]: Health score'
               type: DEPENDENT
-              key: 'jenkins.build.health[{#NAME}]'
+              key: 'jenkins.build.health[{#FULL_NAME}]'
               description: |
                 Represents health of project. A number between 0-100.
                 Job Description: {#DESCRIPTION}
@@ -1768,7 +1968,7 @@ zabbix_export:
                   parameters:
                     - 30m
               master_item:
-                key: 'jenkins.job.get[{#NAME}]'
+                key: 'jenkins.job.get[{#FULL_NAME}]'
               tags:
                 - tag: component
                   value: health
@@ -1778,24 +1978,24 @@ zabbix_export:
                   value: '{#NAME}'
               trigger_prototypes:
                 - uuid: c440cd7d92884c9594c8616f1ac99d74
-                  expression: 'last(/Jenkins by HTTP/jenkins.build.health[{#NAME}])<{$JENKINS.JOB.HEALTH.SCORE.MIN.WARN}'
-                  name: 'Jenkins: Job [{#NAME}]: Job is unhealthy'
+                  expression: 'last(/Jenkins by HTTP/jenkins.build.health[{#FULL_NAME}])<{$JENKINS.JOB.HEALTH.SCORE.MIN.WARN}'
+                  name: 'Jenkins: Job [{#FULL_NAME}]: Job is unhealthy'
                   priority: WARNING
                   manual_close: 'YES'
                   tags:
                     - tag: scope
                       value: performance
             - uuid: c82a3a59d2974e24bfa2489bd02fb10a
-              name: 'Job [{#NAME}]: Get job'
+              name: 'Job [{#FULL_NAME}]: Get job'
               type: DEPENDENT
-              key: 'jenkins.job.get[{#NAME}]'
+              key: 'jenkins.job.get[{#FULL_NAME}]'
               history: '0'
               value_type: TEXT
               description: 'Raw data for a job.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.jobs.[?(@.name == "{#NAME}")].first()'
+                    - '$.jobs.[?(@.fullName==''{#FULL_NAME}'')].first()'
                   error_handler: DISCARD_VALUE
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1812,11 +2012,12 @@ zabbix_export:
                 - tag: job
                   value: '{#NAME}'
             - uuid: a0fa8864c536408895f13758eacb486f
-              name: 'Job [{#NAME}]: Last Build duration'
+              name: 'Job [{#FULL_NAME}]: Last Build duration'
               type: DEPENDENT
-              key: 'jenkins.last_build.duration[{#NAME}]'
+              key: 'jenkins.last_build.duration[{#FULL_NAME}]'
+              value_type: FLOAT
               units: s
-              description: 'Build duration (in seconds).'
+              description: 'Build duration.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1829,16 +2030,16 @@ zabbix_export:
                   parameters:
                     - 30m
               master_item:
-                key: 'jenkins.job.get[{#NAME}]'
+                key: 'jenkins.job.get[{#FULL_NAME}]'
               tags:
                 - tag: component
                   value: jobs
                 - tag: job
                   value: '{#NAME}'
             - uuid: 338020d76f8e4b28b1e1c02f97b889f4
-              name: 'Job [{#NAME}]: Last Build number'
+              name: 'Job [{#FULL_NAME}]: Last Build number'
               type: DEPENDENT
-              key: 'jenkins.last_build.number[{#NAME}]'
+              key: 'jenkins.last_build.number[{#FULL_NAME}]'
               description: 'Details: {#URL}/lastBuild/'
               preprocessing:
                 - type: JSONPATH
@@ -1849,16 +2050,16 @@ zabbix_export:
                   parameters:
                     - 30m
               master_item:
-                key: 'jenkins.job.get[{#NAME}]'
+                key: 'jenkins.job.get[{#FULL_NAME}]'
               tags:
                 - tag: component
                   value: jobs
                 - tag: job
                   value: '{#NAME}'
             - uuid: a3a70807138548a29e9212f48f07946d
-              name: 'Job [{#NAME}]: Last Build result'
+              name: 'Job [{#FULL_NAME}]: Last Build result'
               type: DEPENDENT
-              key: 'jenkins.last_build.result[{#NAME}]'
+              key: 'jenkins.last_build.result[{#FULL_NAME}]'
               value_type: CHAR
               preprocessing:
                 - type: JSONPATH
@@ -1869,16 +2070,16 @@ zabbix_export:
                   parameters:
                     - 30m
               master_item:
-                key: 'jenkins.job.get[{#NAME}]'
+                key: 'jenkins.job.get[{#FULL_NAME}]'
               tags:
                 - tag: component
                   value: jobs
                 - tag: job
                   value: '{#NAME}'
             - uuid: d53a3f165052440098d087d4f2b868b6
-              name: 'Job [{#NAME}]: Last Build timestamp'
+              name: 'Job [{#FULL_NAME}]: Last Build timestamp'
               type: DEPENDENT
-              key: 'jenkins.last_build.timestamp[{#NAME}]'
+              key: 'jenkins.last_build.timestamp[{#FULL_NAME}]'
               units: unixtime
               preprocessing:
                 - type: JSONPATH
@@ -1892,18 +2093,19 @@ zabbix_export:
                   parameters:
                     - 30m
               master_item:
-                key: 'jenkins.job.get[{#NAME}]'
+                key: 'jenkins.job.get[{#FULL_NAME}]'
               tags:
                 - tag: component
                   value: jobs
                 - tag: job
                   value: '{#NAME}'
             - uuid: 907e48fadc6e4a04a076ca9368f73395
-              name: 'Job [{#NAME}]: Last Failed Build duration'
+              name: 'Job [{#FULL_NAME}]: Last Failed Build duration'
               type: DEPENDENT
-              key: 'jenkins.last_failed_build.duration[{#NAME}]'
+              key: 'jenkins.last_failed_build.duration[{#FULL_NAME}]'
+              value_type: FLOAT
               units: s
-              description: 'Build duration (in seconds).'
+              description: 'Build duration.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1916,16 +2118,16 @@ zabbix_export:
                   parameters:
                     - 30m
               master_item:
-                key: 'jenkins.job.get[{#NAME}]'
+                key: 'jenkins.job.get[{#FULL_NAME}]'
               tags:
                 - tag: component
                   value: jobs
                 - tag: job
                   value: '{#NAME}'
             - uuid: 2e4afc599bf54ea29b1b8734f5aea121
-              name: 'Job [{#NAME}]: Last Failed Build number'
+              name: 'Job [{#FULL_NAME}]: Last Failed Build number'
               type: DEPENDENT
-              key: 'jenkins.last_failed_build.number[{#NAME}]'
+              key: 'jenkins.last_failed_build.number[{#FULL_NAME}]'
               description: 'Details: {#URL}/lastFailedBuild/'
               preprocessing:
                 - type: JSONPATH
@@ -1936,16 +2138,16 @@ zabbix_export:
                   parameters:
                     - 30m
               master_item:
-                key: 'jenkins.job.get[{#NAME}]'
+                key: 'jenkins.job.get[{#FULL_NAME}]'
               tags:
                 - tag: component
                   value: jobs
                 - tag: job
                   value: '{#NAME}'
             - uuid: e1885df4d7a440c0805207f0afb28cb5
-              name: 'Job [{#NAME}]: Last Failed Build timestamp'
+              name: 'Job [{#FULL_NAME}]: Last Failed Build timestamp'
               type: DEPENDENT
-              key: 'jenkins.last_failed_build.timestamp[{#NAME}]'
+              key: 'jenkins.last_failed_build.timestamp[{#FULL_NAME}]'
               units: unixtime
               preprocessing:
                 - type: JSONPATH
@@ -1959,18 +2161,19 @@ zabbix_export:
                   parameters:
                     - 30m
               master_item:
-                key: 'jenkins.job.get[{#NAME}]'
+                key: 'jenkins.job.get[{#FULL_NAME}]'
               tags:
                 - tag: component
                   value: jobs
                 - tag: job
                   value: '{#NAME}'
             - uuid: d750d312fa424215931375963100217d
-              name: 'Job [{#NAME}]: Last Successful Build duration'
+              name: 'Job [{#FULL_NAME}]: Last Successful Build duration'
               type: DEPENDENT
-              key: 'jenkins.last_successful_build.duration[{#NAME}]'
+              key: 'jenkins.last_successful_build.duration[{#FULL_NAME}]'
+              value_type: FLOAT
               units: s
-              description: 'Build duration (in seconds).'
+              description: 'Build duration.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1983,16 +2186,16 @@ zabbix_export:
                   parameters:
                     - 30m
               master_item:
-                key: 'jenkins.job.get[{#NAME}]'
+                key: 'jenkins.job.get[{#FULL_NAME}]'
               tags:
                 - tag: component
                   value: jobs
                 - tag: job
                   value: '{#NAME}'
             - uuid: 701c272b59c046e4948a7dc814374d59
-              name: 'Job [{#NAME}]: Last Successful Build number'
+              name: 'Job [{#FULL_NAME}]: Last Successful Build number'
               type: DEPENDENT
-              key: 'jenkins.last_successful_build.number[{#NAME}]'
+              key: 'jenkins.last_successful_build.number[{#FULL_NAME}]'
               description: 'Details: {#URL}/lastSuccessfulBuild/'
               preprocessing:
                 - type: JSONPATH
@@ -2003,16 +2206,16 @@ zabbix_export:
                   parameters:
                     - 30m
               master_item:
-                key: 'jenkins.job.get[{#NAME}]'
+                key: 'jenkins.job.get[{#FULL_NAME}]'
               tags:
                 - tag: component
                   value: jobs
                 - tag: job
                   value: '{#NAME}'
             - uuid: 1adbf52ee3f946118f8a37cf2487262d
-              name: 'Job [{#NAME}]: Last Successful Build timestamp'
+              name: 'Job [{#FULL_NAME}]: Last Successful Build timestamp'
               type: DEPENDENT
-              key: 'jenkins.last_successful_build.timestamp[{#NAME}]'
+              key: 'jenkins.last_successful_build.timestamp[{#FULL_NAME}]'
               units: unixtime
               preprocessing:
                 - type: JSONPATH
@@ -2026,19 +2229,19 @@ zabbix_export:
                   parameters:
                     - 30m
               master_item:
-                key: 'jenkins.job.get[{#NAME}]'
+                key: 'jenkins.job.get[{#FULL_NAME}]'
               tags:
                 - tag: component
                   value: jobs
                 - tag: job
                   value: '{#NAME}'
-          url: '{$JENKINS.URL}/api/json'
-          query_fields:
-            - name: tree
-              value: 'jobs[name,description,url]'
+          master_item:
+            key: jenkins.job_info
           lld_macro_paths:
             - lld_macro: '{#DESCRIPTION}'
               path: $.description
+            - lld_macro: '{#FULL_NAME}'
+              path: $.fullName
             - lld_macro: '{#NAME}'
               path: $.name
             - lld_macro: '{#URL}'
@@ -2046,7 +2249,24 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.jobs.[*]'
+                - $.jobs
+              error_handler: DISCARD_VALUE
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var jobs = JSON.parse(value);
+                  
+                  return JSON.stringify(jobs.map(function (job) {
+                  	return {
+                  		name: job.name,
+                  		fullName: job.fullName,
+                  		description: job.description,
+                  		url: job.url
+                  	};
+                  }));
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
       tags:
         - tag: class
           value: software
@@ -2059,49 +2279,81 @@ zabbix_export:
         - tag: target
           value: jenkins
       macros:
+        - macro: '{$HTTP.TLS.VERIFY}'
+          value: full
+          description: 'TLS certificate verification for the script item: "none" - disabled, "peer" - verify the certificate chain and expiration, "full" - full verification. Any other value enables full verification. To override the setting for this template only, define the macro with the context "Jenkins", e.g. {$HTTP.TLS.VERIFY:"Jenkins"}.'
+          config:
+            type: LIST
+            priority: '1'
+            section_name: Other
+            label: 'TLS certificate verification'
+            description: 'Disabling verification exposes the connection to man-in-the-middle attacks. Disable it only for an endpoint that uses a self-signed certificate.'
+            options:
+              - value: full
+                text: 'Full verification'
+              - value: peer
+                text: 'Certificate chain only'
+              - value: none
+                text: Disabled
         - macro: '{$JENKINS.API.KEY}'
           description: 'API key to access Metrics Servlet.'
           config:
             type: TEXT
-            priority: '2'
+            priority: '4'
             label: 'API key'
             description: 'API key to access Metrics Servlet.'
             required: 'YES'
         - macro: '{$JENKINS.API.TOKEN}'
           type: SECRET_TEXT
-          description: 'API token for HTTP BASIC authentication.'
+          description: 'API token for HTTP BASIC authentication. Leave empty together with {$JENKINS.USER} if the Jenkins instance allows anonymous read access.'
           config:
             type: TEXT
-            priority: '4'
+            priority: '6'
             label: Token
-            description: 'API token for HTTP BASIC authentication.'
-            required: 'YES'
+            description: 'API token for HTTP BASIC authentication. Leave empty together with {$JENKINS.USER} if the Jenkins instance allows anonymous read access.'
         - macro: '{$JENKINS.FILE_DESCRIPTORS.MAX.WARN}'
           value: '85'
           description: 'Maximum percentage of file descriptors usage alert threshold (for trigger expression).'
           config:
             type: TEXT
-            priority: '6'
+            priority: '9'
             section_name: Thresholds
             label: 'Max file descriptor usage (%)'
             description: 'Maximum percentage of file descriptors usage alert threshold (for trigger expression). In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$JENKINS.HTTP_PROXY}'
+          description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/8.2/manual/config/items/itemtypes/http.'
+          config:
+            type: TEXT
+            priority: '2'
+            section_name: Other
+            label: 'HTTP proxy for API requests'
+            description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/8.2/manual/config/items/itemtypes/http.'
         - macro: '{$JENKINS.JOB.HEALTH.SCORE.MIN.WARN}'
           value: '50'
           description: 'Minimum job''s health score (for trigger expression).'
           config:
             type: TEXT
-            priority: '7'
+            priority: '10'
             section_name: Thresholds
             label: 'Min job health score'
             description: 'Minimum job''s health score (for trigger expression).'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$JENKINS.JOBS.MAX.DEPTH}'
+          value: '5'
+          description: 'Maximum folder nesting depth used when querying the Jenkins jobs tree via the API.'
+          config:
+            type: TEXT
+            priority: '7'
+            label: 'Max jobs depth'
+            description: 'Folder nesting depth to query when discovering Jenkins jobs. Increase (up to 10) if jobs are missing from discovery. In the range from 1 to 10 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$JENKINS.PING.REPLY}'
           value: pong
           description: 'Expected reply to the ping.'
           config:
             type: TEXT
-            priority: '5'
+            priority: '8'
             section_name: Other
             label: 'Expected ping reply'
             description: 'Expected reply to the ping.'
@@ -2109,19 +2361,17 @@ zabbix_export:
           description: 'Jenkins URL in the format `<scheme>://<host>:<port>`'
           config:
             type: TEXT
-            priority: '1'
+            priority: '3'
             label: URL
             description: 'Jenkins URL in the format `<scheme>://<host>:<port>`'
             required: 'YES'
         - macro: '{$JENKINS.USER}'
-          value: zabbix
-          description: 'Username for HTTP BASIC authentication.'
+          description: 'Username for HTTP BASIC authentication. Leave empty together with {$JENKINS.API.TOKEN} if the Jenkins instance allows anonymous read access.'
           config:
             type: TEXT
-            priority: '3'
+            priority: '5'
             label: Username
-            description: 'Username for HTTP BASIC authentication.'
-            required: 'YES'
+            description: 'Username for HTTP BASIC authentication. Leave empty together with {$JENKINS.API.TOKEN} if the Jenkins instance allows anonymous read access.'
       valuemaps:
         - uuid: d1b719ea85464279bd473fcdb34008da
           name: 'Computer online'
