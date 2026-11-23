@@ -356,7 +356,7 @@ static int	pg_proxy_hosts_compare_by_hosts_asc(const void *d1, const void *d2)
 	const zbx_pg_proxy_hosts_t	*ph1 = *(const zbx_pg_proxy_hosts_t * const *)d1;
 	const zbx_pg_proxy_hosts_t	*ph2 = *(const zbx_pg_proxy_hosts_t * const *)d2;
 
-	return ph1->host_refs.values_num - ph2->host_refs.values_num;
+	return ph1->hosts_num - ph2->hosts_num;
 }
 
 /******************************************************************************
