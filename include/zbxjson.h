@@ -240,6 +240,7 @@
 #define ZBX_PROTO_TAG_MAX_IDLE			"max_idle"
 #define ZBX_PROTO_TAG_MAX_OPEN			"max_open"
 #define ZBX_PROTO_TAG_CEP_RULEID		"cep_ruleid"
+#define ZBX_PROTO_TAG_BATCH_BLAKE3		"batch_blake3"
 
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"

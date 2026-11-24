@@ -137,4 +137,43 @@ void	zbx_sha256_hash_len(const char *in, size_t len, char *out);
 void	zbx_sha512_hash(const char *in, char *out);
 /* SHA BLOCK END */
 
+/* BLAKE3 BLOCK */
+/* Based on the official BLAKE3 specification and reference implementation (CC0 1.0 Universal). */
+
+#define ZBX_BLAKE3_KEY_LEN	32
+#define ZBX_BLAKE3_OUT_LEN	32
+#define ZBX_BLAKE3_HEX_LEN	65
+#define ZBX_BLAKE3_BLOCK_LEN	64
+#define ZBX_BLAKE3_CHUNK_LEN	1024
+#define ZBX_BLAKE3_MAX_DEPTH	54
+
+typedef struct
+{
+	zbx_uint32_t	cv[8];
+	zbx_uint64_t	chunk_counter;
+	unsigned char	buf[ZBX_BLAKE3_BLOCK_LEN];
+	unsigned char	buf_len;
+	unsigned char	blocks_compressed;
+	unsigned char	flags;
+}
+zbx_blake3_chunk_state_t;
+
+typedef struct
+{
+	zbx_uint32_t			key[8];
+	zbx_blake3_chunk_state_t	chunk;
+	unsigned char			cv_stack_len;
+	unsigned char			cv_stack[(ZBX_BLAKE3_MAX_DEPTH + 1) * ZBX_BLAKE3_OUT_LEN];
+}
+zbx_blake3_hasher_t;
+
+void	zbx_blake3_init(zbx_blake3_hasher_t *self);
+void	zbx_blake3_init_keyed(zbx_blake3_hasher_t *self, const unsigned char key[ZBX_BLAKE3_KEY_LEN]);
+void	zbx_blake3_update(zbx_blake3_hasher_t *self, const void *input, size_t input_len);
+void	zbx_blake3_finalize(const zbx_blake3_hasher_t *self, unsigned char *out, size_t out_len);
+void	zbx_blake3_hash(const void *in, size_t len, unsigned char out[ZBX_BLAKE3_OUT_LEN]);
+void	zbx_blake3_buf2hex(const unsigned char digest[ZBX_BLAKE3_OUT_LEN], char hex_out[ZBX_BLAKE3_HEX_LEN]);
+int	zbx_blake3_hex2buf(const char *hex_in, unsigned char digest_out[ZBX_BLAKE3_OUT_LEN]);
+/* BLAKE3 BLOCK END */
+
 #endif /* ZABBIX_ZBXHASH_H */

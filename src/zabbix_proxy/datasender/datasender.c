@@ -50,6 +50,29 @@
 					ZBX_DATASENDER_AUTOREGISTRATION | ZBX_DATASENDER_TASKS |	\
 					ZBX_DATASENDER_TASKS_RECV)
 
+typedef struct
+{
+	int		active;
+	char		*buffer;
+	size_t		buffer_size;
+	size_t		reserved;
+	char		batch_blake3[ZBX_BLAKE3_HEX_LEN];
+	zbx_uint64_t	flags;
+	int		availability_ts;
+	zbx_uint64_t	history_lastid;
+	zbx_uint64_t	discovery_lastid;
+	zbx_uint64_t	areg_lastid;
+	int		more;
+	int		records;
+}
+zbx_pending_proxy_batch_t;
+
+static void	pending_proxy_batch_clear(zbx_pending_proxy_batch_t *batch)
+{
+	zbx_free(batch->buffer);
+	memset(batch, 0, sizeof(*batch));
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: Get current history upload state (disabled/enabled)               *
@@ -87,23 +110,151 @@ static void	get_hist_upload_state(const char *buffer, int *state)
 static int	proxy_data_sender(int *more, int now, int *hist_upload_state, int *new_tasks,
 		const zbx_thread_info_t *info, zbx_thread_datasender_args *args, int *task_timestamp)
 {
-	static int		data_timestamp = 0, upload_state = SUCCEED;
+	static int			data_timestamp = 0, upload_state = SUCCEED;
+	static unsigned char		server_proto_flags = ZBX_TCP_PROXY_PROTOCOL;
+	static zbx_pending_proxy_batch_t	pending_batch = {0};
 
 	zbx_socket_t		sock;
 	struct zbx_json		j;
-	struct zbx_json_parse	jp, jp_tasks;
-	int			availability_ts, history_records = 0, discovery_records = 0,
+	struct zbx_json_parse	jp, jp_tasks, jp_batch;
+	int			availability_ts = 0, history_records = 0, discovery_records = 0,
 				areg_records = 0, more_history = 0, more_discovery = 0, more_areg = 0, proxy_delay,
-				host_avail_records = 0, data_read = FAIL;
+				host_avail_records = 0, data_read = FAIL, total_records = 0;
 	zbx_uint64_t		history_lastid = 0, discovery_lastid = 0, areg_lastid = 0, flags = 0;
 	zbx_timespec_t		ts;
-	char			*error = NULL, *buffer = NULL;
+	char			*error = NULL, *buffer = NULL, batch_blake3[ZBX_BLAKE3_HEX_LEN];
+	unsigned char		batch_digest[ZBX_BLAKE3_OUT_LEN];
 	zbx_vector_tm_task_t	tasks;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	batch_blake3[0] = '\0';
 	*more = ZBX_PROXY_DATA_DONE;
 	zbx_json_init(&j, 16 * ZBX_KIBIBYTE);
+	zbx_vector_tm_task_create(&tasks);
+
+	if (0 != pending_batch.active && ZBX_PROXY_UPLOAD_DISABLED == *hist_upload_state)
+		pending_proxy_batch_clear(&pending_batch);
+
+	if (0 != pending_batch.active)
+	{
+		size_t	buffer_size = pending_batch.buffer_size;
+		size_t	reserved = pending_batch.reserved;
+		time_t	time_connect;
+
+		buffer = pending_batch.buffer;
+		pending_batch.buffer = NULL;
+		flags = pending_batch.flags;
+		availability_ts = pending_batch.availability_ts;
+		history_lastid = pending_batch.history_lastid;
+		discovery_lastid = pending_batch.discovery_lastid;
+		areg_lastid = pending_batch.areg_lastid;
+		*more = pending_batch.more;
+		total_records = pending_batch.records;
+		zbx_strlcpy(batch_blake3, pending_batch.batch_blake3, sizeof(batch_blake3));
+		pending_batch.active = 0;
+		data_read = SUCCEED;
+
+		zbx_json_free(&j);
+		time_connect = time(NULL);
+
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
+
+		if (FAIL == zbx_connect_to_server(&sock, args->config_source_ip, args->config_server_addrs, 600,
+				args->config_timeout, args->config_proxydata_frequency, LOG_LEVEL_WARNING,
+				args->zbx_config_tls))
+		{
+			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
+			pending_batch.active = 1;
+			pending_batch.buffer = buffer;
+			buffer = NULL;
+			total_records = 0;
+			goto clean;
+		}
+
+		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
+
+		upload_state = zbx_put_data_to_server_ext(&sock, &buffer, buffer_size, reserved, server_proto_flags,
+				&error);
+		get_hist_upload_state(sock.buffer, hist_upload_state);
+
+		if (SUCCEED == upload_state && '\0' != batch_blake3[0] &&
+				SUCCEED != zbx_verify_batch_blake3_ack_ext(sock.buffer, sock.protocol, batch_blake3,
+				&error))
+		{
+			upload_state = FAIL;
+		}
+
+		if (SUCCEED != upload_state)
+		{
+			zbx_addrs_failover(args->config_server_addrs);
+			*more = ZBX_PROXY_DATA_DONE;
+
+			if (ZBX_TCP_PROXY_PROTOCOL == server_proto_flags && 0 == sock.read_bytes)
+			{
+				server_proto_flags = ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS;
+				zbx_free(buffer);
+				zabbix_log(LOG_LEVEL_WARNING, "server at \"%s\" rejected extended ZSTD/BLAKE3 header,"
+						" falling back to legacy zlib protocol", sock.peer);
+			}
+			else if (ZBX_PROXY_UPLOAD_DISABLED != *hist_upload_state && NULL != buffer)
+			{
+				pending_batch.active = 1;
+				pending_batch.buffer = buffer;
+				buffer = NULL;
+				zabbix_log(LOG_LEVEL_WARNING, "cannot send proxy data batch (%s) to server at \"%s\":"
+						" %s (retained for idempotent retry)", batch_blake3, sock.peer, error);
+			}
+			else if (ZBX_PROXY_UPLOAD_DISABLED != *hist_upload_state)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot send proxy data to server at \"%s\": %s",
+						sock.peer, error);
+			}
+			zbx_free(error);
+			total_records = 0;
+		}
+		else
+		{
+			if (0 != (flags & ZBX_DATASENDER_AVAILABILITY))
+				zbx_set_availability_diff_ts(availability_ts);
+
+			if (SUCCEED == zbx_json_open(sock.buffer, &jp) &&
+					SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_TASKS, &jp_tasks))
+			{
+				flags |= ZBX_DATASENDER_TASKS_RECV;
+			}
+
+			if (0 != (flags & ZBX_DATASENDER_DB_UPDATE))
+			{
+				zbx_db_begin();
+
+				if (0 != (flags & ZBX_DATASENDER_TASKS_RECV))
+				{
+					zbx_tm_json_deserialize_tasks(&jp_tasks, &tasks);
+					*new_tasks += tasks.values_num;
+					zbx_tm_save_tasks(&tasks);
+				}
+
+				if (0 != (flags & ZBX_DATASENDER_HISTORY))
+					zbx_pb_set_history_lastid(history_lastid);
+
+				if (0 != (flags & ZBX_DATASENDER_DISCOVERY))
+					zbx_pb_discovery_set_lastid(discovery_lastid);
+
+				if (0 != (flags & ZBX_DATASENDER_AUTOREGISTRATION))
+					zbx_pb_autoreg_set_lastid(areg_lastid);
+
+				zbx_db_commit();
+			}
+
+			if (SUCCEED == data_read && time(NULL) - time_connect <= args->config_timeout)
+				zbx_pb_update_state(*more);
+		}
+
+		zbx_dc_set_proxy_lastonline(now);
+		zbx_disconnect_from_server(&sock);
+		goto clean;
+	}
 
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_PROXY_DATA, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_HOST, args->config_hostname, ZBX_JSON_TYPE_STRING);
@@ -138,8 +289,6 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, int *ne
 		data_read = SUCCEED;
 	}
 
-	zbx_vector_tm_task_create(&tasks);
-
 	if (SUCCEED == upload_state && ZBX_TASK_UPDATE_FREQUENCY <= now - *task_timestamp)
 	{
 		*task_timestamp = now;
@@ -158,10 +307,18 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, int *ne
 	if (SUCCEED != upload_state)
 		flags |= ZBX_DATASENDER_TASKS_REQUEST;
 
+	total_records = history_records + discovery_records + areg_records + host_avail_records;
+
 	if (0 != flags)
 	{
 		size_t	buffer_size, reserved;
 		time_t	time_connect;
+
+		if (SUCCEED == zbx_json_open(j.buffer, &jp_batch) &&
+				SUCCEED == zbx_proxy_batch_compute_blake3(&jp_batch, batch_digest, batch_blake3))
+		{
+			zbx_json_addstring(&j, ZBX_PROTO_TAG_BATCH_BLAKE3, batch_blake3, ZBX_JSON_TYPE_STRING);
+		}
 
 		if (ZBX_PROXY_DATA_MORE == more_history || ZBX_PROXY_DATA_MORE == more_discovery ||
 				ZBX_PROXY_DATA_MORE == more_areg || ZBX_PROXY_UPLOAD_DISABLED == *hist_upload_state)
@@ -179,9 +336,11 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, int *ne
 		if (0 != (flags & ZBX_DATASENDER_HISTORY) && 0 != (proxy_delay = zbx_proxy_get_delay(history_lastid)))
 			zbx_json_adduint64(&j, ZBX_PROTO_TAG_PROXY_DELAY, proxy_delay);
 
-		if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
+		if (SUCCEED != zbx_compress_with_flags(j.buffer, j.buffer_size, &buffer, &buffer_size,
+				server_proto_flags))
 		{
 			zabbix_log(LOG_LEVEL_ERR,"cannot compress data: %s", zbx_compress_strerror());
+			total_records = 0;
 			goto clean;
 		}
 
@@ -199,17 +358,69 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, int *ne
 		{
 			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
+			if ('\0' != batch_blake3[0] && 0 == (flags & ZBX_DATASENDER_TASKS))
+			{
+				pending_batch.active = 1;
+				pending_batch.buffer = buffer;
+				pending_batch.buffer_size = buffer_size;
+				pending_batch.reserved = reserved;
+				zbx_strlcpy(pending_batch.batch_blake3, batch_blake3,
+						sizeof(pending_batch.batch_blake3));
+				pending_batch.flags = flags;
+				pending_batch.availability_ts = availability_ts;
+				pending_batch.history_lastid = history_lastid;
+				pending_batch.discovery_lastid = discovery_lastid;
+				pending_batch.areg_lastid = areg_lastid;
+				pending_batch.more = *more;
+				pending_batch.records = total_records;
+				buffer = NULL;
+			}
+			total_records = 0;
 			goto clean;
 		}
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
-		upload_state = zbx_put_data_to_server(&sock, &buffer, buffer_size, reserved, &error);
+		upload_state = zbx_put_data_to_server_ext(&sock, &buffer, buffer_size, reserved, server_proto_flags,
+				&error);
 		get_hist_upload_state(sock.buffer, hist_upload_state);
+
+		if (SUCCEED == upload_state && '\0' != batch_blake3[0] &&
+				SUCCEED != zbx_verify_batch_blake3_ack_ext(sock.buffer, sock.protocol, batch_blake3,
+				&error))
+		{
+			upload_state = FAIL;
+		}
 
 		if (SUCCEED != upload_state)
 		{
 			zbx_addrs_failover(args->config_server_addrs);
+
+			if (ZBX_TCP_PROXY_PROTOCOL == server_proto_flags && 0 == sock.read_bytes)
+			{
+				server_proto_flags = ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS;
+				zbx_free(buffer);
+				zabbix_log(LOG_LEVEL_WARNING, "server at \"%s\" rejected extended ZSTD/BLAKE3 header,"
+						" falling back to legacy zlib protocol", sock.peer);
+			}
+			else if ('\0' != batch_blake3[0] && 0 == (flags & ZBX_DATASENDER_TASKS) &&
+					ZBX_PROXY_UPLOAD_DISABLED != *hist_upload_state && NULL != buffer)
+			{
+				pending_batch.active = 1;
+				pending_batch.buffer = buffer;
+				pending_batch.buffer_size = buffer_size;
+				pending_batch.reserved = reserved;
+				zbx_strlcpy(pending_batch.batch_blake3, batch_blake3,
+						sizeof(pending_batch.batch_blake3));
+				pending_batch.flags = flags;
+				pending_batch.availability_ts = availability_ts;
+				pending_batch.history_lastid = history_lastid;
+				pending_batch.discovery_lastid = discovery_lastid;
+				pending_batch.areg_lastid = areg_lastid;
+				pending_batch.more = *more;
+				pending_batch.records = total_records;
+				buffer = NULL;
+			}
 
 			*more = ZBX_PROXY_DATA_DONE;
 			if (ZBX_PROXY_UPLOAD_DISABLED != *hist_upload_state)
@@ -218,6 +429,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, int *ne
 						sock.peer, error);
 			}
 			zbx_free(error);
+			total_records = 0;
 		}
 		else
 		{
@@ -283,7 +495,7 @@ clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s more:%d flags:0x" ZBX_FS_UX64, __func__,
 			zbx_result_string(upload_state), *more, flags);
 
-	return history_records + discovery_records + areg_records + host_avail_records;
+	return total_records;
 }
 
 /******************************************************************************

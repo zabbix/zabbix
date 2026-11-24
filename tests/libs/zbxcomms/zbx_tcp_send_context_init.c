@@ -20,35 +20,51 @@
 #include "zbxcommon.h"
 #include "zbxcomms.h"
 
-int __wrap_zbx_compress(const char *in, size_t size_in, char **out, size_t *size_out);
+int	__wrap_zbx_compress(const char *in, size_t size_in, char **out, size_t *size_out);
+int	__wrap_zbx_compress_zstd(const char *in, size_t size_in, char **out, size_t *size_out);
 
-int __wrap_zbx_compress(const char *in, size_t size_in, char **out, size_t *size_out)
+int	__wrap_zbx_compress(const char *in, size_t size_in, char **out, size_t *size_out)
 {
-	ZBX_UNUSED(in);
-	ZBX_UNUSED(size_in);
-	ZBX_UNUSED(out);
-	ZBX_UNUSED(size_out);
+	int	result;
 
-	int	result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("in.compress_result"));
+	result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("in.compress_result"));
+
+	if (SUCCEED == result)
+	{
+		*out = zbx_malloc(NULL, size_in);
+		memcpy(*out, in, size_in);
+		*size_out = size_in;
+	}
 
 	return result;
 }
 
+int	__wrap_zbx_compress_zstd(const char *in, size_t size_in, char **out, size_t *size_out)
+{
+	return __wrap_zbx_compress(in, size_in, out, size_out);
+}
+
 void	zbx_mock_test_entry(void **state)
 {
-	const char	*data = zbx_mock_get_parameter_string("in.data");
-	int		exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
-	size_t		len = zbx_mock_get_parameter_uint64("in.len"),
-			reserved = zbx_mock_get_parameter_uint64("in.reserved");
-	unsigned char	flags = (unsigned char)zbx_mock_get_parameter_uint64("in.flags");
+	const char		*data = zbx_mock_get_parameter_string("in.data");
+	int			exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result")),
+				result;
+	size_t			len = zbx_mock_get_parameter_uint64("in.len"),
+				reserved = zbx_mock_get_parameter_uint64("in.reserved");
+	unsigned char		flags = (unsigned char)zbx_mock_get_parameter_uint64("in.flags");
+	zbx_tcp_send_context_t	context;
 
 	ZBX_UNUSED(state);
 
-	zbx_tcp_send_context_t	context;
-
-	int	result = zbx_tcp_send_context_init(data, len, reserved, flags, &context);
+	result = zbx_tcp_send_context_init(data, len, reserved, flags, &context);
 
 	zbx_mock_assert_int_eq("return value", exp_result, result);
+
+	if (SUCCEED == result && ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("out.header_len"))
+	{
+		zbx_mock_assert_uint64_eq("header length", zbx_mock_get_parameter_uint64("out.header_len"),
+				(zbx_uint64_t)context.header_len);
+	}
 
 	zbx_tcp_send_context_clear(&context);
 }

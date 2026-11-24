@@ -74,19 +74,18 @@ static void	active_passive_misconfig(zbx_socket_t *sock, int config_timeout)
  *                                                                            *
  ******************************************************************************/
 static int	send_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved,
-		int config_timeout, char **error)
+		unsigned char flags, int config_timeout, char **error)
 {
-	if (SUCCEED != zbx_tcp_send_ext(sock, *buffer, buffer_size, reserved, ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS,
-			config_timeout))
+	if (SUCCEED != zbx_tcp_send_ext(sock, *buffer, buffer_size, reserved, flags, config_timeout))
 	{
 		*error = zbx_strdup(*error, zbx_socket_strerror());
 		return FAIL;
 	}
 
-	zbx_free(*buffer);
-
 	if (SUCCEED != zbx_recv_response(sock, config_timeout, error))
 		return FAIL;
+
+	zbx_free(*buffer);
 
 	return SUCCEED;
 }
@@ -108,11 +107,15 @@ static void	send_proxy_data(zbx_socket_t *sock, const zbx_timespec_t *ts,
 {
 	struct zbx_json		j;
 	zbx_uint64_t		areg_lastid = 0, history_lastid = 0, discovery_lastid = 0;
-	char			*error = NULL, *buffer = NULL;
-	int			availability_ts, more_history, more_discovery, more_areg, proxy_delay, more;
+	char			*error = NULL, *buffer = NULL, batch_blake3[ZBX_BLAKE3_HEX_LEN];
+	unsigned char		batch_digest[ZBX_BLAKE3_OUT_LEN], reply_flags;
+	int			availability_ts, more_history, more_discovery, more_areg, proxy_delay, more, send_ret;
 	zbx_vector_tm_task_t	tasks;
-	struct zbx_json_parse	jp, jp_tasks;
+	struct zbx_json_parse	jp, jp_tasks, jp_batch;
 	size_t			buffer_size, reserved;
+
+	batch_blake3[0] = '\0';
+	reply_flags = zbx_negotiate_proxy_reply_flags(sock->protocol);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -141,6 +144,12 @@ static void	send_proxy_data(zbx_socket_t *sock, const zbx_timespec_t *ts,
 	if (0 != tasks.values_num)
 		zbx_tm_json_serialize_tasks(&j, &tasks);
 
+	if (SUCCEED == zbx_json_open(j.buffer, &jp_batch) &&
+			SUCCEED == zbx_proxy_batch_compute_blake3(&jp_batch, batch_digest, batch_blake3))
+	{
+		zbx_json_addstring(&j, ZBX_PROTO_TAG_BATCH_BLAKE3, batch_blake3, ZBX_JSON_TYPE_STRING);
+	}
+
 	if (ZBX_PROXY_DATA_MORE == more_history || ZBX_PROXY_DATA_MORE == more_discovery ||
 			ZBX_PROXY_DATA_MORE == more_areg)
 	{
@@ -157,7 +166,7 @@ static void	send_proxy_data(zbx_socket_t *sock, const zbx_timespec_t *ts,
 	if (0 != history_lastid && 0 != (proxy_delay = zbx_proxy_get_delay(history_lastid)))
 		zbx_json_addint64(&j, ZBX_PROTO_TAG_PROXY_DELAY, proxy_delay);
 
-	if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
+	if (SUCCEED != zbx_compress_with_flags(j.buffer, j.buffer_size, &buffer, &buffer_size, reply_flags))
 	{
 		zabbix_log(LOG_LEVEL_ERR,"cannot compress data: %s", zbx_compress_strerror());
 		goto clean;
@@ -166,8 +175,16 @@ static void	send_proxy_data(zbx_socket_t *sock, const zbx_timespec_t *ts,
 	reserved = j.buffer_size;
 	zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
 
-	if (SUCCEED == send_data_to_server(sock, &buffer, buffer_size, reserved, config_comms->config_timeout,
-			&error))
+	send_ret = send_data_to_server(sock, &buffer, buffer_size, reserved, reply_flags, config_comms->config_timeout,
+			&error);
+
+	if (SUCCEED == send_ret && '\0' != batch_blake3[0] &&
+			SUCCEED != zbx_verify_batch_blake3_ack_ext(sock->buffer, sock->protocol, batch_blake3, &error))
+	{
+		send_ret = FAIL;
+	}
+
+	if (SUCCEED == send_ret)
 	{
 		zbx_set_availability_diff_ts(availability_ts);
 
@@ -245,8 +262,11 @@ static void	send_task_data(zbx_socket_t *sock, const zbx_timespec_t *ts,
 	zbx_vector_tm_task_t	tasks;
 	struct zbx_json_parse	jp, jp_tasks;
 	size_t			buffer_size, reserved;
+	unsigned char		reply_flags;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	reply_flags = zbx_negotiate_proxy_reply_flags(sock->protocol);
 
 	if (SUCCEED != zbx_check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "proxy data request",
 			config_comms->config_tls, config_comms->config_timeout, config_comms->server))
@@ -267,7 +287,7 @@ static void	send_task_data(zbx_socket_t *sock, const zbx_timespec_t *ts,
 	zbx_json_addint64(&j, ZBX_PROTO_TAG_CLOCK, ts->sec);
 	zbx_json_addint64(&j, ZBX_PROTO_TAG_NS, ts->ns);
 
-	if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
+	if (SUCCEED != zbx_compress_with_flags(j.buffer, j.buffer_size, &buffer, &buffer_size, reply_flags))
 	{
 		zabbix_log(LOG_LEVEL_ERR,"cannot compress data: %s", zbx_compress_strerror());
 		goto clean;
@@ -276,8 +296,8 @@ static void	send_task_data(zbx_socket_t *sock, const zbx_timespec_t *ts,
 	reserved = j.buffer_size;
 	zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
 
-	if (SUCCEED == send_data_to_server(sock, &buffer, buffer_size, reserved, config_comms->config_timeout,
-			&error))
+	if (SUCCEED == send_data_to_server(sock, &buffer, buffer_size, reserved, reply_flags,
+			config_comms->config_timeout, &error))
 	{
 		zbx_db_begin();
 

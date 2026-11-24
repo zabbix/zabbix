@@ -19,6 +19,13 @@
 
 int	zbx_compress(const char *in, size_t size_in, char **out, size_t *size_out);
 int	zbx_uncompress(const char *in, size_t size_in, char *out, size_t *size_out);
+
+int	zbx_compress_zstd(const char *in, size_t size_in, char **out, size_t *size_out);
+int	zbx_uncompress_zstd(const char *in, size_t size_in, char *out, size_t *size_out);
+
+int	zbx_compress_proxy(const char *in, size_t size_in, char **out, size_t *size_out);
+int	zbx_compress_with_flags(const char *in, size_t size_in, char **out, size_t *size_out, unsigned char flags);
+
 const char	*zbx_compress_strerror(void);
 
 #endif

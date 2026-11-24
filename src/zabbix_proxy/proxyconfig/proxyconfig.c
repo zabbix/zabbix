@@ -44,6 +44,7 @@ static void	process_configuration_sync(zbx_dbconn_pool_t *dbpool, size_t *data_s
 		zbx_synced_new_config_t *synced, const zbx_thread_info_t *thread_info,
 		zbx_thread_proxyconfig_args *args, int *vault_ret)
 {
+	static unsigned char		server_proto_flags = ZBX_TCP_PROXY_PROTOCOL;
 	zbx_socket_t			sock;
 	struct	zbx_json_parse		jp, jp_kvs_paths = {0};
 	char				value[16], *error = NULL, *buffer = NULL;
@@ -73,7 +74,7 @@ static void	process_configuration_sync(zbx_dbconn_pool_t *dbpool, size_t *data_s
 	if (0 != hostmap_revision)
 		zbx_json_adduint64(&j, ZBX_PROTO_TAG_HOSTMAP_REVISION, hostmap_revision);
 
-	if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
+	if (SUCCEED != zbx_compress_with_flags(j.buffer, j.buffer_size, &buffer, &buffer_size, server_proto_flags))
 	{
 		zabbix_log(LOG_LEVEL_ERR,"cannot compress data: %s", zbx_compress_strerror());
 		goto out;
@@ -94,8 +95,14 @@ static void	process_configuration_sync(zbx_dbconn_pool_t *dbpool, size_t *data_s
 #undef CONFIG_PROXYCONFIG_RETRY
 	zbx_update_selfmon_counter(thread_info, ZBX_PROCESS_STATE_BUSY);
 
-	if (SUCCEED != zbx_get_data_from_server(&sock, &buffer, buffer_size, reserved, &error))
+	if (SUCCEED != zbx_get_data_from_server_ext(&sock, &buffer, buffer_size, reserved, server_proto_flags, &error))
 	{
+		if (ZBX_TCP_PROXY_PROTOCOL == server_proto_flags && 0 == sock.read_bytes)
+		{
+			server_proto_flags = ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS;
+			zabbix_log(LOG_LEVEL_WARNING, "server at \"%s\" rejected extended ZSTD/BLAKE3 header,"
+					" falling back to legacy zlib protocol", sock.peer);
+		}
 		zabbix_log(LOG_LEVEL_WARNING, "cannot obtain configuration data from server at \"%s\": %s",
 				sock.peer, error);
 		goto error;

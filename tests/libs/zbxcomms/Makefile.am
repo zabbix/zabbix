@@ -14,7 +14,9 @@ COMMS_tests = zbx_validate_peer_list \
 	zbx_tcp_accept \
 	zbx_udp_recv \
 	zbx_tcp_write \
-	zbx_tcp_read_close_notify
+	zbx_tcp_read_close_notify \
+	zbx_blake3_hash \
+	zbx_proxy_batch_blake3
 
 if IPV6
 noinst_PROGRAMS = zbx_tcp_check_allowed_peers $(COMMS_tests)
@@ -91,6 +93,7 @@ zbx_tcp_send_context_init_LDADD += @AGENT_LIBS@
 
 zbx_tcp_send_context_init_LDFLAGS = @AGENT_LDFLAGS@ \
 	-Wl,--wrap=zbx_compress \
+	-Wl,--wrap=zbx_compress_zstd \
 	$(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 zbx_tcp_send_context_init_CFLAGS = $(COMMS_COMPILER_FLAGS)
@@ -281,6 +284,36 @@ zbx_udp_recv_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) \
 	-Wl,--wrap=recvfrom
 
 zbx_udp_recv_CFLAGS = $(COMMS_COMPILER_FLAGS)
+
+#zbx_blake3_hash
+
+zbx_blake3_hash_SOURCES = \
+	zbx_blake3_hash.c \
+	$(COMMON_SRC_FILES)
+
+zbx_blake3_hash_LDADD = \
+	$(COMMS_LIBS)
+
+zbx_blake3_hash_LDADD += @AGENT_LIBS@
+
+zbx_blake3_hash_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+
+zbx_blake3_hash_CFLAGS = $(COMMS_COMPILER_FLAGS)
+
+#zbx_proxy_batch_blake3
+
+zbx_proxy_batch_blake3_SOURCES = \
+	zbx_proxy_batch_blake3.c \
+	$(COMMON_SRC_FILES)
+
+zbx_proxy_batch_blake3_LDADD = \
+	$(COMMS_LIBS)
+
+zbx_proxy_batch_blake3_LDADD += @AGENT_LIBS@
+
+zbx_proxy_batch_blake3_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+
+zbx_proxy_batch_blake3_CFLAGS = $(COMMS_COMPILER_FLAGS)
 
 if IPV6
 zbx_tcp_check_allowed_peers_SOURCES = \

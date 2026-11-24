@@ -550,6 +550,11 @@ typedef struct
 
 	int				pending_history;
 
+	unsigned char			has_last_batch_blake3;
+	unsigned char			last_batch_blake3[32];
+	int				last_batch_blake3_ts;
+	unsigned char			protocol_flags;
+
 	const char			*apm;
 }
 ZBX_DC_PROXY;

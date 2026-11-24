@@ -1,0 +1,34 @@
+---
+test case: "legacy proxy payload without batch_blake3 passes rolling-upgrade verification"
+in:
+  payload: '{"request":"proxy data","host":"proxy-legacy","session":"abc123","history data":[{"id":1,"itemid":100,"clock":1700000000,"ns":10,"value":"1.5"}]}'
+out:
+  verify: "SUCCEED"
+  has_blake3: 0
+---
+test case: "tampered batch_blake3 digest is rejected"
+in:
+  payload: '{"request":"proxy data","host":"proxy-01","session":"abc123","history data":[{"id":1,"itemid":100,"clock":1700000000,"ns":10,"value":"1.5"}],"batch_blake3":"0000000000000000000000000000000000000000000000000000000000000000"}'
+out:
+  verify: "FAIL"
+---
+test case: "legacy server ACK without batch_blake3 succeeds when peer_protocol lacks ZBX_TCP_BLAKE3"
+in:
+  payload: '{"request":"proxy data","host":"proxy-01","session":"abc123"}'
+  ack: '{"response":"success"}'
+  peer_protocol: 3
+  expected_hex: "af1349b9f5f9a1a6a0404dea36dcc9499bcb25c9adc112b7cc9a93cae41f3262"
+out:
+  verify: "SUCCEED"
+  ack_result: "SUCCEED"
+---
+test case: "modern BLAKE3 server ACK missing batch_blake3 is rejected"
+in:
+  payload: '{"request":"proxy data","host":"proxy-01","session":"abc123"}'
+  ack: '{"response":"success"}'
+  peer_protocol: 25
+  expected_hex: "af1349b9f5f9a1a6a0404dea36dcc9499bcb25c9adc112b7cc9a93cae41f3262"
+out:
+  verify: "SUCCEED"
+  ack_result: "FAIL"
+...

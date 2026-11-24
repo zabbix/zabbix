@@ -1,0 +1,37 @@
+---
+test case: "official BLAKE3 empty string"
+in:
+  data: ""
+out:
+  hex: "af1349b9f5f9a1a6a0404dea36dcc9499bcb25c9adc112b7cc9a93cae41f3262"
+---
+test case: "official BLAKE3 'abc'"
+in:
+  data: "abc"
+out:
+  hex: "6437b3ac38465133ffb63b75273a8db548c558465d79db03fd359c6cd5bd9d85"
+---
+test case: "official BLAKE3 1-byte cyclic pattern"
+in:
+  pattern_len: 1
+out:
+  hex: "2d3adedff11b61f14c886e35afa036736dcd87a74d27b5c1510225d0f592e213"
+---
+test case: "official BLAKE3 64-byte full block pattern"
+in:
+  pattern_len: 64
+out:
+  hex: "4eed7141ea4a5cd4b788606bd23f46e212af9cacebacdc7d1f4c6dc7f2511b98"
+---
+test case: "official BLAKE3 1024-byte full chunk pattern"
+in:
+  pattern_len: 1024
+out:
+  hex: "42214739f095a406f3fc83deb889744ac00df831c10daa55189b5d121c855af7"
+---
+test case: "official BLAKE3 1025-byte multi-chunk Merkle tree pattern"
+in:
+  pattern_len: 1025
+out:
+  hex: "d00278ae47eb27b34faecf67b4fe263f82d5412916c1ffd97c8cb7fb814b8444"
+...

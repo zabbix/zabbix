@@ -152,6 +152,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxagentget/libzbxagentget.a \
 	$(top_builddir)/src/libs/zbxcurl/libzbxcurl.a \
 	$(top_builddir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(top_builddir)/src/libs/zbxhash/libzbxhash.a \
 	$(top_builddir)/src/libs/zbxbincommon/libzbxbincommon.a
 
 if HAVE_IPMI

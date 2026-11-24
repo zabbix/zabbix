@@ -7285,6 +7285,10 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 			proxy->nodata_win.period_end = 0;
 			proxy->proxy_groupid = 0;
 			proxy->pending_history = ZBX_PROXY_PENDING_HISTORY_NO;
+			proxy->has_last_batch_blake3 = 0;
+			memset(proxy->last_batch_blake3, 0, sizeof(proxy->last_batch_blake3));
+			proxy->last_batch_blake3_ts = 0;
+			proxy->protocol_flags = ZBX_TCP_PROXY_PROTOCOL;
 
 			zbx_vector_dc_host_ptr_create_ext(&proxy->hosts, __config_shmem_malloc_func,
 					__config_shmem_realloc_func, __config_shmem_free_func);
@@ -12798,6 +12802,7 @@ static void	DCget_proxy(zbx_dc_proxy_t *dst_proxy, const ZBX_DC_PROXY *src_proxy
 	dst_proxy->compatibility = src_proxy->compatibility;
 	dst_proxy->lastaccess = src_proxy->lastaccess;
 	dst_proxy->pending_history = src_proxy->pending_history;
+	dst_proxy->protocol_flags = src_proxy->protocol_flags;
 	dst_proxy->last_version_error_time = src_proxy->last_version_error_time;
 
 	zbx_strscpy(dst_proxy->name, src_proxy->name);
@@ -17540,6 +17545,55 @@ void	zbx_dc_update_proxy_pending_history(zbx_dc_proxy_t *proxy, int flag)
 
 	if (NULL != (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxy->proxyid)))
 		dc_proxy->pending_history = flag;
+
+	UNLOCK_CACHE;
+}
+
+int	zbx_dc_proxy_check_batch_blake3(zbx_uint64_t proxyid, const unsigned char digest[32])
+{
+	const ZBX_DC_PROXY	*dc_proxy;
+	int			ret = FAIL;
+
+	RDLOCK_CACHE;
+
+	if (NULL != (dc_proxy = (const ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxyid)))
+	{
+		if (0 != dc_proxy->has_last_batch_blake3 &&
+				0 == memcmp(dc_proxy->last_batch_blake3, digest, sizeof(dc_proxy->last_batch_blake3)))
+		{
+			ret = SUCCEED;
+		}
+	}
+
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+void	zbx_dc_proxy_set_batch_blake3(zbx_uint64_t proxyid, const unsigned char digest[32], int now)
+{
+	ZBX_DC_PROXY	*dc_proxy;
+
+	WRLOCK_CACHE;
+
+	if (NULL != (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxyid)))
+	{
+		dc_proxy->has_last_batch_blake3 = 1;
+		memcpy(dc_proxy->last_batch_blake3, digest, sizeof(dc_proxy->last_batch_blake3));
+		dc_proxy->last_batch_blake3_ts = now;
+	}
+
+	UNLOCK_CACHE;
+}
+
+void	zbx_dc_proxy_set_protocol_flags(zbx_uint64_t proxyid, unsigned char flags)
+{
+	ZBX_DC_PROXY	*dc_proxy;
+
+	WRLOCK_CACHE;
+
+	if (NULL != (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxyid)))
+		dc_proxy->protocol_flags = flags;
 
 	UNLOCK_CACHE;
 }

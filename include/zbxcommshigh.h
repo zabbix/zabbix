@@ -24,7 +24,13 @@ int	zbx_connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_
 void	zbx_disconnect_from_server(zbx_socket_t *sock);
 
 int	zbx_get_data_from_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error);
+int	zbx_get_data_from_server_ext(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved,
+		unsigned char flags, char **error);
 int	zbx_put_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error);
+int	zbx_put_data_to_server_ext(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved,
+		unsigned char flags, char **error);
+
+unsigned char	zbx_negotiate_proxy_reply_flags(int peer_protocol);
 
 int	zbx_send_response_ext(zbx_socket_t *sock, int result, const char *info, const char *version, int protocol,
 		int timeout);
@@ -39,9 +45,18 @@ int	zbx_send_response_json(zbx_socket_t *sock, int result, const char *info, con
 		zbx_send_response_ext(sock, result, info, NULL, sock->protocol, timeout)
 
 #define zbx_send_proxy_response(sock, result, info, timeout) \
-		zbx_send_response_ext(sock, result, info, ZABBIX_VERSION, ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, timeout)
+		zbx_send_response_ext(sock, result, info, ZABBIX_VERSION, \
+		(int)zbx_negotiate_proxy_reply_flags((sock)->protocol), timeout)
 
 int	zbx_recv_response(zbx_socket_t *sock, int timeout, char **error);
+
+int	zbx_proxy_batch_compute_blake3(const struct zbx_json_parse *jp, unsigned char digest_out[ZBX_BLAKE3_OUT_LEN],
+		char hex_out[ZBX_BLAKE3_HEX_LEN]);
+int	zbx_proxy_batch_verify_blake3(const struct zbx_json_parse *jp, unsigned char digest_out[ZBX_BLAKE3_OUT_LEN],
+		char hex_out[ZBX_BLAKE3_HEX_LEN], int *has_blake3, char **error);
+int	zbx_verify_batch_blake3_ack(const char *response_buf, const char *expected_hex, char **error);
+int	zbx_verify_batch_blake3_ack_ext(const char *response_buf, int peer_protocol, const char *expected_hex,
+		char **error);
 
 void	zbx_add_redirect_response(struct zbx_json *json, const zbx_comms_redirect_t *redirect);
 int	zbx_parse_redirect_response(struct zbx_json_parse *jp, char **host, unsigned short *port,
