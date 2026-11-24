@@ -20,10 +20,10 @@ class CControllerTriggerMassupdate extends CController {
 
 	private array $triggers = [];
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'ids' => 'required|array_id',
-			'prototype' => 'in 1',
+			'prototype' => 'required|in 0,1',
 			'update' => 'in 1',
 			'visible' => 'array',
 			'dependencies' => 'array_id',
@@ -50,19 +50,16 @@ class CControllerTriggerMassupdate extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
-		$has_access = match ($this->getInput('context')) {
-			'host' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
-			'template' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-		};
+	protected function checkPermissions(): bool {
+		$ids = array_keys(array_flip($this->getInput('ids')));
 
-		if (!$has_access) {
+		if (!$ids) {
 			return false;
 		}
 
 		$parent_lld = [];
 
-		if ($this->hasInput('prototype')) {
+		if ($this->getInput('prototype') == 1) {
 			$options = [
 				'output' => [],
 				'itemids' => [$this->getInput('parent_discoveryid', 0)],
@@ -78,7 +75,8 @@ class CControllerTriggerMassupdate extends CController {
 
 		$options = [
 			'output' => ['triggerid', 'templateid'],
-			'triggerids' => $this->getInput('ids'),
+			'triggerids' => $ids,
+			'selectHosts' => ['status'],
 			'editable' => true,
 			'preservekeys' => true
 		];
@@ -93,10 +91,31 @@ class CControllerTriggerMassupdate extends CController {
 
 		$this->triggers = $parent_lld ? API::TriggerPrototype()->get($options) : API::Trigger()->get($options);
 
-		return (bool) $this->triggers;
+		if (count($this->triggers) != count($ids)) {
+			return false;
+		}
+
+		$has_template_access = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+		$has_host_access = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
+
+		foreach ($this->triggers as $trigger) {
+			if (!array_key_exists('hosts', $trigger) || !$trigger['hosts']) {
+				return false;
+			}
+
+			foreach ($trigger['hosts'] as $host) {
+				$is_template = $host['status'] == HOST_STATUS_TEMPLATE;
+
+				if (($is_template && !$has_template_access) || (!$is_template && !$has_host_access)) {
+					return false;
+				}
+			}
+		}
+
+		return $has_template_access || $has_host_access;
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		if ($this->hasInput('update')) {
 			$visible = $this->getInput('visible', []);
 			$tags = $this->getInput('tags', []);
@@ -164,7 +183,7 @@ class CControllerTriggerMassupdate extends CController {
 				$triggers_to_update[] = $upd_trigger;
 			}
 
-			$result = $this->hasInput('prototype')
+			$result = $this->getInput('prototype') == 1
 				? API::TriggerPrototype()->update($triggers_to_update)
 				: API::Trigger()->update($triggers_to_update);
 
@@ -172,7 +191,7 @@ class CControllerTriggerMassupdate extends CController {
 
 			if ($result) {
 				$messages = CMessageHelper::getMessages();
-				$output = ['title' => $this->hasInput('prototype')
+				$output = ['title' => $this->getInput('prototype') == 1
 					? _n('Trigger prototype updated', 'Trigger prototypes updated', $triggers_count)
 					: _n('Trigger updated', 'Triggers updated', $triggers_count)
 				];
@@ -183,7 +202,7 @@ class CControllerTriggerMassupdate extends CController {
 			}
 			else {
 				CMessageHelper::setErrorTitle(
-					$this->hasInput('prototype')
+					$this->getInput('prototype') == 1
 						? _n('Cannot update trigger prototype', 'Cannot update trigger prototypes', $triggers_count)
 						: _n('Cannot update trigger', 'Cannot update triggers', $triggers_count)
 				);
@@ -206,11 +225,11 @@ class CControllerTriggerMassupdate extends CController {
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
 				],
-				'prototype' => $this->hasInput('prototype'),
+				'prototype' => $this->getInput('prototype'),
 				'ids' => $this->getInput('ids', []),
 				'parent_discoveryid' => $this->getInput('parent_discoveryid', 0),
 				'context' => $this->getInput('context'),
-				'location_url' => $this->hasInput('prototype')
+				'location_url' => $this->getInput('prototype') == 1
 					? (new CUrl('zabbix.php'))
 						->setArgument('action', 'trigger.prototype.list')
 						->setArgument('parent_discoveryid', $this->getInput('parent_discoveryid', 0))
