@@ -264,16 +264,6 @@ class testSidebarMenu extends CWebTest {
 			[
 				[
 					'section' => 'Administration',
-					'page' => 'Data source',
-					'third_level' =>
-					[
-						"APM"
-					]
-				]
-			],
-			[
-				[
-					'section' => 'Administration',
 					'page' => 'General',
 					'third_level' =>
 					[
@@ -285,6 +275,7 @@ class testSidebarMenu extends CWebTest {
 						'Trigger displaying options',
 						'Geographical maps',
 						'Modules',
+						'APM',
 						'Other'
 					]
 				]
