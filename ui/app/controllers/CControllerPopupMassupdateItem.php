@@ -25,11 +25,11 @@ class CControllerPopupMassupdateItem extends CController {
 
 	private $opt_interfaceid_expected = false;
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'allow_traps' => 'in '.implode(',', [HTTPCHECK_ALLOW_TRAPS_ON, HTTPCHECK_ALLOW_TRAPS_OFF]),
 			'authtype' => 'string',
-			'context' => 'required|string|in host,template',
+			'context' => 'required|string|in '.implode(',', ['host', 'template']),
 			'delay' => 'string',
 			'delay_flex' => 'array',
 			'description' => 'string',
@@ -85,7 +85,7 @@ class CControllerPopupMassupdateItem extends CController {
 					'output' => ['type'],
 					'itemids' => $this->getInput('ids')
 				];
-				$item_types = (bool) $this->getInput('prototype')
+				$item_types = $this->getInput('prototype') == 1
 					? API::ItemPrototype()->get($options)
 					: API::Item()->get($options);
 
@@ -119,30 +119,46 @@ class CControllerPopupMassupdateItem extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
-		$has_access = false;
+	protected function checkPermissions(): bool {
+		$ids = array_keys(array_flip($this->getInput('ids')));
 
-		switch ($this->getInput('context')) {
-			case 'host':
-				$has_access = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
-				break;
-			case 'template':
-				$has_access = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
-				break;
-		};
-
-		if (!$has_access) {
+		if (!$ids) {
 			return false;
 		}
 
-		$entity = ($this->getInput('prototype') == 1) ? API::ItemPrototype() : API::Item();
+		$entity = $this->getInput('prototype') == 1
+			? API::ItemPrototype()
+			: API::Item();
 
-		return (bool) $entity->get([
+		$items = $entity->get([
 			'output' => [],
-			'itemids' => $this->getInput('ids'),
-			'editable' => true,
-			'limit' => 1
+			'selectHosts' => ['status'],
+			'itemids' => $ids,
+			'editable' => true
 		]);
+
+		if (count($items) != count($ids)) {
+			return false;
+		}
+
+		$has_template_access = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+		$has_host_access = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
+
+		foreach ($items as $item) {
+			if (!array_key_exists('hosts', $item) || !$item['hosts']) {
+				return false;
+			}
+
+			foreach ($item['hosts'] as $host) {
+				$is_template = $host['status'] == HOST_STATUS_TEMPLATE;
+
+				if (($is_template && !$has_template_access) || (!$is_template && !$has_host_access)) {
+					return false;
+				}
+			}
+		}
+
+		return $has_template_access || $has_host_access;
 	}
 
 	protected function doAction() {
@@ -413,7 +429,7 @@ class CControllerPopupMassupdateItem extends CController {
 					->setArgument('context', $this->getInput('context'))
 					->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 					->getUrl(),
-				'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM_PROTOTYPE,
+				'preprocessing_test_type' => CControllerPopupItemTest::ZBX_TEST_TYPE_ITEM_PROTOTYPE,
 				'preprocessing_types' => CItemPrototype::SUPPORTED_PREPROCESSING_TYPES
 			];
 		}
@@ -422,7 +438,7 @@ class CControllerPopupMassupdateItem extends CController {
 				'location_url' => (new CUrl('items.php'))
 					->setArgument('context', $this->getInput('context'))
 					->getUrl(),
-				'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM,
+				'preprocessing_test_type' => CControllerPopupItemTest::ZBX_TEST_TYPE_ITEM,
 				'preprocessing_types' => CItem::SUPPORTED_PREPROCESSING_TYPES
 			];
 		}

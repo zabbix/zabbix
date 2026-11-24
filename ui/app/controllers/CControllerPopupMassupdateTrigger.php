@@ -23,10 +23,12 @@ require_once dirname(__FILE__).'/../../include/forms.inc.php';
 
 class CControllerPopupMassupdateTrigger extends CController {
 
-	protected function checkInput() {
+	private $triggers = [];
+
+	protected function checkInput(): bool {
 		$fields = [
 			'ids' => 'required|array_id',
-			'prototype' => 'in 1',
+			'prototype' => 'required|in 0,1',
 			'update' => 'in 1',
 			'visible' => 'array',
 			'dependencies' => 'array_id',
@@ -54,52 +56,73 @@ class CControllerPopupMassupdateTrigger extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
-		$has_access = false;
+	protected function checkPermissions(): bool {
+		$ids = array_keys(array_flip($this->getInput('ids')));
 
-		switch ($this->getInput('context')) {
-			case 'host':
-				$has_access = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
-				break;
-			case 'template':
-				$has_access = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
-				break;
-		};
-
-		if (!$has_access) {
+		if (!$ids) {
 			return false;
 		}
 
-		if ($this->hasInput('prototype')) {
-			$discovery_rule = API::DiscoveryRule()->get([
+		$parent_lld = [];
+
+		if ($this->getInput('prototype') == 1) {
+			$parent_lld = API::DiscoveryRule()->get([
 				'output' => [],
-				'itemids' => [$this->getInput('parent_discoveryid', 0)],
+				'itemids' => [$this->getInput('parent_discoveryid')],
 				'editable' => true
 			]);
 
-			if (!$discovery_rule) {
-				return false;
-			}
-		}
-		else {
-			$trigger = API::Trigger()->get([
-				'output' => [],
-				'triggerids' => $this->getInput('ids', []),
-				'editable' => true
-			]);
-
-			if (!$trigger) {
+			if (!$parent_lld) {
 				return false;
 			}
 		}
 
-		return true;
+		$options = [
+			'output' => ['triggerid', 'templateid'],
+			'selectHosts' => ['status'],
+			'triggerids' => $ids,
+			'editable' => true,
+			'preservekeys' => true
+		];
+
+		if (array_key_exists('tags', $this->getInput('visible', []))) {
+			$options['selectTags'] = ['tag', 'value'];
+		}
+
+		if ($parent_lld) {
+			$options['discoveryids'] = $this->getInput('parent_discoveryid', 0);
+			$options['filter'] = ['flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE];
+		}
+
+		$this->triggers = $parent_lld ? API::TriggerPrototype()->get($options) : API::Trigger()->get($options);
+
+		if (count($this->triggers) != count($ids)) {
+			return false;
+		}
+
+		$has_template_access = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+		$has_host_access = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
+
+		foreach ($this->triggers as $trigger) {
+			if (!array_key_exists('hosts', $trigger) || !$trigger['hosts']) {
+				return false;
+			}
+
+			foreach ($trigger['hosts'] as $host) {
+				$is_template = $host['status'] == HOST_STATUS_TEMPLATE;
+
+				if (($is_template && !$has_template_access) || (!$is_template && !$has_host_access)) {
+					return false;
+				}
+			}
+		}
+
+		return $has_template_access || $has_host_access;
 	}
 
 	protected function doAction() {
 		if ($this->hasInput('update')) {
 			$output = [];
-			$triggerids = $this->getInput('ids', []);
 			$visible = $this->getInput('visible', []);
 			$tags = array_filter($this->getInput('tags', []),
 				function (array $tag): bool {
@@ -123,115 +146,66 @@ class CControllerPopupMassupdateTrigger extends CController {
 				}
 			}
 
-			$result = true;
-
 			$triggers_to_update = [];
 
-			$options = [
-				'output' => ['triggerid', 'templateid'],
-				'triggerids' => $triggerids,
-				'preservekeys' => true
-			];
-
-			if (!$this->hasInput('prototype')) {
-				$options['filter'] = ['flags' => ZBX_FLAG_DISCOVERY_NORMAL];
-			}
-
 			if (array_key_exists('tags', $visible)) {
-				$mass_update_tags = $this->getInput('mass_update_tags', ZBX_ACTION_ADD);
-
-				if ($mass_update_tags == ZBX_ACTION_ADD || $mass_update_tags == ZBX_ACTION_REMOVE) {
-					$options['selectTags'] = ['tag', 'value'];
-				}
-
-				$unique_tags = [];
-
-				foreach ($tags as $tag) {
-					$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
-				}
-
-				$tags = array_values($unique_tags);
+				$tags = self::getUniqueTags($tags);
 			}
 
-			if ($this->hasInput('prototype')) {
-				$triggers = API::TriggerPrototype()->get($options);
-			}
-			else {
-				$triggers = API::Trigger()->get($options);
-			}
+			if ($this->triggers) {
+				foreach ($this->triggers as $triggerid => $trigger) {
+					$upd_trigger = ['triggerid' => $triggerid];
 
+					if (array_key_exists('priority', $visible)) {
+						$upd_trigger['priority'] = $this->getInput('priority');
+					}
 
-			if ($triggers) {
-				foreach ($triggerids as $triggerid) {
-					if (array_key_exists($triggerid, $triggers)) {
-						$trigger = ['triggerid' => $triggerid];
+					if (array_key_exists('dependencies', $visible)) {
+						$upd_trigger['dependencies'] = zbx_toObject($this->getInput('dependencies', []), 'triggerid');
+					}
 
-						if (array_key_exists('priority', $visible)) {
-							$trigger['priority'] = $this->getInput('priority');
+					if (array_key_exists('tags', $visible)) {
+						$tags_action = $this->getInput('mass_update_tags', ZBX_ACTION_ADD);
+
+						if ($tags && $tags_action == ZBX_ACTION_ADD) {
+							$upd_trigger['tags'] = self::getUniqueTags(array_merge($trigger['tags'], $tags));
 						}
-
-						if (array_key_exists('dependencies', $visible)) {
-							$trigger['dependencies'] = zbx_toObject($this->getInput('dependencies', []), 'triggerid');
+						elseif ($tags_action == ZBX_ACTION_REPLACE) {
+							$upd_trigger['tags'] = $tags;
 						}
-
-						if (array_key_exists('tags', $visible)) {
-							if ($tags && $mass_update_tags == ZBX_ACTION_ADD) {
-								$unique_tags = [];
-
-								foreach (array_merge($triggers[$triggerid]['tags'], $tags) as $tag) {
-									$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
-								}
-
-								$trigger['tags'] = array_values($unique_tags);
-							}
-							elseif ($mass_update_tags == ZBX_ACTION_REPLACE) {
-								$trigger['tags'] = $tags;
-							}
-							elseif ($tags && $mass_update_tags == ZBX_ACTION_REMOVE) {
-								$diff_tags = [];
-
-								foreach ($triggers[$triggerid]['tags'] as $a) {
-									foreach ($tags as $b) {
-										if ($a['tag'] === $b['tag'] && $a['value'] === $b['value']) {
-											continue 2;
+						elseif ($tags && $tags_action == ZBX_ACTION_REMOVE) {
+							$upd_trigger['tags'] =
+								array_filter($trigger['tags'], static function (array $tag) use ($tags) {
+									foreach ($tags as $_tag) {
+										if ($tag['tag'] === $_tag['tag'] && $tag['value'] === $_tag['value']) {
+											return false;
 										}
 									}
 
-									$diff_tags[] = $a;
-								}
-
-								$trigger['tags'] = $diff_tags;
-							}
+									return true;
+								});
 						}
-
-						if ($triggers[$triggerid]['templateid'] == 0 && array_key_exists('manual_close', $visible)) {
-							$trigger['manual_close'] = $this->getInput('manual_close');
-						}
-
-						$triggers_to_update[] = $trigger;
 					}
+
+					if ($trigger['templateid'] == 0 && array_key_exists('manual_close', $visible)) {
+						$upd_trigger['manual_close'] = $this->getInput('manual_close');
+					}
+
+					$triggers_to_update[] = $upd_trigger;
 				}
 			}
 
-			if ($this->hasInput('prototype')) {
-				$result = (bool) API::TriggerPrototype()->update($triggers_to_update);
-			}
-			else {
-				$result = (bool) API::Trigger()->update($triggers_to_update);
-			}
-
-			if (!$result) {
-				CMessageHelper::setErrorTitle(
-					$this->hasInput('prototype') ? _('Cannot update trigger prototypes') : _('Cannot update trigger')
-				);
-			}
+			$result = $this->getInput('prototype') == 1
+				? API::TriggerPrototype()->update($triggers_to_update)
+				: API::Trigger()->update($triggers_to_update);
 
 			if ($result) {
 				$messages = CMessageHelper::getMessages();
-				$output = ['title' => $this->hasInput('prototype')
+				$output = ['title' => $this->getInput('prototype') == 1
 					? _('Trigger prototypes updated')
 					: _('Trigger updated')
 				];
+
 				if (count($messages)) {
 					$output['messages'] = array_column($messages, 'message');
 				}
@@ -252,11 +226,11 @@ class CControllerPopupMassupdateTrigger extends CController {
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
 				],
-				'prototype' => $this->hasInput('prototype'),
+				'prototype' => $this->getInput('prototype'),
 				'ids' => $this->getInput('ids', []),
 				'parent_discoveryid' => $this->getInput('parent_discoveryid', 0),
 				'context' => $this->getInput('context'),
-				'location_url' => $this->hasInput('prototype')
+				'location_url' => $this->getInput('prototype') == 1
 					? (new CUrl('trigger_prototypes.php'))
 						->setArgument('parent_discoveryid', $this->getInput('parent_discoveryid', 0))
 						->setArgument('context', $this->getInput('context'))
@@ -268,5 +242,15 @@ class CControllerPopupMassupdateTrigger extends CController {
 
 			$this->setResponse(new CControllerResponseData($data));
 		}
+	}
+
+	private static function getUniqueTags(array $tags): array {
+		$unique_tags = [];
+
+		foreach ($tags as $tag) {
+			$unique_tags[$tag['tag'].':'.$tag['value']] = $tag;
+		}
+
+		return array_values($unique_tags);
 	}
 }
