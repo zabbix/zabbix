@@ -4785,7 +4785,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 
 			$container = CTestArrayHelper::get($data, 'Column.Item', false) ? 'Items' : 'Columns';
 			$form->getFieldContainer($container)->query('button:Add')->one()->waitUntilClickable()->click();
-			$column_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+			$column_overlay = COverlayDialogElement::get('New column');
 			$column_overlay->asForm()->fill($data['Column']);
 
 			/*

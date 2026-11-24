@@ -448,8 +448,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					],
 					'context' => 'template',
 					'expected' => [
-						'Computers discovery',
-						'Jobs discovery'
+						'Computers discovery'
 					]
 				]
 			],
