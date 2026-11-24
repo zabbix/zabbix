@@ -58,8 +58,14 @@ class testDashboardHoneycombWidget extends testWidgets {
 	 */
 	protected static $disposable_dashboard_id;
 
+	protected static $dependent_itemids;
+
 	const DASHBOARD_FOR_MACRO_FUNCTIONS = 'Dashboard for testing macro functions';
 	const WIDGET_FOR_MACRO_FUNCTIONS = 'Widget for testing macro functions';
+	const HOST_CREATE_HONEY = 'Host for honeycomb 1';
+	const HOST_DISPLAY = 'Display';
+	const ITEM_KEY_TEXT = 'text_honey_1';
+	const ITEM_KEY_DISPLAY_TEXT = 'honey_non_numeric_2';
 
 	public static function prepareHoneycombWidgetData() {
 		CDataHelper::call('hostgroup.create', [
@@ -77,7 +83,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 
 		$response = CDataHelper::createHosts([
 			[
-				'host' => 'Host for honeycomb 1',
+				'host' => self::HOST_CREATE_HONEY,
 				'groups' => [['groupid' => 4]], // Zabbix servers.
 				'items' => [
 					[
@@ -85,11 +91,41 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'key_' => 'num_honey_1',
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_UINT64
+					],
+					[
+						'name' => 'Numeric (float) for honeycomb 1',
+						'key_' => 'float_honey_1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					],
+					[
+						'name' => 'Character for honeycomb 1',
+						'key_' => 'char_honey_1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_STR
+					],
+					[
+						'name' => 'Log for honeycomb 1',
+						'key_' => 'log_honey_1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_LOG
+					],
+					[
+						'name' => 'Text for honeycomb 1',
+						'key_' => self::ITEM_KEY_TEXT,
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_TEXT
+					],
+					[
+						'name' => 'JSON for honeycomb 1',
+						'key_' => 'json_honey_1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_JSON
 					]
 				]
 			],
 			[
-				'host' => 'Display',
+				'host' => self::HOST_DISPLAY,
 				'groups' => [['groupid' => 4]], // Zabbix servers.
 				'items' => [
 					[
@@ -121,6 +157,48 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'key_' => 'honey_display_5',
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_UINT64
+					],
+					[
+						'name' => 'Non-numeric JSON',
+						'key_' => 'honey_non_numeric_1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_JSON
+					],
+					[
+						'name' => 'Non-numeric TEXT',
+						'key_' => self::ITEM_KEY_DISPLAY_TEXT,
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_TEXT
+					],
+					[
+						'name' => 'Non-numeric CHAR',
+						'key_' => 'honey_non_numeric_3',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_STR
+					],
+					[
+						'name' => 'Non-numeric LOG',
+						'key_' => 'honey_non_numeric_4',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_LOG
+					],
+					[
+						'name' => 'Non-numeric XSS - Text',
+						'key_' => 'honey_non_numeric_5',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_TEXT
+					],
+					[
+						'name' => 'Non-numeric XSS - Log',
+						'key_' => 'honey_non_numeric_6',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_LOG
+					],
+					[
+						'name' => 'Non-numeric XSS - Char',
+						'key_' => 'honey_non_numeric_7',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_STR
 					]
 				]
 			],
@@ -222,12 +300,54 @@ class testDashboardHoneycombWidget extends testWidgets {
 			]
 		]);
 		$itemids = $response['itemids'];
-		$display_hostid = $response['hostids']['Display'];
+		$display_hostid = $response['hostids'][self::HOST_DISPLAY];
 		$maintenance_hostid = $response['hostids']['Host for maintenance filter'];
 
+		// Create dependent items.
+		$dependent = [
+			self::HOST_CREATE_HONEY => [
+				[
+					'name' => 'Binary for honeycomb 1',
+					'key_' => 'dependent_item_1',
+					'master_itemid' => $itemids[self::HOST_CREATE_HONEY.':'.self::ITEM_KEY_TEXT],
+					'type' => ITEM_TYPE_DEPENDENT,
+					'value_type' => ITEM_VALUE_TYPE_BINARY
+				]
+			],
+			self::HOST_DISPLAY => [
+				[
+					'name' => 'Non-numeric BINARY',
+					'key_' => 'display_bin',
+					'master_itemid' => $itemids[self::HOST_DISPLAY.':'.self::ITEM_KEY_DISPLAY_TEXT],
+					'type' => ITEM_TYPE_DEPENDENT,
+					'value_type' => ITEM_VALUE_TYPE_BINARY
+				]
+			]
+		];
+
+		CDataHelper::createItems('item', $dependent, $response['hostids']);
+		self::$dependent_itemids = CDataHelper::getIds('name');
+
 		foreach ([100, 200, 300, 400, 500] as $i => $value) {
-			CDataHelper::addItemData($itemids['Display:honey_display_'.($i + 1)], $value);
+			CDataHelper::addItemData($itemids[self::HOST_DISPLAY.':honey_display_'.($i + 1)], $value);
 		}
+
+		$non_numeric_data = [
+			'{"test": "json1", "users": {"name1": "test1", "name2": "🙂"}}',
+			'Text test 🙂',
+			'Char test 🙂',
+			'Log test 🙂',
+			'\'"><img src=x onerror=alert(1)>',
+			'"><svg/onload=alert(1)>',
+			' " autofocus onfocus=alert(1) x="'
+		];
+		// Generate data for non-numeric items.
+		foreach ($non_numeric_data as $i => $value) {
+			CDataHelper::addItemData($itemids[self::HOST_DISPLAY.':honey_non_numeric_'.($i + 1)], $value);
+		}
+
+		// Generate data for binary data type.
+		CDataHelper::addItemData(self::$dependent_itemids['Non-numeric BINARY'], 'Test for binary item value 🙂');
 
 		// Items ids that used in filtering scenario.
 		$filtered_items = [
@@ -1215,7 +1335,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'Name' => 'With existing item, hosts and hostgroup',
 						'Item patterns' => 'Numeric for honeycomb 1',
 						'Host groups' => 'Zabbix servers',
-						'Hosts' => 'Host for honeycomb 1'
+						'Hosts' => self::HOST_CREATE_HONEY
 					]
 				]
 			],
@@ -1372,15 +1492,225 @@ class testDashboardHoneycombWidget extends testWidgets {
 					]
 				]
 			],
-			// #20.
+			// #20 Numeric (uint) data type with all available fields.
 			[
 				[
 					'fields' => [
-						'Name' => 'All available fields filled',
+						'Name' => 'Numeric: all available fields filled',
 						'Item patterns' => 'Numeric for honeycomb 1',
 						'Refresh interval' => 'No refresh',
 						'Host groups' => 'Zabbix servers',
-						'Hosts' => 'Host for honeycomb 1',
+						'Hosts' => self::HOST_CREATE_HONEY,
+						'id:primary_label_type' => 'Value',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label_decimal_places' => 6,
+						'id:secondary_label' => 'some text',
+						'id:primary_label_bold' => true,
+						'id:secondary_label_bold' => false,
+						'id:primary_label_size' => 99,
+						'id:secondary_label_size' => 99,
+						self::PATH_TO_COLOR_PICKER.'"primary_label_color"]' => '81C784', // Primary label Color.
+						self::PATH_TO_COLOR_PICKER.'"secondary_label_color"]' => '81C784', // Primary label Color.
+						'id:primary_label_units_pos' => 'Before value',
+						'id:primary_label_units' => 'primary',
+						'Background colour' => 'B2DFDB'
+					],
+					'thresholds' => [
+						[
+							'threshold' => '1',
+							'color' => 'FF465C'
+						],
+						[
+							'threshold' => '2',
+							'color' => 'FFFF00'
+						]
+					]
+				]
+			],
+			// #21 Float data type with all available fields.
+			[
+				[
+					'fields' => [
+						'Name' => 'Float: all available fields filled',
+						'Item patterns' => 'Float for honeycomb 1',
+						'Refresh interval' => 'No refresh',
+						'Host groups' => 'Zabbix servers',
+						'Hosts' => self::HOST_CREATE_HONEY,
+						'id:primary_label_type' => 'Value',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label_decimal_places' => 6,
+						'id:secondary_label' => 'some text',
+						'id:primary_label_bold' => true,
+						'id:secondary_label_bold' => false,
+						'id:primary_label_size' => 99,
+						'id:secondary_label_size' => 99,
+						self::PATH_TO_COLOR_PICKER.'"primary_label_color"]' => '81C784', // Primary label Color.
+						self::PATH_TO_COLOR_PICKER.'"secondary_label_color"]' => '81C784', // Primary label Color.
+						'id:primary_label_units_pos' => 'Before value',
+						'id:primary_label_units' => 'primary',
+						'Background colour' => 'B2DFDB'
+					],
+					'thresholds' => [
+						[
+							'threshold' => '1',
+							'color' => 'FF465C'
+						],
+						[
+							'threshold' => '2',
+							'color' => 'FFFF00'
+						]
+					]
+				]
+			],
+			// #22 Char data type with all available fields.
+			[
+				[
+					'fields' => [
+						'Name' => 'Character: all available fields filled',
+						'Item patterns' => 'Char for honeycomb 1',
+						'Refresh interval' => 'No refresh',
+						'Host groups' => 'Zabbix servers',
+						'Hosts' => self::HOST_CREATE_HONEY,
+						'id:primary_label_type' => 'Value',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label_decimal_places' => 6,
+						'id:secondary_label' => 'some text',
+						'id:primary_label_bold' => true,
+						'id:secondary_label_bold' => false,
+						'id:primary_label_size' => 99,
+						'id:secondary_label_size' => 99,
+						self::PATH_TO_COLOR_PICKER.'"primary_label_color"]' => '81C784', // Primary label Color.
+						self::PATH_TO_COLOR_PICKER.'"secondary_label_color"]' => '81C784', // Primary label Color.
+						'id:primary_label_units_pos' => 'Before value',
+						'id:primary_label_units' => 'primary',
+						'Background colour' => 'B2DFDB'
+					],
+					'thresholds' => [
+						[
+							'threshold' => '1',
+							'color' => 'FF465C'
+						],
+						[
+							'threshold' => '2',
+							'color' => 'FFFF00'
+						]
+					]
+				]
+			],
+			// #23 Log data type with all available fields.
+			[
+				[
+					'fields' => [
+						'Name' => 'Log: all available fields filled',
+						'Item patterns' => 'Log for honeycomb 1',
+						'Refresh interval' => 'No refresh',
+						'Host groups' => 'Zabbix servers',
+						'Hosts' => self::HOST_CREATE_HONEY,
+						'id:primary_label_type' => 'Value',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label_decimal_places' => 6,
+						'id:secondary_label' => 'some text',
+						'id:primary_label_bold' => true,
+						'id:secondary_label_bold' => false,
+						'id:primary_label_size' => 99,
+						'id:secondary_label_size' => 99,
+						self::PATH_TO_COLOR_PICKER.'"primary_label_color"]' => '81C784', // Primary label Color.
+						self::PATH_TO_COLOR_PICKER.'"secondary_label_color"]' => '81C784', // Primary label Color.
+						'id:primary_label_units_pos' => 'Before value',
+						'id:primary_label_units' => 'primary',
+						'Background colour' => 'B2DFDB'
+					],
+					'thresholds' => [
+						[
+							'threshold' => '1',
+							'color' => 'FF465C'
+						],
+						[
+							'threshold' => '2',
+							'color' => 'FFFF00'
+						]
+					]
+				]
+			],
+			// #24 Text data type with all available fields.
+			[
+				[
+					'fields' => [
+						'Name' => 'Text: all available fields filled',
+						'Item patterns' => 'Text for honeycomb 1',
+						'Refresh interval' => 'No refresh',
+						'Host groups' => 'Zabbix servers',
+						'Hosts' => self::HOST_CREATE_HONEY,
+						'id:primary_label_type' => 'Value',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label_decimal_places' => 6,
+						'id:secondary_label' => 'some text',
+						'id:primary_label_bold' => true,
+						'id:secondary_label_bold' => false,
+						'id:primary_label_size' => 99,
+						'id:secondary_label_size' => 99,
+						self::PATH_TO_COLOR_PICKER.'"primary_label_color"]' => '81C784', // Primary label Color.
+						self::PATH_TO_COLOR_PICKER.'"secondary_label_color"]' => '81C784', // Primary label Color.
+						'id:primary_label_units_pos' => 'Before value',
+						'id:primary_label_units' => 'primary',
+						'Background colour' => 'B2DFDB'
+					],
+					'thresholds' => [
+						[
+							'threshold' => '1',
+							'color' => 'FF465C'
+						],
+						[
+							'threshold' => '2',
+							'color' => 'FFFF00'
+						]
+					]
+				]
+			],
+			// #25 JSON data type with all available fields.
+			[
+				[
+					'fields' => [
+						'Name' => 'JSON: all available fields filled',
+						'Item patterns' => 'JSON for honeycomb 1',
+						'Refresh interval' => 'No refresh',
+						'Host groups' => 'Zabbix servers',
+						'Hosts' => self::HOST_CREATE_HONEY,
+						'id:primary_label_type' => 'Value',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label_decimal_places' => 6,
+						'id:secondary_label' => 'some text',
+						'id:primary_label_bold' => true,
+						'id:secondary_label_bold' => false,
+						'id:primary_label_size' => 99,
+						'id:secondary_label_size' => 99,
+						self::PATH_TO_COLOR_PICKER.'"primary_label_color"]' => '81C784', // Primary label Color.
+						self::PATH_TO_COLOR_PICKER.'"secondary_label_color"]' => '81C784', // Primary label Color.
+						'id:primary_label_units_pos' => 'Before value',
+						'id:primary_label_units' => 'primary',
+						'Background colour' => 'B2DFDB'
+					],
+					'thresholds' => [
+						[
+							'threshold' => '1',
+							'color' => 'FF465C'
+						],
+						[
+							'threshold' => '2',
+							'color' => 'FFFF00'
+						]
+					]
+				]
+			],
+			// #26 Binary data type with all available fields.
+			[
+				[
+					'fields' => [
+						'Name' => 'Binary: all available fields filled',
+						'Item patterns' => 'Binary for honeycomb 1',
+						'Refresh interval' => 'No refresh',
+						'Host groups' => 'Zabbix servers',
+						'Hosts' => self::HOST_CREATE_HONEY,
 						'id:primary_label_type' => 'Value',
 						'id:secondary_label_type' => 'Text',
 						'id:primary_label_decimal_places' => 6,
@@ -1770,7 +2100,273 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'result' => 'Only secondary'
 				]
 			],
-			// #15.
+			// #14 Non-numeric value JSON.
+			[
+				[
+					'fields' => [
+						'Name' => 'JSON - value',
+						'Item patterns' => 'Non-numeric JSON',
+						'id:primary_label_type' => 'Value',
+						'id:secondary_label_type' => 'Value'
+					],
+					'result' => '{"test": "json1", "users": {"name1": "test1", "name2": "🙂"}}'
+				]
+			],
+			// #15 Non-numeric value BINARY.
+			[
+				[
+					'fields' => [
+						'Name' => 'BINARY - value',
+						'Item patterns' => 'Non-numeric BINARY',
+						'id:primary_label_type' => 'Value',
+						'id:secondary_label_type' => 'Value'
+					],
+					'result' => 'binary value'
+				]
+			],
+			// #16 Non-numeric value TEXT.
+			[
+				[
+					'fields' => [
+						'Name' => 'TEXT value',
+						'Item patterns' => 'Non-numeric TEXT',
+						'id:primary_label_type' => 'Value',
+						'id:secondary_label_type' => 'Value'
+					],
+					'result' => 'Text test 🙂'
+				]
+			],
+			// #17 Non-numeric value CHAR.
+			[
+				[
+					'fields' => [
+						'Name' => 'CHAR - value',
+						'Item patterns' => 'Non-numeric CHAR',
+						'id:primary_label_type' => 'Value',
+						'id:secondary_label_type' => 'Value'
+					],
+					'result' => 'Char test 🙂'
+				]
+			],
+			// #18 Non-numeric value LOG.
+			[
+				[
+					'fields' => [
+						'Name' => 'LOG - Value',
+						'Item patterns' => 'Non-numeric LOG',
+						'id:primary_label_type' => 'Value',
+						'id:secondary_label_type' => 'Value'
+					],
+					'result' => 'Log test 🙂'
+				]
+			],
+			// #19 Non-numeric value with units (no units should be displayed).
+			[
+				[
+					'fields' => [
+						'Name' => 'JSON - Value with units',
+						'Item patterns' => 'Non-numeric JSON',
+						'id:primary_label_type' => 'Value',
+						'id:secondary_label_type' => 'Value',
+						'id:primary_label_units_pos' => 'After value',
+						'id:secondary_label_units_pos' => 'After value',
+						'id:primary_label_units' => 'units not displayed',
+						'id:secondary_label_units' => 'units not displayed'
+					],
+					'result' => '{"test": "json1", "users": {"name1": "test1", "name2": "🙂"}}'
+				]
+			],
+			// #20 Macros with JSON data type.
+			[
+				[
+					'fields' => [
+						'Name' => 'Resolved macros JSON',
+						'Item patterns' => 'Non-numeric JSON',
+						'id:primary_label_type' => 'Text',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label' => '{HOST.NAME} {ITEM.KEY} {ITEM.LASTVALUE}',
+						'id:secondary_label' => '{HOST.NAME} {ITEM.KEY} {ITEM.LASTVALUE}'
+					],
+					'result' => 'Display honey_non_numeric_1 {"test": "json1", "u...'
+				]
+			],
+			// #21 Macros with Binary data type.
+			[
+				[
+					'fields' => [
+						'Name' => 'Resolved macros BIN',
+						'Item patterns' => 'Non-numeric BINARY',
+						'id:primary_label_type' => 'Text',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label' => '{HOST.NAME} {ITEM.KEY} {ITEM.LASTVALUE}',
+						'id:secondary_label' => '{HOST.NAME} {ITEM.KEY} {ITEM.LASTVALUE}'
+					],
+					'result' => 'Display display_bin *UNKNOWN*'
+				]
+			],
+			// #22 Item value macro with regsub to display full value (JSON).
+			[
+				[
+					'fields' => [
+						'Name' => 'Resolved macros with regsub JSON',
+						'Item patterns' => 'Non-numeric JSON',
+						'id:primary_label_type' => 'Text',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label' => '{{ITEM.LASTVALUE}.regsub("(.*)", \1)}',
+						'id:secondary_label' => '{{ITEM.LASTVALUE}.regsub("(.*)", \1)}'
+					],
+					'result' => '{"test": "json1", "users": {"name1": "test1", "name2": "🙂"}}'
+				]
+			],
+			// #23 Item value macro with macro function - should resolve UNKNOWN for binary item.
+			[
+				[
+					'fields' => [
+						'Name' => 'Resolved macros with regsub BIN',
+						'Item patterns' => 'Non-numeric BINARY',
+						'id:primary_label_type' => 'Text',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label' => '{{ITEM.LASTVALUE}.regsub("(.*)", \1)}',
+						'id:secondary_label' => '{{ITEM.LASTVALUE}.regsub("(.*)", \1)}'
+					],
+					'result' => '*UNKNOWN*'
+				]
+			],
+			// #24 Macros with Text data type.
+			[
+				[
+					'fields' => [
+						'Name' => 'Resolved macros TEXT',
+						'Item patterns' => 'Non-numeric TEXT',
+						'id:primary_label_type' => 'Text',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label' => '{HOST.NAME} {ITEM.KEY} {ITEM.LASTVALUE}',
+						'id:secondary_label' => '{HOST.NAME} {ITEM.KEY} {ITEM.LASTVALUE}'
+					],
+					'result' => 'Display honey_non_numeric_2 Text test 🙂'
+				]
+			],
+			// #25 Macros with Char data type.
+			[
+				[
+					'fields' => [
+						'Name' => 'Resolved macros CHAR',
+						'Item patterns' => 'Non-numeric CHAR',
+						'id:primary_label_type' => 'Text',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label' => '{HOST.NAME} {ITEM.KEY} {ITEM.LASTVALUE}',
+						'id:secondary_label' => '{HOST.NAME} {ITEM.KEY} {ITEM.LASTVALUE}'
+					],
+					'result' => 'Display honey_non_numeric_3 Char test 🙂'
+				]
+			],
+			// #26 Macros with Log data type.
+			[
+				[
+					'fields' => [
+						'Name' => 'Resolved macros LOG',
+						'Item patterns' => 'Non-numeric Log',
+						'id:primary_label_type' => 'Text',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label' => '{HOST.NAME} {ITEM.KEY} {ITEM.LASTVALUE}',
+						'id:secondary_label' => '{HOST.NAME} {ITEM.KEY} {ITEM.LASTVALUE}'
+					],
+					'result' => 'Display honey_non_numeric_4 Log test 🙂'
+				]
+			],
+			// #27 Non-numeric with XSS in item value macro #1.
+			[
+				[
+					'fields' => [
+						'Name' => 'Resolved macros XSS #1',
+						'Item patterns' => 'Non-numeric XSS - Text',
+						'id:primary_label_type' => 'Text',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label' => '{ITEM.LASTVALUE}',
+						'id:secondary_label' => '{ITEM.LASTVALUE}'
+					],
+					'result' => '\'"><img src=x onerro...'
+				]
+			],
+			// #28 Non-numeric with XSS in item value macro #2.
+			[
+				[
+					'fields' => [
+						'Name' => 'Resolved macros XSS #2',
+						'Item patterns' => 'Non-numeric XSS - Log',
+						'id:primary_label_type' => 'Text',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label' => '{ITEM.LASTVALUE}',
+						'id:secondary_label' => '{ITEM.LASTVALUE}'
+					],
+					'result' => '"><svg/onload=alert(...'
+				]
+			],
+			// #29 Non-numeric with XSS in item value macro #3.
+			[
+				[
+					'fields' => [
+						'Name' => 'Resolved macros XSS #3',
+						'Item patterns' => 'Non-numeric XSS - Char',
+						'id:primary_label_type' => 'Text',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label' => '{ITEM.LASTVALUE}',
+						'id:secondary_label' => '{ITEM.LASTVALUE}'
+					],
+					'result' => '" autofocus onfocus...'
+				]
+			],
+			// #30 Non-numeric with XSS in item value #1.
+			[
+				[
+					'fields' => [
+						'Name' => 'Value XSS #1',
+						'Item patterns' => 'Non-numeric XSS - Text',
+						'id:primary_label_type' => 'Value',
+						'id:secondary_label_type' => 'Value'
+					],
+					'result' => '\'"><img src=x onerror=alert(1)>'
+				]
+			],
+			// #31 Non-numeric with XSS in item value #2.
+			[
+				[
+					'fields' => [
+						'Name' => 'Value XSS #2',
+						'Item patterns' => 'Non-numeric XSS - Log',
+						'id:primary_label_type' => 'Value',
+						'id:secondary_label_type' => 'Value'
+					],
+					'result' => '"><svg/onload=alert(1)>'
+				]
+			],
+			// #32 Non-numeric with XSS in item value #3.
+			[
+				[
+					'fields' => [
+						'Name' => 'Value XSS #3',
+						'Item patterns' => 'Non-numeric XSS - Char',
+						'id:primary_label_type' => 'Value',
+						'id:secondary_label_type' => 'Value'
+					],
+					'result' => '" autofocus onfocus=alert(1) x="'
+				]
+			],
+			// #33 XSS used as label.
+			[
+				[
+					'fields' => [
+						'Name' => 'Label XSS',
+						'Item patterns' => 'Non-numeric XSS - Char',
+						'id:primary_label_type' => 'Text',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label' => '<script>alert(\'xss\');</alert>',
+						'id:secondary_label' => '<script>alert(\'xss\');</alert>'
+					],
+					'result' => '<script>alert(\'xss\');</alert>'
+				]
+			],
+			// #34.
 			[
 				[
 					'fields' => [
@@ -1818,15 +2414,18 @@ class testDashboardHoneycombWidget extends testWidgets {
 		$content = $widget->getContent();
 		if (array_key_exists('check_label', $data)) {
 			$displayed = $content->query('class', $data['check_label'])->one()->getText();
-			$this->assertEquals($displayed, $data['result']);
+			$this->assertEquals($data['result'], $displayed);
 			$this->assertFalse($content->query('class', $data['turned_off_label'])->exists());
 		}
 		else {
 			foreach (['svg-honeycomb-label-primary', 'svg-honeycomb-label-secondary'] as $selector) {
 				$displayed = $content->query('class', $selector)->one()->getText();
-				$this->assertEquals($displayed, $data['result']);
+				$this->assertEquals($data['result'], $displayed);
 			}
 		}
+
+		// Check that no alerts appeared in XSS test cases.
+		$this->assertFalse($this->page->isAlertPresent());
 
 		// Check that correct colors displayed.
 		if (array_key_exists('colors', $data)) {
@@ -1913,7 +2512,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 			'Item patterns' => 'Test_cancel',
 			'Refresh interval' => '15 minutes',
 			'Host groups' => 'Zabbix servers',
-			'Hosts' => 'Host for honeycomb 1',
+			'Hosts' => self::HOST_CREATE_HONEY,
 			'id:primary_label_type' => 'Value',
 			'id:secondary_label_type' => 'Text',
 			'id:primary_label_decimal_places' => 6,

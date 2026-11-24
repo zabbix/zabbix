@@ -3,7 +3,9 @@
 
 	<taskdef resource="net/sf/antcontrib/antlib.xml" />
 
-	<property name="ZBX_BASE_FLAGS" value="--enable-server --enable-agent --enable-proxy --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-libevent  --with-ldap  --with-libcurl --with-stacksize=128"/>
+	<!-- Thread stack size is set separately, so builds whose CONFIG_SITE profile sets it can use the flags without it -->
+	<property name="ZBX_BASE_FLAGS_NO_STACKSIZE" value="--enable-server --enable-agent --enable-proxy --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-libevent  --with-ldap  --with-libcurl"/>
+	<property name="ZBX_BASE_FLAGS" value="${ZBX_BASE_FLAGS_NO_STACKSIZE} --with-stacksize=128"/>
 
 	<!-- Initialize database related options based on the database type -->
 	<switch value="${DBTYPE}" caseinsensitive="true">
@@ -215,7 +217,7 @@
 		<property name="cmocka-2-agent-only" value="CONFIG_SITE='share/config.site.d/gcc-debug' -q --enable-agent --with-stacksize=128"/>
 		<property name="cmocka-3-server-only" value="CONFIG_SITE='share/config.site.d/gcc-debug' -q --enable-server --with-mysql --with-libcurl --with-stacksize=128"/>
 		<property name="cmocka-4-proxy-only" value="CONFIG_SITE='share/config.site.d/gcc-debug' -q --enable-proxy --with-sqlite3 --with-libcurl --with-stacksize=128"/>
-		<property name="cmocka-5-sanitizer" value="CONFIG_SITE='share/config.site.d/clang-debug-sanitize' -q ${ZBX_BASE_FLAGS} --with-openssl --with-openipmi --enable-ipv6 --with-mysql --with-libmodbus --with-iconv --with-zlib --with-stacksize=512"/>
+		<property name="cmocka-5-sanitizer" value="CONFIG_SITE='share/config.site.d/clang-debug-sanitize-memory' -q ${ZBX_BASE_FLAGS_NO_STACKSIZE} --with-openssl --with-openipmi --enable-ipv6 --with-mysql --with-libmodbus --with-iconv --with-zlib"/>
 
 	</target>
 

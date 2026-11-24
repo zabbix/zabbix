@@ -20,14 +20,6 @@
 
 #include "mock_history.h"
 
-zbx_uint64_t	__wrap_zbx_dc_get_nextid(const char *table_name, int num)
-{
-	ZBX_UNUSED(table_name);
-	ZBX_UNUSED(num);
-
-	return 0;
-}
-
 int	__wrap_zbx_interface_availability_is_set(const zbx_interface_availability_t *ha)
 {
 	ZBX_UNUSED(ha);

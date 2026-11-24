@@ -91,15 +91,17 @@ AS_HELP_STRING([--with-cmocka@<:@=DIR@:>@],[use specific cmocka library @<:@defa
 		found_cmocka="no"
 		CMOCKA_TRY_LINK([no])
 
-		CFLAGS="$am_save_cflags"
-		LDFLAGS="$am_save_ldflags"
-		LIBS="$am_save_libs"
-
 		if test "x$found_cmocka" = "xyes"; then
 			AC_MSG_RESULT(yes)
+			dnl cmocka 2.0 replaced cm_print_error() with cmocka_print_error()
+			AC_CHECK_FUNCS([cmocka_print_error])
 		else
 			AC_MSG_RESULT(no)
 		fi # if test "x$found_cmocka" = "xyes"; then
+
+		CFLAGS="$am_save_cflags"
+		LDFLAGS="$am_save_ldflags"
+		LIBS="$am_save_libs"
 	else
 		CMOCKA_CFLAGS=""
 		CMOCKA_LDFLAGS=""

@@ -17,7 +17,6 @@
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxcacheconfig.h"
-#include "zbxcachehistory.h"
 #include "zbxcommon.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
@@ -492,7 +491,7 @@ static void	pb_history_set_row_ids(zbx_list_t *rows, int rows_num)
 	zbx_pb_history_t	*row;
 	zbx_list_iterator_t	li;
 
-	id = zbx_dc_get_nextid("proxy_history", rows_num);
+	id = zbx_db_get_maxid_num("proxy_history", rows_num);
 	zbx_list_iterator_init(rows, &li);
 
 	while (SUCCEED == zbx_list_iterator_next(&li))

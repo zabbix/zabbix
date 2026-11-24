@@ -238,6 +238,10 @@ $datatable-resizer-border-color: #0066d9;
 $datatable-scrollbar-thumb-bg-color: #004fa8;
 $datatable-sticky-hover-bg-color: #002856;
 $datatable-sticky-selected-bg-color: #002d5e;
+
+// Trace.
+$trace-missing-span-stripe-color: #003065;
+
 // Important! @import string should come after variables
 @import 'screen';
 
@@ -723,7 +727,7 @@ z-select,
 		}
 
 		&:not(.datatable-row-disabled):not(.row-selected) {
-			.datatable-cell.datatable-cell-data {
+			.datatable-cell.datatable-cell-data.datatable-cell-bg-hover {
 				color: $compact-view-color;
 
 				a {
@@ -744,7 +748,7 @@ z-select,
 				}
 			}
 
-			&:not(:hover) .datatable-cell.datatable-cell-data {
+			&:not(:hover) .datatable-cell.datatable-cell-data.datatable-cell-bg-hover {
 				.problem-unack-fg,
 				.problem-ack-fg,
 				.ok-unack-fg,

@@ -19,6 +19,8 @@ require_once __DIR__ . '/../../include/CWebTest.php';
 
 /**
  * @backup users
+ *
+ * @onBefore prepareMediaTypeData
  */
 class testFormUserProfile extends CLegacyWebTest {
 
@@ -32,6 +34,20 @@ class testFormUserProfile extends CLegacyWebTest {
 	}
 
 	protected static $old_password = 'zabbix';
+
+	/**
+	 * Enabled media type for the New media dialog - all default media types are disabled.
+	 */
+	public function prepareMediaTypeData() {
+		CDataHelper::call('mediatype.create', [
+			[
+				'type' => MEDIA_TYPE_WEBHOOK,
+				'name' => 'Webhook for user profile',
+				'status' => MEDIA_TYPE_STATUS_ACTIVE,
+				'script' => 'return 0;'
+			]
+		]);
+	}
 
 	public function testFormUserProfile_SimpleUpdate() {
 		$sqlHashUsers = 'select userid,username,name,surname,passwd,url,autologin,lang,refresh,roleid,theme,attempt_failed,attempt_clock,rows_per_page'

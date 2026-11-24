@@ -216,6 +216,10 @@ class ZNavigationTree extends HTMLElement {
 		const title = document.createElement('div');
 		title.className = 'z-navigation-tree-title';
 
+		if (item.missing) {
+			title.classList.add('missing');
+		}
+
 		if (item.label instanceof HTMLElement) {
 			title.appendChild(item.label);
 		}

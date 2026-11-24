@@ -5,6 +5,11 @@ then
 	CC=clang
 fi
 
+if [ -z "$with_stacksize" ]
+then
+	with_stacksize=512
+fi
+
 if [ -z "$CFLAGS" ]
 then
 	CFLAGS="-std=gnu11"
@@ -43,11 +48,10 @@ then
 	CFLAGS+=" -Werror=vla"
 
 	# flags for clang
-	CFLAGS+=" -Wno-sometimes-uninitialized"
+	CFLAGS+=" -Wno-uninitialized"
 
 	# flags for clang sanitizers
-	CFLAGS+=" -fsanitize=leak,address,undefined"
-	CFLAGS+=" -fsanitize-address-use-after-scope"
+	CFLAGS+=" -fsanitize=thread"
 	CFLAGS+=" -fno-omit-frame-pointer"
 
 	# other
@@ -57,7 +61,6 @@ fi
 
 if [ -z "$LDFLAGS" ]
 then
-	LDFLAGS="-fsanitize=leak,address,undefined"
-	LDFLAGS+=" -fsanitize-address-use-after-scope"
+	LDFLAGS="-fsanitize=thread"
 	LDFLAGS+=" -fno-omit-frame-pointer"
 fi

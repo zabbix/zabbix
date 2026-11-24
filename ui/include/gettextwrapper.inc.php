@@ -39,7 +39,8 @@ if (!function_exists('ngettext')) {
 	 *
 	 * @param string $string1
 	 * @param string $string2
-	 * @param string $n
+	 * @param int    $n          The built-in ngettext() function only checks whether the count equals one.
+	 *                           There is no need to pass values below zero or above PHP_INT_MAX.
 	 *
 	 * @return string
 	 */
@@ -73,14 +74,14 @@ function pgettext($context, $msgId) {
  * @param string $context
  * @param string $msgId
  * @param string $msgIdPlural
- * @param string $num
+ * @param int    $num
  *
  * @return string
  */
 function npgettext($context, $msgId, $msgIdPlural, $num) {
 	$contextString = $context."\004".$msgId;
 	$contextStringp = $context."\004".$msgIdPlural;
-	return ngettext($contextString, $contextStringp, $num);
+	return ngettext($contextString, $contextStringp, max(0, min($num, PHP_INT_MAX)));
 }
 
 /**
@@ -117,7 +118,7 @@ function _s($string) {
 function _n($string1, $string2) {
 	$arguments = array_slice(func_get_args(), 2);
 
-	return _params(ngettext($string1, $string2, end($arguments)), $arguments);
+	return _params(ngettext($string1, $string2, max(0, min(end($arguments), PHP_INT_MAX))), $arguments);
 }
 
 /**
@@ -181,7 +182,7 @@ function _xn($message, $messagePlural, $num, $context) {
 	$arguments = array_slice(func_get_args(), 4);
 	array_unshift($arguments, $num);
 
-	return _params(pgettext($context, ngettext($message, $messagePlural, $num)), $arguments);
+	return _params(pgettext($context, ngettext($message, $messagePlural, max(0, min($num, PHP_INT_MAX)))), $arguments);
 }
 
 /**

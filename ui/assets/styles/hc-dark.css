@@ -21,7 +21,7 @@
 .form-grid .collapsible > label,
 .form-grid .fields-group > label, .dashboard-navigation-tabs .sortable li div span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .datatable.compact-view .datatable-body .datatable-cell.datatable-cell-data .flex-wrapper > .link-action, .datatable.compact-view .datatable-body .datatable-cell.datatable-cell-data .tags-wrapper .tag, .datatable.compact-view .datatable-body .datatable-cell.datatable-cell-data .opdata,
 .datatable.compact-view .datatable-body .datatable-cell.datatable-cell-data .latest-values,
-.datatable.compact-view .datatable-body .datatable-cell.datatable-cell-data .timeline-date, .datatable .datatable-options .datatable-options-list .datatable-options-list-item label .datatable-options-list-item-label, .datatable .datatable-cell.datatable-cell-header .header-name, .datatable .datatable-cell.datatable-cell-header.datatable-cell-header-link .header-link, .datatable .datatable-cell.datatable-cell-header.datatable-cell-header-link .header-link .name, .datatable .datatable-cell.datatable-cell-data .status-container > *:not(.out), .datatable .datatable-cell.datatable-cell-data .status-container .out > *, .list-table .action-container .link-action, .tag, .trace-view .trace-view-container .trace-scroll .trace-tree z-navigation-tree .trace-tree-title-content .title, div.dashboard-widget-hostcard .host-card .sections-header .host-name .link-action, div.dashboard-widget-hostcard .host-card .sections .section .section-name, div.dashboard-widget-hostcard .host-card .sections .section.section-host-groups .host-groups .host-group .host-group-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitoring .monitoring .monitoring-item .monitoring-item-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitored-by .section-body, div.dashboard-widget-hostcard .host-card .sections .section.section-templates .templates .template .template-name, div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-name,
+.datatable.compact-view .datatable-body .datatable-cell.datatable-cell-data .timeline-date, .datatable .datatable-options .datatable-options-list .datatable-options-list-item label .datatable-options-list-item-label, .datatable .datatable-cell.datatable-cell-header .header-name, .datatable .datatable-cell.datatable-cell-header.datatable-cell-header-link .header-link, .datatable .datatable-cell.datatable-cell-header.datatable-cell-header-link .header-link .name, .datatable .datatable-cell.datatable-cell-data .status-container > *:not(.out), .datatable .datatable-cell.datatable-cell-data .status-container .out > *, .list-table .action-container .link-action, .tag, .trace-view .trace-view-alert .msg-warning span, .trace-view .trace-view-container .trace-scroll .trace-tree z-navigation-tree .trace-tree-title-content .title, div.dashboard-widget-hostcard .host-card .sections-header .host-name .link-action, div.dashboard-widget-hostcard .host-card .sections .section .section-name, div.dashboard-widget-hostcard .host-card .sections .section.section-host-groups .host-groups .host-group .host-group-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitoring .monitoring .monitoring-item .monitoring-item-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitored-by .section-body, div.dashboard-widget-hostcard .host-card .sections .section.section-templates .templates .template .template-name, div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-name,
 div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-value, div.dashboard-widget-itemcard .item-card .sections-header .section-item .item-name .link-action, div.dashboard-widget-itemcard .item-card .sections-header .section-path, div.dashboard-widget-itemcard .item-card .sections-header .section-path .path-element, div.dashboard-widget-itemcard .item-card .sections .section .section-name, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .center-column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-interval-and-storage .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-header, div.dashboard-widget-itemcard .item-card .sections .section.section-latest-data .right-column .column-value, div.dashboard-widget-itemcard .item-card .sections .section.section-triggers .triggers .trigger .trigger-name, div.dashboard-widget-itemcard .item-card .sections .section.section-single-parameter .section-body, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-scatterplot .dataset-head .head-row > label, form.dashboard-widget-scatterplot .dataset-body .form-grid > label, form.dashboard-widget-tophosts #list_columns .text, form.dashboard-widget-topitems #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .multilineinput-control .multilineinput-preview, .notif-body h4, .overlay-descr-url, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a, .preprocessing-list .preprocessing-list-head .step-on-fail, .totals-list.totals-list-horizontal .count,
 .totals-list.totals-list-horizontal .name, .rules-status-container .status-green,
 .rules-status-container .status-grey {
@@ -3051,6 +3051,8 @@ button {
   color: #000000 !important;
   font-size: 12px;
   font-weight: 700; }
+#datatable-traces .missing-span {
+  font-style: italic; }
 #datatable-traces .duration {
   position: relative;
   display: flex;
@@ -5866,6 +5868,7 @@ section {
         font-size: 10px; }
   .trace-view .trace-id {
     font-weight: 700; }
+  .trace-view .trace-view-alert,
   .trace-view .trace-timeline {
     border-block-end: 1px solid var(--trace-border-color); }
   .trace-view .trace-overview {
@@ -6008,9 +6011,17 @@ section {
     inset-inline-start: var(--trace-span-start);
     inline-size: max(2px, var(--trace-span-width));
     block-size: var(--trace-bar-block-size);
+    border: 1px solid var(--trace-span-color);
     border-radius: 2px;
     background: var(--trace-span-color);
     transform: translateY(-50%); }
+    .trace-view .trace-span-bar.missing {
+      --missing-span-bg-color: #000000;
+      --missing-span-border-color: #666666;
+      --missing-span-stripe-color: #333333;
+      background-color: var(--missing-span-bg-color);
+      background-image: repeating-linear-gradient(45deg, var(--missing-span-stripe-color), var(--missing-span-stripe-color) 9px, transparent 0px, transparent 18px);
+      border: 1px dashed var(--missing-span-border-color); }
   .trace-view .trace-span-label {
     position: absolute;
     inset-block-start: calc(100% + 4px);
@@ -6046,6 +6057,8 @@ section {
       text-align: center;
       content: attr(data-count);
       transform: rotate(-45deg); }
+  .trace-view.missing-span {
+    grid-template-rows: auto auto auto minmax(0, 1fr); }
 
 .trace-tooltip {
   min-inline-size: 242px;
@@ -6298,6 +6311,9 @@ z-navigation-tree {
     text-overflow: ellipsis; }
   z-navigation-tree .z-navigation-tree-title {
     font-weight: 600; }
+    z-navigation-tree .z-navigation-tree-title.missing {
+      font-style: italic;
+      font-weight: 400; }
   z-navigation-tree .z-navigation-tree-subtitle {
     margin-block-start: 2px;
     color: var(--navigation-tree-muted-color); }

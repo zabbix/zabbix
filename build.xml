@@ -9,6 +9,15 @@
 	</condition>
 	<property name="with.encryption" value="--with-openssl"/>
 
+	<!-- Initialize sanitizer build profile based on the SANITIZER variable: none (default), memory, or thread -->
+	<condition property="config.site" value="share/config.site.d/clang-debug-sanitize-memory">
+		<equals arg1="${SANITIZER}" arg2="memory"/>
+	</condition>
+	<condition property="config.site" value="share/config.site.d/clang-debug-sanitize-thread">
+		<equals arg1="${SANITIZER}" arg2="thread"/>
+	</condition>
+	<property name="config.site" value="share/config.site.d/clang-debug"/>
+
 	<target name="init-common">
 		<condition property="phpunit_filter" value=" --filter='${PHPUNIT_FILTER}'" else="">
 			<and>
@@ -226,7 +235,7 @@
 
 		<!-- Binaries for integration tests -->
 		<exec executable="./configure" failonerror="on">
-			<arg line="CONFIG_SITE='share/config.site.d/clang-debug-sanitize'"/>
+			<arg line="CONFIG_SITE='${config.site}'"/>
 			<arg line="--quiet"/>
 			<arg line="--enable-server"/>
 			<arg line="--enable-proxy"/>
@@ -234,7 +243,6 @@
 			<arg line="--with-postgresql"/>
 			<arg line="--prefix=${basedir}"/>
 			<arg line="--with-libcurl"/>
-			<arg line="--with-stacksize=512"/>
 			<arg line="--with-ares"/>
 			<arg line="${with.encryption}"/>
 			<arg line="--with-ares"/>
@@ -807,7 +815,7 @@
 
 		<!-- Binaries for integration tests -->
 		<exec executable="./configure" failonerror="on">
-			<arg line="CONFIG_SITE='share/config.site.d/clang-debug-sanitize'"/>
+			<arg line="CONFIG_SITE='${config.site}'"/>
 			<arg line="--quiet"/>
 			<arg line="--enable-server"/>
 			<arg line="--enable-proxy"/>
@@ -815,7 +823,6 @@
 			<arg line="--with-mysql"/>
 			<arg line="--prefix=${basedir}"/>
 			<arg line="--with-libcurl"/>
-			<arg line="--with-stacksize=512"/>
 			<arg line="--with-ares"/>
 			<arg line="${with.encryption}"/>
 			<arg line="--with-net-snmp"/>
