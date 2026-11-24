@@ -1045,7 +1045,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 						"\nUser macros";
 
 					$form->getLabel('Text')->query('xpath:./button[@data-hintbox]')->one()->click();
-					$hint = $this->query('xpath://div[@data-hintboxid]')->waitUntilVisible();
+					$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->waitUntilVisible();
 					$this->assertEquals($hint_text, $hint->one()->getText());
 					$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 					$hint->waitUntilNotPresent();
@@ -1096,8 +1096,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 		}
 
 		// Thresholds warning message.
-		$form->getLabel('Thresholds')->query('xpath:./button[@data-hintbox-html]')->one()->click();
-		$warning = $this->query('xpath://div[@data-hintboxid]')->waitUntilVisible();
+		$form->getLabel('Thresholds')->query('xpath:./button[@data-hintbox-html]')->one()->hoverMouse()->click();
+		$warning = $this->query('xpath://div[contains(@class, "hintbox-static")]')->waitUntilVisible();
 		$this->assertEquals('This setting applies only to numeric data.', $warning->one()->getText());
 		$warning->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 		$warning->waitUntilNotPresent();
