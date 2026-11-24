@@ -16,6 +16,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 // create form
@@ -40,7 +41,7 @@ $host_tab->addRow(
 			->addValue(_('Link'), ZBX_ACTION_ADD)
 			->addValue(_('Replace'), ZBX_ACTION_REPLACE)
 			->addValue(_('Unlink'), ZBX_ACTION_REMOVE)
-			->setModern(true)
+			->setModern()
 			->addStyle('margin-bottom: 5px;'),
 		(new CMultiSelect([
 			'name' => 'templates[]',
@@ -70,7 +71,7 @@ $host_tab->addRow(
 			->addValue(_('Add'), ZBX_ACTION_ADD)
 			->addValue(_('Replace'), ZBX_ACTION_REPLACE)
 			->addValue(_('Remove'), ZBX_ACTION_REMOVE)
-			->setModern(true)
+			->setModern()
 			->addStyle('margin-bottom: 5px;'),
 		(new CMultiSelect([
 			'name' => 'groups[]',
@@ -200,7 +201,7 @@ $inventory_tab->addRow(
 		->addValue(_('Disabled'), HOST_INVENTORY_DISABLED)
 		->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
 		->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
-		->setModern(true)
+		->setModern()
 );
 
 $tags_tab = new CFormList('tagsFormList');
@@ -213,7 +214,7 @@ $tags_tab->addRow(
 			->addValue(_('Add'), ZBX_ACTION_ADD)
 			->addValue(_('Replace'), ZBX_ACTION_REPLACE)
 			->addValue(_('Remove'), ZBX_ACTION_REMOVE)
-			->setModern(true)
+			->setModern()
 			->addStyle('margin-bottom: 10px;'),
 		renderTagTable([['tag' => '', 'value' => '']])
 			->setHeader([_('Name'), _('Value'), ''])
@@ -248,7 +249,7 @@ $encryption_table = (new CFormList('encryption-field'))
 			->addValue(_('No encryption'), HOST_ENCRYPTION_NONE)
 			->addValue(_('PSK'), HOST_ENCRYPTION_PSK)
 			->addValue(_('Certificate'), HOST_ENCRYPTION_CERTIFICATE)
-			->setModern(true)
+			->setModern()
 			->setEnabled(true)
 	)
 	->addRow(_('Connections from host'),
