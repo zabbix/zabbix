@@ -18,9 +18,9 @@ require_once dirname(__FILE__).'/../../include/forms.inc.php';
 
 class CControllerItemMassupdate extends CController {
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
-			'context' => 'required|string|in host,template',
+			'context' => 'required|string|in '.implode(',', ['host', 'template']),
 			'ids' => 'required|array_id',
 			'prototype' => 'required|in 0,1',
 			'update' => 'in 1',
@@ -93,35 +93,49 @@ class CControllerItemMassupdate extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
-		$has_access = match ($this->getInput('context')) {
-			'host' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
-			'template' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-		};
+	protected function checkPermissions(): bool {
+		$ids = array_keys(array_flip($this->getInput('ids')));
 
-		if (!$has_access) {
+		if (!$ids) {
 			return false;
 		}
 
-		if ($this->getInput('prototype') == 1) {
-			$count = API::ItemPrototype()->get([
-				'countOutput' => true,
-				'itemids' => $this->getInput('ids'),
-				'editable' => true
-			]);
-		}
-		else {
-			$count = API::Item()->get([
-				'countOutput' => true,
-				'itemids' => $this->getInput('ids'),
-				'editable' => true
-			]);
+		$entity = $this->getInput('prototype') == 1
+			? API::ItemPrototype()
+			: API::Item();
+
+		$items = $entity->get([
+			'output' => [],
+			'selectHosts' => ['status'],
+			'itemids' => $ids,
+			'editable' => true
+		]);
+
+		if (count($items) != count($ids)) {
+			return false;
 		}
 
-		return $count != 0;
+		$has_template_access = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+		$has_host_access = $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
+
+		foreach ($items as $item) {
+			if (!array_key_exists('hosts', $item) || !$item['hosts']) {
+				return false;
+			}
+
+			foreach ($item['hosts'] as $host) {
+				$is_template = $host['status'] == HOST_STATUS_TEMPLATE;
+
+				if (($is_template && !$has_template_access) || (!$is_template && !$has_host_access)) {
+					return false;
+				}
+			}
+		}
+
+		return $has_template_access || $has_host_access;
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$this->setResponse($this->hasInput('update') ? $this->update() : $this->form());
 	}
 
@@ -132,7 +146,7 @@ class CControllerItemMassupdate extends CController {
 	 */
 	protected function update(): CControllerResponse {
 		$items_count = count($this->getInput('ids'));
-		$item_prototypes = (bool) $this->getInput('prototype', false);
+		$item_prototypes = $this->getInput('prototype') == 1;
 
 		try {
 			$input = [
@@ -185,6 +199,7 @@ class CControllerItemMassupdate extends CController {
 			$this->getInputs($input, array_keys($input));
 
 			$options = [];
+			$tag_values = [];
 
 			if (array_key_exists('tags', $input)) {
 				$input['tags'] = prepareItemTags($input['tags']);
@@ -198,8 +213,6 @@ class CControllerItemMassupdate extends CController {
 					error($error);
 					throw new Exception();
 				}
-
-				$tag_values = [];
 
 				foreach ($input['tags'] as $tag) {
 					$tag_values[$tag['tag']][] = $tag['value'];
@@ -274,10 +287,10 @@ class CControllerItemMassupdate extends CController {
 
 			if ($items) {
 				if ($item_prototypes) {
-					$response = API::ItemPrototype()->update($items);
+					$response = (bool) API::ItemPrototype()->update($items);
 				}
 				else {
-					$response = API::Item()->update($items);
+					$response = (bool) API::Item()->update($items);
 				}
 
 				if ($response === false) {
@@ -285,8 +298,9 @@ class CControllerItemMassupdate extends CController {
 				}
 			}
 		}
-		catch (Exception $e) {
+		catch (Exception) {
 			$result = false;
+
 			CMessageHelper::setErrorTitle(
 				$item_prototypes
 					? _n('Cannot update item prototype', 'Cannot update item prototypes', $items_count)
@@ -321,7 +335,7 @@ class CControllerItemMassupdate extends CController {
 	 * @param array $db_item
 	 * @param array $tag_values
 	 *
-	 * @return array
+	 * @return array|null
 	 */
 	private function getTagsToUpdate(array $db_item, array $tag_values): ?array {
 		$tags = [];
@@ -396,7 +410,7 @@ class CControllerItemMassupdate extends CController {
 					->setArgument('context', $this->getInput('context'))
 					->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 					->getUrl(),
-				'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM_PROTOTYPE,
+				'preprocessing_test_type' => CControllerPopupItemTest::ZBX_TEST_TYPE_ITEM_PROTOTYPE,
 				'preprocessing_types' => CItemPrototype::SUPPORTED_PREPROCESSING_TYPES
 			];
 		}
@@ -406,7 +420,7 @@ class CControllerItemMassupdate extends CController {
 					->setArgument('action', 'item.list')
 					->setArgument('context', $this->getInput('context'))
 					->getUrl(),
-				'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM,
+				'preprocessing_test_type' => CControllerPopupItemTest::ZBX_TEST_TYPE_ITEM,
 				'preprocessing_types' => CItem::SUPPORTED_PREPROCESSING_TYPES
 			];
 		}
