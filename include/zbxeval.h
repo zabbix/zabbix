@@ -17,7 +17,7 @@
 
 #include "zbxtime.h"
 #include "zbxvariant.h"
-#include "zbxexpr.h"
+#include "zbxstr.h"
 #include "zbxregexp.h"
 
 /*

@@ -231,6 +231,10 @@ $arrow-fill-up: #000000;
 $arrow-fill-down: #000000;
 $arrow-fill-up-down: #000000;
 
+// Trace.
+$trace-datatable-duration-bar-bg-color: #d9d9d9;
+$trace-missing-span-border-color: #000000;
+
 // Important! @import string should come after variables
 @import 'screen';
 @import "base/icons-severity";
@@ -747,6 +751,17 @@ textarea.has-error {
 		border-color: rgba($ui-bg-color, .2);
 		background-color: $ui-bg-selected-color;
 		color: $ui-bg-color;
+	}
+}
+
+.status-container {
+	.status-amp-severity-trace,
+	.status-amp-severity-debug,
+	.status-amp-severity-info,
+	.status-amp-severity-warn,
+	.status-amp-severity-error,
+	.status-amp-severity-fatal {
+		color: $font-color;
 	}
 }
 

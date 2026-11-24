@@ -117,6 +117,7 @@ class CSvgGraph extends CSvg {
 	private $left_y_power;
 	private $left_y_empty = true;
 	private $left_y_zero;
+	private $left_y_unsigned;
 
 	private $show_right_y_axis;
 	private $right_y_scale;
@@ -141,6 +142,7 @@ class CSvgGraph extends CSvg {
 	private $right_y_power;
 	private $right_y_empty = true;
 	private $right_y_zero;
+	private $right_y_unsigned;
 
 	private $show_x_axis;
 
@@ -206,6 +208,7 @@ class CSvgGraph extends CSvg {
 		$this->left_y_units = $options['axes']['left_y_units'] !== null
 			? trim(preg_replace('/\s+/', ' ', $options['axes']['left_y_units']))
 			: null;
+		$this->left_y_unsigned = $options['axes']['left_y_unsigned'];
 
 		$this->show_right_y_axis = $options['axes']['show_right_y_axis'];
 		$this->right_y_scale = $options['axes']['right_y_scale'];
@@ -214,6 +217,7 @@ class CSvgGraph extends CSvg {
 		$this->right_y_units = $options['axes']['right_y_units'] !== null
 			? trim(preg_replace('/\s+/', ' ', $options['axes']['right_y_units']))
 			: null;
+		$this->right_y_unsigned = $options['axes']['right_y_unsigned'];
 
 		$this->show_x_axis = $options['axes']['show_x_axis'];
 
@@ -1765,6 +1769,7 @@ class CSvgGraph extends CSvg {
 			if ($side == GRAPH_YAXIS_SIDE_LEFT) {
 				$percent = $this->percentile_left_value;
 				$units = $this->left_y_units;
+				$unsigned = $this->left_y_unsigned;
 				$color = $this->graph_theme['leftpercentilecolor'];
 				$scale = $this->left_y_scale;
 
@@ -1783,6 +1788,7 @@ class CSvgGraph extends CSvg {
 			else {
 				$percent = $this->percentile_right_value;
 				$units = $this->right_y_units;
+				$unsigned = $this->right_y_unsigned;
 				$color = $this->graph_theme['rightpercentilecolor'];
 				$scale = $this->right_y_scale;
 
@@ -1804,7 +1810,7 @@ class CSvgGraph extends CSvg {
 
 				$value = $points[((int) ceil($percent / 100 * count($points))) - 1];
 				$label = convertUnits([
-					'value' => $value,
+					'value' => $unsigned ? abs($value) : $value,
 					'units' => $units
 				]);
 
@@ -1978,18 +1984,20 @@ class CSvgGraph extends CSvg {
 		$lower_power_shift = 0;
 		$upper_power_shift = 0;
 		$scale = SVG_GRAPH_AXIS_SCALE_LINEAR;
+		$unsigned = false;
 
 		if (!$empty_set) {
 			if ($side === GRAPH_YAXIS_SIDE_LEFT) {
 				$scale = $this->left_y_scale;
 				$min = $this->left_y_min;
 				$max = $this->left_y_max;
-				$min_calculated = $this->left_y_min_calculated;
-				$max_calculated = $this->left_y_max_calculated;
 				$interval = $this->left_y_interval;
 				$units = $this->left_y_units;
+				$unsigned = $this->left_y_unsigned;
 
 				if ($scale == SVG_GRAPH_AXIS_SCALE_LOGARITHMIC) {
+					$min_calculated = $this->left_y_min_calculated;
+					$max_calculated = $this->left_y_max_calculated;
 					$min_positive_power = $this->left_y_min_positive_power;
 					$max_positive_power = $this->left_y_max_positive_power;
 					$min_negative_power = $this->left_y_min_negative_power;
@@ -2006,12 +2014,13 @@ class CSvgGraph extends CSvg {
 				$scale = $this->right_y_scale;
 				$min = $this->right_y_min;
 				$max = $this->right_y_max;
-				$min_calculated = $this->right_y_min_calculated;
-				$max_calculated = $this->right_y_max_calculated;
 				$interval = $this->right_y_interval;
 				$units = $this->right_y_units;
+				$unsigned = $this->right_y_unsigned;
 
 				if ($scale == SVG_GRAPH_AXIS_SCALE_LOGARITHMIC) {
+					$min_calculated = $this->right_y_min_calculated;
+					$max_calculated = $this->right_y_max_calculated;
 					$min_positive_power = $this->right_y_min_positive_power;
 					$max_positive_power = $this->right_y_max_positive_power;
 					$min_negative_power = $this->right_y_min_negative_power;
@@ -2029,13 +2038,11 @@ class CSvgGraph extends CSvg {
 		if ($scale == SVG_GRAPH_AXIS_SCALE_LOGARITHMIC) {
 			$relative_values = calculateLogarithmicGraphScaleValues($min_negative_power, $max_negative_power,
 				$min_positive_power, $max_positive_power, $has_zero, $min_calculated, $max_calculated, $interval,
-				$units, 14, $lower_power_shift, $upper_power_shift
+				$units, 14, $lower_power_shift, $upper_power_shift, $unsigned
 			);
 		}
 		else {
-			$relative_values = calculateGraphScaleValues($min, $max, $min_calculated, $max_calculated, $interval,
-				$units, $power, 14
-			);
+			$relative_values = calculateGraphScaleValues($min, $max, $interval, $units, $power, 14, $unsigned);
 		}
 
 		$absolute_values = [];

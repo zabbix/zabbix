@@ -248,16 +248,6 @@ class ZBase {
 				}
 				catch (ConfigFileException $e) {
 					switch ($e->getCode()) {
-						case CConfigFile::CONFIG_VAULT_ERROR:
-							echo (new CView('general.warning', [
-								'header' => _('Vault connection failed.'),
-								'messages' => [$e->getMessage()],
-								'theme' => ZBX_DEFAULT_THEME
-							]))->getOutput();
-
-							session_write_close();
-							exit;
-
 						case CConfigFile::CONFIG_ERROR:
 							echo (new CView('general.warning', [
 								'header' => 'Configuration file error',
@@ -265,7 +255,6 @@ class ZBase {
 								'theme' => ZBX_DEFAULT_THEME
 							]))->getOutput();
 
-							session_write_close();
 							exit;
 
 						default:
@@ -744,6 +733,7 @@ class ZBase {
 					'action' => $router->getAction()
 				],
 				'main_block' => '',
+				'side_block' => null,
 				'javascript' => [
 					'files' => []
 				],
@@ -768,6 +758,7 @@ class ZBase {
 
 				$layout_data = array_replace($layout_data_defaults, [
 					'main_block' => $this->view->getOutput(),
+					'side_block' => $this->view->getSideDrawer(),
 					'javascript' => [
 						'files' => $this->view->getJsFiles()
 					],

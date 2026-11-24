@@ -175,7 +175,7 @@ class testDashboardsWidgetsPage extends CWebTest {
 
 		// Expected table values.
 		$expected = [
-			'Zabbix servers'					=> 18,
+			'Zabbix servers'					=> 17,
 			'Inheritance test'					=> 1,
 			'Host group for suppression'		=> 1
 		];

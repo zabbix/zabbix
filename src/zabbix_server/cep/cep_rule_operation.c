@@ -975,7 +975,8 @@ static int	cep_operation_execute_close_event(zbx_uint64_t ruleid, zbx_cep_event_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: execute a valid operation on a matching event                     *
+ * Purpose: execute operation on event within operation scope and             *
+ *          matching operation scope filter                                   *
  *                                                                            *
  * Parameters: op           - [IN] operation to execute                       *
  *             execute_when - [IN] execution phase                            *
@@ -988,10 +989,9 @@ static int	cep_operation_execute_close_event(zbx_uint64_t ruleid, zbx_cep_event_
  *             event        - [IN/OUT] resolved mutable event, resolved and   *
  *                            reused across calls as operations execute       *
  *                                                                            *
- * Return value: SUCCEED - the operation was executed, or does not apply at   *
- *                         execute_when                                       *
- *               FAIL - the operation did not match ctx, or its execution     *
- *                      failed                                                *
+ * Return value: SUCCEED - the operation was executed                         *
+ *               FAIL - the event is outside operation scope, did not         *
+ *                      match scope filter, or execution failed               *
  *                                                                            *
  ******************************************************************************/
 static int	cep_operation_event_execute(const zbx_cep_operation_t *op, int execute_when, zbx_uint64_t ruleid,
@@ -1002,8 +1002,24 @@ static int	cep_operation_event_execute(const zbx_cep_operation_t *op, int execut
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() operationid:" ZBX_FS_UI64 " type:%d", __func__, op->operationid, op->type);
 
-	if (SUCCEED != cep_operation_match_event(op, ctx))
-		goto out;
+	switch (op->scope)
+	{
+		case ZBX_CEP_SCOPE_CURRENT:
+			if (0 == (ctx->pos & CEP_POS_CURRENT))
+				goto out;
+			break;
+		case ZBX_CEP_SCOPE_OTHERS:
+			if (0 != (ctx->pos & CEP_POS_CURRENT))
+				goto out;
+			ZBX_FALLTHROUGH;
+		case ZBX_CEP_SCOPE_ALL:
+			if (SUCCEED != cep_op_filter_match_event(&op->scope_filter, ctx))
+				goto out;
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN_MSG("unknown \"scope\":%d found in cep operation", op->scope);
+			goto out;
+	}
 
 	switch (op->type)
 	{
@@ -1091,49 +1107,52 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: execute a rule's operations that apply at a given execution       *
- *          phase against an event context                                    *
+ * Purpose: execute rule operations of execution phase against an event       *
+ *          context                                                           *
  *                                                                            *
- * Parameters: rule         - [IN] rule whose operations are executed         *
+ * Parameters: ruleid       - [IN] identifier of the rule owning the          *
+ *                                 operations                                 *
  *             execute_when - [IN] execution phase                            *
+ *             ops          - [IN] operations to execute                      *
  *             ctx          - [IN/OUT] event context                          *
  *             event        - [IN/OUT] resolved mutable event, resolved and   *
  *                            reused across operations                        *
- *             ack          - [IN/OUT] acknowledge data                       *
+ *             ack          - [IN/OUT] acknowledge data, can be NULL          *
  *             tasks        - [OUT] vector to append tasks created by         *
  *                            operations to                                   *
  *                                                                            *
  * Return value: bitmask of the types of operations successfully executed     *
  *                                                                            *
+ * Comments: Without acknowledge data an acknowledge task is created for the  *
+ *           event if any operation sets it.                                  *
+ *                                                                            *
  ******************************************************************************/
-zbx_uint64_t	cep_rule_event_execute_ops(const zbx_cep_rule_t *rule, int execute_when, zbx_cep_event_context_t *ctx,
+zbx_uint64_t	cep_rule_event_execute_ops(zbx_uint64_t ruleid, int execute_when,
+		const zbx_vector_const_cep_operation_ptr_t *ops, zbx_cep_event_context_t *ctx,
 		zbx_cep_event_t **event, zbx_cep_acknowledge_t *ack, zbx_vector_mw_task_ptr_t *tasks)
 {
 	zbx_cep_acknowledge_t	ack_local = {0};
 	zbx_uint64_t		opmask = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64 " operations:%d when:%d", __func__, rule->ruleid,
-			rule->operations.values_num, execute_when);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64 " operations:%d when:%d", __func__, ruleid,
+			ops->values_num, execute_when);
 
 	if (NULL == ack)
 		ack = &ack_local;
 
-	for (int i = 0; i < rule->operations.values_num; i++)
+	for (int i = 0; i < ops->values_num; i++)
 	{
-		if (rule->operations.values[i].execute_when == execute_when)
+		if (SUCCEED == cep_operation_event_execute(ops->values[i], execute_when, ruleid, ctx, ack, tasks,
+				event))
 		{
-			if (SUCCEED == cep_operation_event_execute(&rule->operations.values[i], execute_when,
-					rule->ruleid, ctx, ack, tasks, event))
-			{
-				opmask |= CEP_FLAG(rule->operations.values[i].type);
-			}
+			opmask |= CEP_FLAG(ops->values[i]->type);
 		}
 	}
 
 	if (ack == &ack_local && SUCCEED == cep_acknowledge_is_set(ack))
 	{
 		/* acknowledge data is moved to the created task */
-		zbx_mw_task_t	*t = cep_create_task_acknowledge(ack, rule->ruleid, cep_event_context_eventid(ctx));
+		zbx_mw_task_t	*t = cep_create_task_acknowledge(ack, ruleid, cep_event_context_eventid(ctx));
 
 		zbx_vector_mw_task_ptr_append(tasks, t);
 	}
@@ -1145,13 +1164,15 @@ zbx_uint64_t	cep_rule_event_execute_ops(const zbx_cep_rule_t *rule, int execute_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: execute a rule's operations against an event context, syncing     *
- *          the event if it was modified                                      *
+ * Purpose: execute rule operations against an event context, syncing the     *
+ *          event if it was modified                                          *
  *                                                                            *
- * Parameters: rule         - [IN] rule whose operations are executed         *
- *             ctx          - [IN/OUT] event context                          *
+ * Parameters: ruleid       - [IN] identifier of the rule owning the          *
+ *                                 operations                                 *
  *             execute_when - [IN] execution phase                            *
- *             ack    - [IN/OUT] acknowledge data                             *
+ *             ops          - [IN] operations to execute                      *
+ *             ctx          - [IN/OUT] event context                          *
+ *             ack          - [IN/OUT] acknowledge data, can be NULL          *
  *             tasks        - [OUT] vector to append tasks created by the     *
  *                            operations to                                   *
  *                                                                            *
@@ -1161,15 +1182,16 @@ zbx_uint64_t	cep_rule_event_execute_ops(const zbx_cep_rule_t *rule, int execute_
  *           updated to reference it and a sync task is created.              *
  *                                                                            *
  ******************************************************************************/
-zbx_uint64_t	cep_rule_event_context_execute_ops(const zbx_cep_rule_t *rule, zbx_cep_event_context_t *ctx,
-		int execute_when, zbx_cep_acknowledge_t *ack, zbx_vector_mw_task_ptr_t *tasks)
+zbx_uint64_t	cep_rule_event_context_execute_ops(zbx_uint64_t ruleid, int execute_when,
+		const zbx_vector_const_cep_operation_ptr_t *ops, zbx_cep_event_context_t *ctx,
+		zbx_cep_acknowledge_t *ack, zbx_vector_mw_task_ptr_t *tasks)
 {
 	zbx_cep_event_t	*event = NULL;
 	zbx_uint64_t	opmask = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, rule->ruleid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ruleid:" ZBX_FS_UI64, __func__, ruleid);
 
-	opmask = cep_rule_event_execute_ops(rule, execute_when, ctx, &event, ack, tasks);
+	opmask = cep_rule_event_execute_ops(ruleid, execute_when, ops, ctx, &event, ack, tasks);
 
 	if (NULL != event)
 	{

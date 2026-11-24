@@ -435,6 +435,10 @@ class CSettings extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		if (array_key_exists('url', $apm_global_db)) {
+			$apm_global_db['url'] = CUrlHelper::sanitize($apm_global_db['url']);
+		}
+
 		$apm_global_db += array_intersect_key($db_apm_global_db, array_flip(['url', 'authentication_type']));
 
 		$username_api_required = 0;

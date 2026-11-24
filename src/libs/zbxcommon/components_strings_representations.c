@@ -134,6 +134,10 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "event processor";
 		case ZBX_PROCESS_TYPE_TELEMETRY_QUERY_POLLER:
 			return "telemetry query poller";
+		case ZBX_PROCESS_TYPE_APM_MANAGER:
+			return "apm manager";
+		case ZBX_PROCESS_TYPE_APM_WORKER:
+			return "apm worker";
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;

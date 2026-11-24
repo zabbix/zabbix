@@ -122,7 +122,7 @@ $ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] = '';
 // 'vault_path' - Vault path if vault is used for credentials, cannot be set with username or password. Can be empty.
 // Additional parameters for ClickHouse url with 'https' scheme:
 // 'ssl_verify_peer' - Verify peer. Default: false.
-// 'ssl_verity_host' - Verify host. Only supported if 'ssl_verify_peer' is set to true. Default: false.
+// 'ssl_verify_host' - Verify host. Only supported if 'ssl_verify_peer' is set to true. Default: false.
 // 'ssl_cert_file' - Client certificate file path. Can be empty.
 // 'ssl_key_file' - Client private key file path. Can be empty.
 // 'ssl_key_password' - Client private key password. Can be empty.
@@ -136,3 +136,6 @@ $ZBX_SERVER_TLS['CERTIFICATE_SUBJECT'] = '';
 //	'username' => 'zabbix',
 //	'password' => 'zabbix'
 //];
+// Uncomment to set the desired default values for all global APM data source configuration providers.
+//$APM_CA_LOCATION = '';
+//$APM_CA_FILE = '';

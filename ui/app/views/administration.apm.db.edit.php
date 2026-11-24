@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Copyright (C) 2001-2026 Zabbix SIA
 **
@@ -123,9 +123,9 @@ $apm_tab = (new CFormGrid())
 $apm_view = (new CTabView())
 	->addTab('apm', _('APM'), $apm_tab)
 	->setFooter(makeFormFooter(
-		(new CSubmit('', _('Update')))->addClass('js-submit'),
+		(new CSubmit('update', _('Update')))->addClass('js-submit'),
 		[
-			(new CButton('', _('Test')))
+			(new CButton('test', _('Test')))
 				->setAttribute('hidden', '')
 				->setEnabled(false)
 				->addClass(ZBX_STYLE_BTN_ALT)

@@ -14,6 +14,7 @@
 
 #include "cep.h"
 #include "cep_event.h"
+#include "cep_window.h"
 #include "zbx_cep.h"
 #include "zbx_cep_client.h"
 
@@ -57,6 +58,8 @@ ZBX_VECTOR_LITE_IMPL(lite_uint64, zbx_uint64_t)
 ZBX_VECTOR_IMPL(cep_event, zbx_cep_event_t)
 ZBX_PTR_VECTOR_IMPL(cep_event_ptr, zbx_cep_event_t *)
 
+ZBX_VECTOR_LITE_IMPL(cep_win_event, zbx_cep_win_event_t)
+
 /* When CEP is notified about deleted events it might not be able to remove them from cache */
 /* if their handles are held by other entities. In this case mark them as deleted in cache  */
 /* and pretend those events are not cached when requested.                                  */
@@ -74,10 +77,12 @@ zbx_cep_event_state_t;
 /* event handle implementation */
 struct zbx_cep_event_ptr
 {
-	zbx_uint64_t		eventid;
-	zbx_cep_event_t		*event;
-	zbx_atomic_uint32_t	refcount;
-	zbx_atomic_uint32_t	state;
+	zbx_uint64_t			eventid;
+	zbx_cep_event_t			*event;
+	zbx_atomic_uint32_t		refcount;
+	zbx_atomic_uint32_t		state;
+
+	zbx_vector_cep_window_ptr_t	windows;
 };
 
 ZBX_VECTOR_IMPL(cep_event_handle, zbx_cep_event_handle_t)
@@ -170,6 +175,7 @@ zbx_cep_event_t	*cep_event_handle_remove(zbx_cep_t *cep, zbx_cep_event_handle_t 
 {
 	zbx_cep_event_t	*event = h->event;
 
+	zbx_vector_cep_window_ptr_destroy(&h->windows);
 	zbx_hashset_remove_direct(&cep->events, h);
 
 	return event;
@@ -195,6 +201,8 @@ static zbx_cep_event_handle_t	cep_create_event_handle(zbx_cep_t *cep, zbx_cep_ev
 			.state = state,
 			.refcount = 1
 		};
+
+	zbx_vector_cep_window_ptr_create(&handle_local.windows);
 
 	return (zbx_cep_event_handle_t)zbx_hashset_insert(&cep->events, &handle_local, sizeof(handle_local));
 }
@@ -284,6 +292,7 @@ void	cep_destroy(void *a)
 	zbx_hashset_iter_reset(&cep->events, &iter);
 	while (NULL !=  (h = (zbx_cep_event_handle_t)zbx_hashset_iter_next(&iter)))
 	{
+		zbx_vector_cep_window_ptr_destroy(&h->windows);
 		zbx_cep_event_release(h->event);
 	}
 	zbx_hashset_destroy(&cep->events);
@@ -345,7 +354,7 @@ static zbx_cep_event_handle_t	cep_event_handle_acquire(zbx_cep_event_handle_t h)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: acquire (with incremented refcoutn) event handle by event ID      *
+ * Purpose: acquire (with incremented refcount) event handle by event ID      *
  *                                                                            *
  * Parameters: cep     - [IN] cep cache                                       *
  *             eventid - [IN] event ID                                        *
@@ -361,6 +370,25 @@ zbx_cep_event_handle_t	cep_acquire_event_handle_by_eventid(zbx_cep_t *cep, zbx_u
 		return NULL;
 
 	return cep_event_handle_acquire(h);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if event is in cache                                        *
+ *                                                                            *
+ * Parameters: cep     - [IN] cep cache                                       *
+ *             eventid - [IN] event ID                                        *
+ *                                                                            *
+ * Return value: SUCCEED - event is in cache                                  *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	cep_is_event_cached(zbx_cep_t *cep, zbx_uint64_t eventid)
+{
+	if (NULL == zbx_hashset_search(&cep->events, &eventid))
+		return FAIL;
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -463,6 +491,62 @@ void	cep_origin_pending_event_done(zbx_cep_t *cep, zbx_cep_origin_t *origin)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: load event tags from database into cached events                  *
+ *                                                                            *
+ * Parameters: cep        - [IN/OUT] cep cache                                *
+ *             db         - [IN]     database connection                      *
+ *             table_name - [IN]     tag table (problem_tag or event_tag)     *
+ *             eventids   - [IN]     IDs of cached events                     *
+ *                                                                            *
+ * Return value: number of loaded tags                                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	cep_load_event_tags(zbx_cep_t *cep, zbx_dbconn_t *db, const char *table_name,
+		const zbx_vector_uint64_t *eventids)
+{
+	zbx_db_large_query_t	query;
+	zbx_cep_event_t		*event = NULL;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_db_row_t		row;
+	int			tags_num = 0;
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select eventid,tag,value from %s where", table_name);
+	zbx_dbconn_large_query_prepare_uint(&query, db, &sql, &sql_alloc, &sql_offset, "eventid", eventids);
+
+	while (NULL != (row = zbx_db_large_query_fetch(&query)))
+	{
+		zbx_tag_t	tag;
+		zbx_uint64_t	eventid;
+
+		ZBX_STR2UINT64(eventid, row[0]);
+
+		if (NULL == event || event->eventid != eventid)
+		{
+			zbx_cep_event_handle_t	h = cep_acquire_event_handle_by_eventid(cep, eventid);
+
+			if (NULL == h)
+				continue;
+
+			event = h->event;
+			cep_release_event_handle(cep, h);
+		}
+
+		tag.tag = zbx_strdup(NULL, row[1]);
+		tag.value = zbx_strdup(NULL, row[2]);
+		zbx_vector_lite_tag_append(&event->tags, tag);
+
+		tags_num++;
+	}
+	zbx_db_large_query_clear(&query);
+
+	zbx_free(sql);
+
+	return tags_num;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: load open problems from database into cache                       *
  *                                                                            *
  * Parameters: cep   - [IN/OUT] cep cache                                     *
@@ -470,22 +554,21 @@ void	cep_origin_pending_event_done(zbx_cep_t *cep, zbx_cep_origin_t *origin)
  *             stats - [OUT] initialization statistics                        *
  *                                                                            *
  ******************************************************************************/
-static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db, zbx_cep_init_stats_t *stats)
+static void	cep_load_open_problems(zbx_cep_t *cep, zbx_dbconn_t *db, zbx_cep_init_stats_t *stats)
 {
-#define CEP_PROBLEM_BATCH	5000
+#define CEP_EVENT_BATCH	5000
 
 	zbx_cep_event_t		*event = NULL;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
-	zbx_vector_uint64_t	eventids;
+	zbx_vector_uint64_t	cached_eventids;
 	zbx_uint64_t		eventid = 0;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset;
-	int			events_num, tags_num = 0;
+	int			events_num;
 	double			events_time, tags_time;
 
-	zbx_vector_uint64_create(&eventids);
-
+	zbx_vector_uint64_create(&cached_eventids);
 	events_time = zbx_time();
 
 	do
@@ -504,7 +587,7 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db, zbx_cep_init_sta
 				" order by p.eventid",
 				eventid, EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL);
 
-		result = zbx_dbconn_select_n(db, sql, CEP_PROBLEM_BATCH);
+		result = zbx_dbconn_select_n(db, sql, CEP_EVENT_BATCH);
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
@@ -532,59 +615,113 @@ static void	cep_load_problems(zbx_cep_t *cep, zbx_dbconn_t *db, zbx_cep_init_sta
 
 			zbx_vector_cep_event_handle_append(&obj->events, h);
 
-			zbx_vector_uint64_append(&eventids, eventid);
+			zbx_vector_uint64_append(&cached_eventids, eventid);
 			events_num++;
 		}
 		zbx_db_free_result(result);
 	}
-	while (CEP_PROBLEM_BATCH == events_num);
+	while (CEP_EVENT_BATCH == events_num);
 
 	tags_time = zbx_time();
 	stats->events_time = tags_time - events_time;
-	stats->events_num = eventids.values_num;
+	stats->events_num = cached_eventids.values_num;
 
-	if (0 != eventids.values_num)
-	{
-		zbx_db_large_query_t	query;
-
-		event = NULL;
-		sql_offset = 0;
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select eventid,tag,value from problem_tag where");
-		zbx_dbconn_large_query_prepare_uint(&query, db, &sql, &sql_alloc, &sql_offset, "eventid", &eventids);
-
-		while (NULL != (row = zbx_db_large_query_fetch(&query)))
-		{
-			zbx_tag_t	tag;
-
-			ZBX_STR2UINT64(eventid, row[0]);
-
-			if (NULL == event || event->eventid != eventid)
-			{
-				zbx_cep_event_handle_t	h = cep_acquire_event_handle_by_eventid(cep, eventid);
-
-				if (NULL == h)
-					continue;
-
-				event = h->event;
-				cep_release_event_handle(cep, h);
-			}
-
-			tag.tag = zbx_strdup(NULL, row[1]);
-			tag.value = zbx_strdup(NULL, row[2]);
-			zbx_vector_lite_tag_append(&event->tags, tag);
-
-			tags_num++;
-		}
-		zbx_db_large_query_clear(&query);
-	}
+	if (0 != cached_eventids.values_num)
+		stats->tags_num = cep_load_event_tags(cep, db, "problem_tag", &cached_eventids);
 
 	stats->tags_time = zbx_time() - tags_time;
-	stats->tags_num = tags_num;
 
 	zbx_free(sql);
-	zbx_vector_uint64_destroy(&eventids);
+	zbx_vector_uint64_destroy(&cached_eventids);
 
-#undef CEP_PROBLEM_BATCH
+#undef CEP_EVENT_BATCH
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: load specified problems from database into cache                  *
+ *                                                                            *
+ * Parameters: cep      - [IN/OUT] cep cache                                  *
+ *             db       - [IN]     database connection                        *
+ *             eventids - [IN]     sorted IDs of events to load               *
+ *             handles  - [OUT]    handles of loaded events, must be released *
+ *                                 by caller                                  *
+ *                                                                            *
+ * Comments: Loaded events are not linked to their objects, so they stay in   *
+ *           cache only while referenced (for example by cep windows).        *
+ *                                                                            *
+ ******************************************************************************/
+void	cep_load_problems_by_eventids(zbx_cep_t *cep, zbx_dbconn_t *db, const zbx_vector_uint64_t *eventids,
+		zbx_vector_cep_event_handle_t *handles)
+{
+	zbx_db_row_t		row;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_uint64_t		eventid = 0;
+	zbx_cep_event_t		*event;
+	zbx_vector_uint64_t	cached_eventids;
+	zbx_db_large_query_t	query;
+
+	zbx_vector_uint64_create(&cached_eventids);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select e.eventid,e.clock,e.severity,e.ns,e.source,e.object,e.objectid,e.name,"
+				"es.cause_eventid,e.flags,er.r_eventid"
+			" from events e"
+			" left join event_symptom es"
+				" on e.eventid=es.eventid"
+			" left join event_recovery er"
+				" on e.eventid=er.eventid"
+			" where");
+
+	zbx_dbconn_large_query_prepare_uint(&query, db, &sql, &sql_alloc, &sql_offset, "e.eventid", eventids);
+	zbx_dbconn_large_query_append_sql(&query, " order by e.eventid");
+
+	while (NULL != (row = zbx_db_large_query_fetch(&query)))
+	{
+		zbx_cep_origin_t	origin;
+		unsigned char		flags;
+		zbx_uint64_t		cause_eventid;
+		int			clock, ns, severity;
+		zbx_cep_event_handle_t	hevent;
+
+		ZBX_STR2UINT64(eventid, row[0]);
+		ZBX_STR2UCHAR(origin.source, row[4]);
+		ZBX_STR2UCHAR(origin.object, row[5]);
+		ZBX_STR2UINT64(origin.objectid, row[6]);
+		ZBX_DBROW2UINT64(cause_eventid, row[8]);
+		ZBX_STR2UCHAR(flags, row[9]);
+		clock = atoi(row[1]);
+		severity = atoi(row[2]);
+		ns = atoi(row[3]);
+
+		event = cep_event_create(eventid, origin.source, origin.object, origin.objectid, row[7],
+				clock, ns, cep_origin_problem(&origin), severity, flags, cause_eventid, NULL, NULL);
+
+		hevent = cep_create_event_handle(cep, event, CEP_EVENT_STATE_COMMITTED);
+		zbx_vector_cep_event_handle_append(handles, hevent);
+
+		if (SUCCEED != zbx_db_is_null(row[10]))
+		{
+			zbx_uint64_t	r_eventid;
+
+			ZBX_STR2UINT64(r_eventid, row[10]);
+
+			/* currently recovery event details are not used for pre-loaded events - use problem */
+			/* timestamp instead of nesting selects to get real recovery event timestamp         */
+			event->r_event = cep_event_create(r_eventid, origin.source, origin.object, origin.objectid,
+					row[7], clock, ns, TRIGGER_VALUE_OK, severity, ZBX_EVENT_NORMAL, 0, NULL, NULL);
+		}
+
+		zbx_vector_uint64_append(&cached_eventids, eventid);
+	}
+	zbx_db_large_query_clear(&query);
+
+	if (0 != cached_eventids.values_num)
+		(void)cep_load_event_tags(cep, db, "event_tag", &cached_eventids);
+
+	zbx_vector_uint64_destroy(&cached_eventids);
+	zbx_free(sql);
 }
 
 /******************************************************************************
@@ -938,7 +1075,7 @@ void	cep_init(zbx_cep_t *cep, zbx_dbconn_pool_t *dbpool, zbx_cep_init_stats_t *s
 	/* warmup event ids cache */
 	(void)zbx_dbconn_get_maxid_num(db, "events", 1);
 
-	cep_load_problems(cep, db, stats);
+	cep_load_open_problems(cep, db, stats);
 	cep_load_maintenances(cep, db, stats);
 	cep_load_rule_errors(cep, db);
 
@@ -1292,9 +1429,6 @@ void	cep_event_handle_set(zbx_cep_event_handle_t h, zbx_cep_event_t *event)
  *             r_event - [IN]     result event                                *
  *             events  - [IN/OUT] trigger events to resolve                   *
  *                                                                            *
- * Comments: For each trigger event handle, updates event value to OK and     *
- *           replaces the event using copy-on-write if needed.                *
- *                                                                            *
  ******************************************************************************/
 void	cep_resolve_trigger_events(zbx_cep_t *cep, zbx_cep_event_t *r_event, zbx_vector_cep_event_handle_t *events)
 {
@@ -1308,7 +1442,6 @@ void	cep_resolve_trigger_events(zbx_cep_t *cep, zbx_cep_event_t *r_event, zbx_ve
 
 		event = cep_event_handle_mutable(h);
 		event->r_event = cep_event_addref(r_event);
-		event->value = TRIGGER_VALUE_OK;
 	}
 }
 
@@ -1884,8 +2017,10 @@ void	cep_delete_events(zbx_cep_t *cep, const zbx_vector_uint64_t *eventids, zbx_
  *             event  - [IN]  event to dump                                   *
  *                                                                            *
  ******************************************************************************/
-static void	cep_dump_event(const char *indent, zbx_cep_event_t *event)
+static void	cep_dump_event(const char *indent, zbx_cep_event_handle_t h)
 {
+	zbx_cep_event_t	*event = h->event;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "%seventid:" ZBX_FS_UI64 " name:%s", indent, event->eventid, event->name);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s  clock:%d ns:%d severity:%d cause:" ZBX_FS_UI64 " refs:%u tags:",
 			indent, event->clock, event->ns, event->severity, event->cause_eventid, event->refcount);
@@ -1905,6 +2040,13 @@ static void	cep_dump_event(const char *indent, zbx_cep_event_t *event)
 					indent, event->suppress.values[i].maintenanceid,
 					event->suppress.values[i].cep_ruleid);
 		}
+	}
+
+	if (0 != h->windows.values_num)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s  windows:", indent);
+		for (int i = 0; i < h->windows.values_num; i++)
+			zabbix_log(LOG_LEVEL_DEBUG, "%s    %p", indent, h->windows.values[i]);
 	}
 }
 
@@ -1934,9 +2076,7 @@ void	cep_dump(zbx_cep_t *cep, const char *msg)
 		zabbix_log(LOG_LEVEL_DEBUG, "  pending events:%d events:", obj->pending_events_num);
 
 		for (int i = 0; i < obj->events.values_num; i++)
-		{
-			cep_dump_event("    ", obj->events.values[i]->event);
-		}
+			cep_dump_event("    ", obj->events.values[i]);
 	}
 }
 
@@ -2124,3 +2264,104 @@ void	cep_event_handle_set_committed(zbx_cep_event_handle_t hevent)
 	atomic_fetch_or(&hevent->state, CEP_EVENT_STATE_COMMITTED);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: link cep window to event handle                                   *
+ *                                                                            *
+ * Parameters: cep    - [IN] cep cache, must be acquired by caller            *
+ *             h      - [IN] event handle                                     *
+ *             window - [IN] window containing the event                      *
+ *                                                                            *
+ * Comments: The link is not owning - window reference count is not changed.  *
+ *           Window must unlink itself before removing event from its queue.  *
+ *                                                                            *
+ ******************************************************************************/
+void	cep_event_handle_link_window(zbx_cep_t *cep, zbx_cep_event_handle_t h, zbx_cep_window_t *window)
+{
+	ZBX_UNUSED(cep);
+
+	zbx_vector_cep_window_ptr_append(&h->windows, window);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: unlink cep window from event handle                               *
+ *                                                                            *
+ * Parameters: cep    - [IN] cep cache, must be acquired by caller            *
+ *             h      - [IN] event handle                                     *
+ *             window - [IN] window to unlink                                 *
+ *                                                                            *
+ ******************************************************************************/
+void	cep_event_handle_unlink_window(zbx_cep_t *cep, zbx_cep_event_handle_t h, zbx_cep_window_t *window)
+{
+	ZBX_UNUSED(cep);
+
+	for (int i = 0; i < h->windows.values_num; i++)
+	{
+		if (h->windows.values[i] == window)
+		{
+			zbx_vector_cep_window_ptr_remove_noorder(&h->windows, i);
+			return;
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: acquire reference to cep window through non-owning link           *
+ *                                                                            *
+ * Parameters: cep    - [IN] cep cache, must be acquired by caller            *
+ *             window - [IN] cep window                                       *
+ *                                                                            *
+ * Return value: window with incremented refcount or NULL if window is being  *
+ *               released                                                     *
+ *                                                                            *
+ * Comments: Must be called with cep cache locked - window unlinks itself     *
+ *           from event handles under cache lock before being freed.          *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_cep_window_t	*cep_acquire_window(zbx_cep_t *cep, zbx_cep_window_t *window)
+{
+	ZBX_UNUSED(cep);
+
+	if (0 == atomic_fetch_add(&window->refcount, 1))
+	{
+		/* window is being released, revert refcount and return NULL */
+		atomic_fetch_sub(&window->refcount, 1);
+		return NULL;
+	}
+
+	return window;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: acquire windows linked to the specified events                    *
+ *                                                                            *
+ * Parameters: cep        - [IN] cep cache, must be acquired by caller        *
+ *             handles    - [IN] event handles, referenced by caller          *
+ *             win_events - [OUT] window/event handle pairs with acquired     *
+ *                          window and event handle references                *
+ *                                                                            *
+ * Comments: Windows being released are skipped.                              *
+ *                                                                            *
+ ******************************************************************************/
+void	cep_acquire_event_windows(zbx_cep_t *cep, const zbx_vector_cep_event_handle_t *handles,
+		zbx_vector_cep_win_event_t *win_events)
+{
+	for (int i = 0; i < handles->values_num; i++)
+	{
+		zbx_cep_event_handle_t	h = handles->values[i];
+
+		for (int j = 0; j < h->windows.values_num; j++)
+		{
+			zbx_cep_win_event_t	win_event;
+
+			if (NULL == (win_event.window = cep_acquire_window(cep, h->windows.values[j])))
+				continue;
+
+			win_event.hevent = zbx_cep_event_handle_addref(h);
+			zbx_vector_cep_win_event_append(win_events, win_event);
+		}
+	}
+}

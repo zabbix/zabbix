@@ -274,7 +274,6 @@ class CZabbixServer {
 	 * @param array  $data                       Array of report test data to send.
 	 * @param string $data['name']               Report name (used to make attachment file name).
 	 * @param string $data['dashboardid']        Dashboard ID.
-	 * @param string $data['userid']             User ID used to access the dashboard.
 	 * @param string $data['period']             Report period. Possible values:
 	 *                                            0 - ZBX_REPORT_PERIOD_DAY;
 	 *                                            1 - ZBX_REPORT_PERIOD_WEEK;

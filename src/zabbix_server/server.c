@@ -299,6 +299,8 @@ int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
 	1, /* ZBX_PROCESS_TYPE_CEP_MANAGER */
 	10, /* ZBX_PROCESS_TYPE_CEP_WORKER */
 	1, /* ZBX_PROCESS_TYPE_TELEMETRY_QUERY_POLLER */
+	0, /* ZBX_PROCESS_TYPE_APM_MANAGER */
+	0  /* ZBX_PROCESS_TYPE_APM_WORKER */
 };
 
 static int	get_config_forks(unsigned char process_type)
@@ -2933,6 +2935,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		if (ZBX_NODE_STATUS_UNKNOWN != ha_status && ha_status != ha_status_old)
 		{
+			int	server_started = ZBX_NODE_STATUS_UNKNOWN != ha_status_old ? SUCCEED : FAIL;
+
 			ha_status_old = ha_status;
 			zabbix_log(LOG_LEVEL_INFORMATION, "\"%s\" node switched to \"%s\" mode",
 					ZBX_NULL2EMPTY_STR(CONFIG_HA_NODE_NAME), zbx_ha_status_str(ha_status));
@@ -2972,7 +2976,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 					break;
 				case ZBX_NODE_STATUS_STANDBY:
-					server_teardown(&rtc, &listen_sock);
+					if (SUCCEED == server_started)
+						server_teardown(&rtc, &listen_sock);
 					standby_warning_time = now;
 					break;
 				default:

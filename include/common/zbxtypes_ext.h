@@ -19,7 +19,7 @@
 
 #include "zbxsysinc.h"
 
-#if defined(HAVE_STDATOMIC_H)
+#if defined(HAVE_STDATOMIC_H) && !defined(__cplusplus)
 typedef _Atomic uint64_t zbx_atomic_uint64_t;
 typedef _Atomic uint32_t zbx_atomic_uint32_t;
 typedef _Atomic int zbx_atomic_int_t;

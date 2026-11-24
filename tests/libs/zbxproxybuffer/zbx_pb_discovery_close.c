@@ -46,8 +46,6 @@ void	zbx_mock_test_entry(void **state)
 	rows_written = zbx_mock_get_parameter_int("in.rows");
 	expected_rows = zbx_mock_get_parameter_int("out.rows");
 
-	zbx_pb_mock_set_nextid(1);
-
 	zbx_mock_assert_result_eq("locks_create", SUCCEED, zbx_locks_create(&error));
 	zbx_mock_assert_result_eq("pb_create", SUCCEED,
 			zbx_pb_create(ZBX_PB_MODE_MEMORY, ZBX_MEBIBYTE, 0, 0, &error));

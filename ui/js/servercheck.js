@@ -41,9 +41,13 @@ jQuery(function($) {
 			this.prepareNext(timeout);
 
 			this.$elem = $elem;
-			this.updateWidth();
 			this.$elem.on('mouseenter', this.hideMessage.bind(this));
-			$(window).on('resize', this.updateWidth.bind(this));
+
+			const resize_observer = new ResizeObserver(() => this.updateWidth());
+
+			document.querySelectorAll('main, aside').forEach(element => {
+				resize_observer.observe(element);
+			});
 		},
 
 		prepareNext: function(delay) {
@@ -101,10 +105,32 @@ jQuery(function($) {
 		},
 
 		updateWidth: function() {
-			let $wrapper = $('.wrapper');
+			const split_view = document.querySelector('body > z-split-view');
+
+			if (split_view) {
+				let width_modifier = 20;
+
+				const rect = split_view.getBoundingClientRect();
+
+				const wrapper = split_view.querySelector(':scope > .wrapper');
+
+				if (wrapper.scrollHeight > wrapper.clientHeight) {
+					width_modifier += 15;
+				}
+
+				this.$elem.css({
+					left: rect.left + 10,
+					width: rect.width - width_modifier
+				});
+
+				return;
+			}
+
+			const wrapper_rect = document.querySelector('main').getBoundingClientRect();
+
 			this.$elem.css({
-				left: $wrapper.offset().left + 10,
-				width: $wrapper[0].clientWidth - 20
+				left: wrapper_rect.left + 10,
+				width: wrapper_rect.width - 20
 			});
 		}
 	};

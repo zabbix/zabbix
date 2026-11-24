@@ -38,8 +38,8 @@ abstract class CControllerDataTable extends CController {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 
 		$this->setValidationRules([
-			'data_fields' =>		'required|array',
-			'options' =>			'required|array',
+			'data_fields' =>		'array|required',
+			'options' =>			'array|required',
 			'filter' =>				'array',
 			'filter_counters' =>	'in 1',
 			'page' =>				'int32',
@@ -50,7 +50,7 @@ abstract class CControllerDataTable extends CController {
 	}
 
 	protected function checkInput(): bool {
-		$ret = $this->validateInput($this->validation_rules);
+		$ret = $this->validateInput($this->validation_rules, true);
 
 		if ($ret) {
 			$options = $this->getInput('options');
@@ -62,17 +62,16 @@ abstract class CControllerDataTable extends CController {
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
-						'messages' => _('Invalid request')
+						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
-				])])
+				], JSON_THROW_ON_ERROR)])
 			);
 		}
 
 		return $ret;
 	}
 
-	protected function paginate(array &$rows, int $page, string $sort_order): array {
-		$num_rows = count($rows);
+	protected function paginateNumRows(int $num_rows, int $page, ?string $sort_order, &$offset, &$limit): array {
 		$rows_per_page = (int) CWebUser::$data['rows_per_page'];
 
 		$offset_down = 0;
@@ -86,12 +85,18 @@ abstract class CControllerDataTable extends CController {
 		$num_pages = max(1, (int) ceil($num_rows / $rows_per_page));
 		$page = max(1, min($num_pages, $page));
 
-		$start = ($page - 1) * $rows_per_page;
-		$end = min($num_rows, $start + $rows_per_page);
-		$offset = $sort_order == ZBX_SORT_DOWN ? $offset_down : 0;
+		if ($sort_order !== null) {
+			$start = ($page - 1) * $rows_per_page;
+			$end = min($num_rows, $start + $rows_per_page);
+			$start_offset = $sort_order == ZBX_SORT_DOWN ? $offset_down : 0;
 
-		// Trim given rows for the current page.
-		$rows = array_slice($rows, $start + $offset, $end - $start, true);
+			$offset = $start + $start_offset;
+			$limit = $end - $start;
+		}
+		else {
+			$offset = ($page - 1) * $rows_per_page;
+			$limit = $rows_per_page;
+		}
 
 		return [
 			'page' => $page,
@@ -100,6 +105,15 @@ abstract class CControllerDataTable extends CController {
 			'rows_per_page' => $rows_per_page,
 			'limit_exceeded' => $limit_exceeded
 		];
+	}
+
+	protected function paginate(array &$rows, int $page, ?string $sort_order): array {
+		$paging = $this->paginateNumRows(count($rows), $page, $sort_order, $offset, $limit);
+
+		// Trim given rows for the current page.
+		$rows = array_slice($rows, $offset, $limit, true);
+
+		return $paging;
 	}
 
 	protected function export(string $type): ?string {
@@ -137,13 +151,14 @@ abstract class CControllerDataTable extends CController {
 			}
 
 			unset($data['rows']);
-		} catch (Throwable) {
+		}
+		catch (Throwable) {
 			$this->setResponse(new CControllerResponseData([
 				'main_block' => json_encode([
 					'error' => [
-						'title' => _('Invalid request')
+						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
-				])
+				], JSON_THROW_ON_ERROR)
 			]));
 
 			return;
@@ -165,8 +180,10 @@ abstract class CControllerDataTable extends CController {
 		]));
 	}
 
-	protected function getDataFields(): array {
-		return array_values(array_intersect($this->getInput('data_fields'), $this->allowed_data_fields));
+	protected function getDataFields(array $additional_data_fields = []): array {
+		$data_fields = array_unique(array_merge($this->getInput('data_fields'), $additional_data_fields));
+
+		return array_values(array_intersect($data_fields, $this->allowed_data_fields));
 	}
 
 	protected function getUserConfigs(string $storage_idx): array {

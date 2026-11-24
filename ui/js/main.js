@@ -444,10 +444,17 @@ const hintBox = {
 		const box = jQuery('<div>', {'data-hintboxid': hintboxid})
 			.addClass(`${ZBX_STYLE_OVERLAY_DIALOGUE} hintbox wordbreak`);
 
-		for (let element = target; element && element !== document.body; element = element.parentElement) {
-			if (getComputedStyle(element).position === 'fixed') {
+		if ('hintboxPositionFixed' in target.dataset) {
+			if (target.dataset.hintboxPositionFixed) {
 				box.addClass('hintbox-position-fixed');
-				break;
+			}
+		}
+		else {
+			for (let element = target; element && element !== document.body; element = element.parentElement) {
+				if (getComputedStyle(element).position === 'fixed') {
+					box.addClass('hintbox-position-fixed');
+					break;
+				}
 			}
 		}
 
@@ -671,6 +678,8 @@ const hintBox = {
 			left: null
 		};
 
+		const {overflowX, overflowY} = host.style;
+
 		const resetPosition = () => {
 			Object.keys(css).forEach(key => {
 				css[key] = null;
@@ -791,8 +800,8 @@ const hintBox = {
 		}
 		while (host_client_width > host.clientWidth || host_client_height > host.clientHeight);
 
-		host.style.overflowX = null;
-		host.style.overflowY = null;
+		host.style.overflowX = overflowX;
+		host.style.overflowY = overflowY;
 	},
 
 	hideHint: function(target, hideStatic) {

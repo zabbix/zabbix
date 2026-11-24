@@ -160,6 +160,7 @@ class CMacroValue extends CDiv {
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass(ZBX_ICON_ARROW_BACK)
 			->addClass(self::ZBX_STYLE_BTN_UNDO)
+			->setAttribute('hidden', '')
 			->setAttribute('title', _('Revert changes'));
 
 		return $this;
@@ -226,7 +227,11 @@ class CMacroValue extends CDiv {
 		}
 
 		if ($this->revert_button !== null) {
-			$elements[] = $this->revert_button->addStyle($this->revert_visible ? 'display: block' : '');
+			if ($this->revert_visible) {
+				$this->revert_button->removeAttribute('hidden');
+			}
+
+			$elements[] = $this->revert_button;
 		}
 
 		$elements[] = (new CButtonDropdown($this->name.'[type]',  $this->type, [

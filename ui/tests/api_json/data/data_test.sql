@@ -750,12 +750,12 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50023, 99013, 50
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50024, 99014, 50028);
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params,query_fields, description, posts, headers,query) VALUES (158736, 99013, NULL, 2, 3, 'item', 'item', '1d', '90d', 0, '','', '', '', '','');
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params,query_fields, description, posts, headers,query) VALUES (158737, 99014, NULL, 2, 3, 'item', 'item', '1d', '90d', 0, '','', '', '', '','');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50176, 'test-trigger-1', '{50236}=0', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50236, 50176, 158736, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50177, 'test-trigger-2', '{50237}=0', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50237, 50177, 158736, 'last', '$');
-INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50178, 'template-trigger', '{50238}=0', '');
-INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50238, 50178, 158737, 'last', '$');
+INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50176, 'test-trigger-1', '{60236}=0', '');
+INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (60236, 50176, 158736, 'last', '$');
+INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50177, 'test-trigger-2', '{60237}=0', '');
+INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (60237, 50177, 158736, 'last', '$');
+INSERT INTO triggers (triggerid, description, expression, comments) VALUES (50178, 'template-trigger', '{60238}=0', '');
+INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (60238, 50178, 158737, 'last', '$');
 
 -- services
 INSERT INTO services (serviceid, name, description) VALUES (1, 'API Service for delete', '');

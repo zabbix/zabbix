@@ -173,7 +173,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 					'percentile' => ['float', 'required', 'not_empty', 'min' => 0, 'max' => 100, 'decimal_limit' => 4,
 						'when' => ['function', 'in' => [AGGREGATE_PERCENTILE]]
 					],
-					'alias' => ['string', 'required', 'length' => 255, 'not_empty']
+					'alias' => ['string', 'required', 'length' => 255, 'not_empty', 'not_in' => ['clock']]
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
 			],
@@ -184,26 +184,8 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 					'attribute_key' => ['string', 'required', 'length' => 255, 'not_empty',
 						'when' => ['column', 'in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
 					],
-					'operator' => [
-						['integer', 'required',
-							'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_EXISTS],
-							'when' => ['column', 'in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
-						],
-						['integer', 'required',
-							'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
-								CONDITION_OPERATOR_NOT_LIKE
-							],
-							'when' => ['column', 'not_in' => CItemTypeTelemetryQuery::COMPLEX_COLUMN_NAME]
-						]
-					],
-					'value' => [
-						['string', 'required', 'length' => 255,
-							'when' => ['operator', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL]]
-						],
-						['string', 'required', 'length' => 255, 'not_empty',
-							'when' => ['operator', 'in' => [CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE]]
-						]
-					]
+					'operator' => CTelemetryHelper::getConditionOperatorValidationRules(),
+					'value' => CTelemetryHelper::getConditionValueValidationRules($allow_lld_macro)
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_TELEMETRY_QUERY]]
 			],
@@ -229,7 +211,15 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		}
 
 		if ($this->item_type == ITEM_TYPE_TELEMETRY_QUERY) {
-			$item = ['query' => CItemGeneralHelper::composeTelemetryQuery($this->getInputAll())];
+			$item = [
+				'flags' => in_array($this->test_type, [
+					self::ZBX_TEST_TYPE_ITEM_PROTOTYPE,
+					self::ZBX_TEST_TYPE_LLD_PROTOTYPE
+				])
+					? ZBX_FLAG_DISCOVERY_PROTOTYPE
+					: ZBX_FLAG_DISCOVERY_NORMAL,
+				'query' => CItemGeneralHelper::composeTelemetryQuery($this->getInputAll())
+			];
 
 			if (!CItemTypeTelemetryQuery::validateFilter($item, '', $error)) {
 				error($error);
@@ -438,7 +428,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 					array_column($inputs['item'][$field], 'value')
 				);
 				$texts_having_macros = array_filter($texts_having_macros, static function(string $str): bool {
-					return (strstr($str, '{') !== false);
+					return (str_contains($str, '{'));
 				});
 
 				if ($texts_having_macros) {
@@ -451,7 +441,28 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 					}
 				}
 			}
-			elseif (strstr($inputs['item'][$field], '{') !== false) {
+			elseif ($field === 'query') {
+				$query = json_decode($inputs['item'][$field], true);
+
+				$texts_having_macros = [];
+
+				foreach ($query['filter']['conditions'] ?? [] as $condition) {
+					foreach (['attribute_key', 'value'] as $name) {
+						if (str_contains($condition[$name], '{')) {
+							$texts_having_macros[] = $condition[$name];
+						}
+					}
+				}
+
+				if ($texts_having_macros) {
+					$texts_support_user_macros = array_merge($texts_support_user_macros, $texts_having_macros);
+
+					if ($support_lldmacros && $this->macros_by_item_props[$field]['support_lld_macros']) {
+						$texts_support_lld_macros = array_merge($texts_support_lld_macros, $texts_having_macros);
+					}
+				}
+			}
+			elseif (str_contains($inputs['item'][$field], '{')) {
 				if ($field === 'key') {
 					$item_key_parser = new CItemKey();
 

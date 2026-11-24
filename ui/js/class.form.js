@@ -229,10 +229,8 @@ class CForm {
 			validator.validateChanges(values, fields)
 				.then(() => this.#custom_validation.forEach((fn) => fn.call(this, values)))
 				.then(() => {
-					if (validator !== null) {
-						this.setErrors(validator.getErrors(), undefined, force_display_errors);
-						this.renderErrors();
-					}
+					this.setErrors(validator.getErrors(), undefined, force_display_errors);
+					this.renderErrors();
 				})
 				.catch((error) => {
 					if (error.cause !== 'RulesError' && error.type !== 'abort') {
@@ -245,6 +243,8 @@ class CForm {
 					if (index !== -1) {
 						this.#validators.splice(index, 1);
 					}
+
+					this.#form.dispatchEvent(new CustomEvent('form.validated'));
 				});
 		};
 
@@ -624,6 +624,10 @@ class CForm {
 		for (const field of fields) {
 			field.unlock();
 		}
+	}
+
+	hasErrors() {
+		return Object.values(this.#fields).some(field => field.hasErrors());
 	}
 
 	/**

@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '8.0'
+  version: '8.2'
   template_groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -35,7 +35,7 @@ zabbix_export:
         >Please, refer to the [vendor documentation](https://docs.cradlepoint.com/r/NCM-APIv2-Overview/Overview-of-NetCloud-API-v2) about NetCloud API authentication.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.2-0
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -480,7 +480,7 @@ zabbix_export:
             description: 'NetCloud Manager X-ECM-API-KEY.'
             required: 'YES'
         - macro: '{$NCM.HTTP_PROXY}'
-          description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/http'
+          description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/8.2/manual/config/items/itemtypes/http'
           config:
             type: TEXT
             priority: '12'
@@ -582,7 +582,7 @@ zabbix_export:
         >Please, refer to the [vendor documentation](https://docs.cradlepoint.com/r/NCM-APIv2-Overview/Overview-of-NetCloud-API-v2) about NetCloud API authentication.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.2-0
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -2042,7 +2042,7 @@ zabbix_export:
             description: 'NetCloud Manager X-ECM-API-KEY.'
             required: 'YES'
         - macro: '{$NCM.HTTP_PROXY}'
-          description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/8.0/manual/config/items/itemtypes/http'
+          description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/8.2/manual/config/items/itemtypes/http'
           config:
             type: TEXT
             priority: '23'

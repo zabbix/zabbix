@@ -17,6 +17,7 @@
 require_once __DIR__.'/../../include/CBehavior.php';
 
 use Facebook\WebDriver\Exception\ElementClickInterceptedException;
+use Facebook\WebDriver\Exception\TimeoutException;
 use Facebook\WebDriver\WebDriverKeys;
 
 /**
@@ -58,6 +59,7 @@ class CDatatableBehavior extends CBehavior {
 	 * @var string
 	 */
 	const COMMON_SELECTOR = 'class:datatable-scrollable';
+	const CUSTOMIZE_TABLE_SELECTOR = 'xpath:.//button[@title="Customize table"]';
 
 	/**
 	 * Get datatable element by specified selector or by common selector.
@@ -270,11 +272,7 @@ class CDatatableBehavior extends CBehavior {
 	 * @param array $column_list   list of available columns in datatable options dialog, their state and status
 	 */
 	public function checkColumnList($column_list) {
-		$table = $this->getDatatable();
-		$table->query('xpath:.//button[@title="Customize table"]')->one()->waitUntilClickable()->click();
-
-		$popup_dialog = $this->test->query('xpath://div[@class="datatable-options-popup datatable-options"]')
-				->waitUntilVisible()->one();
+		$popup_dialog = $this->getDatatableConfigurationDialog();
 		$this->test->assertEquals('Column list', $popup_dialog->query('class:datatable-options-header')->one()->getText());
 
 		foreach ($column_list as $column => $parameters) {
@@ -297,10 +295,7 @@ class CDatatableBehavior extends CBehavior {
 	 */
 	public function updateColumnList($column_state_changes) {
 		$table = $this->getDatatable();
-		$button = $table->query('xpath:.//button[@title="Customize table"]')->one()->waitUntilClickable();
-		$button->click();
-		$popup_dialog = $this->test->query('xpath://div[@class="datatable-options-popup datatable-options"]')
-				->waitUntilVisible()->one();
+		$popup_dialog = $this->getDatatableConfigurationDialog();
 
 		foreach ($column_state_changes as $field => $value) {
 			$for = $popup_dialog->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($field).']/..')->one()
@@ -309,10 +304,30 @@ class CDatatableBehavior extends CBehavior {
 			$table->waitUntilReady();
 		}
 
-		// Click on button again to close the popup.
-		$button->invalidate();
-		$button->click();
+		// Click on customize datatable button to close the popup.
+		$table->query(self::CUSTOMIZE_TABLE_SELECTOR)->waitUntilClickable()->one()->click();
 		$popup_dialog->waitUntilNotVisible();
+	}
+
+	/**
+	 * Get the customize datatable popup dialog.
+	 *
+	 * @return CElement
+	 */
+	protected function getDatatableConfigurationDialog() {
+		$dialog_selector = 'xpath://div[@class="datatable-options-popup datatable-options"]';
+		$button = $this->getDatatable()->query(self::CUSTOMIZE_TABLE_SELECTOR)->waitUntilClickable()->one();
+
+		try {
+			$button->click();
+			$this->test->query($dialog_selector)->waitUntilVisible(3);
+		}
+		catch (TimeoutException $e) {
+			$button->invalidate();
+			$button->click();
+		}
+
+		return $this->test->query($dialog_selector)->waitUntilVisible(3)->one();
 	}
 
 	/**

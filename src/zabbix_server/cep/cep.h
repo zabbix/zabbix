@@ -39,6 +39,9 @@ zbx_cep_t	*cep_create(void);
 void	cep_init(zbx_cep_t *cep, zbx_dbconn_pool_t *dbpool, zbx_cep_init_stats_t *stats);
 void	cep_destroy(void *a);
 
+void	cep_load_problems_by_eventids(zbx_cep_t *cep, zbx_dbconn_t *db, const zbx_vector_uint64_t *eventids,
+		zbx_vector_cep_event_handle_t *handles);
+
 void	cep_sync_object_state(zbx_cep_t *cep, zbx_dbconn_t *db);
 
 void	cep_assess_trigger_events(zbx_cep_t *cep, const zbx_vector_cep_assessment_query_t *queries,
@@ -60,6 +63,7 @@ zbx_uint64_t	cep_close_internal_event(zbx_cep_t *cep, unsigned char object, zbx_
 		zbx_vector_uint64_t *eventids);
 
 zbx_cep_event_handle_t	cep_acquire_event_handle_by_eventid(zbx_cep_t *cep, zbx_uint64_t eventid);
+int	cep_is_event_cached(zbx_cep_t *cep, zbx_uint64_t eventid);
 
 int	cep_origin_problem(const zbx_cep_origin_t *origin);
 void	cep_origin_pending_event_done(zbx_cep_t *cep, zbx_cep_origin_t *origin);
@@ -94,5 +98,20 @@ void	cep_update_events_processed(zbx_cep_t *cep, zbx_uint64_t value);
 void	cep_update_events_discarded(zbx_cep_t *cep, zbx_uint64_t value);
 void	cep_get_stats(zbx_cep_t *cep, zbx_cep_stats_t *stats);
 
+/* window links */
+
+typedef struct
+{
+	zbx_cep_window_t	*window;
+	zbx_cep_event_handle_t	hevent;
+}
+zbx_cep_win_event_t;
+
+ZBX_VECTOR_LITE_DECL(cep_win_event, zbx_cep_win_event_t)
+
+void	cep_event_handle_link_window(zbx_cep_t *cep, zbx_cep_event_handle_t h, zbx_cep_window_t *window);
+void	cep_event_handle_unlink_window(zbx_cep_t *cep, zbx_cep_event_handle_t h, zbx_cep_window_t *window);
+void	cep_acquire_event_windows(zbx_cep_t *cep, const zbx_vector_cep_event_handle_t *handles,
+		zbx_vector_cep_win_event_t *win_events);
 
 #endif /* ZABBIX_CEP_H */

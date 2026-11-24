@@ -5,6 +5,10 @@ then
 	CC=clang
 fi
 
+if [ -z "$with_stacksize" ]
+then
+	with_stacksize=128
+fi
 
 if [ -z "$CFLAGS" ]
 then

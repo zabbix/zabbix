@@ -180,6 +180,12 @@ void	zbx_json_reset(struct zbx_json *j)
 	zbx_json_addobject(j, NULL);
 }
 
+void	zbx_json_reset_array(struct zbx_json *j)
+{
+	zbx_json_setempty(j);
+	zbx_json_addarray(j, NULL);
+}
+
 void	zbx_json_free(struct zbx_json *j)
 {
 	assert(j);
@@ -416,7 +422,7 @@ void	zbx_json_addarray(struct zbx_json *j, const char *name)
 	__zbx_json_addobject(j, name, 0);
 }
 
-size_t	zbx_json_addstring_limit( struct zbx_json *j, const char *name, const char *string, zbx_json_type_t type,
+size_t	zbx_json_addstring_limit(struct zbx_json *j, const char *name, const char *string, zbx_json_type_t type,
 		size_t max_size)
 {
 	size_t	len = 0, str_len = 0, orig_len;

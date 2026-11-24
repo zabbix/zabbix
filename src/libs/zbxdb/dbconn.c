@@ -247,6 +247,9 @@ static int	dbconn_is_recoverable_error(zbx_dbconn_t *db, int err_no)
 	if (0 == err_no)
 		err_no = (int)mysql_errno(db->conn);
 
+	if (OFF == db->mariadb_fork && ZBX_MYSQL_ER_CLIENT_INTERACTION_TIMEOUT == err_no)
+		return SUCCEED;
+
 	switch (err_no)
 	{
 		case CR_CONN_HOST_ERROR:
@@ -263,9 +266,6 @@ static int	dbconn_is_recoverable_error(zbx_dbconn_t *db, int err_no)
 		case ER_UNKNOWN_COM_ERROR:
 		case ER_LOCK_DEADLOCK:
 		case ER_LOCK_WAIT_TIMEOUT:
-#ifdef ER_CLIENT_INTERACTION_TIMEOUT
-		case ER_CLIENT_INTERACTION_TIMEOUT:
-#endif
 #ifdef CR_SSL_CONNECTION_ERROR
 		case CR_SSL_CONNECTION_ERROR:
 #endif
@@ -286,13 +286,13 @@ static int	dbconn_is_inhibited_error(zbx_dbconn_t *db, int err_no)
 	if (0 < db->txn_level && 0 == db->txn_begin)
 		return FAIL;
 
+	if (OFF == db->mariadb_fork && ZBX_MYSQL_ER_CLIENT_INTERACTION_TIMEOUT == err_no)
+		return SUCCEED;
+
 	switch (err_no)
 	{
 		case CR_SERVER_GONE_ERROR:
 		case CR_SERVER_LOST:
-#ifdef ER_CLIENT_INTERACTION_TIMEOUT
-		case ER_CLIENT_INTERACTION_TIMEOUT:
-#endif
 			return SUCCEED;
 	}
 
@@ -545,6 +545,7 @@ static int	dbconn_open(zbx_dbconn_t *db)
 	}
 
 	zbx_dbconn_extract_version_info(db, &version_info);
+	db->mariadb_fork = version_info.mariadb_fork;
 
 	/* innodb_snapshot_isolation variable became ON by default in MariaDB 11.6.2, we need it to be OFF */
 	if (ZBX_DB_OK == ret && ON == version_info.mariadb_fork && 110602 <= version_info.current_version)
@@ -882,12 +883,21 @@ static int	dbconn_vexecute(zbx_dbconn_t *db, const char *fmt, va_list args)
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
-		char		buf_sql_trunc[MAX_BUFFER_LEN + 1];
-		const char	*sql_trunc = zbx_truncate_value(sql, MAX_BUFFER_LEN, buf_sql_trunc,
-				sizeof(buf_sql_trunc));
+		char		*sql_trunc_buf = NULL;
+		const char	*sql_trunc = sql;
+
+		/* Only allocate the truncation buffer when the query is actually long enough to need it.       */
+		/* The buffer is NOT on stack on purpose - to reduce consumption of limited thread stack space. */
+		if (MAX_BUFFER_LEN < sql_offset)
+		{
+			sql_trunc_buf = (char *)zbx_malloc(NULL, MAX_BUFFER_LEN + 1);
+			sql_trunc = zbx_truncate_value(sql, MAX_BUFFER_LEN, sql_trunc_buf, MAX_BUFFER_LEN + 1);
+		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", db->txn_level,
 				db_replace_nonprintable_chars(sql_trunc, &sql_printable));
+
+		zbx_free(sql_trunc_buf);
 	}
 #if defined(HAVE_MYSQL)
 	if (NULL == db->conn)
@@ -1601,7 +1611,7 @@ int	zbx_dbconn_begin(zbx_dbconn_t *db)
 	while (ZBX_DB_DOWN == rc)
 	{
 		dbconn_close(db);
-		dbconn_open(db);
+		dbconn_open_retry(db);
 
 		if (ZBX_DB_DOWN == (rc = dbconn_begin(db)))
 		{
@@ -1658,7 +1668,7 @@ int	zbx_dbconn_rollback(zbx_dbconn_t *db)
 		zabbix_log(LOG_LEVEL_WARNING, "cannot perform transaction rollback, connection will be reset");
 
 		dbconn_close(db);
-		rc = dbconn_open(db);
+		rc = dbconn_open_retry(db);
 	}
 	else
 	{
@@ -1708,7 +1718,7 @@ int	zbx_dbconn_vexecute(zbx_dbconn_t *db, const char *fmt, va_list args)
 	while (ZBX_DB_DOWN == rc)
 	{
 		dbconn_close(db);
-		dbconn_open(db);
+		dbconn_open_retry(db);
 
 		if (ZBX_DB_DOWN == (rc = dbconn_vexecute(db, fmt, args)))
 		{
@@ -1760,7 +1770,7 @@ zbx_db_result_t	__zbx_attr_weak zbx_dbconn_vselect(zbx_dbconn_t *db, const char 
 	while ((zbx_db_result_t)ZBX_DB_DOWN == rc)
 	{
 		dbconn_close(db);
-		dbconn_open(db);
+		dbconn_open_retry(db);
 
 		if ((zbx_db_result_t)ZBX_DB_DOWN == (rc = dbconn_vselect(db, fmt, args)))
 		{
@@ -1812,7 +1822,7 @@ zbx_db_result_t	zbx_dbconn_select_n(zbx_dbconn_t *db, const char *query, int n)
 	while ((zbx_db_result_t)ZBX_DB_DOWN == rc)
 	{
 		dbconn_close(db);
-		dbconn_open(db);
+		dbconn_open_retry(db);
 
 		if ((zbx_db_result_t)ZBX_DB_DOWN == (rc = dbconn_select_n(db, query, n)))
 		{
