@@ -208,6 +208,11 @@
 	Chart.DELAY_LOADING = 3;
 
 	/**
+	* @var {number}  Narrowest data area (pixels, without the Y axis margins) a chart is requested with.
+	*/
+	Chart.GRAPH_WIDTH_MIN = 500;
+
+	/**
 	 * Represents chart, it can be refreshed.
 	 *
 	 * @param {object} chart     Chart object prepared in server.
@@ -307,7 +312,7 @@
 		this.curl.setArgument('from', this.timeline.from);
 		this.curl.setArgument('to', this.timeline.to);
 		this.curl.setArgument('height', this.dimensions.graphHeight);
-		this.curl.setArgument('width', Math.max(1000, width));
+		this.curl.setArgument('width', Math.max(Chart.GRAPH_WIDTH_MIN, width));
 		this.curl.setArgument('profileIdx', 'web.charts.filter');
 		this.curl.setArgument('resolve_macros', 1);
 		this.curl.setArgument('_', (+new Date).toString(34));

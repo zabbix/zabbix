@@ -94,9 +94,14 @@ window.drule_edit_popup = new class {
 		input.warning = row.querySelector('.btn-icon')?.getAttribute('data-hintbox-contents');
 
 		this.#addCheck(input, row, true);
+
+		const updated_row = row.nextElementSibling;
+
 		row.remove();
 		this.#updateCheckWarningIcon(input);
 		this.#addInputFields(input);
+
+		updated_row.querySelector('.js-edit').focus();
 	}
 
 	#editCheck(row = null) {

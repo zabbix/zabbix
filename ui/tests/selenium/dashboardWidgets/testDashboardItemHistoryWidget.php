@@ -45,17 +45,20 @@ class testDashboardItemHistoryWidget extends testWidgets {
 	const DEFAULT_WIDGET = 'Default Item history Widget';
 	const DELETE_WIDGET = 'Widget for delete';
 	const DATA_WIDGET = 'Widget for data check';
+	const ITEM_BIN = 'Item with BINARY data for table test';
+	const HOST_HISTORY_WIDGET = 'Simple host with item for Item history widget';
 
 	protected static $dashboardid;
 	protected static $dashboard_create;
 	protected static $dashboard_data;
+	protected static $depend_items;
 	protected static $update_widget = 'Update Item history Widget';
 
 	public static function prepareData() {
 		// Create host for widget header and data tests.
 		CDataHelper::createHosts([
 			[
-				'host' => 'Simple host with item for Item history widget',
+				'host' => self::HOST_HISTORY_WIDGET,
 				'interfaces' => [
 					[
 						'type' => INTERFACE_TYPE_AGENT,
@@ -81,6 +84,20 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			]
 		]);
 		$itemids = CDataHelper::getIds('name');
+
+		// Create dependent item with binary data.
+		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr(self::HOST_HISTORY_WIDGET));
+		CDataHelper::call('item.create', [
+			[
+				'hostid' => $hostid,
+				'name' => self::ITEM_BIN,
+				'key_' => 'bin_table',
+				'master_itemid' => $itemids['Test Item history'],
+				'type' => ITEM_TYPE_DEPENDENT,
+				'value_type' => ITEM_VALUE_TYPE_BINARY
+			]
+		]);
+		self::$depend_items = CDataHelper::getIds('name');
 
 		$response = CDataHelper::call('dashboard.create', [
 			[
@@ -301,6 +318,21 @@ class testDashboardItemHistoryWidget extends testWidgets {
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'override_hostid._reference',
 										'value' => 'DASHBOARD._hostid'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.5.name',
+										'value' => 'BIN'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.5.history',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'columns.5.itemid',
+										'value' => self::$depend_items[self::ITEM_BIN]
 									]
 								]
 							]
@@ -679,7 +711,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// #6.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'same_host' => 'ЗАББИКС Сервер',
 					'fields' => [
 						'Name' => '2 columns from one host'
@@ -709,7 +740,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// #7 Test case with items from two different hosts.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => ''
 					],
@@ -728,7 +758,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 								'Name' => 'Column2',
 								'Item' => [
 									'values' => 'Test Item history',
-									'context' => ['values' => 'Simple host with item for Item history widget']
+									'context' => ['values' => self::HOST_HISTORY_WIDGET]
 								]
 							]
 						]
@@ -738,7 +768,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// #8 Test case with items from the same host and with custom name.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Test custom name'
 					],
@@ -767,7 +796,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// #9 Test case with items from two different hosts and with custom name.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Test custom name2'
 					],
@@ -786,7 +814,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 								'Name' => 'Column2',
 								'Item' => [
 									'values' => 'Test Item history',
-									'context' => ['values' => 'Simple host with item for Item history widget']
+									'context' => ['values' => self::HOST_HISTORY_WIDGET]
 								]
 							]
 						]
@@ -796,7 +824,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// #10.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Custom refresh',
 						'Refresh interval' => 'Default (1 minute)'
@@ -807,7 +834,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 								'Name' => 'Column1',
 								'Item' => [
 									'values' => 'Test Item history',
-									'context' => ['values' => 'Simple host with item for Item history widget']
+									'context' => ['values' => self::HOST_HISTORY_WIDGET]
 								]
 							]
 						]
@@ -817,7 +844,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// #11.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Header is hidden',
 						'Show header' => false,
@@ -844,7 +870,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// #12.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Header appears',
 						'Show header' => true,
@@ -868,7 +893,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// #13.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Refresh interval' => '30 seconds'
 					],
@@ -888,7 +912,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// #14.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Refresh interval' => '1 minute'
 					],
@@ -908,7 +931,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// #15.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Show lines' => '1',
 						'Refresh interval' => '2 minutes'
@@ -929,7 +951,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// #16.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Show lines' => '100',
 						'Refresh interval' => '10 minutes'
@@ -950,7 +971,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// #17.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Refresh interval' => '15 minutes'
 					],
@@ -970,7 +990,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// #18.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Refresh interval' => '10 minutes'
 					],
@@ -990,7 +1009,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// #19.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Override host' => 'Dashboard',
 						'Refresh interval' => '2 minutes'
@@ -1011,7 +1029,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// #20.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Override host' => 'Dashboard',
 						'Refresh interval' => '1 minute'
@@ -1032,7 +1049,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// #21.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => ' Widget with trimmed trailing and leading spaces ',
 						'Refresh interval' => '30 seconds',
@@ -1044,7 +1060,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 								'Name' => 'Column1',
 								'Item' => [
 									'values' => 'Test Item history',
-									'context' => ['values' => 'Simple host with item for Item history widget']
+									'context' => ['values' => self::HOST_HISTORY_WIDGET]
 								]
 							]
 						]
@@ -1055,7 +1071,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// #22.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Show header' => true,
 						'Name' => 'Widget with updated fields',
@@ -1100,7 +1115,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// #24.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Binary column with color'
 					],
@@ -1121,7 +1135,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// #25.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Character column with color and highlights'
 					],
@@ -1499,7 +1512,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// #41.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Float with negative Thresholds'
 					],
@@ -1536,7 +1548,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// #42.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Float with different colors Thresholds'
 					],
@@ -1569,7 +1580,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// #43.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Float with empty Threshold'
 					],
@@ -1593,7 +1603,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// #44.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Log item column'
 					],
@@ -1614,7 +1623,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// #45.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Text item column'
 					],
@@ -1710,7 +1718,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// #49.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Time period = Custom, Default from/to',
 						'Advanced configuration' => true,
@@ -1731,7 +1738,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// #50.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Time period = Custom',
 						'Advanced configuration' => true,
@@ -1755,7 +1761,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// #51.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Time period = Custom, To in future',
 						'Advanced configuration' => true,
@@ -1778,7 +1783,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// #52.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Time period = Custom, human readable in the past',
 						'Advanced configuration' => true,
@@ -1849,7 +1853,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			// #55.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'Time period = widget',
 						'Advanced configuration' => true,
@@ -2180,7 +2183,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		$column_overlay->asForm()->fill([
 			'Item' => [
 				'values' => 'Test Item history',
-				'context' => ['values' => 'Simple host with item for Item history widget']
+				'context' => ['values' => self::HOST_HISTORY_WIDGET]
 			]
 		]);
 
@@ -2488,7 +2491,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			[
 				[
 					'host_select' => [
-						'without_data' => 'Simple host with item for Item history widget',
+						'without_data' => self::HOST_HISTORY_WIDGET,
 						'with_data' => 'ЗАББИКС Сервер'
 					],
 					'initial_data' => [
@@ -2647,6 +2650,27 @@ class testDashboardItemHistoryWidget extends testWidgets {
 						['itemid' => '42244', 'values' => '82.061797', 'time' => strtotime('+1 hours')]
 					]
 				]
+			],
+			// #9 Data for Binary type.
+			[
+				[
+					'initial_data' => [
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
+							'Name' => 'BIN',
+							'Value' => 'Show'
+						]
+					],
+					'item_data' => [
+						[
+							'itemid' => 'dependent',
+							'values' => 'Test encoded value',
+							'encoded_value' => 'VGVzdCBlbmNvZGVkIHZhbHVl',
+							'time' => strtotime('Now'),
+							'binary' => true
+						]
+					]
+				]
 			]
 		];
 	}
@@ -2719,12 +2743,15 @@ class testDashboardItemHistoryWidget extends testWidgets {
 	}
 
 	/**
-	 * @backup !history, !history_uint, !history_str
+	 * @backup !history, !history_uint, !history_str, !history_bin
 	 *
 	 * @dataProvider getTableData
 	 */
 	public function testDashboardItemHistoryWidget_TableData($data) {
 		foreach ($data['item_data'] as $params) {
+			if ($params['itemid'] === 'dependent') {
+				$params['itemid'] = self::$depend_items[self::ITEM_BIN];
+			}
 			CDataHelper::addItemData($params['itemid'], $params['values'], $params['time']);
 		}
 
@@ -2735,6 +2762,27 @@ class testDashboardItemHistoryWidget extends testWidgets {
 
 		// Check initial data.
 		$this->assertEquals($data['initial_data'], $this->getWidgetTableData($widget));
+
+		// Check Show button and value in case of Binary data type.
+		foreach ($data['item_data'] as $params) {
+			if (array_key_exists('binary', $params)) {
+				$button = $widget->query('button:Show')->one();
+
+				// Wait until the button is ready to open the hintbox.
+				$button->waitUntilAttributesPresent('data-hintbox-preload')->waitUntilClassesNotPresent('is-loading');
+				$this->assertTrue($button->isClickable());
+				$button->click();
+
+				// Wait until the hintbox content is loaded.
+				$hint = $this->query('class:hintbox-static')->asOverlayDialog()->waitUntilVisible()->one();
+				$hint->query('id:hintbox-preloader')->waitUntilNotPresent();
+
+				// Check that binary data is displayed in the hintbox.
+				$this->assertEquals($params['encoded_value'], $button->getAttribute('data-hintbox-contents'));
+				$this->assertEquals($params['encoded_value'], $hint->getText());
+				$hint->close();
+			}
+		}
 
 		$default_values = [
 			'fields' => [

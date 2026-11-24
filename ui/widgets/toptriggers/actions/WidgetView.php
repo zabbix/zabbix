@@ -93,14 +93,38 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$db_triggers = API::Trigger()->get([
 			'output' => ['description', 'priority'],
-			'selectHosts' => ['hostid', 'name', 'status'],
+			'selectHosts' => ['hostid', 'name', 'status', 'maintenanceid', 'maintenance_status', 'maintenance_type'],
 			'expandDescription' => true,
 			'triggerids' => array_keys($db_problems),
 			'preservekeys' => true
 		]);
 
+		$maintenanceids = [];
+		foreach ($db_triggers as $trigger) {
+			$maintenanceids += array_fill_keys(array_column($trigger['hosts'], 'maintenanceid'), true);
+		}
+
+		$maintenances = API::Maintenance()->get([
+			'output' => ['name', 'description'],
+			'maintenanceids' => array_keys($maintenanceids),
+			'preservekeys' => true
+		]);
+
 		foreach ($db_triggers as $triggerid => &$trigger) {
 			$trigger['problem_count'] = $db_problems[$triggerid]['rowscount'];
+
+			foreach ($trigger['hosts'] as &$host) {
+				if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+					if(array_key_exists($host['maintenanceid'], $maintenances)) {
+						$host['maintenance_name'] = $maintenances[$host['maintenanceid']]['name'];
+						$host['maintenance_description'] = $maintenances[$host['maintenanceid']]['description'];
+					}
+					else {
+						$host['inaccessible_maintenance'] = true;
+					}
+				}
+			}
+			unset($host);
 		}
 		unset($trigger);
 

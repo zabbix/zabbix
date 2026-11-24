@@ -1,19 +1,33 @@
 Changes for 7.0.33rc1
 
 New features:
+A.......S. [ZBXNEXT-10866] updated maximum supported TimescaleDB version to 2.31 (mprihodko)
+.D......S. [ZBXNEXT-10621] added new runtime control option permissions_rebuild to rebuild user and host group permission cache (mprihodko)
 A......PS. [ZBXNEXT-10796] updated maximum supported MariaDB version to 13.0 (mprihodko)
 
 Bug fixes:
-..F....... [ZBX-27647] fixed empty space between Y-axis and graph data for graph widget (kastafjevs)
+.........T [ZBX-23192] added JS script for job discovery with configurable folder depth to Jenkins by HTTP template (mruszczyk)
+.........T [ZBX-23148] fixed uniqueness of Dell template items (kflorowski)
+........S. [ZBX-28284] fixed Zabbix server crash if database connection is lost during startup (vso)
+..F....... [ZBX-27578] changed multiline input preview to span element (vskalbins)
+..F....... [ZBX-1977] fixed Y-axis label clipping in classic graphs by sizing margin to content (msnihach)
+........S. [ZBX-28312] fixed autoregistration, invalid SQL in add_discovered_host() due to missing delim = ',' (mprihodko)
+.......PS. [ZBX-28117] fixed web scenario checks stopping permanently after failed database query (arimdjonoks, jburlakovs)
+.D........ [ZBX-25451] clarified zabbix_sender manpage options (rtrizna)
+.......PS. [ZBX-27224] fixed SNMP agent walk[] "only partial data received" error by resetting retries between requests (vso)
+..F....... [ZBX-28107] fixed maintenance icon not being shown for hosts in some widgets (aluchko)
+..F....... [ZBX-27726] fixed host form layout change in "Inherited and host macros" view after adding template to host (aluchko)
+..F....... [ZBX-27489] fixed UTF-8 error for binary items in Honeycomb widget (gklavins)
+..F....... [ZBX-27647] fixed empty space between Y-axis and graph data in Graph widget (kastafjevs)
 A......... [ZBX-28140] fixed icon mapping order after updating mappings (dpankins)
-..F....... [ZBX-24090] added auto logout field for guest user edit form (gklavins)
-..F....... [ZBX-27456] removed an extra scrollbar in the Import Compare dialog (aluchko)
+..F....... [ZBX-24090] added Auto-logout field to guest user edit form (gklavins)
+..F....... [ZBX-27456] removed extra scrollbar in import comparison dialog (aluchko)
 ..F....... [ZBX-26496] fixed scrollbar appearing when hint box is shown (gklavins)
-..F....... [ZBX-28227] restored the widgets actions button tooltip (aluchko)
-..F....... [ZBX-27339] fixed the last letter being cut off in short vertical labels in Data overview widget (aluchko)
+..F....... [ZBX-28227] restored tooltip of widget actions button (aluchko)
+..F....... [ZBX-27339] fixed last letter being cut off in short vertical labels in Data overview widget (aluchko)
 A......... [ZBX-27721] fixed Elasticsearch query construction in CTrend::getFromElasticsearch() (vskalbins)
-..F....... [ZBX-28028] fixed page refresh after modal dialog or action submit when URL contains a fragment identifier (scernisenko)
-...G...... [ZBX-26650] fixed Zabbix agent 2 system run timeout on UNIX (sboidenko)
+..F....... [ZBX-28028] fixed page refresh after modal dialog or action submit when URL contains fragment identifier (scernisenko)
+...G...... [ZBX-26650] fixed Zabbix agent 2 system.run timeout on Unix (sboidenko)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.32
@@ -4283,6 +4297,7 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.50rc1
 
 New features:
+A.......S. [ZBXNEXT-10866] updated maximum supported TimescaleDB version to 2.31 (mprihodko)
 A......PS. [ZBXNEXT-10796] updated maximum supported MariaDB version to 13.0 (mprihodko)
 
 Bug fixes:
