@@ -955,7 +955,7 @@ class testFormSetup extends CWebTest {
 		$form->fill($db_parameters);
 
 		for ($i = 0; $i < $skip_sections[$section]; $i++) {
-			$this->query('button:Next step')->one()->click();
+			$this->query('button:Next step')->one()->click()->waitUntilStalled();
 		}
 	}
 

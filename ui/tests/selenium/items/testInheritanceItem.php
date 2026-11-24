@@ -104,9 +104,9 @@ class testInheritanceItem extends CLegacyWebTest {
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
+				$this->assertMessage(TEST_GOOD, 'Item added');
 				$this->zbxTestCheckTitle('Configuration of items');
 				$this->zbxTestCheckHeader('Items');
-				$this->zbxTestTextPresent('Item added');
 
 				$itemId = 0;
 
@@ -141,11 +141,9 @@ class testInheritanceItem extends CLegacyWebTest {
 				break;
 
 			case TEST_BAD:
+				$this->assertMessage(TEST_BAD, 'Cannot add item', $data['errors']);
 				$this->zbxTestCheckTitle('Configuration of items');
 				$this->zbxTestCheckHeader('Items');
-				$this->zbxTestTextNotPresent('Item added');
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add item');
-				$this->zbxTestTextPresent($data['errors']);
 				break;
 		}
 	}

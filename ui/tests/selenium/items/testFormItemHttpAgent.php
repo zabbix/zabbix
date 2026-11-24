@@ -1356,7 +1356,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 				case 'clone':
 					$name .= ' (cloned)';
 					$this->zbxTestInputTypeOverwrite('name', $name);
-					$this->zbxTestClickWait('clone');
+					$this->query('button:Clone')->waitUntilClickable()->one()->click()->waitUntilNotVisible();
 					$this->zbxTestClickWait('cancel');
 					break;
 
