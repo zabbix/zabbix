@@ -1554,7 +1554,8 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 				}
 
 				/* update host proxy index if host was renamed */
-				dc_rename_host_proxy(host->host, row[2], &host_proxy_reindex);
+				if (NULL == config->proxy_hostname)
+					dc_rename_host_proxy(host->host, row[2], &host_proxy_reindex);
 			}
 
 			host_h_local.host = row[2];

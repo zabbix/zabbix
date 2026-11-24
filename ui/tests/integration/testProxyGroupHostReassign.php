@@ -57,6 +57,13 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 	const EXCHANGE_HOSTNAME_W = 'pg_reassign_exchange_w';
 	const EXCHANGE_HOSTNAME_X = 'pg_reassign_exchange_x';
 	const EXCHANGE_HOSTNAME_Y = 'pg_reassign_exchange_y';
+	const PENDING_HOSTNAME_1 = 'pg_reassign_pending_1';
+	const PENDING_HOSTNAME_2 = 'pg_reassign_pending_2';
+	const PENDING_HOSTNAME_TMP = 'pg_reassign_pending_tmp';
+	const PENDING_DIRECT_HOSTNAME = 'pg_reassign_pending_direct';
+	const MAPPING_HOSTNAME_1 = 'pg_reassign_mapping_1';
+	const MAPPING_HOSTNAME_2 = 'pg_reassign_mapping_2';
+	const MAPPING_HOSTNAME_TMP = 'pg_reassign_mapping_tmp';
 	const FAILOVER_HOSTNAME = 'pg_reassign_failover';
 	const REENTER_HOSTNAME = 'pg_reassign_reenter';
 	const ITEM_KEY = 'agent.ping';
@@ -102,18 +109,14 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 				'DebugLevel' => 3,
 				'LogFileSize' => 0,
 				'Hostname' => self::PROXY1_NAME,
-				'Server' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
-				// Configuration must be fetched only by the test, otherwise a host rename and the host_proxy row
-				// update it causes could be split between two proxy syncs.
-				'ProxyConfigFrequency' => 3600
+				'Server' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort')
 			],
 			self::COMPONENT_PROXY_HANODE1 => [
 				'ProxyMode' => PROXY_OPERATING_MODE_ACTIVE,
 				'DebugLevel' => 3,
 				'LogFileSize' => 0,
 				'Hostname' => self::PROXY2_NAME,
-				'Server' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
-				'ProxyConfigFrequency' => 3600
+				'Server' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort')
 			],
 			self::COMPONENT_AGENT => [
 				'Hostname' => self::HOSTNAME,
@@ -253,7 +256,9 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 				self::RENAMED_HOSTNAME, self::DIRECT_OTHER_HOSTNAME, self::REDIRECT_HOSTNAME,
 				self::REDIRECT_RENAMED_HOSTNAME, self::SWAP_HOSTNAME_W, self::SWAP_HOSTNAME_X,
 				self::SWAP_HOSTNAME_Y, self::EXCHANGE_HOSTNAME_W, self::EXCHANGE_HOSTNAME_X,
-				self::EXCHANGE_HOSTNAME_Y, self::FAILOVER_HOSTNAME,
+				self::EXCHANGE_HOSTNAME_Y, self::PENDING_HOSTNAME_1, self::PENDING_HOSTNAME_2,
+				self::PENDING_HOSTNAME_TMP, self::PENDING_DIRECT_HOSTNAME, self::MAPPING_HOSTNAME_1,
+				self::MAPPING_HOSTNAME_2, self::MAPPING_HOSTNAME_TMP, self::FAILOVER_HOSTNAME,
 				self::REENTER_HOSTNAME
 			]]
 		]);
@@ -991,6 +996,331 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 	}
 
 	/**
+	 * Swapping host names must not make a proxy redirect its own host to the other proxy when the proxy gets the
+	 * host-to-proxy mapping with the new names before the rename of its own host.
+	 *
+	 * Host A (named "1") is monitored by proxy PA, host B (named "2") by proxy PB, both proxies are online in group 1.
+	 * The server sends a change of a proxy group host to its proxy only after the server syncs the re-sent mapping row
+	 * of the host, while the mapping rows are sent to proxies as soon as proxy group manager updates them:
+	 *   1) swap the host names: A "1" -> "tmp", B "2" -> "1", A "tmp" -> "2", and sync the server - proxy group manager
+	 *      re-sends the mapping rows of A and B;
+	 *   2) sync PA only - PA gets the mapping rows with the new names ("2" is A, "1" is B), but not the rename of its
+	 *      own host A, which PA still knows as "1";
+	 *   3) sync the server, then PA - PA gets the rename of A from "1" to "2", without mapping rows. PA must not rename
+	 *      the mapping found under name "1", which belongs to B. Otherwise PA redirects its own host A, under the new
+	 *      name "2", to PB, and does not redirect B anymore, until the mapping of B changes again.
+	 *
+	 * @depends testProxyGroupHostReassign_reassignAfterGroupRecovery
+	 */
+	public function testProxyGroupHostReassign_mappingBeforeRenameRedirect() {
+		$components = [self::COMPONENT_SERVER, self::COMPONENT_PROXY, self::COMPONENT_PROXY_HANODE1];
+
+		// both proxies in group 1, one host on each
+		$response = $this->call('proxy.update', [
+			'proxyid' => self::$proxyid2,
+			'proxy_groupid' => self::$proxy_groupid1
+		]);
+		$this->assertArrayHasKey('proxyids', $response['result']);
+
+		$hostids = [
+			'a' => $this->createGroup1Host(self::MAPPING_HOSTNAME_1),
+			'b' => $this->createGroup1Host(self::MAPPING_HOSTNAME_2)
+		];
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		$assigned = function ($row) {
+			return ($row !== false) ? true : 'Host is expected to be assigned to a proxy of group 1';
+		};
+		$rows = [];
+		$proxies = [];
+		foreach ($hostids as $host => $hostid) {
+			$rows[$host] = $this->waitForHostProxyRow($hostid, $assigned);
+			$proxies[$host] = $this->getProxyComponent($rows[$host]['proxyid']);
+		}
+
+		$this->assertNotSame($proxies['a'], $proxies['b'], 'Hosts are expected to be assigned to different proxies, '.
+				'host_proxy rows: '.json_encode($rows));
+
+		$proxy_a = $proxies['a'];
+		$address_b = self::getProxyAddress($proxies['b']);
+
+		foreach ($components as $component) {
+			$this->reloadConfigurationCacheAndWaitForLogLine($component);
+		}
+
+		$this->checkHostRenamesMonitoring(['a' => self::MAPPING_HOSTNAME_1, 'b' => self::MAPPING_HOSTNAME_2], $proxies,
+				'before the renames');
+
+		// 1) swap the host names and sync the server, proxy group manager re-sends both mapping rows
+		foreach ([
+			[$hostids['a'], self::MAPPING_HOSTNAME_TMP],
+			[$hostids['b'], self::MAPPING_HOSTNAME_1],
+			[$hostids['a'], self::MAPPING_HOSTNAME_2]
+		] as [$hostid, $hostname]) {
+			$response = $this->call('host.update', [
+				'hostid' => $hostid,
+				'host' => $hostname
+			]);
+			$this->assertArrayHasKey('hostids', $response['result']);
+		}
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		foreach ($hostids as $host => $hostid) {
+			$row = $rows[$host];
+
+			$this->waitForHostProxyRow($hostid, function ($new_row) use ($row) {
+				return ($new_row !== false && bccomp($new_row['hostproxyid'], $row['hostproxyid']) == 0
+						&& bccomp($new_row['proxyid'], $row['proxyid']) == 0
+						&& bccomp($new_row['revision'], $row['revision']) > 0)
+					? true
+					: 'Host rename is expected to bump the revision of host_proxy row '.json_encode($row).
+						', got: '.json_encode($new_row);
+			});
+		}
+
+		// 2) sync PA only - it gets the mapping rows with the new names, but not the rename of its own host A
+		$this->reloadConfigurationCacheAndWaitForLogLine($proxy_a);
+
+		$this->waitForRedirect($proxy_a, self::MAPPING_HOSTNAME_1, $address_b, 'Proxy "'.$proxy_a.
+				'" did not get the mapping of host B under its new name "'.self::MAPPING_HOSTNAME_1.'"');
+		$this->waitForProxyActiveCheck($proxy_a, self::MAPPING_HOSTNAME_2, false, 'Proxy "'.$proxy_a.
+				'" got the rename of its own host A together with the mapping rows, the test does not reproduce the '.
+				'scenario');
+
+		// 3) sync the server, then PA - PA gets the rename of A, the mapping rows were already sent
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCacheAndWaitForLogLine($proxy_a);
+
+		$this->waitForRedirect($proxy_a, self::MAPPING_HOSTNAME_2, null, 'Proxy "'.$proxy_a.
+				'" redirects its own host A, renamed to "'.self::MAPPING_HOSTNAME_2.'" - renaming A took the '.
+				'mapping of host B');
+		$this->waitForProxyActiveCheck($proxy_a, self::MAPPING_HOSTNAME_2, true, 'Proxy "'.$proxy_a.
+				'" does not monitor its own host A, renamed to "'.self::MAPPING_HOSTNAME_2.'"');
+		$this->waitForRedirect($proxy_a, self::MAPPING_HOSTNAME_1, $address_b, 'Proxy "'.$proxy_a.
+				'" does not redirect host B, renamed to "'.self::MAPPING_HOSTNAME_1.'", to its proxy');
+
+		// all components agree after another sync
+		foreach ($components as $component) {
+			$this->reloadConfigurationCacheAndWaitForLogLine($component);
+		}
+
+		$this->checkHostRenamesMonitoring(['a' => self::MAPPING_HOSTNAME_2, 'b' => self::MAPPING_HOSTNAME_1], $proxies,
+				'after the renames');
+
+		foreach ($components as $component) {
+			$this->waitForRedirect($component, self::MAPPING_HOSTNAME_TMP, null, 'Component "'.$component.
+					'" redirects temporary name "'.self::MAPPING_HOSTNAME_TMP.'"');
+		}
+
+		// delete the hosts, the server and the proxies must stop redirecting them
+		$response = $this->call('host.delete', array_values($hostids));
+		$this->assertArrayHasKey('hostids', $response['result']);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		foreach ([self::MAPPING_HOSTNAME_1, self::MAPPING_HOSTNAME_2] as $hostname) {
+			foreach ($components as $component) {
+				$this->waitForRedirect($component, $hostname, null, 'Component "'.$component.
+						'" still redirects deleted host "'.$hostname.'"', $component !== self::COMPONENT_SERVER);
+			}
+		}
+
+		// restore the proxy groups
+		$response = $this->call('proxy.update', [
+			'proxyid' => self::$proxyid2,
+			'proxy_groupid' => self::$proxy_groupid2
+		]);
+		$this->assertArrayHasKey('proxyids', $response['result']);
+
+		foreach ($components as $component) {
+			$this->reloadConfigurationCacheAndWaitForLogLine($component);
+		}
+	}
+
+	/**
+	 * Swapping host names must not make a proxy redirect its own host to the other proxy.
+	 *
+	 * Host A (named "1") is monitored by proxy PA, host B (named "2") by proxy PB, both proxies are online in group 1.
+	 * A proxy learns about hosts from two sources:
+	 *   - its own hosts come from the server configuration cache, so a rename reaches the proxy only after the server
+	 *     syncs;
+	 *   - the host-to-proxy mapping of the group (host_proxy rows) is read straight from the database, so a mapping
+	 *     row carries the newest host name, even before the server syncs it.
+	 * A change of a proxy group host alone does not make the server send it to its proxy. The proxy gets the change
+	 * once the server syncs the re-sent mapping row of the host, so normally the rename and the mapping with the new
+	 * name arrive together. Any other change for the same proxy sends the renamed host right away, without its
+	 * mapping - here host D, monitored by PA directly, is changed for that.
+	 * The test makes PA get the mapping of B under its new name before PA gets the rename of its own host A:
+	 *   1) change B (visible name) and sync the server - proxy group manager marks the mapping of B to be re-sent;
+	 *   2) swap the host names and change D, without syncing the server: A "1" -> "tmp", B "2" -> "1", A "tmp" -> "2";
+	 *   3) sync PA only - PA still knows its own host A as "1", but gets the mapping of B already named "1", so PA
+	 *      redirects name "1" to PB;
+	 *   4) sync the server, then PA - the change of D makes PA get the rename of A from "1" to "2". PA must rename the
+	 *      mapping of A only, not the mapping now found under name "1", which belongs to B. Otherwise PA redirects its
+	 *      own host A, under the new name "2", to PB.
+	 * About a second after the server sync in step 4, proxy group manager re-sends both renamed mappings. If PA gets
+	 * them in the same sync as the rename of A, they repair a wrong mapping right away. PA is synced right after the
+	 * server, so without the fix the test fails in most runs, but not in all of them.
+	 *
+	 * @depends testProxyGroupHostReassign_reassignAfterGroupRecovery
+	 */
+	public function testProxyGroupHostReassign_renameWithPendingHostmapRedirect() {
+		$components = [self::COMPONENT_SERVER, self::COMPONENT_PROXY, self::COMPONENT_PROXY_HANODE1];
+
+		// both proxies in group 1, one host on each
+		$response = $this->call('proxy.update', [
+			'proxyid' => self::$proxyid2,
+			'proxy_groupid' => self::$proxy_groupid1
+		]);
+		$this->assertArrayHasKey('proxyids', $response['result']);
+
+		$hostids = [
+			'a' => $this->createGroup1Host(self::PENDING_HOSTNAME_1),
+			'b' => $this->createGroup1Host(self::PENDING_HOSTNAME_2)
+		];
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		$assigned = function ($row) {
+			return ($row !== false) ? true : 'Host is expected to be assigned to a proxy of group 1';
+		};
+		$rows = [];
+		$proxies = [];
+		foreach ($hostids as $host => $hostid) {
+			$rows[$host] = $this->waitForHostProxyRow($hostid, $assigned);
+			$proxies[$host] = $this->getProxyComponent($rows[$host]['proxyid']);
+		}
+
+		$this->assertNotSame($proxies['a'], $proxies['b'], 'Hosts are expected to be assigned to different proxies, '.
+				'host_proxy rows: '.json_encode($rows));
+
+		$proxy_a = $proxies['a'];
+		$address_b = self::getProxyAddress($proxies['b']);
+
+		// host D is monitored by PA directly, its change makes the server send changed hosts to PA
+		$response = $this->call('host.create', [
+			'host' => self::PENDING_DIRECT_HOSTNAME,
+			'groups' => [['groupid' => 4]],
+			'monitored_by' => ZBX_MONITORED_BY_PROXY,
+			'proxyid' => $this->getProxyId($proxy_a)
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		$direct_hostid = $response['result']['hostids'][0];
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		foreach ($components as $component) {
+			$this->reloadConfigurationCacheAndWaitForLogLine($component);
+		}
+
+		$this->checkHostRenamesMonitoring(['a' => self::PENDING_HOSTNAME_1, 'b' => self::PENDING_HOSTNAME_2], $proxies,
+				'before the renames');
+
+		// 1) change B and sync the server, proxy group manager bumps the revision of the mapping of B
+		$response = $this->call('host.update', [
+			'hostid' => $hostids['b'],
+			'name' => self::PENDING_HOSTNAME_2.' visible'
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		$bumped = function ($row) {
+			return function ($new_row) use ($row) {
+				return ($new_row !== false && bccomp($new_row['hostproxyid'], $row['hostproxyid']) == 0
+						&& bccomp($new_row['proxyid'], $row['proxyid']) == 0
+						&& bccomp($new_row['revision'], $row['revision']) > 0)
+					? true
+					: 'Host change is expected to bump the revision of host_proxy row '.json_encode($row).
+						', got: '.json_encode($new_row);
+			};
+		};
+		$rows['b'] = $this->waitForHostProxyRow($hostids['b'], $bumped($rows['b']));
+
+		// 2) swap the host names and change D, the server does not sync
+		foreach ([
+			[$hostids['a'], self::PENDING_HOSTNAME_TMP],
+			[$hostids['b'], self::PENDING_HOSTNAME_1],
+			[$hostids['a'], self::PENDING_HOSTNAME_2]
+		] as [$hostid, $hostname]) {
+			$response = $this->call('host.update', [
+				'hostid' => $hostid,
+				'host' => $hostname
+			]);
+			$this->assertArrayHasKey('hostids', $response['result']);
+		}
+
+		$response = $this->call('host.update', [
+			'hostid' => $direct_hostid,
+			'name' => self::PENDING_DIRECT_HOSTNAME.' visible'
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+
+		// 3) sync PA only - it gets the mapping of B already named "1", while it still knows its own host A as "1"
+		$this->reloadConfigurationCacheAndWaitForLogLine($proxy_a);
+
+		$this->waitForRedirect($proxy_a, self::PENDING_HOSTNAME_1, $address_b, 'Proxy "'.$proxy_a.
+				'" did not get the mapping of host B under its new name before the server synced the renames, '.
+				'the test does not reproduce the scenario');
+
+		// 4) sync the server, then PA right away, before proxy group manager re-sends the renamed mappings - the change
+		// of D makes PA get the rename of A
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCacheAndWaitForLogLine($proxy_a);
+
+		$this->waitForRedirect($proxy_a, self::PENDING_HOSTNAME_2, null, 'Proxy "'.$proxy_a.
+				'" redirects its own host A, renamed to "'.self::PENDING_HOSTNAME_2.'" - renaming A took the '.
+				'mapping of host B');
+		$this->waitForProxyActiveCheck($proxy_a, self::PENDING_HOSTNAME_2, true, 'Proxy "'.$proxy_a.
+				'" does not monitor its own host A, renamed to "'.self::PENDING_HOSTNAME_2.'"');
+		$this->waitForRedirect($proxy_a, self::PENDING_HOSTNAME_1, $address_b, 'Proxy "'.$proxy_a.
+				'" does not redirect host B, renamed to "'.self::PENDING_HOSTNAME_1.'", to its proxy');
+
+		// proxy group manager bumps the revision of both renamed mappings
+		foreach ($hostids as $host => $hostid) {
+			$this->waitForHostProxyRow($hostid, $bumped($rows[$host]));
+		}
+
+		foreach ($components as $component) {
+			$this->reloadConfigurationCacheAndWaitForLogLine($component);
+		}
+
+		$this->checkHostRenamesMonitoring(['a' => self::PENDING_HOSTNAME_2, 'b' => self::PENDING_HOSTNAME_1], $proxies,
+				'after the renames');
+
+		foreach ($components as $component) {
+			$this->waitForRedirect($component, self::PENDING_HOSTNAME_TMP, null, 'Component "'.$component.
+					'" redirects temporary name "'.self::PENDING_HOSTNAME_TMP.'"');
+		}
+
+		// delete the hosts, the server and the proxies must stop redirecting them
+		$response = $this->call('host.delete', array_merge(array_values($hostids), [$direct_hostid]));
+		$this->assertArrayHasKey('hostids', $response['result']);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		foreach ([self::PENDING_HOSTNAME_1, self::PENDING_HOSTNAME_2] as $hostname) {
+			foreach ($components as $component) {
+				$this->waitForRedirect($component, $hostname, null, 'Component "'.$component.
+						'" still redirects deleted host "'.$hostname.'"', $component !== self::COMPONENT_SERVER);
+			}
+		}
+
+		// restore the proxy groups
+		$response = $this->call('proxy.update', [
+			'proxyid' => self::$proxyid2,
+			'proxy_groupid' => self::$proxy_groupid2
+		]);
+		$this->assertArrayHasKey('proxyids', $response['result']);
+
+		foreach ($components as $component) {
+			$this->reloadConfigurationCacheAndWaitForLogLine($component);
+		}
+	}
+
+	/**
 	 * Host must fail over between proxies of a group and back, and the proxy that lost the host must redirect it:
 	 *   1) host of group 1 is assigned to proxy P;
 	 *   2) P is stopped, proxy group manager fails the host over to proxy Q in the database, while the server
@@ -1246,26 +1576,7 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 		// host B is created first, so it gets lower ids and tends to be processed before host A
 		$hostids = [];
 		foreach ([$names['b'], $names['a']] as $hostname) {
-			$response = $this->call('host.create', [
-				'host' => $hostname,
-				'groups' => [['groupid' => 4]],
-				'monitored_by' => ZBX_MONITORED_BY_PROXY_GROUP,
-				'proxy_groupid' => self::$proxy_groupid1
-			]);
-			$this->assertArrayHasKey('hostids', $response['result']);
-			$hostid = $response['result']['hostids'][0];
-			$hostids[] = $hostid;
-
-			// active item, so the proxy monitoring the host can be checked by the active checks it serves
-			$response = $this->call('item.create', [
-				'name' => 'Agent ping',
-				'key_' => self::ITEM_KEY,
-				'type' => ITEM_TYPE_ZABBIX_ACTIVE,
-				'value_type' => ITEM_VALUE_TYPE_UINT64,
-				'delay' => '1s',
-				'hostid' => $hostid
-			]);
-			$this->assertArrayHasKey('itemids', $response['result']);
+			$hostids[] = $this->createGroup1Host($hostname);
 		}
 		[self::$swap_hostid_b, self::$swap_hostid_a] = $hostids;
 		$hostids = ['a' => self::$swap_hostid_a, 'b' => self::$swap_hostid_b];
@@ -1381,6 +1692,37 @@ class testProxyGroupHostReassign extends CIntegrationTest {
 		foreach ($components as $component) {
 			$this->reloadConfigurationCacheAndWaitForLogLine($component);
 		}
+	}
+
+	/**
+	 * Create a host monitored by proxy group 1, with an active item, so the proxy monitoring the host can be checked
+	 * by the active checks it serves.
+	 *
+	 * @param string $hostname
+	 *
+	 * @return string  host ID
+	 */
+	private function createGroup1Host($hostname) {
+		$response = $this->call('host.create', [
+			'host' => $hostname,
+			'groups' => [['groupid' => 4]],
+			'monitored_by' => ZBX_MONITORED_BY_PROXY_GROUP,
+			'proxy_groupid' => self::$proxy_groupid1
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		$hostid = $response['result']['hostids'][0];
+
+		$response = $this->call('item.create', [
+			'name' => 'Agent ping',
+			'key_' => self::ITEM_KEY,
+			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'delay' => '1s',
+			'hostid' => $hostid
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+
+		return $hostid;
 	}
 
 	/**
