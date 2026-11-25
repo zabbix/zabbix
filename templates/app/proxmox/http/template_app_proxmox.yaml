@@ -5291,7 +5291,7 @@ zabbix_export:
                       name: width
                       value: '20'
                 - type: piechart
-                  name: 'Cluster: Virtual mashines'
+                  name: 'Cluster: Virtual machines'
                   x: '8'
                   'y': '3'
                   width: '10'
