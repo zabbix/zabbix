@@ -960,6 +960,8 @@ typedef struct
 }
 zbx_dc_host_proxy_t;
 
+ZBX_PTR_VECTOR_DECL(dc_host_proxy_ptr, zbx_dc_host_proxy_t *)
+
 typedef struct
 {
 	const char		*host;
