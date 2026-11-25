@@ -12,6 +12,7 @@ declare -A BASELINE_TIMES=(
   [testMacros]=282
   [testItemTimeouts]=209
   [testAgentJsonProtocol]=188
+  [testProxyGroupHostReassign]=180
   [testLLDProxyHistorySyncAtScale]=180
   [testHighAvailability]=165
   [testAlertingForServices]=160
