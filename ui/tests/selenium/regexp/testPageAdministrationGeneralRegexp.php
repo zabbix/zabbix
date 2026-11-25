@@ -103,7 +103,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		// Validate the dropdown menu under header.
 		$popup_menu = $this->query('id:page-title-general')->asPopupButton()->one()->getMenu();
 		$this->assertEquals(['GUI', 'Autoregistration', 'Timeouts', 'Images', 'Icon mapping', 'Regular expressions',
-			'Trigger displaying options', 'Geographical maps', 'Modules', 'Connectors', 'Other'],
+			'Trigger displaying options', 'Geographical maps', 'Modules', 'Connectors', 'APM', 'Other'],
 			$popup_menu->getItems()->asText()
 		);
 		$popup_menu->close();

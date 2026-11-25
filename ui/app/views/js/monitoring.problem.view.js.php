@@ -29,6 +29,7 @@
 		#active_filter = null;
 		#global_timerange = null;
 		#opened_eventids = [];
+		/** @var {CDataTable|null} */
 		#datatable = null;
 		#csrf_token = null;
 		#show_problems_hidden_column_ids = ['recovery', 'status'];
@@ -113,7 +114,7 @@
 						.setSortField('clock')
 						.setSortable(true),
 					new CDataTableColumn('severity', <?= json_encode(_('Severity')); ?>)
-						.setFields(['severity'])
+						.setFields(['severity', 'trigger_value'])
 						.setRenderer('severity')
 						.setSortable(true),
 					new CDataTableColumn('recovery', <?= json_encode(_('Recovery time')); ?>)
@@ -190,7 +191,7 @@
 				.setFilter(filter)
 				.setTabFilterItem(this.#active_filter)
 				.setSelectable('problem', 'eventids', ['eventid', 'nested', 'symptom_count', 'cause_eventid',
-					'severity'])
+					'severity', 'trigger_value'])
 				.setDefaultSortField(default_sort_field)
 				.setDefaultSortOrder(default_sort_order)
 				.setSortField(sort_field)
@@ -199,7 +200,7 @@
 				.setStickyHeader(true)
 				.setStickyFooter(true)
 				.setCellRenderer(CDataTableColumn.CHECKBOX, ({column, cell_data, row, row_index, cell, response}) => {
-					const [eventid, nested, symptom_count, cause_eventid, severity] = cell_data;
+					const [eventid, nested, symptom_count, cause_eventid, severity, trigger_value] = cell_data;
 
 					if (!eventid) {
 						return;
@@ -304,13 +305,16 @@
 								return;
 							}
 
-							for (const data_cell of this.#datatable.findDataCells({row_index})) {
-								data_cell.target.classList.add(CDataTable.ZBX_STYLE_CELL_BG_HOVER, severity_data.style);
-							}
+							if (trigger_value == TRIGGER_VALUE_TRUE) {
+								for (const data_cell of this.#datatable.findDataCells({row_index})) {
+									data_cell.target.classList.add(CDataTable.ZBX_STYLE_CELL_BG_HOVER,
+										severity_data.style);
+								}
 
-							const row_spacer = this.#datatable.findRowSpacer(row);
-							if (row_spacer) {
-								row_spacer.classList.add(severity_data.style);
+								const row_spacer = this.#datatable.findRowSpacer(row);
+								if (row_spacer) {
+									row_spacer.classList.add(severity_data.style);
+								}
 							}
 						}
 					});
@@ -386,11 +390,9 @@
 					}
 				})
 				.setCellRenderer('severity', ({cell_data, cell}) => {
-					const [severity] = cell_data;
+					const [severity, trigger_value] = cell_data;
 					const severity_data = severities.find(data => data.value == severity);
 					const compact_view = this.#datatable.getOption('compact_view');
-
-					cell.classList.add(CDataTable.ZBX_STYLE_CELL_BG);
 
 					if (severity_data) {
 						const wordbreak = document.createElement('span');
@@ -405,7 +407,11 @@
 
 						flex_wrapper.appendChild(wordbreak);
 
-						cell.classList.add(severity_data.style);
+						if (trigger_value == TRIGGER_VALUE_TRUE) {
+							cell.classList.add(CDataTable.ZBX_STYLE_CELL_BG);
+							cell.classList.add(severity_data.style);
+						}
+
 						cell.appendChild(flex_wrapper);
 					}
 				})

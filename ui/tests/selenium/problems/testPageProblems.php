@@ -2262,9 +2262,11 @@ class testPageProblems extends CWebTest {
 	public function testPageProblems_OperationalData($data) {
 		$this->page->login()->open(self::URL.'&sort=clock&sortorder=ASC');
 		$form = CFilterElement::find()->one()->getForm();
-
+		$table = $this->query('id:datatable-problems')->asDatatable()->one();
+		$headers = $table->getHeaders();
 		$form->fill($data['filter'])->submit();
-		$this->query('id:datatable-problems')->asDatatable()->one()->waitUntilReady();
+		$headers->waitUntilStalled();
+		$table->waitUntilReady()->invalidate();
 
 		// Set operational data in Problem column.
 		if (array_key_exists('header_settings', $data)) {

@@ -2668,11 +2668,11 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/item_card'
 				]
 			],
-			// #253 Administration -> Data source -> APM view.
+			// #253 Administration -> General -> APM view.
 			[
 				[
 					'url' => 'zabbix.php?action=apm.db.edit',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/data_source#apm'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#apm'
 				]
 			],
 			// #254 APM -> Traces view.

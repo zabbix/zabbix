@@ -1359,6 +1359,11 @@ class testFormGraphs extends CWebTest {
 			}
 		}
 
+		// Trigger the inline error for Y axis MAX, so that it does not move the Add button during the click.
+		$form->query('xpath://div[@id="ymax_itemid"]//input')->one()->click();
+		$this->page->removeFocus();
+		$this->assertInlineError($form, ['xpath://div[@id="ymax_itemid"]/..' => 'This field cannot be empty.']);
+
 		$this->checkItemsInDialog($form, 'xpath://button[@id="add_item"]', self::HOST_WITH_ITEMS);
 
 		if ($this->prototype) {

@@ -727,7 +727,7 @@ z-select,
 		}
 
 		&:not(.datatable-row-disabled):not(.row-selected) {
-			.datatable-cell.datatable-cell-data {
+			.datatable-cell.datatable-cell-data.datatable-cell-bg-hover {
 				color: $compact-view-color;
 
 				a {
@@ -748,7 +748,7 @@ z-select,
 				}
 			}
 
-			&:not(:hover) .datatable-cell.datatable-cell-data {
+			&:not(:hover) .datatable-cell.datatable-cell-data.datatable-cell-bg-hover {
 				.problem-unack-fg,
 				.problem-ack-fg,
 				.ok-unack-fg,

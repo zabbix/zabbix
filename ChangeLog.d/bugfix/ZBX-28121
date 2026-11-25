@@ -1,0 +1,1 @@
+..F....... [ZBX-28121] fixed focus loss by restoring focus to the Edit button after updating a discovery check in the list (aluchko)
