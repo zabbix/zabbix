@@ -949,12 +949,13 @@ function objectToFormData(object) {
 /**
  * Create a URL pointing to zabbix.php.
  *
- * @param arguments
+ * @param {Object} arguments
+ * @param {string} path
  *
  * @returns {string}
  */
-function zabbixUrl(arguments) {
-	return `zabbix.php?${objectToSearchParams(arguments)}`;
+function zabbixUrl(arguments, path = 'zabbix.php') {
+	return `${path}?${objectToSearchParams(arguments)}`;
 }
 
 /**

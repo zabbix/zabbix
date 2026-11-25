@@ -67,8 +67,8 @@ class testWidgets extends CWebTest {
 
 		// Item types expected in items table. For the most cases these are all items except of Binary and dependent.
 		$item_types = (in_array($widget, ['Item navigator', 'Item history', 'Honeycomb', 'Top hosts']))
-			? ['Binary item', 'Character item', 'Float item', 'Log item', 'Text item', 'Unsigned item', 'Unsigned_dependent item']
-			: ['Character item', 'Float item', 'Log item', 'Text item', 'Unsigned item', 'Unsigned_dependent item'];
+			? ['Binary item', 'Character item', 'Float item', 'JSON item', 'Log item', 'Text item','Unsigned item', 'Unsigned_dependent item']
+			: ['Character item', 'Float item', 'JSON item', 'Log item', 'Text item', 'Unsigned item', 'Unsigned_dependent item'];
 
 		switch ($widget) {
 			case 'Top hosts':
@@ -181,9 +181,9 @@ class testWidgets extends CWebTest {
 			: CDashboardElement::find()->one()->getWidget($widget_name);
 
 		$widget->waitUntilReady();
-		$locator = 'xpath://div[contains(@class,"node-is-selected")]';
+		$locator = 'xpath:.//div[contains(@class,"node-is-selected")]';
 		$this->assertFalse($widget->query($locator)->one(false)->isValid());
-		$widget->query('xpath://span[@title="'.$entity_name.'"]')->waitUntilReady()->one()->click();
+		$widget->query('xpath:.//span[@title="'.$entity_name.'"]')->waitUntilVisible()->one()->click();
 		$this->assertTrue($widget->query($locator)->one()->isVisible());
 	}
 

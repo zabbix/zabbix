@@ -92,12 +92,18 @@
 					this.#delete(e.target, [e.target.dataset.serviceid]);
 				}
 				else if (e.target.classList.contains('js-massupdate-service')) {
-					openMassupdatePopup('popup.massupdate.service', {
+					const overlay = openMassupdatePopup('popup.massupdate.service', {
 						location_url: this.return_url,
 						[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('service')) ?>
 					}, {
 						dialogue_class: 'modal-popup-static',
 						trigger_element: e.target
+					});
+
+					overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
+						chkbxRange.clearSelectedOnFilterChange();
+
+						this.reload({success: e.detail});
 					});
 				}
 				else if (e.target.classList.contains('js-massdelete-service')) {
@@ -166,28 +172,7 @@
 				body: JSON.stringify({serviceids})
 			})
 				.then((response) => response.json())
-				.then((response) => {
-					if ('error' in response) {
-						if ('title' in response.error) {
-							postMessageError(response.error.title);
-						}
-
-						postMessageDetails('error', response.error.messages);
-
-						uncheckTableRows(chkbxRange.prefix, response.keepids);
-					}
-					else if ('success' in response) {
-						postMessageOk(response.success.title);
-
-						if ('messages' in response.success) {
-							postMessageDetails('success', response.success.messages);
-						}
-
-						uncheckTableRows(chkbxRange.prefix);
-					}
-
-					location.reload();
-				})
+				.then((response) => this.reload(response))
 				.catch(() => {
 					clearMessages();
 
@@ -258,6 +243,29 @@
 
 					this.is_refresh_pending = false;
 				});
+		}
+
+		reload(response) {
+			if ('error' in response) {
+				if ('title' in response.error) {
+					postMessageError(response.error.title);
+				}
+
+				postMessageDetails('error', response.error.messages);
+
+				uncheckTableRows(chkbxRange.prefix, response.keepids);
+			}
+			else if ('success' in response) {
+				postMessageOk(response.success.title);
+
+				if ('messages' in response.success) {
+					postMessageDetails('success', response.success.messages);
+				}
+
+				uncheckTableRows(chkbxRange.prefix);
+			}
+
+			location.reload();
 		}
 	};
 </script>

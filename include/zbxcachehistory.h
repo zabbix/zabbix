@@ -194,8 +194,6 @@ int	zbx_init_database_cache(zbx_get_program_type_f get_program_type,
 
 void	zbx_free_database_cache(int sync, const zbx_events_funcs_t *events_cbs);
 
-zbx_uint64_t	zbx_dc_get_nextid(const char *table_name, int num);
-
 void	zbx_dc_update_interfaces_availability(void);
 void	zbx_hc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num);
 void	zbx_hc_get_mem_stats(zbx_shmem_stats_t *data, zbx_shmem_stats_t *index);

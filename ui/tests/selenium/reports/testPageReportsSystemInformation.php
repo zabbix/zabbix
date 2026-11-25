@@ -25,18 +25,37 @@ require_once __DIR__.'/../common/testSystemInformation.php';
  */
 class testPageReportsSystemInformation extends testSystemInformation {
 
-	public function testPageReportsSystemInformation_checkDisabledHA() {
-		$this->page->login()->open('zabbix.php?action=report.status')->waitUntilReady();
+	public static function getUserData() {
+		return [
+			[
+				[
+					'username' => 'Admin'
+				]
+			],
+			[
+				[
+					'username' => 'admin-zabbix'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getUserData
+	 */
+	public function testPageReportsSystemInformation_checkDisabledHA($data) {
+		$this->page->userLogin($data['username'], 'zabbix');
+		$this->page->open('zabbix.php?action=report.status')->waitUntilReady();
 
 		// Check field that is skipped in screenshot assertion.
-		$data = [
+		$check_data = [
 			[
 				'Parameter' => 'Zabbix frontend version',
 				'Value' => ZABBIX_VERSION,
 				'Details' => ''
 			]
 		];
-		$this->assertTableHasData($data);
+		$this->assertTableHasData($check_data);
 
 		// Check that system information export button is clickable.
 		$this->assertTrue($this->query('xpath://a[text() = "Export"]')->one()->isClickable());
@@ -45,19 +64,21 @@ class testPageReportsSystemInformation extends testSystemInformation {
 		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
 				[$this->query('xpath://table[@class="list-table sticky-header rounded-surface"]/tbody/tr[3]/td[1]')->one()]
 		);
-		$this->assertScreenshotExcept(null, $this->query('xpath://footer')->one(), 'report_without_ha');
+		$this->assertScreenshotExcept(null, $this->query('xpath://footer')->one(), 'report_without_ha_'.$data['username']);
 	}
 
 	/**
-	 * @onBefore prepareHANodeData
+	 * @onBeforeOnce prepareHANodeData
+	 *
+	 * @dataProvider getUserData
 	 */
-	public function testPageReportsSystemInformation_checkEnabledHA() {
-		$this->assertEnabledHACluster();
+	public function testPageReportsSystemInformation_checkEnabledHA($data) {
+		$this->assertEnabledHACluster(null, $data['username']);
 
 		// Check that system information export button is clickable.
 		$this->assertTrue($this->query('xpath://a[text() = "Export"]')->one()->isClickable());
 
-		$this->assertScreenshotExcept(null, self::$skip_fields, 'report_with_ha');
+		$this->assertScreenshotExcept(null, self::$skip_fields, 'report_with_ha_'.$data['username']);
 	}
 
 	/**

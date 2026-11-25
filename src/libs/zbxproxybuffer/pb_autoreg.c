@@ -14,7 +14,6 @@
 
 #include "pb_autoreg.h"
 #include "proxybuffer.h"
-#include "zbxcachehistory.h"
 #include "zbxcommon.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
@@ -164,7 +163,7 @@ static int	pb_autoreg_add_row_mem(zbx_pb_t *pb, const char *host, const char *ip
 	ret = zbx_list_append(&pb->autoreg, row, NULL);
 out:
 	if (SUCCEED == ret)
-		row->id = zbx_dc_get_nextid("proxy_autoreg_host", 1);
+		row->id = zbx_db_get_maxid_num("proxy_autoreg_host", 1);
 	else if (NULL != row)
 		pb_list_free_autoreg(&get_pb_data()->autoreg, row);
 

@@ -101,8 +101,9 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 	}
 
 	protected function doAction(): void {
+		$hostids = $this->getInput('hostids');
+
 		if ($this->hasInput('update')) {
-			$hostids = $this->getInput('hostids');
 			$hosts_count = count($hostids);
 			$visible = $this->getInput('visible', []);
 
@@ -498,8 +499,6 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				$backurl = new CUrl($this->getInput('backurl'));
 
 				if ($result) {
-					$backurl->setArgument('uncheck', 1);
-
 					CMessageHelper::setSuccessTitle($upd_status
 						? _n('Host enabled', 'Hosts enabled', $hosts_count)
 						: _n('Host disabled', 'Hosts disabled', $hosts_count)
@@ -548,7 +547,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
 				],
-				'hostids' => $this->getInput('hostids'),
+				'hostids' => $hostids,
 				'inventories' => zbx_toHash(getHostInventories(), 'db_field'),
 				'location_url' => (new CUrl('zabbix.php'))
 					->setArgument('action', 'host.list')

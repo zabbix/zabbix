@@ -30,7 +30,6 @@
 #include "zbxcacheconfig.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
-#include "zbxdbschema.h"
 #include "zbxjson.h"
 #include "zbxshmem.h"
 #include "zbxstr.h"
@@ -47,12 +46,9 @@ static zbx_shmem_info_t	*trend_mem = NULL;
 #define	UNLOCK_CACHE	zbx_mutex_unlock(cache_lock)
 #define	LOCK_TRENDS	zbx_mutex_lock(trends_lock)
 #define	UNLOCK_TRENDS	zbx_mutex_unlock(trends_lock)
-#define	LOCK_CACHE_IDS		zbx_mutex_lock(cache_ids_lock)
-#define	UNLOCK_CACHE_IDS	zbx_mutex_unlock(cache_ids_lock)
 
 static zbx_mutex_t	cache_lock = ZBX_MUTEX_NULL;
 static zbx_mutex_t	trends_lock = ZBX_MUTEX_NULL;
-static zbx_mutex_t	cache_ids_lock = ZBX_MUTEX_NULL;
 
 static ZBX_THREAD_LOCAL char	*sql = NULL;
 static ZBX_THREAD_LOCAL size_t	sql_alloc = 4 * ZBX_KIBIBYTE;
@@ -60,26 +56,9 @@ static ZBX_THREAD_LOCAL size_t	sql_alloc = 4 * ZBX_KIBIBYTE;
 static zbx_get_program_type_f	get_program_type_cb = NULL;
 static zbx_sync_history_cache_f	sync_history_cache_cb = NULL;
 
-#define ZBX_IDS_SIZE	14
-
 #define ZBX_HC_ITEMS_INIT_SIZE	1000
 
 #define ZBX_TRENDS_CLEANUP_TIME	(SEC_PER_MIN * 55)
-
-typedef struct
-{
-	char		table_name[ZBX_TABLENAME_LEN_MAX];
-	zbx_uint64_t	lastid;
-}
-ZBX_DC_ID;
-
-typedef struct
-{
-	ZBX_DC_ID	id[ZBX_IDS_SIZE];
-}
-ZBX_DC_IDS;
-
-static ZBX_DC_IDS	*ids = NULL;
 
 typedef struct
 {
@@ -3732,9 +3711,6 @@ int	zbx_init_database_cache(zbx_get_program_type_f get_program_type,
 	if (SUCCEED != (ret = zbx_mutex_create(&cache_lock, ZBX_MUTEX_CACHE, error)))
 		goto out;
 
-	if (SUCCEED != (ret = zbx_mutex_create(&cache_ids_lock, ZBX_MUTEX_CACHE_IDS, error)))
-		goto out;
-
 	if (SUCCEED != (ret = zbx_shmem_create(&hc_mem, history_cache_size, "history cache",
 			"HistoryCacheSize", 1, error)))
 	{
@@ -3749,9 +3725,6 @@ int	zbx_init_database_cache(zbx_get_program_type_f get_program_type,
 
 	cache = (ZBX_DC_CACHE *)__hc_index_shmem_malloc_func(NULL, sizeof(ZBX_DC_CACHE));
 	memset(cache, 0, sizeof(ZBX_DC_CACHE));
-
-	ids = (ZBX_DC_IDS *)__hc_index_shmem_malloc_func(NULL, sizeof(ZBX_DC_IDS));
-	memset(ids, 0, sizeof(ZBX_DC_IDS));
 
 	zbx_hashset_create_ext(&cache->history_items, ZBX_HC_ITEMS_INIT_SIZE,
 			ZBX_DEFAULT_ID_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
@@ -3830,7 +3803,6 @@ void	zbx_free_database_cache(int sync, const zbx_events_funcs_t *events_cbs)
 	hc_index_mem = NULL;
 
 	zbx_mutex_destroy(&cache_lock);
-	zbx_mutex_destroy(&cache_ids_lock);
 
 	if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 	{
@@ -3840,82 +3812,6 @@ void	zbx_free_database_cache(int sync, const zbx_events_funcs_t *events_cbs)
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: Return next id for requested table                                *
- *                                                                            *
- ******************************************************************************/
-zbx_uint64_t	zbx_dc_get_nextid(const char *table_name, int num)
-{
-	int			i;
-	zbx_db_result_t		result;
-	zbx_db_row_t		row;
-	const zbx_db_table_t	*table;
-	ZBX_DC_ID		*id;
-	zbx_uint64_t		min = 0, max = ZBX_DB_MAX_ID, nextid, lastid;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' num:%d", __func__, table_name, num);
-
-	LOCK_CACHE_IDS;
-
-	for (i = 0; i < ZBX_IDS_SIZE; i++)
-	{
-		id = &ids->id[i];
-		if ('\0' == *id->table_name)
-			break;
-
-		if (0 == strcmp(id->table_name, table_name))
-		{
-			nextid = id->lastid + 1;
-			id->lastid += num;
-			lastid = id->lastid;
-
-			UNLOCK_CACHE_IDS;
-
-			zabbix_log(LOG_LEVEL_DEBUG, "End of %s() table:'%s' [" ZBX_FS_UI64 ":" ZBX_FS_UI64 "]",
-					__func__, table_name, nextid, lastid);
-
-			return nextid;
-		}
-	}
-
-	if (i == ZBX_IDS_SIZE)
-	{
-		zabbix_log(LOG_LEVEL_ERR, "insufficient shared memory for ids");
-		zbx_exit(EXIT_FAILURE);
-	}
-
-	table = zbx_db_get_table(table_name);
-
-	result = zbx_db_select("select max(%s) from %s where %s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
-			table->recid, table_name, table->recid, min, max);
-
-	if (NULL != result)
-	{
-		zbx_strlcpy(id->table_name, table_name, sizeof(id->table_name));
-
-		if (NULL == (row = zbx_db_fetch(result)) || SUCCEED == zbx_db_is_null(row[0]))
-			id->lastid = min;
-		else
-			ZBX_STR2UINT64(id->lastid, row[0]);
-
-		nextid = id->lastid + 1;
-		id->lastid += num;
-		lastid = id->lastid;
-	}
-	else
-		nextid = lastid = 0;
-
-	UNLOCK_CACHE_IDS;
-
-	zbx_db_free_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() table:'%s' [" ZBX_FS_UI64 ":" ZBX_FS_UI64 "]",
-			__func__, table_name, nextid, lastid);
-
-	return nextid;
 }
 
 /******************************************************************************

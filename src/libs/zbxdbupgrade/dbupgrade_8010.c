@@ -14,16 +14,24 @@
 
 #include "dbupgrade.h"
 
+#include "zbxdb.h"
+
 /*
  * 8.2 development database patches
  */
 
 #ifndef HAVE_SQLITE3
 
-/*static int	DBpatch_8010000(void)
+static int	DBpatch_8010000(void)
 {
-	*** first upgrade patch ***
-}*/
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from role_rule where name='ui.administration.data_source'"))
+		return FAIL;
+
+	return SUCCEED;
+}
 
 #endif
 
@@ -31,7 +39,7 @@ DBPATCH_START(8010)
 
 /* version, duplicates flag, mandatory flag */
 
-/*DBPATCH_ADD(8010000, 0, 1)*/
+DBPATCH_ADD(8010000, 0, 1)
 
 DBPATCH_END()
 

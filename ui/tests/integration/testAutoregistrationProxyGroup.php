@@ -35,6 +35,10 @@ class testAutoregistrationProxyGroup extends CIntegrationTest {
 	const ACTIVE_ITEM_KEY = 'agent.ping';
 	const REFRESH_ACTIVE_CHECKS = 30;
 	const SERVER_DOWNTIME = 40;
+	const DISTRIBUTED_HOST_PREFIX = 'autoreg_pg_host_';
+	const DISTRIBUTED_SINGLE_HOST_PREFIX = 'autoreg_pg_single_host_';
+	const DISTRIBUTED_HOSTS_NUM = 30;
+	const DISTRIBUTED_HOSTS_MAX_DIFF = 2;
 
 	private static $proxy_groupid;
 	private static $proxyid;
@@ -225,7 +229,12 @@ class testAutoregistrationProxyGroup extends CIntegrationTest {
 
 		$response = CAPIHelper::call('host.get', [
 			'output' => ['hostid'],
-			'filter' => ['host' => [self::AGENT_HOSTNAME, self::DISCOVERED_HOST]]
+			'filter' => [
+				'host' => array_merge([self::AGENT_HOSTNAME, self::DISCOVERED_HOST],
+					self::getDistributedHostnames(self::DISTRIBUTED_HOST_PREFIX),
+					self::getDistributedHostnames(self::DISTRIBUTED_SINGLE_HOST_PREFIX)
+				)
+			]
 		]);
 		$hostids = array_column($response['result'], 'hostid');
 		if (count($hostids) > 0) {
@@ -385,6 +394,161 @@ class testAutoregistrationProxyGroup extends CIntegrationTest {
 				'Failed to find the "'.self::ACTIVE_ITEM_KEY.'" item on the autoregistered host: '.
 				json_encode($response['result']));
 		$itemid = $response['result'][0]['itemid'];
+	}
+
+	/**
+	 * Autoregister a batch of new hosts through a single proxy of the group and verify that the
+	 * server spreads them evenly between all proxies of the group instead of leaving them on the
+	 * proxy they arrived through.
+	 *
+	 * @depends testAutoregistrationProxyGroup_autoregHost
+	 */
+	public function testAutoregistrationProxyGroup_autoregHostsDistributedBetweenProxies() {
+		$hostnames = self::getDistributedHostnames(self::DISTRIBUTED_HOST_PREFIX);
+
+		foreach ($hostnames as $hostname) {
+			$this->requestAutoregistration($hostname);
+		}
+
+		$this->checkHostsDistribution($this->waitForHostsAssigned($hostnames));
+	}
+
+	/**
+	 * Same as the previous test, but the hosts are autoregistered one by one: the next host is
+	 * requested only after the previous one has been created and assigned to a proxy, so every
+	 * host goes through its own assignment round instead of being distributed in a single batch.
+	 *
+	 * @depends testAutoregistrationProxyGroup_autoregHost
+	 */
+	public function testAutoregistrationProxyGroup_autoregHostsDistributedBetweenProxiesOneByOne() {
+		$hostnames = self::getDistributedHostnames(self::DISTRIBUTED_SINGLE_HOST_PREFIX);
+
+		foreach ($hostnames as $hostname) {
+			$this->requestAutoregistration($hostname);
+			$this->waitForHostsAssigned([$hostname]);
+		}
+
+		$this->checkHostsDistribution($this->getAssignedHosts($hostnames));
+	}
+
+	/**
+	 * Make the first proxy of the group queue a host for autoregistration.
+	 *
+	 * @param string $hostname  name of the host to autoregister
+	 */
+	private function requestAutoregistration($hostname) {
+		// An active checks request for an unknown host makes the proxy queue it for autoregistration.
+		// The request itself is expected to fail with "host not found", so the response is ignored.
+		$this->getClient(self::COMPONENT_PROXY)->getActiveChecks($hostname);
+	}
+
+	/**
+	 * Wait until all the given hosts are autoregistered and assigned to a proxy in the group.
+	 *
+	 * @param array $hostnames  names of the hosts to wait for
+	 *
+	 * @return array  hosts as returned by host.get
+	 */
+	private function waitForHostsAssigned(array $hostnames) {
+		$expected = count($hostnames);
+
+		// Wait for the hosts to be created by the autoregistration action.
+		$this->callUntilDataIsPresent('host.get', [
+			'output' => ['hostid'],
+			'filter' => ['host' => $hostnames]
+		], 90, 1, function ($response) use ($expected) {
+			$total = count($response['result']);
+
+			return ($total == $expected) ? true : 'Autoregistered '.$total.' of '.$expected.' hosts';
+		});
+
+		// Make the server aware of the new hosts so that the proxy group manager can assign them.
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+
+		$response = $this->callUntilDataIsPresent('host.get', [
+			'output' => ['hostid', 'host', 'monitored_by', 'proxy_groupid', 'assigned_proxyid'],
+			'filter' => ['host' => $hostnames]
+		], 90, 1, function ($response) {
+			$unassigned = [];
+			foreach ($response['result'] as $host) {
+				if ($host['assigned_proxyid'] == 0) {
+					$unassigned[] = $host['host'];
+				}
+			}
+
+			return (count($unassigned) == 0)
+				? true
+				: 'Hosts are not yet assigned to a proxy in the group: '.implode(', ', $unassigned);
+		});
+
+		return $response['result'];
+	}
+
+	/**
+	 * Get the given hosts with their current proxy assignment, without waiting or reloading.
+	 *
+	 * @param array $hostnames  names of the hosts to get
+	 *
+	 * @return array  hosts as returned by host.get
+	 */
+	private function getAssignedHosts(array $hostnames) {
+		$response = $this->call('host.get', [
+			'output' => ['hostid', 'host', 'monitored_by', 'proxy_groupid', 'assigned_proxyid'],
+			'filter' => ['host' => $hostnames]
+		]);
+		$this->assertCount(count($hostnames), $response['result'],
+				'Failed to get all autoregistered hosts: '.json_encode($response['result']));
+
+		return $response['result'];
+	}
+
+	/**
+	 * Check that the given hosts are monitored by the proxy group and are spread evenly between
+	 * its proxies.
+	 *
+	 * @param array $hosts  hosts as returned by waitForHostsAssigned()
+	 */
+	private function checkHostsDistribution(array $hosts) {
+		$assigned = [self::$proxyid => 0, self::$proxyid2 => 0];
+
+		foreach ($hosts as $host) {
+			$this->assertEquals(ZBX_MONITORED_BY_PROXY_GROUP, $host['monitored_by'],
+					'Host "'.$host['host'].'" is expected to be monitored by proxy group');
+			$this->assertEquals(self::$proxy_groupid, $host['proxy_groupid'],
+					'Host "'.$host['host'].'" is expected to be assigned to the created proxy group');
+			$this->assertArrayHasKey($host['assigned_proxyid'], $assigned,
+					'Host "'.$host['host'].'" is assigned to an unexpected proxy: '.json_encode($host));
+
+			$assigned[$host['assigned_proxyid']]++;
+		}
+
+		// New hosts are always given to the least loaded proxy, so the group as a whole stays within
+		// one host of even. The group also holds hosts created by the previous tests, which is why the
+		// new hosts alone can be off by a little more.
+		$this->assertLessThanOrEqual(self::DISTRIBUTED_HOSTS_MAX_DIFF,
+				abs($assigned[self::$proxyid] - $assigned[self::$proxyid2]),
+				'Autoregistered hosts are expected to be distributed evenly between proxies, got: '.
+				json_encode([
+					self::PROXY_NAME => $assigned[self::$proxyid],
+					self::PROXY2_NAME => $assigned[self::$proxyid2]
+				]));
+	}
+
+	/**
+	 * Get names of the hosts autoregistered by a distribution test.
+	 *
+	 * @param string $prefix  host name prefix used by the test
+	 *
+	 * @return array
+	 */
+	private static function getDistributedHostnames($prefix) {
+		$hostnames = [];
+
+		for ($i = 1; $i <= self::DISTRIBUTED_HOSTS_NUM; $i++) {
+			$hostnames[] = $prefix.$i;
+		}
+
+		return $hostnames;
 	}
 
 	/**

@@ -795,6 +795,20 @@ char	*zbx_strerror(int errnum);
 #	else
 #		define zbx_sigmask	sigprocmask
 #	endif
+
+/* fill signal set with asynchronous signals that must be handled only by the main thread of the process */
+#	define ZBX_SIGSET_THREAD_SIGNALS(mask)	\
+	do					\
+	{					\
+		sigemptyset(mask);		\
+		sigaddset(mask, SIGTERM);	\
+		sigaddset(mask, SIGUSR1);	\
+		sigaddset(mask, SIGUSR2);	\
+		sigaddset(mask, SIGHUP);	\
+		sigaddset(mask, SIGQUIT);	\
+		sigaddset(mask, SIGINT);	\
+	}					\
+	while (0)
 #endif
 
 #define ZBX_GET_CONFIG_VAR(type, varname, defvalue) \

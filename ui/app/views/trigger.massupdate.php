@@ -28,13 +28,12 @@ $form = (new CForm())
 	->addVar('update', '1')
 	->addVar('location_url', $data['location_url'])
 	->addVar('context', $data['context'])
+	->addVar('prototype', $data['prototype'])
 	->disablePasswordAutofill();
 
-	if ($data['prototype']) {
-		$form
-			->addVar('parent_discoveryid', $data['parent_discoveryid'])
-			->addVar('prototype', $data['prototype']);
-	}
+if ($data['prototype']) {
+	$form->addVar('parent_discoveryid', $data['parent_discoveryid']);
+}
 
 /*
  * Trigger tab

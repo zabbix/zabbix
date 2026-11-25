@@ -1273,7 +1273,7 @@ void	op_host_enable(const zbx_db_event *event, zbx_config_t *cfg, zbx_op_host_t 
 		zbx_db_execute("update hosts"
 				" set status=%d"
 				" where hostid=" ZBX_FS_UI64,
-				HOST_STATUS_MONITORED, h->status);
+				HOST_STATUS_MONITORED, h->hostid);
 
 		zbx_audit_host_update_json_update_host_status(zbx_map_db_event_to_audit_context(event), h->hostid,
 				h->status, HOST_STATUS_MONITORED);
