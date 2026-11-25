@@ -181,9 +181,9 @@ class testWidgets extends CWebTest {
 			: CDashboardElement::find()->one()->getWidget($widget_name);
 
 		$widget->waitUntilReady();
-		$locator = 'xpath://div[contains(@class,"node-is-selected")]';
+		$locator = 'xpath:.//div[contains(@class,"node-is-selected")]';
 		$this->assertFalse($widget->query($locator)->one(false)->isValid());
-		$widget->query('xpath://span[@title="'.$entity_name.'"]')->waitUntilReady()->one()->click();
+		$widget->query('xpath:.//span[@title="'.$entity_name.'"]')->waitUntilVisible()->one()->click();
 		$this->assertTrue($widget->query($locator)->one()->isVisible());
 	}
 

@@ -361,13 +361,6 @@ class CMenuHelper {
 		}
 
 		$submenu_administration = [
-			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_DATA_SOURCE)
-				? (new CMenuItem(_('Data source')))
-					->setSubMenu(new CMenu([
-						(new CMenuItem(_('APM')))
-							->setAction('apm.db.edit')
-					]))
-				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)
 				? (new CMenuItem(_('General')))
 					->setId('main-menu-general')
@@ -399,6 +392,8 @@ class CMenuHelper {
 						(new CMenuItem(_('Connectors')))
 							->setAction('connector.list')
 							->setAliases(['connector.edit']),
+						(new CMenuItem(_('APM')))
+							->setAction('apm.db.edit'),
 						(new CMenuItem(_('Other')))
 							->setAction('miscconfig.edit')
 					])))
@@ -487,7 +482,7 @@ class CMenuHelper {
 				->setTarget('_blank')
 		);
 
-		$user = array_intersect_key(CWebUser::$data, array_flip(['username', 'name', 'surname'])) + [
+		$user = array_intersect_key((array) CWebUser::$data, array_flip(['username', 'name', 'surname'])) + [
 			'name' => null,
 			'surname' => null
 		];

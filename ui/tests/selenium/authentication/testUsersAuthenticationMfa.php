@@ -656,6 +656,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	public function testUsersAuthenticationMfa_SaveEmpty() {
 		$mfa_form = $this->openMfaForm();
 		$mfa_form->query('button:Update')->one()->waitUntilClickable()->click();
+		$this->page->removeFocus();
 		$this->assertScreenshot($this->query('id:tabs')->one(), 'empty_mfa_form');
 		$this->assertInlineError($mfa_form, ['xpath:.//div[@data-field-name="mfa_methods"]' => 'This field cannot be empty.']);
 

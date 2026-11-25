@@ -17,8 +17,8 @@
 class CControllerProblemViewData extends CControllerDataTable {
 
 	protected array $allowed_data_fields = ['eventid', 'data_actions', 'time', 'eventid', 'objectid', 'severity',
-		'recovery', 'status', 'info', 'host', 'description', 'duration', 'can_be_closed', 'actions', 'opdata', 'nested',
-		'symptom_count', 'cause_eventid', 'tags', 'custom_text'];
+		'trigger_value', 'recovery', 'status', 'info', 'host', 'description', 'duration', 'can_be_closed', 'actions',
+		'opdata', 'nested', 'symptom_count', 'cause_eventid', 'tags', 'custom_text'];
 
 	protected function init(): void {
 		parent::init();
@@ -174,6 +174,8 @@ class CControllerProblemViewData extends CControllerDataTable {
 				$value = $in_closing ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
 				$value_clock = $in_closing ? time() : $clock;
 			}
+
+			$problem['trigger_value'] = $value;
 
 			$status = getEventStatusString($in_closing, $problem);
 

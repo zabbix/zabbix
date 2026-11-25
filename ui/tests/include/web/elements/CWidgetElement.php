@@ -102,7 +102,7 @@ class CWidgetElement extends CElement {
 		 */
 		$button = $this->query('xpath:.//button[contains(@class, "js-widget-edit")]')->waitUntilPresent()->one();
 		$this->hoverMouse();
-		$button->hoverMouse();
+		$button->hoverMouse()->waitUntilClickable();
 
 		/*
 		 * Hovering a widget in edit mode adds resize handles, and the top resize border (ui-resizable-border-n) can
