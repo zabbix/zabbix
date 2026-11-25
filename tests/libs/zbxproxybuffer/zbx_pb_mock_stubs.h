@@ -21,11 +21,6 @@
  * range used to detect whether the function wrote to *mode on failure. */
 #define ZBX_PB_MODE_UNSET	(-99)
 
-/* Monotonic ID counter used by zbx_dc_get_nextid stub.
- * Tests that write rows must call zbx_pb_mock_set_nextid(1) at the start of
- * zbx_mock_test_entry; tests that never write rows can skip this. */
-void	zbx_pb_mock_set_nextid(zbx_uint64_t id);
-
 /* Deterministic allocation-failure injection for the proxy memory buffer.
  * Makes the call_no'th call (1-based, counted from this call) to the shmem
  * allocator underlying pb_malloc()/pb_strdup() return NULL; every other call

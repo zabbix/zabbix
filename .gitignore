@@ -417,3 +417,9 @@ ui/tests/composer.*
 ui/tests/vendor
 ui/tests/.phpunit.result.cache
 .cache
+tests/libs/zbxproxybuffer/zbx_pb_parse_mode
+tests/libs/zbxsysinfo/common/cpus_test
+tests/libs/zbxproxybuffer/zbx_pb_autoreg_write_host
+tests/libs/zbxproxybuffer/zbx_pb_create_error
+tests/libs/zbxproxybuffer/zbx_pb_discovery_close
+tests/libs/zbxproxybuffer/zbx_pb_discovery_write_host

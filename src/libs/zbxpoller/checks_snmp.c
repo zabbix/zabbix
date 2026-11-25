@@ -154,6 +154,7 @@ typedef struct
 	char			*error;
 	netsnmp_large_fd_set	fdset;
 	char			*error_msgget;
+	int			retries;
 }
 zbx_bulkwalk_context_t;
 
@@ -234,6 +235,7 @@ typedef struct
 	char		*hostname;
 	u_int		engineboots;
 	zbx_uint64_t	revision;
+	unsigned short	port;
 }
 zbx_snmp_engineid_device_t;
 
@@ -252,7 +254,8 @@ zbx_snmp_engineid_record_t;
 
 typedef struct
 {
-	char		address[ZBX_INTERFACE_IP_LEN_MAX];
+	char		address[ZBX_INTERFACE_ADDR_LEN_MAX];
+	unsigned short	port;
 	unsigned char	engineid[ZBX_SNMP_MAX_ENGINEID_LEN];
 	size_t		engineid_len;
 }
@@ -261,8 +264,11 @@ zbx_snmp_identity_t;
 static zbx_hash_t	snmp_identity_hash(const void *d)
 {
 	const zbx_snmp_identity_t	*identity = (const zbx_snmp_identity_t *)d;
+	zbx_hash_t			hash;
 
-	return ZBX_DEFAULT_STRING_HASH_FUNC(identity->address);
+	hash = ZBX_DEFAULT_STRING_HASH_FUNC(identity->address);
+
+	return ZBX_DEFAULT_STRING_HASH_ALGO(&identity->port, sizeof(identity->port), hash);
 }
 
 static int	snmp_identity_compare(const void *d1, const void *d2)
@@ -270,35 +276,38 @@ static int	snmp_identity_compare(const void *d1, const void *d2)
 	const zbx_snmp_identity_t	*identity1 = (const zbx_snmp_identity_t *)d1;
 	const zbx_snmp_identity_t	*identity2 = (const zbx_snmp_identity_t *)d2;
 
+	ZBX_RETURN_IF_NOT_EQUAL(identity1->port, identity2->port);
+
 	return strcmp(identity1->address, identity2->address);
 }
 
-static void	snmp_identity_insert(const char *address, const unsigned char *engineid, size_t engineid_len,
-		const zbx_dc_item_context_t *item_contex)
+static void	snmp_identity_insert(const char *address, unsigned short port, const unsigned char *engineid,
+		size_t engineid_len, const zbx_dc_item_context_t *item_contex)
 {
 	zbx_snmp_identity_t	identity, *identity_ptr;
 	int			num_data = identity_cache.num_data;
 
 	zbx_strlcpy(identity.address, address, sizeof(identity.address));
+	identity.port = port;
 
 	identity_ptr = zbx_hashset_insert(&identity_cache, &identity, sizeof(identity));
 	if (num_data != identity_cache.num_data)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " EngineID added for address '%s'",
-				item_contex->itemid, address);
+		zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " EngineID added for address '[%s]:%hu'",
+				item_contex->itemid, address, port);
 	}
 	else if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
 		if (identity_ptr->engineid_len != engineid_len ||
 				0 != memcmp(identity_ptr->engineid, engineid, engineid_len))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " updated EngineID for address '%s'",
-					item_contex->itemid, address);
+			zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " updated EngineID for address '[%s]:%hu'",
+					item_contex->itemid, address, port);
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " EngineID for address '%s' already cached",
-				item_contex->itemid, address);
+			zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " EngineID for address '[%s]:%hu' already"
+					" cached", item_contex->itemid, address, port);
 		}
 	}
 
@@ -306,11 +315,12 @@ static void	snmp_identity_insert(const char *address, const unsigned char *engin
 	memcpy(identity_ptr->engineid, engineid, engineid_len);
 }
 
-static void	snmp_identity_remove(const char *address)
+static void	snmp_identity_remove(const char *address, unsigned short port)
 {
 	zbx_snmp_identity_t	identity;
 
 	zbx_strlcpy(identity.address, address, sizeof(identity.address));
+	identity.port = port;
 
 	zbx_hashset_remove(&identity_cache, &identity);
 }
@@ -336,7 +346,7 @@ static void	zbx_clear_snmp_engineid_devices(zbx_vector_engineid_device_t *d)
 {
 	for (int i = 0; i < d->values_num; i++)
 	{
-		snmp_identity_remove(d->values[i].address);
+		snmp_identity_remove(d->values[i].address, d->values[i].port);
 		zbx_free(d->values[i].address);
 		zbx_free(d->values[i].hostname);
 	}
@@ -403,14 +413,15 @@ static zbx_uint64_t	zbx_snmp_engineid_record_revision(const zbx_snmp_engineid_re
 	return revision;
 }
 
-static zbx_snmp_identity_t	*zbx_get_snmp_identity(const char *ip, zbx_uint64_t revision)
+static zbx_snmp_identity_t	*zbx_get_snmp_identity(const char *address, unsigned short port, zbx_uint64_t revision)
 {
 	zbx_snmp_identity_t	*identity_ptr, local_identity;
 
 	if (0 == engineid_cache_initialized)
 		return NULL;
 
-	zbx_strlcpy(local_identity.address, ip, sizeof(local_identity.address));
+	zbx_strlcpy(local_identity.address, address, sizeof(local_identity.address));
+	local_identity.port = port;
 
 	if (NULL == (identity_ptr = zbx_hashset_search(&identity_cache, &local_identity)))
 		return NULL;
@@ -473,11 +484,12 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 		zbx_vector_engineid_device_create(&local_record.devices);
 		d.address = zbx_strdup(NULL, item_context->interface.addr);
 		d.hostname = zbx_strdup(NULL, item_context->host);
+		d.port = item_context->interface.port;
 		d.engineboots = current_engineboots;
 		d.revision = item_context->interface.revision;
 
 		zbx_vector_engineid_device_append(&local_record.devices, d);
-		snmp_identity_insert(d.address, local_record.engineid, local_record.engineid_len, item_context);
+		snmp_identity_insert(d.address, d.port, local_record.engineid, local_record.engineid_len, item_context);
 		local_record.lastlog = 0;
 		local_record.lastseen = time(NULL);
 		ptr = zbx_hashset_insert(&engineid_cache, &local_record, sizeof(local_record));
@@ -493,10 +505,24 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 
 		ptr->lastseen = time(NULL);
 
+		if (zbx_snmp_engineid_record_revision(ptr) < item_context->interface.revision)
+		{
+			for (int i = 0; i < ptr->devices.values_num; i++)
+			{
+				snmp_identity_remove(ptr->devices.values[i].address, ptr->devices.values[i].port);
+				zbx_free(ptr->devices.values[i].address);
+				zbx_free(ptr->devices.values[i].hostname);
+			}
+
+			zbx_vector_engineid_device_clear(&ptr->devices);
+			snmp_remove_user_by_engineid(ptr);
+		}
+
 		for (int i = 0; i < ptr->devices.values_num; i++)
 		{
 			if ((0 == strcmp(item_context->interface.addr, ptr->devices.values[i].address) &&
-					0 == strcmp(item_context->host, ptr->devices.values[i].hostname)))
+					0 == strcmp(item_context->host, ptr->devices.values[i].hostname)) &&
+					item_context->interface.port == ptr->devices.values[i].port)
 			{
 				if (ptr->devices.values[i].engineboots != current_engineboots)
 				{
@@ -516,30 +542,17 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 				if (0 != hosts_alloc)
 					zbx_snprintf_alloc(&hosts, &hosts_alloc, &hosts_offset, ", ");
 
-				zbx_snprintf_alloc(&hosts, &hosts_alloc, &hosts_offset, "%s (%s)",
-						ptr->devices.values[i].address, ptr->devices.values[i].hostname);
+				zbx_snprintf_alloc(&hosts, &hosts_alloc, &hosts_offset, "[%s]:%hu (%s)",
+						ptr->devices.values[i].address, ptr->devices.values[i].port,
+						ptr->devices.values[i].hostname);
 			}
-		}
-
-		if (zbx_snmp_engineid_record_revision(ptr) < item_context->interface.revision)
-		{
-			for (int i = 0; i < ptr->devices.values_num; i++)
-			{
-				snmp_identity_remove(ptr->devices.values[i].address);
-				zbx_free(ptr->devices.values[i].address);
-				zbx_free(ptr->devices.values[i].hostname);
-			}
-
-			zbx_vector_engineid_device_clear(&ptr->devices);
-			found = 0;
-
-			snmp_remove_user_by_engineid(ptr);
 		}
 
 		if (0 == found)
 		{
 			d.address = zbx_strdup(NULL, item_context->interface.addr);
 			d.hostname = zbx_strdup(NULL, item_context->host);
+			d.port = item_context->interface.port;
 			d.engineboots = current_engineboots;
 			d.revision = item_context->interface.revision;
 
@@ -549,8 +562,8 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 		/* sync devices with identity hashset */
 		for (int i = 0; i < ptr->devices.values_num; i++)
 		{
-			snmp_identity_insert(ptr->devices.values[i].address, local_record.engineid,
-					local_record.engineid_len, item_context);
+			snmp_identity_insert(ptr->devices.values[i].address, ptr->devices.values[i].port,
+					local_record.engineid, local_record.engineid_len, item_context);
 		}
 
 		if (1 == diff_engineboots)
@@ -561,8 +574,8 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 			if (now >= ptr->lastlog + ZBX_SNMP_ENGINEID_WARNING_PERIOD)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "SNMP engineId is not unique across following "
-						"interfaces: %s (%s), %s", item_context->interface.addr,
-						item_context->host, hosts);
+						"interfaces: [%s]:%hu (%s), %s", item_context->interface.addr,
+						item_context->interface.port, item_context->host, hosts);
 
 				ptr->lastlog = now;
 			}
@@ -3208,6 +3221,7 @@ static zbx_bulkwalk_context_t	*snmp_bulkwalk_context_create(zbx_snmp_context_t *
 	bulkwalk_context->arg = snmp_context;
 	bulkwalk_context->error = NULL;
 	bulkwalk_context->error_msgget = NULL;
+	bulkwalk_context->retries = 0;	/* must be reset before each request */
 
 	netsnmp_large_fd_set_init(&bulkwalk_context->fdset, FD_SETSIZE);
 
@@ -3227,16 +3241,17 @@ static int	snmp_bulkwalk_add(zbx_snmp_context_t *snmp_context, int *fd, char *er
 	struct snmp_pdu			*pdu;
 	zbx_bulkwalk_context_t		*bulkwalk_context = snmp_context->bulkwalk_contexts.values[snmp_context->i];
 	struct netsnmp_transport_s	*transport;
+	netsnmp_session			*session;
 	int				ret, numfds = 0, block = 0;
 	struct timeval			timeout = {0};
 	fd_set				fdset;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " fd:%d", __func__, snmp_context->item.itemid, *fd);
 
+	session = snmp_sess_session(snmp_context->ssp);
+
 	if (1 == snmp_context->probe)
 	{
-		netsnmp_session	*session = snmp_sess_session(snmp_context->ssp);
-
 		session->flags |= SNMP_FLAGS_DONT_PROBE;
 
 		if (NULL == (pdu = usm_probe_pdu_create()))
@@ -3285,6 +3300,9 @@ static int	snmp_bulkwalk_add(zbx_snmp_context_t *snmp_context, int *fd, char *er
 
 	bulkwalk_context->reqid = -1;
 	bulkwalk_context->operation = 0;
+	/* make sure snmp library keeps resending */
+	session->retries = snmp_context->retries;
+	bulkwalk_context->retries = snmp_context->retries;
 
 	if (0 == (bulkwalk_context->reqid = snmp_sess_async_send(snmp_context->ssp, pdu, asynch_response,
 			bulkwalk_context)))
@@ -3427,12 +3445,12 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 		if (ZBX_SNMP_TIMEOUT_WATERMARK < snmp_context->config_timeout)
 			high_timeout_msg = " (timeout value may be too high)";
 
-		if (0 < snmp_context->retries--)
+		if (0 < bulkwalk_context->retries--)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " cannot receive response from [[%s]:%hu]:"
-					" timed out%s, retrying", snmp_context->item.itemid,
+					" timed out%s, retrying, %d retries left", snmp_context->item.itemid,
 					snmp_context->item.interface.addr, snmp_context->item.interface.port,
-					high_timeout_msg);
+					high_timeout_msg, bulkwalk_context->retries);
 
 			snmp_sess_timeout(snmp_context->ssp);
 
@@ -3452,7 +3470,10 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 					snmp_sess_close(snmp_context->ssp);
 
 					if (1 == engineid_cache_initialized)
-						snmp_identity_remove(addresses->values[0].ip);
+					{
+						snmp_identity_remove(snmp_context->item.interface.addr,
+								snmp_context->item.interface.port);
+					}
 
 					SNMP_MT_UNLOCK;
 
@@ -3644,8 +3665,8 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 		size_t			securityPrivKeyLen = 0;
 
 		if (ZBX_IF_SNMP_VERSION_3 == snmp_context->snmp_version &&
-				NULL != (identity_ptr = zbx_get_snmp_identity(addresses->values[0].ip,
-				snmp_context->item.interface.revision)))
+				NULL != (identity_ptr = zbx_get_snmp_identity(snmp_context->item.interface.addr,
+				snmp_context->item.interface.port, snmp_context->item.interface.revision)))
 		{
 				securityEngineID = identity_ptr->engineid;
 				securityEngineIDLen = identity_ptr->engineid_len;
@@ -3701,7 +3722,7 @@ stop:
 	if (ZBX_ASYNC_TASK_STOP == task_ret && ZBX_ISSET_MSG(&snmp_context->item.result))
 	{
 		if (1 == engineid_cache_initialized)
-			snmp_identity_remove(addresses->values[0].ip);
+			snmp_identity_remove(snmp_context->item.interface.addr, snmp_context->item.interface.port);
 
 		if (ZBX_IF_SNMP_VERSION_3 == snmp_context->snmp_version &&
 				0 == snmp_context->probe_processed && 0 == snmp_context->probe)
@@ -4557,7 +4578,7 @@ out:
  ******************************************************************************/
 void	zbx_clear_cache_snmp(unsigned char process_type, int process_num)
 {
-	int	cached_dev_count;
+	int	cached_dev_count, identity_count;
 
 	if (0 == zbx_snmp_init_done)
 		return;
@@ -4567,7 +4588,10 @@ void	zbx_clear_cache_snmp(unsigned char process_type, int process_num)
 	shutdown_usm();
 
 	if (ZBX_PROCESS_TYPE_SNMP_POLLER == process_type)
+	{
 		cached_dev_count = zbx_clear_snmp_engineid_cache();
+		identity_count = identity_cache.num_data;
+	}
 
 	SNMP_MT_UNLOCK;
 
@@ -4580,6 +4604,9 @@ void	zbx_clear_cache_snmp(unsigned char process_type, int process_num)
 			zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the snmp cache on [%s #%d, "
 					"deleted %d device(s) from cache]", process_type_s, process_num,
 					cached_dev_count);
+
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() identities in net-snmp cache: remaining:%d", __func__,
+					identity_count);
 		}
 		else
 		{

@@ -3135,7 +3135,7 @@ const SUBJECT_INTERNAL = "Internal";
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of add_object_msg()', true);
 
-		$response = $this->call('alert.get', [
+		$response = $this->callUntilDataIsPresent('alert.get', [
 			'hostids' => [self::$host_id],
 			'actionids' => self::$discovery_action_id,
 			'sortfield' => 'alertid',
@@ -3196,6 +3196,39 @@ const SUBJECT_INTERNAL = "Internal";
 
 		CDataHelper::call('action.delete', [self::$discovery_action_id]);
 		$this->removeValue(self::$action_ids, self::$discovery_action_id);
+	}
+
+	/***************************************************************************************************************
+
+		Test unsupported macros in calculated item query filters.
+
+	***************************************************************************************************************/
+	public function testMacros_calculatedItemFilterUnsupportedMacro() {
+		foreach (['group', 'tag'] as $filter) {
+			$response = $this->call('item.create', [
+				'hostid' => self::$host_id,
+				'name' => 'Calculated item with unsupported '.$filter.' macro',
+				'key_' => 'calc.filter.'.$filter,
+				'type' => ITEM_TYPE_CALCULATED,
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'params' => 'count(last_foreach(/*/'.self::TRAPPER_ITEM_KEY.
+						'1?['.$filter.'="{TEST}"]))',
+				'delay' => '1s'
+			]);
+			$this->assertArrayHasKey('itemids', $response['result']);
+			$this->assertCount(1, $response['result']['itemids']);
+			$itemid = $response['result']['itemids'][0];
+
+			$this->reloadConfigurationCacheAndWaitForLogLine();
+
+			// The unknown macro stays literal, so no items match the filter.
+			$response = $this->callUntilDataIsPresent('history.get', [
+				'itemids' => [$itemid],
+				'history' => ITEM_VALUE_TYPE_UINT64,
+				'limit' => 1
+			]);
+			$this->assertEquals('0', $response['result'][0]['value']);
+		}
 	}
 
 	/***************************************************************************************************************

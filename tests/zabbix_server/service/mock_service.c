@@ -22,7 +22,6 @@
 
 #include "mock_service.h"
 
-zbx_uint64_t __wrap_zbx_dc_get_nextid(const char *table_name, int num);
 void	*__wrap_zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,
 		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
@@ -317,14 +316,6 @@ void	mock_destroy_service_cache(void)
 }
 
 /* function stubs to cut off library dependencies */
-
-zbx_uint64_t	__wrap_zbx_dc_get_nextid(const char *table_name, int num)
-{
-	ZBX_UNUSED(table_name);
-	ZBX_UNUSED(num);
-
-	return 0;
-}
 
 void	*__wrap_zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,

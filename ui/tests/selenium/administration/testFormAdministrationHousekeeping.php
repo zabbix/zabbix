@@ -1674,6 +1674,9 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 	 * @dataProvider getCheckFormData
 	 */
 	public function testFormAdministrationHousekeeping_CheckForm($data) {
+		// Move checkboxes to the beginning of the fields, so that inline errors of text fields do not move them.
+		$data['fields'] = array_filter($data['fields'], 'is_bool') + $data['fields'];
+
 		$this->executeCheckForm($data);
 	}
 }

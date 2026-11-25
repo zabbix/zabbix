@@ -63,6 +63,15 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			]
 		]);
 
+		// Default parameters of a new webhook media type.
+		$webhook_parameters = [
+			['name' => 'HTTPProxy'],
+			['name' => 'Message', 'value' => '{ALERT.MESSAGE}'],
+			['name' => 'Subject', 'value' => '{ALERT.SUBJECT}'],
+			['name' => 'To', 'value' => '{ALERT.SENDTO}'],
+			['name' => 'URL']
+		];
+
 		CDataHelper::call('mediatype.create', [
 			[
 				'type' => MEDIA_TYPE_EXEC,
@@ -79,26 +88,14 @@ class testPageAdministrationMediaTypes extends CWebTest {
 				'type' => MEDIA_TYPE_WEBHOOK,
 				'name' => 'Multiple spaces in   webhook   123',
 				'script' => 'test.sh',
-				'parameters' => [
-					[
-						'name' => 'HTTPProxy'
-					],
-					[
-						'name' => 'Message',
-						'value' => '{ALERT.MESSAGE}'
-					],
-					[
-						'name' => 'Subject',
-						'value' => '{ALERT.SUBJECT}'
-					],
-					[
-						'name' => 'To',
-						'value' => '{ALERT.SENDTO}'
-					],
-					[
-						'name' => 'URL'
-					]
-				]
+				'parameters' => $webhook_parameters
+			],
+			[
+				'type' => MEDIA_TYPE_WEBHOOK,
+				'name' => 'Reference webhook',
+				'status' => MEDIA_TYPE_STATUS_ACTIVE,
+				'script' => 'return 0;',
+				'parameters' => $webhook_parameters
 			]
 		]);
 	}
@@ -453,7 +450,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	 * @param array		$data		data provider
 	 * @param string	$action		action to be performed with the selected media types
 	 */
-	private function checkStatusChangeButton($data, $action = 'disable') {
+	protected function checkStatusChangeButton($data, $action = 'disable') {
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
 		$this->selectTableRows(CTestArrayHelper::get($data, 'rows', []));
 

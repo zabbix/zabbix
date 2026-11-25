@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '8.0'
+  version: '8.2'
   template_groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -42,7 +42,7 @@ zabbix_export:
         3. If you use an atypical location of ES API, don't forget to change the host wizard configuration fields `Elasticsearch scheme`,`Elasticsearch port`.
       vendor:
         name: Zabbix
-        version: 8.0-5
+        version: 8.2-0
       groups:
         - name: Templates/Applications
       items:

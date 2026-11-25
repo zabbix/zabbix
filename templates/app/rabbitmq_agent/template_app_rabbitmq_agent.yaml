@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '8.0'
+  version: '8.2'
   template_groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -45,10 +45,10 @@ zabbix_export:
         
         If you use another API endpoint, then don't forget to change `Address` host wizard configuration field.
         
-        Install and setup [Zabbix agent](https://www.zabbix.com/documentation/8.0/manual/installation/install_from_packages).
+        Install and setup [Zabbix agent](https://www.zabbix.com/documentation/8.2/manual/installation/install_from_packages).
       vendor:
         name: Zabbix
-        version: 8.0-4
+        version: 8.2-0
       groups:
         - name: Templates/Applications
       items:
@@ -1139,10 +1139,10 @@ zabbix_export:
         - {$RABBITMQ.API.PASSWORD}
         
         If you use another API endpoint, then don't forget to change `Address` host wizard configuration field.
-        Install and setup [Zabbix agent](https://www.zabbix.com/documentation/8.0/manual/installation/install_from_packages).
+        Install and setup [Zabbix agent](https://www.zabbix.com/documentation/8.2/manual/installation/install_from_packages).
       vendor:
         name: Zabbix
-        version: 8.0-5
+        version: 8.2-0
       groups:
         - name: Templates/Applications
       items:

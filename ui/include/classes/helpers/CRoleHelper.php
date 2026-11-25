@@ -53,7 +53,6 @@ class CRoleHelper {
 	public const UI_CONFIGURATION_CEPRULES = 'ui.configuration.ceprules';
 	public const UI_CONFIGURATION_DISCOVERY = 'ui.configuration.discovery';
 	public const UI_ADMINISTRATION_GENERAL = 'ui.administration.general';
-	public const UI_ADMINISTRATION_DATA_SOURCE = 'ui.administration.data_source';
 	public const UI_ADMINISTRATION_AUDIT_LOG = 'ui.administration.audit_log';
 	public const UI_ADMINISTRATION_HOUSEKEEPING = 'ui.administration.housekeeping';
 	public const UI_ADMINISTRATION_PROXY_GROUPS = 'ui.administration.proxy_groups';
@@ -119,21 +118,21 @@ class CRoleHelper {
 	 *
 	 * @var array
 	 */
-	private static $roles = [];
+	private static array $roles = [];
 
 	/**
 	 * Array for storing all API methods by user type.
 	 *
 	 * @var array
 	 */
-	private static $api_methods = [];
+	private static array $api_methods = [];
 
 	/**
 	 * Array for storing all API methods with masks by user type.
 	 *
 	 * @var array
 	 */
-	private static $api_method_masks = [];
+	private static array $api_method_masks = [];
 
 	/**
 	 * Checks the access of specific role to specific rule.
@@ -317,7 +316,6 @@ class CRoleHelper {
 				self::UI_ADMINISTRATION_AUTHENTICATION,
 				self::UI_ADMINISTRATION_LINKED_DEVICES,
 				self::UI_ADMINISTRATION_GENERAL,
-				self::UI_ADMINISTRATION_DATA_SOURCE,
 				self::UI_ADMINISTRATION_AUDIT_LOG,
 				self::UI_ADMINISTRATION_HOUSEKEEPING,
 				self::UI_ADMINISTRATION_PROXY_GROUPS,
@@ -558,7 +556,6 @@ class CRoleHelper {
 				if ($user_type === USER_TYPE_SUPER_ADMIN) {
 					$labels = [
 						self::UI_ADMINISTRATION_GENERAL => _('General'),
-						self::UI_ADMINISTRATION_DATA_SOURCE => _('Data source'),
 						self::UI_ADMINISTRATION_AUDIT_LOG => _('Audit log'),
 						self::UI_ADMINISTRATION_HOUSEKEEPING => _('Housekeeping'),
 						self::UI_ADMINISTRATION_PROXY_GROUPS => _('Proxy groups'),
@@ -569,6 +566,7 @@ class CRoleHelper {
 				}
 
 				return $labels;
+
 			default:
 				return [];
 		}

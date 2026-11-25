@@ -264,16 +264,6 @@ class testSidebarMenu extends CWebTest {
 			[
 				[
 					'section' => 'Administration',
-					'page' => 'Data source',
-					'third_level' =>
-					[
-						"APM"
-					]
-				]
-			],
-			[
-				[
-					'section' => 'Administration',
 					'page' => 'General',
 					'third_level' =>
 					[
@@ -285,6 +275,7 @@ class testSidebarMenu extends CWebTest {
 						'Trigger displaying options',
 						'Geographical maps',
 						'Modules',
+						'APM',
 						'Other'
 					]
 				]
@@ -456,7 +447,7 @@ class testSidebarMenu extends CWebTest {
 			[
 				[
 					'section' => 'Help',
-					'link' => 'https://www.zabbix.com/documentation/'.ZABBIX_EXPORT_VERSION.'/en/manual'
+					'link' => 'https://www.zabbix.com/documentation/'.ZABBIX_MAJOR_VERSION.'/en/manual'
 				]
 			],
 			[
