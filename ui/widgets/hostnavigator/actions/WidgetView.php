@@ -173,6 +173,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'hostids' => array_column($hosts, 'hostid'),
 				'skipDependent' => true,
 				'monitored' => true,
+				'filter' => ['value' => TRIGGER_VALUE_TRUE],
 				'preservekeys' => true
 			]);
 
