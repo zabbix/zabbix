@@ -248,7 +248,8 @@ class CControllerProxyCreate extends CController {
 					| ($this->hasInput('tls_accept_psk') ? HOST_ENCRYPTION_PSK : 0)
 					| ($this->hasInput('tls_accept_certificate') ? HOST_ENCRYPTION_CERTIFICATE : 0);
 
-				if ($this->hasInput('clone_proxyid') && $this->hasInput('tls_accept_psk')) {
+				if ($this->hasInput('clone_proxyid') && $this->getInput('update_psk', 0) == 0
+						&& $this->hasInput('tls_accept_psk')) {
 					$proxy['tls_psk_identity'] = $this->clone_proxy['tls_psk_identity'];
 					$proxy['tls_psk'] = $this->clone_proxy['tls_psk'];
 				}
@@ -259,7 +260,8 @@ class CControllerProxyCreate extends CController {
 				$proxy['address'] = $this->getInput('address','');
 				$proxy['port'] = $this->getInput('port','');
 
-				if ($this->hasInput('clone_proxyid') && $this->getInput('tls_connect', 0) == HOST_ENCRYPTION_PSK) {
+				if ($this->hasInput('clone_proxyid') && $this->getInput('update_psk', 0) == 0
+						&& $this->getInput('tls_connect', 0) == HOST_ENCRYPTION_PSK) {
 					$proxy['tls_psk_identity'] = $this->clone_proxy['tls_psk_identity'];
 					$proxy['tls_psk'] = $this->clone_proxy['tls_psk'];
 				}
