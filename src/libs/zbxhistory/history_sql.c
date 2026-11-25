@@ -517,7 +517,7 @@ static int	db_read_values_by_count(zbx_uint64_t itemid, int value_type, zbx_vect
 		{
 			clock_from = clock_to;
 
-			step = ARRSIZE(periods) - 1;
+			step = ARRSIZE(periods) - 2;
 		}
 
 		sql_offset = 0;
