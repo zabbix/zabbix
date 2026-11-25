@@ -1599,18 +1599,18 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/config/notifications/action#configuring-an-action'
 				]
 			],
-			// #155 Event correlation list view.
+			// #155 Event processing list view.
 			[
 				[
 					'url' => 'zabbix.php?action=ceprule.list',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/ceprules'
+					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/event_processing'
 				]
 			],
 			// #156 Create event correlation form view.
 			[
 				[
 					'url' => 'zabbix.php?action=popup&popup=correlation.edit',
-					'doc_link' => '/en/manual/config/event_correlation/global#configuration'
+					'doc_link' => '/en/manual/events/event_correlation/global'
 				]
 			],
 			// #157 Edit event correlation form view.
@@ -1623,87 +1623,107 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'link:Event correlation for links check'
 						]
 					],
-					'doc_link' => '/en/manual/config/event_correlation/global#configuration'
+					'doc_link' => '/en/manual/events/event_correlation/global'
 				]
 			],
-			// #158 Network discovery list view.
+			// #158 Create complex event processing form view.
+			[
+				[
+					'url' => 'zabbix.php?action=popup&popup=ceprule.edit',
+					'doc_link' => '/en/manual/events/complex_event_processing#configuration'
+				]
+			],
+			// #159 Edit complex event processing form view.
+			[
+				[
+					'url' => 'zabbix.php?action=ceprule.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'link:Close problems older than 2 weeks'
+						]
+					],
+					'doc_link' => '/en/manual/events/complex_event_processing#configuration'
+				]
+			],
+			// #160 Network discovery list view.
 			[
 				[
 					'url' => 'zabbix.php?action=discovery.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/discovery'
 				]
 			],
-			// #159 Create network discovery form view.
+			// #161 Create network discovery form view.
 			[
 				[
 					'url' => 'zabbix.php?action=popup&popup=discovery.edit',
 					'doc_link' => '/en/manual/discovery/network_discovery/rule#rule-attributes'
 				]
 			],
-			// #160 Edit network discovery form view.
+			// #162 Edit network discovery form view.
 			[
 				[
 					'url' => 'zabbix.php?action=popup&popup=discovery.edit&druleid=2', // Discovery rule => Local network.
 					'doc_link' => '/en/manual/discovery/network_discovery/rule#rule-attributes'
 				]
 			],
-			// #161 Administration -> General -> GUI view.
+			// #163 Administration -> General -> GUI view.
 			[
 				[
 					'url' => 'zabbix.php?action=gui.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#gui'
 				]
 			],
-			// #162 Administration -> General -> Autoregistration view.
+			// #164 Administration -> General -> Autoregistration view.
 			[
 				[
 					'url' => 'zabbix.php?action=autoreg.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#autoregistration'
 				]
 			],
-			// #163 Administration -> General -> Housekeeping view.
+			// #165 Administration -> General -> Housekeeping view.
 			[
 				[
 					'url' => 'zabbix.php?action=housekeeping.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/housekeeping'
 				]
 			],
-			// #164 Administration -> General -> Audit log view.
+			// #166 Administration -> General -> Audit log view.
 			[
 				[
 					'url' => 'zabbix.php?action=audit.settings.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/audit_log'
 				]
 			],
-			// #165 Administration -> General -> Images -> Icon view.
+			// #167 Administration -> General -> Images -> Icon view.
 			[
 				[
 					'url' => 'zabbix.php?action=image.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#images'
 				]
 			],
-			// #166 Administration -> General -> Images -> Background view.
+			// #168 Administration -> General -> Images -> Background view.
 			[
 				[
 					'url' => 'zabbix.php?action=image.list&imagetype=2',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#images'
 				]
 			],
-			// #167 Administration -> General -> Images -> Create image view.
+			// #169 Administration -> General -> Images -> Create image view.
 			[
 				[
 					'url' => 'zabbix.php?action=image.edit&imagetype=1',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#images'
 				]
 			],
-			// #168 Administration -> General -> Images -> Edit image view.
+			// #170 Administration -> General -> Images -> Edit image view.
 			[
 				[
 					'url' => 'zabbix.php?action=image.edit&imageid=2',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#images'
 				]
 			],
-			// #169 Administration -> General -> Images -> Create background view.
+			// #171 Administration -> General -> Images -> Create background view.
 			[
 				[
 					'url' => 'zabbix.php?action=image.list&imagetype=2',
@@ -1716,77 +1736,77 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#images'
 				]
 			],
-			// #170 Administration -> General -> Icon mapping list view.
+			// #172 Administration -> General -> Icon mapping list view.
 			[
 				[
 					'url' => 'zabbix.php?action=iconmap.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#icon-mapping'
 				]
 			],
-			// #171 Administration -> General -> Icon mapping -> Create form view.
+			// #173 Administration -> General -> Icon mapping -> Create form view.
 			[
 				[
 					'url' => 'zabbix.php?action=iconmap.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#icon-mapping'
 				]
 			],
-			// #172 Administration -> General -> Icon mapping -> Edit form view.
+			// #174 Administration -> General -> Icon mapping -> Edit form view.
 			[
 				[
 					'url' => 'zabbix.php?action=iconmap.edit&iconmapid=101',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#icon-mapping'
 				]
 			],
-			// #173 Administration -> General -> Regular expressions list view.
+			// #175 Administration -> General -> Regular expressions list view.
 			[
 				[
 					'url' => 'zabbix.php?action=regex.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#regular-expressions'
 				]
 			],
-			// #174 Administration -> General -> Regular expressions -> Create form view.
+			// #176 Administration -> General -> Regular expressions -> Create form view.
 			[
 				[
 					'url' => 'zabbix.php?action=popup&popup=regex.edit',
 					'doc_link' => '/en/manual/regular_expressions#global-regular-expressions'
 				]
 			],
-			// #175 Administration -> General -> Regular expressions -> Edit form view.
+			// #177 Administration -> General -> Regular expressions -> Edit form view.
 			[
 				[
 					'url' => 'zabbix.php?action=popup&popup=regex.edit&regexpid=3',
 					'doc_link' => '/en/manual/regular_expressions#global-regular-expressions'
 				]
 			],
-			// #176 Administration -> General -> Macros view.
+			// #178 Administration -> General -> Macros view.
 			[
 				[
 					'url' => 'zabbix.php?action=macros.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/macros'
 				]
 			],
-			// #177 Administration -> General -> Trigger displaying options view.
+			// #179 Administration -> General -> Trigger displaying options view.
 			[
 				[
 					'url' => 'zabbix.php?action=trigdisplay.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#trigger-displaying-options'
 				]
 			],
-			// #178 Administration -> General -> Geographical maps view.
+			// #180 Administration -> General -> Geographical maps view.
 			[
 				[
 					'url' => 'zabbix.php?action=geomaps.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#geographical-maps'
 				]
 			],
-			// #179 Administration -> General -> Modules list view.
+			// #181 Administration -> General -> Modules list view.
 			[
 				[
 					'url' => 'zabbix.php?action=module.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#modules'
 				]
 			],
-			// #180 Administration -> General -> Module edit view.
+			// #182 Administration -> General -> Module edit view.
 			[
 				[
 					'url' => 'zabbix.php?action=module.list',
@@ -1803,21 +1823,21 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/extensions/frontendmodules#manifest-preparation'
 				]
 			],
-			// #181 Users -> Api tokens list view.
+			// #183 Users -> Api tokens list view.
 			[
 				[
 					'url' => 'zabbix.php?action=token.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/users/api_tokens'
 				]
 			],
-			// #182 Users -> Api tokens -> Create Api token popup.
+			// #184 Users -> Api tokens -> Create Api token popup.
 			[
 				[
 					'url' => 'zabbix.php?action=popup&popup=token.edit&admin_mode=1',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/users/api_tokens'
 				]
 			],
-			// #183 Users -> Api tokens -> Edit Api token popup.
+			// #185 Users -> Api tokens -> Edit Api token popup.
 			[
 				[
 					'url' => 'zabbix.php?action=token.list',
@@ -1830,28 +1850,28 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/users/api_tokens'
 				]
 			],
-			// #184 Administration -> General -> Other view.
+			// #186 Administration -> General -> Other view.
 			[
 				[
 					'url' => 'zabbix.php?action=miscconfig.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#other'
 				]
 			],
-			// #185 Administration -> Proxy list view.
+			// #187 Administration -> Proxy list view.
 			[
 				[
 					'url' => 'zabbix.php?action=proxy.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/proxies'
 				]
 			],
-			// #186 Administration -> Create proxy view.
+			// #188 Administration -> Create proxy view.
 			[
 				[
 					'url' => 'zabbix.php?action=popup&popup=proxy.edit',
 					'doc_link' => '/en/manual/distributed_monitoring/proxies#configuration'
 				]
 			],
-			// #187 Administration -> Proxies -> Edit proxy view.
+			// #189 Administration -> Proxies -> Edit proxy view.
 			[
 				[
 					'url' => 'zabbix.php?action=proxy.list',
@@ -1864,21 +1884,21 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/distributed_monitoring/proxies#configuration'
 				]
 			],
-			// #188 Administration -> Proxy groups list view.
+			// #190 Administration -> Proxy groups list view.
 			[
 				[
 					'url' => 'zabbix.php?action=proxygroup.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/proxy_groups'
 				]
 			],
-			// #189 Administration -> Create proxy group view.
+			// #191 Administration -> Create proxy group view.
 			[
 				[
 					'url' => 'zabbix.php?action=popup&popup=proxygroup.edit',
 					'doc_link' => '/en/manual/distributed_monitoring/proxies/ha'
 				]
 			],
-			// #190 Administration -> Proxy groups -> Edit proxy group view.
+			// #192 Administration -> Proxy groups -> Edit proxy group view.
 			[
 				[
 					'url' => 'zabbix.php?action=proxygroup.list',
@@ -1891,98 +1911,98 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/distributed_monitoring/proxies/ha'
 				]
 			],
-			// #191 Users -> Authentication view.
+			// #193 Users -> Authentication view.
 			[
 				[
 					'url' => 'zabbix.php?action=authentication.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/users/authentication'
 				]
 			],
-			// #192 Users -> User groups list view.
+			// #194 Users -> User groups list view.
 			[
 				[
 					'url' => 'zabbix.php?action=usergroup.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/users/user_groups'
 				]
 			],
-			// #193 Users -> User groups -> Create user group view.
+			// #195 Users -> User groups -> Create user group view.
 			[
 				[
 					'url' => 'zabbix.php?action=usergroup.edit',
 					'doc_link' => '/en/manual/config/users_and_usergroups/usergroup#configuration'
 				]
 			],
-			// #194 Users -> User groups -> Edit user group view.
+			// #196 Users -> User groups -> Edit user group view.
 			[
 				[
 					'url' => 'zabbix.php?action=usergroup.edit&usrgrpid=7',
 					'doc_link' => '/en/manual/config/users_and_usergroups/usergroup#configuration'
 				]
 			],
-			// #195 Users -> User roles list view.
+			// #197 Users -> User roles list view.
 			[
 				[
 					'url' => 'zabbix.php?action=userrole.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/users/user_roles'
 				]
 			],
-			// #196 Administration -> User roles -> Create form view.
+			// #198 Administration -> User roles -> Create form view.
 			[
 				[
 					'url' => '/zabbix.php?action=userrole.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/users/user_roles#default-user-roles'
 				]
 			],
-			// #197 Users -> User roles -> Edit form view.
+			// #199 Users -> User roles -> Edit form view.
 			[
 				[
 					'url' => 'zabbix.php?action=userrole.edit&roleid=3',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/users/user_roles#default-user-roles'
 				]
 			],
-			// #198 Administration -> Users list view.
+			// #200 Administration -> Users list view.
 			[
 				[
 					'url' => 'zabbix.php?action=user.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/users/user_list'
 				]
 			],
-			// #199 Users -> Users -> Create form view.
+			// #201 Users -> Users -> Create form view.
 			[
 				[
 					'url' => 'zabbix.php?action=user.edit',
 					'doc_link' => '/en/manual/config/users_and_usergroups/user'
 				]
 			],
-			// #200 Users -> Users -> Edit form view.
+			// #202 Users -> Users -> Edit form view.
 			[
 				[
 					'url' => 'zabbix.php?action=user.edit&userid=1',
 					'doc_link' => '/en/manual/config/users_and_usergroups/user'
 				]
 			],
-			// #201 Alerts -> Media type list view.
+			// #203 Alerts -> Media type list view.
 			[
 				[
 					'url' => 'zabbix.php?action=mediatype.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/alerts/mediatypes'
 				]
 			],
-			// #202 Alerts -> Media type -> Create form view.
+			// #204 Alerts -> Media type -> Create form view.
 			[
 				[
 					'url' => 'zabbix.php?action=popup&popup=mediatype.edit',
 					'doc_link' => '/en/manual/config/notifications/media#common-parameters'
 				]
 			],
-			// #203 Alerts -> Media type -> Edit form view.
+			// #205 Alerts -> Media type -> Edit form view.
 			[
 				[
 					'url' => 'zabbix.php?action=popup&popup=mediatype.edit&mediatypeid=1', // Email.
 					'doc_link' => '/en/manual/config/notifications/media#common-parameters'
 				]
 			],
-			// #204 Alerts -> Media type -> Import view.
+			// #206 Alerts -> Media type -> Import view.
 			[
 				[
 					'url' => 'zabbix.php?action=mediatype.list',
@@ -1995,70 +2015,70 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/xml_export_import/media#importing'
 				]
 			],
-			// #205 Alerts -> Scripts list view.
+			// #207 Alerts -> Scripts list view.
 			[
 				[
 					'url' => 'zabbix.php?action=script.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/alerts/scripts'
 				]
 			],
-			// #206 Alerts -> Scripts -> Create form view.
+			// #208 Alerts -> Scripts -> Create form view.
 			[
 				[
 					'url' => 'zabbix.php?action=popup&popup=script.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/alerts/scripts#configuring-a-global-script'
 				]
 			],
-			// #207 Alerts -> Scripts -> Edit form view.
+			// #209 Alerts -> Scripts -> Edit form view.
 			[
 				[
 					'url' => 'zabbix.php?action=popup&popup=script.edit&scriptid=1', // Ping.
 					'doc_link' => '/en/manual/web_interface/frontend_sections/alerts/scripts#configuring-a-global-script'
 				]
 			],
-			// #208 Administration -> Queue overview view.
+			// #210 Administration -> Queue overview view.
 			[
 				[
 					'url' => 'zabbix.php?action=queue.overview',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/queue#overview-by-item-type'
 				]
 			],
-			// #209 Administration -> Queue overview by proxy view.
+			// #211 Administration -> Queue overview by proxy view.
 			[
 				[
 					'url' => 'zabbix.php?action=queue.overview.proxy',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/queue#overview-by-proxy'
 				]
 			],
-			// #210 Administration -> Queue details view.
+			// #212 Administration -> Queue details view.
 			[
 				[
 					'url' => 'zabbix.php?action=queue.details',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/queue#list-of-waiting-items'
 				]
 			],
-			// #211 User profile view.
+			// #213 User profile view.
 			[
 				[
 					'url' => 'zabbix.php?action=userprofile.edit',
 					'doc_link' => '/en/manual/web_interface/user_profile#user-profile'
 				]
 			],
-			// #212 User settings -> Api tokens list view.
+			// #214 User settings -> Api tokens list view.
 			[
 				[
 					'url' => 'zabbix.php?action=user.token.list',
 					'doc_link' => '/en/manual/web_interface/user_profile#api-tokens'
 				]
 			],
-			// #213 User settings -> Api tokens -> Create Api token popup.
+			// #215 User settings -> Api tokens -> Create Api token popup.
 			[
 				[
 					'url' => 'zabbix.php?action=popup&popup=token.edit&admin_mode=0',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/users/api_tokens'
 				]
 			],
-			// #214 User settings -> Api tokens -> Edit Api token popup.
+			// #216 User settings -> Api tokens -> Edit Api token popup.
 			[
 				[
 					'url' => 'zabbix.php?action=user.token.list',
@@ -2071,28 +2091,28 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/users/api_tokens'
 				]
 			],
-			// #215 Template groups list view.
+			// #217 Template groups list view.
 			[
 				[
 					'url' => 'zabbix.php?action=templategroup.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/templategroups'
 				]
 			],
-			// #216 Create template group popup.
+			// #218 Create template group popup.
 			[
 				[
 					'url' => 'zabbix.php?action=popup&popup=templategroup.edit',
 					'doc_link' => '/en/manual/config/templates/template_groups#configuration'
 				]
 			],
-			// #217 Edit template group popup.
+			// #219 Edit template group popup.
 			[
 				[
 					'url' => 'zabbix.php?action=popup&popup=templategroup.edit&groupid=12', // Templates/Applications.
 					'doc_link' => '/en/manual/config/templates/template_groups#configuration'
 				]
 			],
-			// #218 Start creating Discovery status widget.
+			// #220 Start creating Discovery status widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2110,7 +2130,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/discovery_status'
 				]
 			],
-			// #219 Start creating Favorite Graphs widget.
+			// #221 Start creating Favorite Graphs widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2128,7 +2148,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/favorite_graphs'
 				]
 			],
-			// #220 Start creating Favorite maps widget.
+			// #222 Start creating Favorite maps widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2146,7 +2166,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/favorite_maps'
 				]
 			],
-			// #221 Start creating Geomap widget.
+			// #223 Start creating Geomap widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2164,7 +2184,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/geomap'
 				]
 			],
-			// #222 Start creating Graph widget.
+			// #224 Start creating Graph widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2182,7 +2202,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/graph'
 				]
 			],
-			// #223 Start creating Graph (Classic) widget.
+			// #225 Start creating Graph (Classic) widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2200,7 +2220,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/graph_classic'
 				]
 			],
-			// #224 Start creating Graph prototype widget.
+			// #226 Start creating Graph prototype widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2218,7 +2238,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/graph_prototype'
 				]
 			],
-			// #225 Start creating Host availability widget.
+			// #227 Start creating Host availability widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2236,7 +2256,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/host_availability'
 				]
 			],
-			// #226 Start creating Host Card widget.
+			// #228 Start creating Host Card widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2254,7 +2274,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/host_card'
 				]
 			],
-			// #227 Start creating Item value widget.
+			// #229 Start creating Item value widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2272,7 +2292,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/item_value'
 				]
 			],
-			// #228 Start c8eating Map widget.
+			// #230 Start c8eating Map widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2290,7 +2310,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/map'
 				]
 			],
-			// #229 Start creating Map tree widget.
+			// #231 Start creating Map tree widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2308,7 +2328,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/map_tree'
 				]
 			],
-			// #230 Start creating History widget.
+			// #232 Start creating History widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2326,7 +2346,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/item_history'
 				]
 			],
-			// #231 Start creating Problem hosts widget.
+			// #233 Start creating Problem hosts widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2344,7 +2364,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/problem_hosts'
 				]
 			],
-			// #232 Start creating Problems widget.
+			// #234 Start creating Problems widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2362,7 +2382,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/problems'
 				]
 			],
-			// #233 Start creating Problems severity widget.
+			// #235 Start creating Problems severity widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2380,7 +2400,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/problems_severity'
 				]
 			],
-			// #234 Start creating SLA report widget.
+			// #236 Start creating SLA report widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2398,7 +2418,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/sla_report'
 				]
 			],
-			// #235 Start creating System widget.
+			// #237 Start creating System widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2416,7 +2436,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/system'
 				]
 			],
-			// #236 Start creating Top hosts widget.
+			// #238 Start creating Top hosts widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2434,7 +2454,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/top_hosts'
 				]
 			],
-			// #237 Start creating Top triggers widget.
+			// #239 Start creating Top triggers widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2452,7 +2472,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/top_triggers'
 				]
 			],
-			// #238 Start creating Trigger overview widget.
+			// #240 Start creating Trigger overview widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2470,7 +2490,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/trigger_overview'
 				]
 			],
-			// #239 Start creating URL widget.
+			// #241 Start creating URL widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2488,7 +2508,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/url'
 				]
 			],
-			// #240 Start creating Web monitoring widget.
+			// #242 Start creating Web monitoring widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2506,7 +2526,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/web_monitoring'
 				]
 			],
-			// #241 Start creating Data overview widget.
+			// #243 Start creating Data overview widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2524,7 +2544,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/top_items'
 				]
 			],
-			// #242 Start creating Gauge widget.
+			// #244 Start creating Gauge widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2542,21 +2562,21 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/gauge'
 				]
 			],
-			// #243 Connectors list view.
+			// #245 Connectors list view.
 			[
 				[
 					'url' => 'zabbix.php?action=connector.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#connectors'
 				]
 			],
-			// #244 Create connectors popup.
+			// #246 Create connectors popup.
 			[
 				[
 					'url' => 'zabbix.php?action=popup&popup=connector.edit',
 					'doc_link' => '/en/manual/config/export/streaming#configuration'
 				]
 			],
-			// #245 Edit connectors popup.
+			// #247 Edit connectors popup.
 			[
 				[
 					'url' => 'zabbix.php?action=connector.list',
@@ -2569,14 +2589,14 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/config/export/streaming#configuration'
 				]
 			],
-			// #246 Administration -> General -> Timeouts.
+			// #248 Administration -> General -> Timeouts.
 			[
 				[
 					'url' => 'zabbix.php?action=timeouts.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#timeouts'
 				]
 			],
-			// #247 Create Pie chart.
+			// #249 Create Pie chart.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2594,7 +2614,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/pie_chart'
 				]
 			],
-			// #248 Start creating Host navigator widget.
+			// #250 Start creating Host navigator widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2612,7 +2632,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/host_navigator'
 				]
 			],
-			// #249 Start creating Item navigator widget.
+			// #251 Start creating Item navigator widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2630,7 +2650,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/item_navigator'
 				]
 			],
-			// #250 Start creating Item Card widget.
+			// #252 Start creating Item Card widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2648,28 +2668,28 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/item_card'
 				]
 			],
-			// #251 Administration -> General -> APM view.
+			// #253 Administration -> General -> APM view.
 			[
 				[
 					'url' => 'zabbix.php?action=apm.db.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#apm'
 				]
 			],
-			// #252 APM -> Traces view.
+			// #254 APM -> Traces view.
 			[
 				[
 					'url' => 'zabbix.php?action=apm.trace.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/apm/traces'
 				]
 			],
-			// #253 APM -> Metrics view.
+			// #255 APM -> Metrics view.
 			[
 				[
 					'url' => 'zabbix.php?action=apm.metric.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/apm/metrics'
 				]
 			],
-			// #254 APM -> Logs view.
+			// #256 APM -> Logs view.
 			[
 				[
 					'url' => 'zabbix.php?action=apm.log.list',
