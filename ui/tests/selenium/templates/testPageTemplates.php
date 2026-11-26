@@ -504,6 +504,8 @@ class testPageTemplates extends CLegacyWebTest {
 			$this->assertMessage(TEST_GOOD, ($template_count > 1) ? 'Templates deleted' : 'Template deleted');
 			CMessageElement::find()->one()->close();
 			$table_rows_count = $table_rows_count - $template_count;
+			$table->invalidate();
+			$table->waitUntilRowsCount($table_rows_count);
 			$this->assertDatatableStats($table_rows_count);
 			$this->assertSelectedCount(0);
 		}

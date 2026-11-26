@@ -240,7 +240,7 @@ class testPageMonitoringLatestData extends CWebTest {
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
 		$this->assertFalse($this->query('id:latest-data-subfilter')->waitUntilNotVisible()->exists());
 		$this->assertEquals(['Filter is not set', 'Use the filter to display results'],
-				explode("\n", $this->query('class:no-data-message')->one()->getText())
+				explode("\n", $this->query('class:no-data-message')->waitUntilVisible()->one()->getText())
 		);
 
 		// Check filter collapse/expand.

@@ -16,6 +16,8 @@
 
 require_once __DIR__ . '/../../include/CWebTest.php';
 
+use Facebook\WebDriver\Exception\TimeoutException;
+
 /**
  * @backup profiles
  *
@@ -692,7 +694,28 @@ class testAlarmNotification extends CWebTest {
 	}
 
 	protected function getAlarmOverlay() {
-		return $this->query('xpath://div['.CXPathHelper::fromClass('overlay-dialogue notif').']')->waitUntilVisible()->one();
+		try {
+			return $this->query('xpath://div['.CXPathHelper::fromClass('overlay-dialogue notif').']')->waitUntilVisible()
+					->one();
+		}
+		catch (TimeoutException $exception) {
+			// TODO: Temporary debug output for the unstable notification appearance.
+			$browser = CElementQuery::getDriver()->executeScript('const get = (key) => Object.keys(localStorage)'.
+					'.filter((k) => k.endsWith(key)).map((k) => JSON.parse(localStorage.getItem(k)).payload);'.
+					'return "focus: " + document.hasFocus() + ", active tab: " + get(":notifications.active_tabid")'.
+					' + ", tabs: " + JSON.stringify(get(":tabs.lastseen"));'
+			);
+			$last_clock = CDBHelper::getValue('SELECT value_str FROM profiles WHERE userid=1 AND idx='.
+					zbx_dbstr('web.messages').' AND source='.zbx_dbstr('last.clock')
+			);
+			$events = CDBHelper::getAll('SELECT eventid, clock FROM events WHERE source=0 AND value=1 AND clock>'.
+					(time() - 600)
+			);
+			echo "\nNotification debug: now ".time().', last.clock '.$last_clock.', '.$browser.', events (id:clock) '.
+					implode(' ', array_map(fn($event) => $event['eventid'].':'.$event['clock'], $events))."\n";
+
+			throw $exception;
+		}
 	}
 
 	/**

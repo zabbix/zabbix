@@ -16,6 +16,8 @@
 
 require_once __DIR__.'/../common/testWidgetCommunication.php';
 
+use Facebook\WebDriver\Exception\TimeoutException;
+
 /**
  * @backup profiles
  *
@@ -4120,6 +4122,14 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					$table_selector = ($listener_name === 'new')
 						? 'xpath:(//h4[text()='.CXPathHelper::escapeQuotes($new_listener_name).'])[2]/../..//table'
 						: 'xpath://h4[text()='.CXPathHelper::escapeQuotes($listener_name).']/../..//table';
+
+					// Listener can still show the previous selection, wait until it shows the expected one.
+					try {
+						$this->query($table_selector)->waitUntilTextPresent((string) reset($values[0]));
+					}
+					catch (TimeoutException $exception) {
+						// Data mismatch is reported by the assertion below.
+					}
 
 					$this->assertTableData($values, $table_selector);
 					break;
