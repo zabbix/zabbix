@@ -18,6 +18,7 @@ require_once 'vendor/autoload.php';
 require_once __DIR__.'/../CElement.php';
 
 use Facebook\WebDriver\Exception\ElementClickInterceptedException;
+use Facebook\WebDriver\Exception\ElementNotInteractableException;
 
 /**
  * Dashboard widget element.
@@ -102,17 +103,17 @@ class CWidgetElement extends CElement {
 		 */
 		$button = $this->query('xpath:.//button[contains(@class, "js-widget-edit")]')->waitUntilPresent()->one();
 		$this->hoverMouse();
-		$button->hoverMouse()->waitUntilClickable();
+		$button->hoverMouse();
 
 		/*
 		 * Hovering a widget in edit mode adds resize handles, and the top resize border (ui-resizable-border-n) can
-		 * overlap the edit button and intercept the click. If that happens, re-query the button (the widget may have
-		 * re-rendered), scroll it into view to clear the overlap, then click again.
+		 * overlap the edit button and intercept the click, or the widget may re-render and the button is briefly not
+		 * interactable. If that happens, re-query the button, scroll it into view, then click again.
 		 */
 		try {
 			$button->click();
 		}
-		catch (ElementClickInterceptedException $exception) {
+		catch (ElementClickInterceptedException | ElementNotInteractableException $exception) {
 			$button = $this->query('xpath:.//button[contains(@class, "js-widget-edit")]')->waitUntilPresent()->one();
 			$button->scrollIntoView();
 			$button->click();
