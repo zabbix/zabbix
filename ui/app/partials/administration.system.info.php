@@ -31,7 +31,7 @@ if (array_key_exists('serverid', $data) && $data['serverid'] !== '') {
 	$info_table->addRow([
 		_('Zabbix server ID'),
 		[
-			(new CTrim($data['serverid'], 8))
+			(new CSpan($data['serverid']))
 				->setHint($data['serverid'])
 				->addClass(ZBX_STYLE_MIDDLE)
 				->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
