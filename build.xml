@@ -248,6 +248,7 @@
 			<arg line="--with-ares"/>
 			<arg line="--with-net-snmp"/>
 			<arg line="--with-ssh2"/>
+			<arg line="--with-openipmi"/>
 			<arg line="--enable-java"/>
 			<arg line="--with-apm"/>
 		</exec>
@@ -827,6 +828,7 @@
 			<arg line="${with.encryption}"/>
 			<arg line="--with-net-snmp"/>
 			<arg line="--with-ssh2"/>
+			<arg line="--with-openipmi"/>
 			<arg line="--enable-java"/>
 			<arg line="--with-apm"/>
 		</exec>

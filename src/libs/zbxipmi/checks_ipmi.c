@@ -38,17 +38,26 @@
 #define ZBX_IPMI_THRESHOLD_STATUS_DISABLED	0
 #define ZBX_IPMI_THRESHOLD_STATUS_ENABLED	1
 
+#define ZBX_IPMI_DOMAIN_STATE_CLOSED	0	/* domain is not opened or was closed */
+#define ZBX_IPMI_DOMAIN_STATE_OPENING	1	/* ipmi_open_domain() was called, domain is not up yet */
+#define ZBX_IPMI_DOMAIN_STATE_UP	2	/* domain is up */
+
 #include <OpenIPMI/ipmiif.h>
 #include <OpenIPMI/ipmi_posix.h>
 #include <OpenIPMI/ipmi_lan.h>
 #include <OpenIPMI/ipmi_auth.h>
 
-#define RETURN_IF_CB_DATA_NULL(x, y)								\
+/* cb_data passed to OpenIPMI is host's domain_nr (never 0, so NULL stays invalid) instead of pointer to host -    */
+/* callback may arrive after the host has been freed and its memory reused, while domain_nr is never reused        */
+#define ZBX_IPMI_HOST_CB_DATA(h)	((void *)(uintptr_t)(h)->domain_nr)
+
+#define RESOLVE_CB_DATA(x, h)									\
 	do											\
 	{											\
-		if (NULL == (x))								\
+		if (NULL == ((h) = zbx_get_ipmi_host_by_cb_data(x)))				\
 		{										\
-			zabbix_log(LOG_LEVEL_WARNING, "%s() called with cb_data:NULL", (y));	\
+			zabbix_log(LOG_LEVEL_WARNING, "%s() called with invalid cb_data:%p",	\
+					__func__, (x));						\
 			return;									\
 		}										\
 	}											\
@@ -70,7 +79,8 @@ zbx_ipmi_sensor_threshold_t;
 
 typedef struct
 {
-	ipmi_sensor_t			*sensor;
+	ipmi_sensor_id_t		sensor_id;	/* Keep ID, it is stable. */
+							/* ipmi_sensor_t pointer is valid only inside callbacks. */
 	char				id[IPMI_SENSOR_ID_SZ];
 	enum ipmi_str_type_e		id_type;	/* For sensors IPMI specifications mention Unicode, BCD plus, */
 							/* 6-bit ASCII packed, 8-bit ASCII+Latin1.  */
@@ -82,6 +92,11 @@ typedef struct
 							/* Current, Fan, Physical Security (Chassis Intrusion), etc. */
 	char				*full_name;
 	int				state;
+	char				*type_str;
+	char				*reading_type_str;
+	int				threshold_access;
+	char				*units;
+	char				*reading_names[MAX_DISCRETE_STATES];
 #define IPMI_THRESHOLDS_NUM	6
 	zbx_ipmi_sensor_threshold_t	thresholds[IPMI_THRESHOLDS_NUM];
 #undef IPMI_THRESHOLDS_NUM
@@ -90,11 +105,14 @@ zbx_ipmi_sensor_t;
 
 typedef struct
 {
-	ipmi_control_t		*control;
+	ipmi_control_id_t	control_id;	/* Keep ID, it is stable. */
+						/* ipmi_control_t pointer is valid only inside callbacks. */
 	char			*c_name;
 	int			num_values;
 	int			*val;
 	char			*full_name;
+	int			is_readable;
+	int			is_settable;
 }
 zbx_ipmi_control_t;
 
@@ -112,7 +130,7 @@ typedef struct zbx_ipmi_host
 	int			sensor_count;
 	int			control_count;
 	ipmi_con_t		*con;
-	int			domain_up;
+	int			domain_state;	/* ZBX_IPMI_DOMAIN_STATE_* */
 	int			done;
 	time_t			lastaccess;	/* Time of last access attempt. Used to detect and delete inactive */
 						/* (disabled) IPMI hosts from OpenIPMI to stop polling them. */
@@ -123,9 +141,34 @@ typedef struct zbx_ipmi_host
 }
 zbx_ipmi_host_t;
 
-static unsigned int	domain_nr = 0;		/* for making a sequence of domain names "0", "1", "2", ... */
+static unsigned int	domain_nr = 1;		/* for making a sequence of domain names "1", "2", "3", ... */
 static zbx_ipmi_host_t	*hosts = NULL;		/* head of single-linked list of monitored hosts */
 static os_handler_t	*os_hnd;
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: finds host by callback data created by ZBX_IPMI_HOST_CB_DATA()    *
+ *                                                                            *
+ * Parameters: cb_data - [IN]                                                 *
+ *                                                                            *
+ * Return value: pointer to host data or NULL if host does not exist          *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_ipmi_host_t	*zbx_get_ipmi_host_by_cb_data(const void *cb_data)
+{
+	zbx_ipmi_host_t	*h;
+
+	if (NULL == cb_data)
+		return NULL;
+
+	for (h = hosts; NULL != h; h = h->next)
+	{
+		if (h->domain_nr == (unsigned int)(uintptr_t)cb_data)
+			break;
+	}
+
+	return h;
+}
 
 static char	*zbx_sensor_id_to_str(char *str, size_t str_sz, const char *id, enum ipmi_str_type_e id_type, int id_sz)
 {
@@ -220,16 +263,28 @@ static zbx_ipmi_host_t	*zbx_allocate_ipmi_host(const char *ip, int port, int aut
 
 	zbx_ipmi_host_t	*h = (zbx_ipmi_host_t *)zbx_malloc(NULL, sizeof(zbx_ipmi_host_t));
 
-	memset(h, 0, sizeof(zbx_ipmi_host_t));
-
 	h->ip = strdup(ip);
 	h->port = port;
 	h->authtype = authtype;
 	h->privilege = privilege;
+	h->ret = SUCCEED;
 	h->username = strdup(username);
 	h->password = strdup(password);
-	h->domain_nr = domain_nr++;
+	h->sensors = NULL;
+	h->controls = NULL;
+	h->sensor_count = 0;
+	h->control_count = 0;
+	h->con = NULL;
+	h->domain_state = ZBX_IPMI_DOMAIN_STATE_CLOSED;
+	h->done = 0;
+	h->lastaccess = 0;
+	h->domain_nr = domain_nr;
 
+	/* 0 is reserved to keep NULL cb_data invalid */
+	if (0 == ++domain_nr)
+		domain_nr = 1;
+
+	h->err = NULL;
 	h->next = hosts;
 	hosts = h;
 
@@ -238,15 +293,16 @@ static zbx_ipmi_host_t	*zbx_allocate_ipmi_host(const char *ip, int port, int aut
 	return h;
 }
 
-static zbx_ipmi_sensor_t	*zbx_get_ipmi_sensor(const zbx_ipmi_host_t *h, const ipmi_sensor_t *sensor)
+static zbx_ipmi_sensor_t	*zbx_get_ipmi_sensor(const zbx_ipmi_host_t *h, ipmi_sensor_t *sensor)
 {
 	zbx_ipmi_sensor_t	*s = NULL;
+	ipmi_sensor_id_t	sensor_id = ipmi_sensor_convert_to_id(sensor);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p psensor:%p", __func__, (const void *)h, (const void *)sensor);
 
 	for (int i = 0; i < h->sensor_count; i++)
 	{
-		if (h->sensors[i].sensor == sensor)
+		if (0 == ipmi_cmp_sensor_id(h->sensors[i].sensor_id, sensor_id))
 		{
 			s = &h->sensors[i];
 			break;
@@ -256,6 +312,55 @@ static zbx_ipmi_sensor_t	*zbx_get_ipmi_sensor(const zbx_ipmi_host_t *h, const ip
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __func__, (void *)s);
 
 	return s;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: finds sensor by its OpenIPMI sensor ID                            *
+ *                                                                            *
+ * Parameters: h         - [IN]                                               *
+ *             sensor_id - [IN]                                               *
+ *                                                                            *
+ * Return value: pointer to sensor data or NULL if sensor does not exist      *
+ *                                                                            *
+ * Comments: Sensors are reallocated when OpenIPMI adds or deletes them while *
+ *           processing events, so pointers to sensors must be looked up      *
+ *           again after every zbx_perform_openipmi_ops() call.               *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_ipmi_sensor_t	*zbx_get_ipmi_sensor_by_sensor_id(const zbx_ipmi_host_t *h, ipmi_sensor_id_t sensor_id)
+{
+	for (int i = 0; i < h->sensor_count; i++)
+	{
+		if (0 == ipmi_cmp_sensor_id(h->sensors[i].sensor_id, sensor_id))
+			return &h->sensors[i];
+	}
+
+	return NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: finds control by its OpenIPMI control ID                          *
+ *                                                                            *
+ * Parameters: h          - [IN]                                              *
+ *             control_id - [IN]                                              *
+ *                                                                            *
+ * Return value: pointer to control data or NULL if control does not exist    *
+ *                                                                            *
+ * Comments: see zbx_get_ipmi_sensor_by_sensor_id()                           *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_ipmi_control_t	*zbx_get_ipmi_control_by_control_id(const zbx_ipmi_host_t *h,
+		ipmi_control_id_t control_id)
+{
+	for (int i = 0; i < h->control_count; i++)
+	{
+		if (0 == ipmi_cmp_control_id(h->controls[i].control_id, control_id))
+			return &h->controls[i];
+	}
+
+	return NULL;
 }
 
 static zbx_ipmi_sensor_t	*zbx_get_ipmi_sensor_by_id(const zbx_ipmi_host_t *h, const char *id)
@@ -354,6 +459,9 @@ static char *zbx_get_sensor_id(ipmi_sensor_t *sensor, char *id, int sz, int *id_
 	return zbx_sensor_id_to_str(id_str, (size_t)id_str_sz, id, *id_type, *id_sz);
 }
 
+static char	*zbx_get_ipmi_units(ipmi_sensor_t *sensor);
+static int	zbx_close_ipmi_domain(zbx_ipmi_host_t *h);
+
 static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *sensor)
 {
 	char			id_str[2 * IPMI_SENSOR_ID_SZ + 1];
@@ -364,7 +472,6 @@ static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sens
 	size_t			sz;
 	char			full_name[IPMI_SENSOR_NAME_LEN];
 	char			ip_port[MAX_STRING_LEN];
-	int 			i;
 
 	zbx_get_sensor_id(sensor, id, sizeof(id), &id_sz, &id_type, id_str, sizeof(id_str));
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sensor:'%s@[%s]:%d'", __func__, id_str, h->ip, h->port);
@@ -378,7 +485,7 @@ static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sens
 		h->sensors = (zbx_ipmi_sensor_t *)zbx_realloc(h->sensors, sz);
 
 	s = &h->sensors[h->sensor_count - 1];
-	s->sensor = sensor;
+	s->sensor_id = ipmi_sensor_convert_to_id(sensor);
 	memcpy(s->id, id, sizeof(id));
 	s->id_type = id_type;
 	s->id_sz = id_sz;
@@ -386,17 +493,43 @@ static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sens
 	s->reading_type = ipmi_sensor_get_event_reading_type(sensor);
 	s->type = ipmi_sensor_get_sensor_type(sensor);
 
-	ipmi_sensor_get_name(s->sensor, full_name, sizeof(full_name));
+	ipmi_sensor_get_name(sensor, full_name, sizeof(full_name));
 	s->full_name = zbx_strdup(NULL, full_name + get_domain_offset(h, full_name));
-	for (i = IPMI_LOWER_NON_CRITICAL; i <= IPMI_UPPER_NON_RECOVERABLE; i++)
+
+	for (int i = IPMI_LOWER_NON_CRITICAL; i <= IPMI_UPPER_NON_RECOVERABLE; i++)
 		s->thresholds[i].status = ZBX_IPMI_THRESHOLD_STATUS_DISABLED;
+
+	/* sensor properties used outside of callbacks must be collected now while 'sensor' pointer is valid */
+	s->type_str = zbx_strdup(NULL, ipmi_sensor_get_sensor_type_string(sensor));
+	s->reading_type_str = zbx_strdup(NULL, ipmi_sensor_get_event_reading_type_string(sensor));
+
+	memset(s->reading_names, 0, sizeof(s->reading_names));
+
+	if (IPMI_EVENT_READING_TYPE_THRESHOLD == s->reading_type)
+	{
+		s->threshold_access = ipmi_sensor_get_threshold_access(sensor);
+		s->units = zbx_get_ipmi_units(sensor);
+	}
+	else
+	{
+		s->threshold_access = IPMI_THRESHOLD_ACCESS_SUPPORT_NONE;
+		s->units = NULL;
+
+		for (int i = 0; i < MAX_DISCRETE_STATES; i++)
+		{
+			const char	*p = ipmi_sensor_reading_name_string(sensor, i);
+
+			if (NULL != p)
+				s->reading_names[i] = zbx_strdup(NULL, p);
+		}
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Added sensor: host:'%s' id_type:%d id_sz:%d id:'%s' reading_type:0x%x "
 			"('%s') type:0x%x ('%s') domain:'%u' name:'%s'",
 			zbx_join_hostport(ip_port, sizeof(ip_port), h->ip, h->port), (int)s->id_type, s->id_sz,
 			zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz),
-			(unsigned int)s->reading_type, ipmi_sensor_get_event_reading_type_string(s->sensor),
-			(unsigned int)s->type, ipmi_sensor_get_sensor_type_string(s->sensor), h->domain_nr,
+			(unsigned int)s->reading_type, s->reading_type_str,
+			(unsigned int)s->type, s->type_str, h->domain_nr,
 			s->full_name);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __func__, (void *)s);
@@ -404,13 +537,26 @@ static zbx_ipmi_sensor_t	*zbx_allocate_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sens
 	return s;
 }
 
-static void	zbx_delete_ipmi_sensor(zbx_ipmi_host_t *h, const ipmi_sensor_t *sensor)
+static void	zbx_free_ipmi_sensor_properties(zbx_ipmi_sensor_t *s)
 {
+	zbx_free(s->full_name);
+	zbx_free(s->type_str);
+	zbx_free(s->reading_type_str);
+	zbx_free(s->units);
+
+	for (int i = 0; i < MAX_DISCRETE_STATES; i++)
+		zbx_free(s->reading_names[i]);
+}
+
+static void	zbx_delete_ipmi_sensor(zbx_ipmi_host_t *h, ipmi_sensor_t *sensor)
+{
+	ipmi_sensor_id_t	sensor_id = ipmi_sensor_convert_to_id(sensor);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p psensor:%p", __func__, (void *)h, (const void *)sensor);
 
 	for (int i = 0; i < h->sensor_count; i++)
 	{
-		if (h->sensors[i].sensor != sensor)
+		if (0 != ipmi_cmp_sensor_id(h->sensors[i].sensor_id, sensor_id))
 			continue;
 
 		size_t	sz = sizeof(zbx_ipmi_sensor_t);
@@ -420,14 +566,17 @@ static void	zbx_delete_ipmi_sensor(zbx_ipmi_host_t *h, const ipmi_sensor_t *sens
 				zbx_sensor_id_to_str(id_str, sizeof(id_str), h->sensors[i].id, h->sensors[i].id_type,
 				h->sensors[i].id_sz), h->ip, h->port);
 
-		zbx_free(h->sensors[i].full_name);
+		zbx_free_ipmi_sensor_properties(&h->sensors[i]);
 
 		h->sensor_count--;
 
 		if (h->sensor_count != i)
 			memmove(&h->sensors[i], &h->sensors[i + 1], sz * (size_t)(h->sensor_count - i));
 
-		h->sensors = (zbx_ipmi_sensor_t *)zbx_realloc(h->sensors, sz * (size_t)h->sensor_count);
+		if (0 == h->sensor_count)
+			zbx_free(h->sensors);
+		else
+			h->sensors = (zbx_ipmi_sensor_t *)zbx_realloc(h->sensors, sz * (size_t)h->sensor_count);
 
 		break;
 	}
@@ -435,15 +584,16 @@ static void	zbx_delete_ipmi_sensor(zbx_ipmi_host_t *h, const ipmi_sensor_t *sens
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static zbx_ipmi_control_t	*zbx_get_ipmi_control(const zbx_ipmi_host_t *h, const ipmi_control_t *control)
+static zbx_ipmi_control_t	*zbx_get_ipmi_control(const zbx_ipmi_host_t *h, ipmi_control_t *control)
 {
 	zbx_ipmi_control_t	*c = NULL;
+	ipmi_control_id_t	control_id = ipmi_control_convert_to_id(control);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p pcontrol:%p", __func__, (const void *)h, (const void *)control);
 
 	for (int i = 0; i < h->control_count; i++)
 	{
-		if (h->controls[i].control == control)
+		if (0 == ipmi_cmp_control_id(h->controls[i].control_id, control_id))
 		{
 			c = &h->controls[i];
 			break;
@@ -526,7 +676,7 @@ static zbx_ipmi_control_t	*zbx_allocate_ipmi_control(zbx_ipmi_host_t *h, ipmi_co
 
 	memset(c, 0, sizeof(zbx_ipmi_control_t));
 
-	c->control = control;
+	c->control_id = ipmi_control_convert_to_id(control);
 	c->c_name = c_name;
 	c->num_values = ipmi_control_get_num_vals(control);
 	sz = sizeof(int) * (size_t)c->num_values;
@@ -534,18 +684,24 @@ static zbx_ipmi_control_t	*zbx_allocate_ipmi_control(zbx_ipmi_host_t *h, ipmi_co
 	memset(c->val, 0, sz);
 	c->full_name = zbx_strdup(NULL, full_name + dm_sz);
 
+	/* control properties used outside of callbacks must be collected now while 'control' pointer is valid */
+	c->is_readable = ipmi_control_is_readable(control);
+	c->is_settable = ipmi_control_is_settable(control);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __func__, (void *)c);
 
 	return c;
 }
 
-static void	zbx_delete_ipmi_control(zbx_ipmi_host_t *h, const ipmi_control_t *control)
+static void	zbx_delete_ipmi_control(zbx_ipmi_host_t *h, ipmi_control_t *control)
 {
+	ipmi_control_id_t	control_id = ipmi_control_convert_to_id(control);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p pcontrol:%p", __func__, (void *)h, (const void *)control);
 
 	for (int i = 0; i < h->control_count; i++)
 	{
-		if (h->controls[i].control != control)
+		if (0 != ipmi_cmp_control_id(h->controls[i].control_id, control_id))
 			continue;
 
 		size_t	sz = sizeof(zbx_ipmi_control_t);
@@ -561,7 +717,10 @@ static void	zbx_delete_ipmi_control(zbx_ipmi_host_t *h, const ipmi_control_t *co
 		if (h->control_count != i)
 			memmove(&h->controls[i], &h->controls[i + 1], sz * (size_t)(h->control_count - i));
 
-		h->controls = (zbx_ipmi_control_t *)zbx_realloc(h->controls, sz * (size_t)h->control_count);
+		if (0 == h->control_count)
+			zbx_free(h->controls);
+		else
+			h->controls = (zbx_ipmi_control_t *)zbx_realloc(h->controls, sz * (size_t)h->control_count);
 
 		break;
 	}
@@ -572,10 +731,10 @@ static void	zbx_delete_ipmi_control(zbx_ipmi_host_t *h, const ipmi_control_t *co
 /* callback function invoked from OpenIPMI */
 static void	zbx_got_thresholds_cb(ipmi_sensor_t *sensor, int err, ipmi_thresholds_t *th, void *cb_data)
 {
-	zbx_ipmi_host_t		*h = (zbx_ipmi_host_t *)cb_data;
+	zbx_ipmi_host_t		*h;
 	zbx_ipmi_sensor_t	*s;
 
-	RETURN_IF_CB_DATA_NULL(cb_data, __func__);
+	RESOLVE_CB_DATA(cb_data, h);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d' err:%d th:%p", __func__, h->ip, h->port, err, (void *)th);
 
@@ -663,12 +822,12 @@ static void	zbx_got_thresh_reading_cb(ipmi_sensor_t *sensor, int err, enum ipmi_
 		unsigned int raw_value, double val, ipmi_states_t *states, void *cb_data)
 {
 	char			id_str[2 * IPMI_SENSOR_ID_SZ + 1];
-	zbx_ipmi_host_t		*h = (zbx_ipmi_host_t *)cb_data;
+	zbx_ipmi_host_t		*h;
 	zbx_ipmi_sensor_t	*s;
 
 	ZBX_UNUSED(raw_value);
 
-	RETURN_IF_CB_DATA_NULL(cb_data, __func__);
+	RESOLVE_CB_DATA(cb_data, h);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -757,10 +916,10 @@ static void	zbx_got_discrete_states_cb(ipmi_sensor_t *sensor, int err, ipmi_stat
 {
 	char			id_str[2 * IPMI_SENSOR_ID_SZ + 1];
 	int			id, val, ret, is_state_set;
-	zbx_ipmi_host_t		*h = (zbx_ipmi_host_t *)cb_data;
+	zbx_ipmi_host_t		*h;
 	zbx_ipmi_sensor_t	*s;
 
-	RETURN_IF_CB_DATA_NULL(cb_data, __func__);
+	RESOLVE_CB_DATA(cb_data, h);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -899,6 +1058,38 @@ void	zbx_perform_all_openipmi_ops(int timeout)
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: waits until OpenIPMI operation started for host is completed      *
+ *                                                                            *
+ * Parameters: h         - [IN]                                               *
+ *             func_name - [IN] name of function which started the operation  *
+ *                                                                            *
+ * Comments: Operation which is not completed in time leaves the domain in    *
+ *           unknown state - its callbacks may still arrive and complete a    *
+ *           later operation. So the domain is closed and the next attempt    *
+ *           starts from scratch. Not used for opening the domain, which may  *
+ *           take longer and is let complete in the background instead.       *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_wait_openipmi_op(zbx_ipmi_host_t *h, const char *func_name)
+{
+	if (SUCCEED == zbx_perform_openipmi_ops(h, func_name))
+		return;
+
+	if (SUCCEED == h->ret)
+	{
+		h->err = zbx_dsprintf(h->err, "timeout while waiting for IPMI host [%s]:%d", h->ip, h->port);
+		h->ret = NETWORK_ERROR;
+	}
+
+	if (SUCCEED != zbx_close_ipmi_domain(h))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot close IPMI domain of host [%s]:%d", func_name, h->ip,
+				h->port);
+	}
+}
+
 static void	zbx_read_ipmi_sensor(zbx_ipmi_host_t *h, const zbx_ipmi_sensor_t *s)
 {
 	char		id_str[2 * IPMI_SENSOR_ID_SZ + 1];
@@ -916,12 +1107,11 @@ static void	zbx_read_ipmi_sensor(zbx_ipmi_host_t *h, const zbx_ipmi_sensor_t *s)
 	switch (s->reading_type)
 	{
 		case IPMI_EVENT_READING_TYPE_THRESHOLD:
-			if (0 != (ret = ipmi_sensor_get_reading(s->sensor, zbx_got_thresh_reading_cb, h)))
+			if (0 != (ret = ipmi_sensor_id_get_reading(s->sensor_id, zbx_got_thresh_reading_cb,
+					ZBX_IPMI_HOST_CB_DATA(h))))
 			{
-				/* do not use pointer to sensor here - the sensor may have disappeared during */
-				/* ipmi_sensor_get_reading(), as domain might be closed due to communication failure */
 				h->err = zbx_dsprintf(h->err, "Cannot read sensor \"%s\"."
-						" ipmi_sensor_get_reading() return error: 0x%x", id_str,
+						" ipmi_sensor_id_get_reading() returned error: 0x%x", id_str,
 						(unsigned int)ret);
 				h->ret = NOTSUPPORTED;
 				goto out;
@@ -955,19 +1145,18 @@ static void	zbx_read_ipmi_sensor(zbx_ipmi_host_t *h, const zbx_ipmi_sensor_t *s)
 		case 0x7d:
 		case 0x7e:
 		case 0x7f:
-			if (0 != (ret = ipmi_sensor_get_states(s->sensor, zbx_got_discrete_states_cb, h)))
+			if (0 != (ret = ipmi_sensor_id_get_states(s->sensor_id, zbx_got_discrete_states_cb,
+					ZBX_IPMI_HOST_CB_DATA(h))))
 			{
-				/* do not use pointer to sensor here - the sensor may have disappeared during */
-				/* ipmi_sensor_get_states(), as domain might be closed due to communication failure */
 				h->err = zbx_dsprintf(h->err, "Cannot read sensor \"%s\"."
-						" ipmi_sensor_get_states() return error: 0x%x", id_str,
+						" ipmi_sensor_id_get_states() returned error: 0x%x", id_str,
 						(unsigned int)ret);
 				h->ret = NOTSUPPORTED;
 				goto out;
 			}
 			break;
 		default:
-			s_reading_type_string = ipmi_sensor_get_event_reading_type_string(s->sensor);
+			s_reading_type_string = s->reading_type_str;
 
 			h->err = zbx_dsprintf(h->err, "Cannot read sensor \"%s\"."
 					" IPMI reading type \"%s\" is not supported", id_str, s_reading_type_string);
@@ -975,7 +1164,7 @@ static void	zbx_read_ipmi_sensor(zbx_ipmi_host_t *h, const zbx_ipmi_sensor_t *s)
 			goto out;
 	}
 
-	zbx_perform_openipmi_ops(h, __func__);	/* ignore returned result */
+	zbx_wait_openipmi_op(h, __func__);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(h->ret));
 }
@@ -984,7 +1173,6 @@ static void	zbx_read_ipmi_thresholds(zbx_ipmi_host_t *h, const zbx_ipmi_sensor_t
 {
 	char	id_str[2 * IPMI_SENSOR_ID_SZ + 1];
 	int 	ret;
-	int	thr_access;
 
 	/* copy sensor details at start - it can go away and we won't be able to make an error message */
 	zbx_sensor_id_to_str(id_str, sizeof(id_str), s->id, s->id_type, s->id_sz);
@@ -993,21 +1181,21 @@ static void	zbx_read_ipmi_thresholds(zbx_ipmi_host_t *h, const zbx_ipmi_sensor_t
 
 	h->done = 0;
 
-	thr_access = ipmi_sensor_get_threshold_access(s->sensor);
-	if (thr_access == IPMI_THRESHOLD_ACCESS_SUPPORT_NONE || thr_access == IPMI_THRESHOLD_ACCESS_SUPPORT_FIXED)
+	if (IPMI_THRESHOLD_ACCESS_SUPPORT_NONE == s->threshold_access ||
+			IPMI_THRESHOLD_ACCESS_SUPPORT_FIXED == s->threshold_access)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Cannot access thresholds");
 		goto out;
 	}
 
-	if (0 != (ret = ipmi_sensor_get_thresholds(s->sensor, zbx_got_thresholds_cb, h)))
+	if (0 != (ret = ipmi_sensor_id_get_thresholds(s->sensor_id, zbx_got_thresholds_cb, ZBX_IPMI_HOST_CB_DATA(h))))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Cannot read thresholds for sensor \"%s\". ipmi_sensor_get_thresholds()"
-				" return error: 0x%x", id_str, (unsigned int)ret);
+		zabbix_log(LOG_LEVEL_DEBUG, "Cannot read thresholds for sensor \"%s\". ipmi_sensor_id_get_thresholds()"
+				" returned error: 0x%x", id_str, (unsigned int)ret);
 		goto out;
 	}
 
-	zbx_perform_openipmi_ops(h, __func__);	/* ignore returned result */
+	zbx_wait_openipmi_op(h, __func__);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(h->ret));
 }
@@ -1015,12 +1203,12 @@ out:
 /* callback function invoked from OpenIPMI */
 static void	zbx_got_control_reading_cb(ipmi_control_t *control, int err, int *val, void *cb_data)
 {
-	zbx_ipmi_host_t		*h = (zbx_ipmi_host_t *)cb_data;
+	zbx_ipmi_host_t		*h;
 	zbx_ipmi_control_t	*c;
 	const char		*e_string;
 	size_t			sz;
 
-	RETURN_IF_CB_DATA_NULL(cb_data, __func__);
+	RESOLVE_CB_DATA(cb_data, h);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1070,10 +1258,10 @@ out:
 /* callback function invoked from OpenIPMI */
 static void	zbx_got_control_setting_cb(ipmi_control_t *control, int err, void *cb_data)
 {
-	zbx_ipmi_host_t		*h = (zbx_ipmi_host_t *)cb_data;
+	zbx_ipmi_host_t		*h;
 	zbx_ipmi_control_t	*c;
 
-	RETURN_IF_CB_DATA_NULL(cb_data, __func__);
+	RESOLVE_CB_DATA(cb_data, h);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1112,7 +1300,7 @@ static void	zbx_read_ipmi_control(zbx_ipmi_host_t *h, const zbx_ipmi_control_t *
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() control:'%s@[%s]:%d'", __func__, c->c_name, h->ip, h->port);
 
-	if (0 == ipmi_control_is_readable(c->control))
+	if (0 == c->is_readable)
 	{
 		h->err = zbx_strdup(h->err, "control is not readable");
 		h->ret = NOTSUPPORTED;
@@ -1125,17 +1313,15 @@ static void	zbx_read_ipmi_control(zbx_ipmi_host_t *h, const zbx_ipmi_control_t *
 	h->ret = SUCCEED;
 	h->done = 0;
 
-	if (0 != (ret = ipmi_control_get_val(c->control, zbx_got_control_reading_cb, h)))
+	if (0 != (ret = ipmi_control_id_get_val(c->control_id, zbx_got_control_reading_cb, ZBX_IPMI_HOST_CB_DATA(h))))
 	{
-		/* do not use pointer to control here - the control may have disappeared during */
-		/* ipmi_control_get_val(), as domain might be closed due to communication failure */
-		h->err = zbx_dsprintf(h->err, "Cannot read control %s. ipmi_control_get_val() return error: 0x%x",
+		h->err = zbx_dsprintf(h->err, "Cannot read control %s. ipmi_control_id_get_val() returned error: 0x%x",
 				control_name, (unsigned int)ret);
 		h->ret = NOTSUPPORTED;
 		goto out;
 	}
 
-	zbx_perform_openipmi_ops(h, __func__);	/* ignore returned result */
+	zbx_wait_openipmi_op(h, __func__);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(h->ret));
 }
@@ -1157,7 +1343,7 @@ static void	zbx_set_ipmi_control(zbx_ipmi_host_t *h, zbx_ipmi_control_t *c, int 
 		goto out;
 	}
 
-	if (0 == ipmi_control_is_settable(c->control))
+	if (0 == c->is_settable)
 	{
 		h->err = zbx_strdup(h->err, "control is not settable");
 		h->ret = NOTSUPPORTED;
@@ -1171,27 +1357,100 @@ static void	zbx_set_ipmi_control(zbx_ipmi_host_t *h, zbx_ipmi_control_t *c, int 
 	h->ret = SUCCEED;
 	h->done = 0;
 
-	if (0 != (ret = ipmi_control_set_val(c->control, c->val, zbx_got_control_setting_cb, h)))
+	if (0 != (ret = ipmi_control_id_set_val(c->control_id, c->val, zbx_got_control_setting_cb,
+			ZBX_IPMI_HOST_CB_DATA(h))))
 	{
-		/* do not use pointer to control here - the control may have disappeared during */
-		/* ipmi_control_set_val(), as domain might be closed due to communication failure */
-		h->err = zbx_dsprintf(h->err, "Cannot set control %s. ipmi_control_set_val() return error: 0x%x",
+		h->err = zbx_dsprintf(h->err, "Cannot set control %s. ipmi_control_id_set_val() returned error: 0x%x",
 				control_name, (unsigned int)ret);
 		h->ret = NOTSUPPORTED;
 		goto out;
 	}
 
-	zbx_perform_openipmi_ops(h, __func__);	/* ignore returned result */
+	zbx_wait_openipmi_op(h, __func__);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(h->ret));
+}
+
+typedef struct
+{
+	const void	*deleted;	/* object being deleted */
+	int		ret;		/* SUCCEED if another object has the same ID */
+}
+zbx_ipmi_replaced_t;
+
+/* callback function invoked from OpenIPMI */
+static void	zbx_sensor_replaced_cb(ipmi_sensor_t *sensor, void *cb_data)
+{
+	zbx_ipmi_replaced_t	*replaced = (zbx_ipmi_replaced_t *)cb_data;
+
+	if ((const void *)sensor != replaced->deleted)
+		replaced->ret = SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks if sensor being deleted is replaced by another one         *
+ *                                                                            *
+ * Parameters: sensor - [IN]                                                  *
+ *                                                                            *
+ * Return value: SUCCEED - OpenIPMI already has another sensor with the same  *
+ *                         ID, which replaces the one being deleted           *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: OpenIPMI removes a destroyed sensor from its lookup right away,  *
+ *           but may report its deletion only after the replacing sensor      *
+ *           (with the same ID) was added. Must be called within OpenIPMI     *
+ *           callback.                                                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_ipmi_sensor_is_replaced(ipmi_sensor_t *sensor)
+{
+	zbx_ipmi_replaced_t	replaced = {sensor, FAIL};
+
+	if (0 != ipmi_sensor_pointer_cb(ipmi_sensor_convert_to_id(sensor), zbx_sensor_replaced_cb, &replaced))
+		return FAIL;
+
+	return replaced.ret;
+}
+
+/* callback function invoked from OpenIPMI */
+static void	zbx_control_replaced_cb(ipmi_control_t *control, void *cb_data)
+{
+	zbx_ipmi_replaced_t	*replaced = (zbx_ipmi_replaced_t *)cb_data;
+
+	if ((const void *)control != replaced->deleted)
+		replaced->ret = SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks if control being deleted is replaced by another one        *
+ *                                                                            *
+ * Parameters: control - [IN]                                                 *
+ *                                                                            *
+ * Return value: SUCCEED - OpenIPMI already has another control with the      *
+ *                         same ID, which replaces the one being deleted      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: see zbx_ipmi_sensor_is_replaced()                                *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_ipmi_control_is_replaced(ipmi_control_t *control)
+{
+	zbx_ipmi_replaced_t	replaced = {control, FAIL};
+
+	if (0 != ipmi_control_pointer_cb(ipmi_control_convert_to_id(control), zbx_control_replaced_cb, &replaced))
+		return FAIL;
+
+	return replaced.ret;
 }
 
 /* callback function invoked from OpenIPMI */
 static void	zbx_sensor_change_cb(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi_sensor_t *sensor, void *cb_data)
 {
-	zbx_ipmi_host_t	*h = (zbx_ipmi_host_t *)cb_data;
+	zbx_ipmi_host_t	*h;
 
-	RETURN_IF_CB_DATA_NULL(cb_data, __func__);
+	RESOLVE_CB_DATA(cb_data, h);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d' phost:%p ent:%p sensor:%p op:%d",
 			__func__, h->ip, h->port, (void *)h, (void *)ent, (void *)sensor, (int)op);
@@ -1202,11 +1461,14 @@ static void	zbx_sensor_change_cb(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi
 		switch (op)
 		{
 			case IPMI_ADDED:
-				if (NULL == zbx_get_ipmi_sensor(h, sensor))
-					zbx_allocate_ipmi_sensor(h, sensor);
+				/* the replaced sensor with the same ID may not be deleted yet */
+				zbx_delete_ipmi_sensor(h, sensor);
+				zbx_allocate_ipmi_sensor(h, sensor);
 				break;
 			case IPMI_DELETED:
-				zbx_delete_ipmi_sensor(h, sensor);
+				/* the entry is kept for the replacing sensor, which has the same ID */
+				if (SUCCEED != zbx_ipmi_sensor_is_replaced(sensor))
+					zbx_delete_ipmi_sensor(h, sensor);
 				break;
 			case IPMI_CHANGED:
 				break;
@@ -1221,9 +1483,9 @@ static void	zbx_sensor_change_cb(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi
 /* callback function invoked from OpenIPMI */
 static void	zbx_control_change_cb(enum ipmi_update_e op, ipmi_entity_t *ent, ipmi_control_t *control, void *cb_data)
 {
-	zbx_ipmi_host_t	*h = (zbx_ipmi_host_t *)cb_data;
+	zbx_ipmi_host_t	*h;
 
-	RETURN_IF_CB_DATA_NULL(cb_data, __func__);
+	RESOLVE_CB_DATA(cb_data, h);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d' phost:%p ent:%p control:%p op:%d",
 			__func__, h->ip, h->port, (void *)h, (void *)ent, (void *)control, (int)op);
@@ -1231,11 +1493,14 @@ static void	zbx_control_change_cb(enum ipmi_update_e op, ipmi_entity_t *ent, ipm
 	switch (op)
 	{
 		case IPMI_ADDED:
-			if (NULL == zbx_get_ipmi_control(h, control))
-				zbx_allocate_ipmi_control(h, control);
+			/* the replaced control with the same ID may not be deleted yet */
+			zbx_delete_ipmi_control(h, control);
+			zbx_allocate_ipmi_control(h, control);
 			break;
 		case IPMI_DELETED:
-			zbx_delete_ipmi_control(h, control);
+			/* the entry is kept for the replacing control, which has the same ID */
+			if (SUCCEED != zbx_ipmi_control_is_replaced(control))
+				zbx_delete_ipmi_control(h, control);
 			break;
 		case IPMI_CHANGED:
 			break;
@@ -1250,9 +1515,9 @@ static void	zbx_control_change_cb(enum ipmi_update_e op, ipmi_entity_t *ent, ipm
 static void	zbx_entity_change_cb(enum ipmi_update_e op, ipmi_domain_t *domain, ipmi_entity_t *entity, void *cb_data)
 {
 	int	ret;
-	zbx_ipmi_host_t	*h = (zbx_ipmi_host_t *)cb_data;
+	zbx_ipmi_host_t	*h;
 
-	RETURN_IF_CB_DATA_NULL(cb_data, __func__);
+	RESOLVE_CB_DATA(cb_data, h);
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
@@ -1267,15 +1532,17 @@ static void	zbx_entity_change_cb(enum ipmi_update_e op, ipmi_domain_t *domain, i
 
 	if (op == IPMI_ADDED)
 	{
-		if (0 != (ret = ipmi_entity_add_sensor_update_handler(entity, zbx_sensor_change_cb, h)))
+		if (0 != (ret = ipmi_entity_add_sensor_update_handler(entity, zbx_sensor_change_cb,
+				ZBX_IPMI_HOST_CB_DATA(h))))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "ipmi_entity_set_sensor_update_handler() return error: 0x%x",
+			zabbix_log(LOG_LEVEL_DEBUG, "ipmi_entity_add_sensor_update_handler() returned error: 0x%x",
 					(unsigned int)ret);
 		}
 
-		if (0 != (ret = ipmi_entity_add_control_update_handler(entity, zbx_control_change_cb, h)))
+		if (0 != (ret = ipmi_entity_add_control_update_handler(entity, zbx_control_change_cb,
+				ZBX_IPMI_HOST_CB_DATA(h))))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "ipmi_entity_add_control_update_handler() return error: 0x%x",
+			zabbix_log(LOG_LEVEL_DEBUG, "ipmi_entity_add_control_update_handler() returned error: 0x%x",
 					(unsigned int)ret);
 		}
 	}
@@ -1286,13 +1553,20 @@ static void	zbx_entity_change_cb(enum ipmi_update_e op, ipmi_domain_t *domain, i
 /* callback function invoked from OpenIPMI */
 static void	zbx_domain_closed_cb(void *cb_data)
 {
-	zbx_ipmi_host_t	*h = (zbx_ipmi_host_t *)cb_data;
+	zbx_ipmi_host_t	*h;
 
-	RETURN_IF_CB_DATA_NULL(cb_data, __func__);
+	RESOLVE_CB_DATA(cb_data, h);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() phost:%p host:'[%s]:%d'", __func__, (void *)h, h->ip, h->port);
 
-	h->domain_up = 0;
+	/* domain closing started on connection failure may complete while another operation is in progress */
+	if (SUCCEED == h->ret)
+	{
+		h->err = zbx_strdup(h->err, "IPMI domain was closed");
+		h->ret = NETWORK_ERROR;
+	}
+
+	h->domain_state = ZBX_IPMI_DOMAIN_STATE_CLOSED;
 	h->done = 1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -1305,9 +1579,9 @@ static void	zbx_connection_change_cb(ipmi_domain_t *domain, int err, unsigned in
 	/* this function is called when a connection comes up or goes down */
 
 	int		ret;
-	zbx_ipmi_host_t	*h = (zbx_ipmi_host_t *)cb_data;
+	zbx_ipmi_host_t	*h;
 
-	RETURN_IF_CB_DATA_NULL(cb_data, __func__);
+	RESOLVE_CB_DATA(cb_data, h);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d' phost:%p domain:%p err:%d conn_num:%u port_num:%u"
 			" still_connected:%d cb_data:%p", __func__, h->ip, h->port, (void *)h, (void *)domain,
@@ -1320,15 +1594,16 @@ static void	zbx_connection_change_cb(ipmi_domain_t *domain, int err, unsigned in
 		h->err = zbx_dsprintf(h->err, "cannot connect to IPMI host: %s", zbx_strerror(err));
 		h->ret = NETWORK_ERROR;
 
-		if (0 != (ret = ipmi_domain_close(domain, zbx_domain_closed_cb, h)))
+		if (0 != (ret = ipmi_domain_close(domain, zbx_domain_closed_cb, ZBX_IPMI_HOST_CB_DATA(h))))
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot close IPMI domain: [0x%x]", (unsigned int)ret);
 
 		goto out;
 	}
 
-	if (0 != (ret = ipmi_domain_add_entity_update_handler(domain, zbx_entity_change_cb, h)))
+	if (0 != (ret = ipmi_domain_add_entity_update_handler(domain, zbx_entity_change_cb,
+			ZBX_IPMI_HOST_CB_DATA(h))))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "ipmi_domain_add_entity_update_handler() return error: [0x%x]",
+		zabbix_log(LOG_LEVEL_DEBUG, "ipmi_domain_add_entity_update_handler() returned error: [0x%x]",
 				(unsigned int)ret);
 	}
 out:
@@ -1338,14 +1613,14 @@ out:
 /* callback function invoked from OpenIPMI */
 static void	zbx_domain_up_cb(ipmi_domain_t *domain, void *cb_data)
 {
-	zbx_ipmi_host_t	*h = (zbx_ipmi_host_t *)cb_data;
+	zbx_ipmi_host_t	*h;
 
-	RETURN_IF_CB_DATA_NULL(cb_data, __func__);
+	RESOLVE_CB_DATA(cb_data, h);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d' domain:%p cb_data:%p", __func__, h->ip,
 			h->port, (void *)domain, cb_data);
 
-	h->domain_up = 1;
+	h->domain_state = ZBX_IPMI_DOMAIN_STATE_UP;
 	h->done = 1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -1393,7 +1668,7 @@ int	zbx_init_ipmi_handler(void)
 	if (0 != (res = ipmi_init(os_hnd)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "unable to initialize the OpenIPMI library."
-				" ipmi_init() return error: 0x%x", (unsigned int)res);
+				" ipmi_init() returned error: 0x%x", (unsigned int)res);
 		goto out;
 	}
 
@@ -1412,6 +1687,12 @@ static void	zbx_free_ipmi_host(zbx_ipmi_host_t *h)
 	{
 		zbx_free(h->controls[i].c_name);
 		zbx_free(h->controls[i].val);
+		zbx_free(h->controls[i].full_name);
+	}
+
+	for (int i = 0; i < h->sensor_count; i++)
+	{
+		zbx_free_ipmi_sensor_properties(&h->sensors[i]);
 	}
 
 	zbx_free(h->sensors);
@@ -1471,8 +1752,19 @@ static zbx_ipmi_host_t	*zbx_init_ipmi_host(const char *ip, int port, int authtyp
 
 	if (NULL != (h = zbx_get_ipmi_host(ip, port, authtype, privilege, username, password)))
 	{
-		if (1 == h->domain_up)
+		if (ZBX_IPMI_DOMAIN_STATE_UP == h->domain_state)
 			goto out;
+
+		if (ZBX_IPMI_DOMAIN_STATE_OPENING == h->domain_state)
+		{
+			/* Opening the domain may take longer than one wait. Opening another domain would */
+			/* make both of them report the same sensors to this host once they are up. */
+			h->ret = SUCCEED;
+			h->done = 0;
+
+			zbx_perform_openipmi_ops(h, __func__);	/* result is checked below */
+			goto check;
+		}
 	}
 	else
 		h = zbx_allocate_ipmi_host(ip, port, authtype, privilege, username, password);
@@ -1515,7 +1807,8 @@ static zbx_ipmi_host_t	*zbx_init_ipmi_host(const char *ip, int port, int authtyp
 
 	zbx_snprintf(domain_name, sizeof(domain_name), "%u", h->domain_nr);
 
-	if (0 != (ret = ipmi_open_domain(domain_name, &h->con, 1, zbx_connection_change_cb, h, zbx_domain_up_cb, h,
+	if (0 != (ret = ipmi_open_domain(domain_name, &h->con, 1, zbx_connection_change_cb, ZBX_IPMI_HOST_CB_DATA(h),
+			zbx_domain_up_cb, ZBX_IPMI_HOST_CB_DATA(h),
 			options, ARRSIZE(options), NULL)))
 	{
 		h->err = zbx_dsprintf(h->err, "Cannot connect to IPMI host [%s]:%d. ipmi_open_domain() failed: %s",
@@ -1524,7 +1817,16 @@ static zbx_ipmi_host_t	*zbx_init_ipmi_host(const char *ip, int port, int authtyp
 		goto out;
 	}
 
-	zbx_perform_openipmi_ops(h, __func__);	/* ignore returned result */
+	h->domain_state = ZBX_IPMI_DOMAIN_STATE_OPENING;
+
+	zbx_perform_openipmi_ops(h, __func__);	/* result is checked below */
+check:
+	/* the domain continues to be opened in the background if it is not up yet */
+	if (ZBX_IPMI_DOMAIN_STATE_UP != h->domain_state && SUCCEED == h->ret)
+	{
+		h->err = zbx_dsprintf(h->err, "connecting to IPMI host [%s]:%d is not finished", h->ip, h->port);
+		h->ret = NETWORK_ERROR;
+	}
 out:
 	zbx_free(addrs[0]);
 	zbx_free(ports[0]);
@@ -1545,7 +1847,12 @@ static void	zbx_get_domain_id_by_name_cb(ipmi_domain_t *domain, void *cb_data)
 {
 	char	name[IPMI_DOMAIN_NAME_LEN], *domain_name = (char *)cb_data;
 
-	RETURN_IF_CB_DATA_NULL(cb_data, "zbx_get_domain_id_by_name_cb");
+	if (NULL == cb_data)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s() called with cb_data:NULL", __func__);
+
+		return;
+	}
 
 	/* from 'domain' pointer find the domain name */
 	ipmi_domain_get_name(domain, name, sizeof(name));
@@ -1561,23 +1868,33 @@ static void	zbx_get_domain_id_by_name_cb(ipmi_domain_t *domain, void *cb_data)
 /* callback function invoked from OpenIPMI */
 static void	zbx_domain_close_cb(ipmi_domain_t *domain, void *cb_data)
 {
-	zbx_ipmi_host_t	*h = (zbx_ipmi_host_t *)cb_data;
+	zbx_ipmi_host_t	*h;
 	int		ret;
 
-	RETURN_IF_CB_DATA_NULL(cb_data, "zbx_domain_close_cb");
+	RESOLVE_CB_DATA(cb_data, h);
 
-	if (0 != (ret = ipmi_domain_close(domain, zbx_domain_closed_cb, h)))
+	if (0 != (ret = ipmi_domain_close(domain, zbx_domain_closed_cb, ZBX_IPMI_HOST_CB_DATA(h))))
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot close IPMI domain: [0x%x]", (unsigned int)ret);
 	else
 		domain_close_ok = 1;
 }
 
-static int	zbx_close_inactive_host(zbx_ipmi_host_t *h)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: closes OpenIPMI domain of host and waits until it is closed       *
+ *                                                                            *
+ * Parameters: h - [IN]                                                       *
+ *                                                                            *
+ * Return value: SUCCEED - domain was closed or does not exist                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_close_ipmi_domain(zbx_ipmi_host_t *h)
 {
 	char	domain_name[11];	/* max int length */
 	int	ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): %s", __func__, h->ip);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d'", __func__, h->ip, h->port);
 
 	zbx_snprintf(domain_name, sizeof(domain_name), "%u", h->domain_nr);
 
@@ -1595,9 +1912,9 @@ static int	zbx_close_inactive_host(zbx_ipmi_host_t *h)
 	{
 		int	res;
 
-		if (0 != (res = ipmi_domain_pointer_cb(domain_id, zbx_domain_close_cb, h)))
+		if (0 != (res = ipmi_domain_pointer_cb(domain_id, zbx_domain_close_cb, ZBX_IPMI_HOST_CB_DATA(h))))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s(): ipmi_domain_pointer_cb() return error: %s", __func__,
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): ipmi_domain_pointer_cb() returned error: %s", __func__,
 					zbx_strerror(res));
 			goto out;
 		}
@@ -1607,9 +1924,22 @@ static int	zbx_close_inactive_host(zbx_ipmi_host_t *h)
 	}
 
 	/* The domain was either successfully closed or not found. */
-	zbx_free_ipmi_host(h);
 	ret = SUCCEED;
 out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+static int	zbx_close_inactive_host(zbx_ipmi_host_t *h)
+{
+	int	ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): %s", __func__, h->ip);
+
+	if (SUCCEED == (ret = zbx_close_ipmi_domain(h)))
+		zbx_free_ipmi_host(h);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
@@ -1706,7 +2036,7 @@ int	get_value_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, s
 
 	h->lastaccess = time(NULL);
 
-	if (0 == h->domain_up)
+	if (ZBX_IPMI_DOMAIN_STATE_UP != h->domain_state)
 	{
 		if (NULL != h->err)
 			*value = zbx_strdup(*value, h->err);
@@ -1732,9 +2062,26 @@ int	get_value_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, s
 	}
 
 	if (NULL != s)
+	{
+		ipmi_sensor_id_t	sensor_id = s->sensor_id;
+
 		zbx_read_ipmi_sensor(h, s);
+		s = zbx_get_ipmi_sensor_by_sensor_id(h, sensor_id);
+	}
 	else
+	{
+		ipmi_control_id_t	control_id = c->control_id;
+
 		zbx_read_ipmi_control(h, c);
+		c = zbx_get_ipmi_control_by_control_id(h, control_id);
+	}
+
+	/* the domain is closed when connection is lost during reading, but the pending reading reports its own error */
+	if (ZBX_IPMI_DOMAIN_STATE_UP != h->domain_state)
+	{
+		*value = zbx_dsprintf(*value, "connection to IPMI host [%s]:%d was lost", h->ip, h->port);
+		return NETWORK_ERROR;
+	}
 
 	if (h->ret != SUCCEED)
 	{
@@ -1742,6 +2089,13 @@ int	get_value_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short port, s
 			*value = zbx_strdup(*value, h->err);
 
 		return h->ret;
+	}
+
+	if (NULL == s && NULL == c)
+	{
+		*value = zbx_dsprintf(*value, "sensor or control %s@[%s]:%d was deleted while being read", sensor,
+				h->ip, h->port);
+		return NOTSUPPORTED;
 	}
 
 	if (NULL != s)
@@ -1787,8 +2141,10 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 #define ZBX_IPMI_TAG_CRIT		"crit"
 #define ZBX_IPMI_TAG_NON_RECOVER	"non_recover"
 
-	zbx_ipmi_host_t	*h;
-	struct zbx_json	json;
+	zbx_ipmi_host_t		*h;
+	struct zbx_json		json;
+	ipmi_sensor_id_t	*sensor_ids;
+	int			sensor_num;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __func__, itemid);
 
@@ -1802,7 +2158,7 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 
 	h->lastaccess = time(NULL);
 
-	if (0 == h->domain_up)
+	if (ZBX_IPMI_DOMAIN_STATE_UP != h->domain_state)
 	{
 		if (NULL != h->err)
 			*value = zbx_strdup(*value, h->err);
@@ -1812,29 +2168,55 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 
 	zbx_json_initarray(&json, ZBX_JSON_STAT_BUF_LEN);
 
-	for (int i = 0; i < h->sensor_count; i++)
-	{
-		const char 	*p;
-		char 		state_name[MAX_STRING_LEN];
-		size_t		offset = 0;
-		zbx_uint64_t	state;
+	/* sensors may be added or deleted while OpenIPMI processes events during reading, */
+	/* so they are iterated by their IDs and looked up again after every read          */
+	sensor_num = h->sensor_count;
+	sensor_ids = (ipmi_sensor_id_t *)zbx_malloc(NULL, sizeof(ipmi_sensor_id_t) * (size_t)(sensor_num + 1));
 
-		zbx_read_ipmi_sensor(h, &h->sensors[i]);
+	for (int i = 0; i < sensor_num; i++)
+		sensor_ids[i] = h->sensors[i].sensor_id;
+
+	for (int i = 0; i < sensor_num; i++)
+	{
+		const char 		*p;
+		char 			state_name[MAX_STRING_LEN];
+		size_t			offset = 0;
+		zbx_uint64_t		state;
+		zbx_ipmi_sensor_t	*s;
+
+		if (NULL == (s = zbx_get_ipmi_sensor_by_sensor_id(h, sensor_ids[i])))
+			continue;
+
+		zbx_read_ipmi_sensor(h, s);
+
+		if (ZBX_IPMI_DOMAIN_STATE_UP != h->domain_state)
+			break;
+
+		if (NULL == (s = zbx_get_ipmi_sensor_by_sensor_id(h, sensor_ids[i])))
+			continue;
+
 		if (SUCCEED != h->ret)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG,"Sensor '%s' cannot be discovered. Error: %s",h->sensors[i].id,
+			zabbix_log(LOG_LEVEL_DEBUG,"Sensor '%s' cannot be discovered. Error: %s",s->id,
 					ZBX_NULL2EMPTY_STR(h->err));
 
 			continue;
 		}
 
-		if (IPMI_EVENT_READING_TYPE_THRESHOLD == h->sensors[i].reading_type)
+		if (IPMI_EVENT_READING_TYPE_THRESHOLD == s->reading_type)
 		{
-			zbx_read_ipmi_thresholds(h, &h->sensors[i]);
+			zbx_read_ipmi_thresholds(h, s);
+
+			if (ZBX_IPMI_DOMAIN_STATE_UP != h->domain_state)
+				break;
+
+			if (NULL == (s = zbx_get_ipmi_sensor_by_sensor_id(h, sensor_ids[i])))
+				continue;
+
 			if (SUCCEED != h->ret)
 			{
 				zabbix_log(LOG_LEVEL_DEBUG,"Sensor '%s' cannot be discovered. Error: %s",
-						h->sensors[i].id, ZBX_NULL2EMPTY_STR(h->err));
+						s->id, ZBX_NULL2EMPTY_STR(h->err));
 
 				continue;
 			}
@@ -1842,24 +2224,24 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 
 		zbx_json_addobject(&json, NULL);
 
-		zbx_json_addstring(&json, ZBX_IPMI_TAG_ID, h->sensors[i].id, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&json, ZBX_IPMI_TAG_NAME, h->sensors[i].full_name, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, ZBX_IPMI_TAG_ID, s->id, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, ZBX_IPMI_TAG_NAME, s->full_name, ZBX_JSON_TYPE_STRING);
 
 		zbx_json_addobject(&json, ZBX_IPMI_TAG_SENSOR);
-		zbx_json_adduint64(&json, ZBX_IPMI_TAG_TYPE, (zbx_uint64_t)h->sensors[i].type);
-		p = ipmi_sensor_get_sensor_type_string(h->sensors[i].sensor);
+		zbx_json_adduint64(&json, ZBX_IPMI_TAG_TYPE, (zbx_uint64_t)s->type);
+		p = s->type_str;
 		zbx_json_addstring(&json, ZBX_IPMI_TAG_TEXT, p,	ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json);
 
 		zbx_json_addobject(&json, ZBX_IPMI_TAG_READING);
-		zbx_json_adduint64(&json, ZBX_IPMI_TAG_TYPE, (zbx_uint64_t)h->sensors[i].reading_type);
-		p = ipmi_sensor_get_event_reading_type_string(h->sensors[i].sensor);
+		zbx_json_adduint64(&json, ZBX_IPMI_TAG_TYPE, (zbx_uint64_t)s->reading_type);
+		p = s->reading_type_str;
 		zbx_json_addstring(&json, ZBX_IPMI_TAG_TEXT, p,	ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json);
 
-		if (IPMI_EVENT_READING_TYPE_THRESHOLD != h->sensors[i].reading_type)	/* discrete */
+		if (IPMI_EVENT_READING_TYPE_THRESHOLD != s->reading_type)	/* discrete */
 		{
-			state = h->sensors[i].value.discrete;
+			state = s->value.discrete;
 			zbx_json_addobject(&json, ZBX_IPMI_TAG_STATE);
 			zbx_json_adduint64(&json, ZBX_IPMI_TAG_STATE, state);
 
@@ -1868,7 +2250,7 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 			{
 				if (0 != (state & (1u << j)))
 				{
-					if (NULL != (p = ipmi_sensor_reading_name_string(h->sensors[i].sensor, j)))
+					if (NULL != (p = s->reading_names[j]))
 					{
 						if (0 < offset)
 							offset += zbx_snprintf(state_name + offset,
@@ -1884,9 +2266,7 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 		}
 		else	/* threshold */
 		{
-			char	*units;
-
-			state = (zbx_uint64_t)h->sensors[i].state;
+			state = (zbx_uint64_t)s->state;
 			zbx_json_addobject(&json, ZBX_IPMI_TAG_STATE);
 			zbx_json_adduint64(&json, ZBX_IPMI_TAG_STATE, state);
 
@@ -1906,34 +2286,30 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 			zbx_json_addstring(&json, ZBX_IPMI_TAG_TEXT, state_name, ZBX_JSON_TYPE_STRING);
 			zbx_json_close(&json);
 
-			zbx_json_addfloat(&json, ZBX_IPMI_TAG_VALUE, h->sensors[i].value.threshold);
+			zbx_json_addfloat(&json, ZBX_IPMI_TAG_VALUE, s->value.threshold);
 
-			units = zbx_get_ipmi_units(h->sensors[i].sensor);
-			zbx_json_addstring(&json, ZBX_IPMI_TAG_UNITS, units, ZBX_JSON_TYPE_STRING);
-			zbx_free(units);
-
-			zbx_read_ipmi_thresholds(h, &h->sensors[i]);
+			zbx_json_addstring(&json, ZBX_IPMI_TAG_UNITS, s->units, ZBX_JSON_TYPE_STRING);
 
 			zbx_json_addobject(&json, ZBX_IPMI_TAG_THRESHOLD);
 			zbx_json_addobject(&json, ZBX_IPMI_TAG_LOWER);
 
 			add_threshold_ipmi(&json,ZBX_IPMI_TAG_NON_CRIT,
-					&h->sensors[i].thresholds[IPMI_LOWER_NON_CRITICAL]);
+					&s->thresholds[IPMI_LOWER_NON_CRITICAL]);
 			add_threshold_ipmi(&json,ZBX_IPMI_TAG_CRIT,
-					&h->sensors[i].thresholds[IPMI_LOWER_CRITICAL]);
+					&s->thresholds[IPMI_LOWER_CRITICAL]);
 			add_threshold_ipmi(&json,ZBX_IPMI_TAG_NON_RECOVER,
-					&h->sensors[i].thresholds[IPMI_LOWER_NON_RECOVERABLE]);
+					&s->thresholds[IPMI_LOWER_NON_RECOVERABLE]);
 
 			zbx_json_close(&json);
 
 			zbx_json_addobject(&json, ZBX_IPMI_TAG_UPPER);
 
 			add_threshold_ipmi(&json,ZBX_IPMI_TAG_NON_CRIT,
-					&h->sensors[i].thresholds[IPMI_UPPER_NON_CRITICAL]);
+					&s->thresholds[IPMI_UPPER_NON_CRITICAL]);
 			add_threshold_ipmi(&json,ZBX_IPMI_TAG_CRIT,
-					&h->sensors[i].thresholds[IPMI_UPPER_CRITICAL]);
+					&s->thresholds[IPMI_UPPER_CRITICAL]);
 			add_threshold_ipmi(&json,ZBX_IPMI_TAG_NON_RECOVER,
-					&h->sensors[i].thresholds[IPMI_UPPER_NON_RECOVERABLE]);
+					&s->thresholds[IPMI_UPPER_NON_RECOVERABLE]);
 
 			zbx_json_close(&json);
 			zbx_json_close(&json);
@@ -1941,6 +2317,18 @@ int	get_discovery_ipmi(zbx_uint64_t itemid, const char *addr, unsigned short por
 		zbx_json_close(&json);
 
 	}
+
+	zbx_free(sensor_ids);
+
+	/* only sensors read before connection was lost would be reported, as if the others did not exist */
+	if (ZBX_IPMI_DOMAIN_STATE_UP != h->domain_state)
+	{
+		zbx_json_free(&json);
+		*value = zbx_dsprintf(*value, "connection to IPMI host [%s]:%d was lost", h->ip, h->port);
+
+		return NETWORK_ERROR;
+	}
+
 	zbx_json_close(&json);
 
 	*value = zbx_strdup(*value, json.buffer);
@@ -2027,7 +2415,7 @@ int	zbx_set_ipmi_control_value(zbx_uint64_t hostid, const char *addr, unsigned s
 	zbx_ipmi_control_t	*c;
 	size_t			offset;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 "control:%s value:%d",
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 " control:%s value:%d",
 			__func__, hostid, sensor, value);
 
 	if (NULL == os_hnd)
@@ -2039,7 +2427,9 @@ int	zbx_set_ipmi_control_value(zbx_uint64_t hostid, const char *addr, unsigned s
 
 	h = zbx_init_ipmi_host(addr, port, authtype, privilege, username, password);
 
-	if (0 == h->domain_up)
+	h->lastaccess = time(NULL);
+
+	if (ZBX_IPMI_DOMAIN_STATE_UP != h->domain_state)
 	{
 		if (NULL != h->err)
 		{
@@ -2075,7 +2465,7 @@ int	zbx_set_ipmi_control_value(zbx_uint64_t hostid, const char *addr, unsigned s
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);\
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return h->ret;
 }

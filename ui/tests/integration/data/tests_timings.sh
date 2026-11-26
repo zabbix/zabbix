@@ -17,6 +17,7 @@ declare -A BASELINE_TIMES=(
   [testHighAvailability]=165
   [testAlertingForServices]=160
   [testActiveCheckHeartbeat]=155
+  [testIpmiChecks]=140
   [testPermissions]=138
   [testServiceRoles]=122
   [testLLDTelemetrySyncAtScaleJsonPathTrigger]=120
