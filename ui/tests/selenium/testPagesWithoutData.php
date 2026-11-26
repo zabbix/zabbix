@@ -334,8 +334,10 @@ class testPagesWithoutData extends CWebTest {
 		else {
 			if ($datatable_present) {
 				$table = $this->query('class:datatable-scrollable')->asDatatable()->one()->waitUntilReady();
+				$this->assertEquals('No data found', $table->query('class:datatable-body')->waitUntilVisible()->one()
+						->getText()
+				);
 				$this->assertDatatableStats();
-				$this->assertEquals('No data found', $table->query('class:datatable-body')->one()->getText());
 			}
 			else {
 				$table = $this->getTable('xpath://table[contains(@class, "no-data")]');

@@ -2486,6 +2486,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 		$this->assertInlineError($form, $hashicorp['inline_error']);
 
 		COverlayDialogElement::find()->one()->close();
+		// Closing a form opened by direct URL redirects to the list page, wait for it before opening other page.
+		$this->page->waitUntilReady();
 
 		// Change Vault in settings to correct one.
 		$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();

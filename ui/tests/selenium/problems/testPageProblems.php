@@ -2312,8 +2312,8 @@ class testPageProblems extends CWebTest {
 		// Check data in popup.
 		foreach ($data['popup rows'] as $i => $popup_row) {
 			$metric_in_column = CTestArrayHelper::get($popup_row, 'truncated', $popup_row['metric']);
-			$opdata_column->query('link', $metric_in_column)->waitUntilClickable()->one()->click();
-			$popup = $this->query('css:.overlay-dialogue.wordbreak')->asOverlayDialog()->one()->waitUntilVisible();
+			$opdata_column->query('link', $metric_in_column)->waitUntilClickable()->one()->scrollIntoView(50)->click();
+			$popup = $this->query('css:.overlay-dialogue.wordbreak')->waitUntilVisible()->asOverlayDialog()->one();
 			$popup_table = $popup->asTable();
 
 			// Check expected popup rows number.
