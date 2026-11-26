@@ -1,0 +1,657 @@
+# SDR definitions for the testIpmiChecks integration test BMC, installed as the persistent main SDR
+# repository of the simulated BMC (mc address 0x20).
+#
+# testIpmiChecks.php never compiles this file at runtime - it always installs the pre-compiled test.bsdr
+# checked in alongside it (some environments ship ipmi_sim/ipmitool without the rest of the openipmi
+# package, i.e. without sdrcomp). After editing this file, regenerate test.bsdr:
+#
+#   sdrcomp -o test.bsdr test.sdrs
+
+sdr type 18
+	device_slave_address	0x20
+	device_channel_number	0
+	chassis			true
+	ipmb_event_gen		false
+	ipmb_event_recv		false
+	fru_inventory		true
+	sel			true
+	sdr			true
+	sensor			true
+	entity_id		system_board
+	entity_instance		1
+	id_string		"zbxtest BMC"
+endsdr
+
+# Threshold (analog) temperature sensor, sensor number 1.
+sdr type 1
+	sensor_owner_id		0x20
+	sensor_owner_lun	0
+	channel_number		0
+	sensor_number		1
+	entity_id		system_board
+	entity_instance		1
+	sensor_type		Temperature
+	init_scanning		true
+	init_sensor_type	true
+	default_sensor_scan_on	true
+	event_reading_type_code	1
+	analog_data_format	unsigned
+	rate_unit		none
+	modifier_unit		none
+	percentage		false
+	base_unit		degrees_C
+	modifier_unit_code	unspecified
+	linearization		linear
+	m			1
+	tolerance		0
+	b			0
+	accuracy		1
+	accuracy_exp		0
+	sensor_direction	input
+	r_exp			0
+	b_exp			0
+	sensor_maximum		255
+	sensor_minimum		0
+	lnc_thrsh_readable	true
+	lc_thrsh_readable	true
+	lnr_thrsh_readable	true
+	unc_thrsh_readable	true
+	uc_thrsh_readable	true
+	unr_thrsh_readable	true
+	sensor_threshold_access	readable
+	return_lnc		true
+	return_lc		true
+	return_lnr		true
+	return_unc		true
+	return_uc		true
+	return_unr		true
+	id_string		"Temp"
+endsdr
+
+# Discrete presence sensor, sensor number 2.
+sdr type 2
+	sensor_owner_id		0x20
+	sensor_owner_lun	0
+	channel_number		0
+	sensor_number		2
+	entity_id		system_board
+	entity_instance		1
+	sensor_type		37
+	event_reading_type_code	0x6f
+	init_scanning		true
+	init_sensor_type	true
+	default_sensor_scan_on	true
+	event0_state_ret	true
+	assert_event0		true
+	deassert_event0		true
+	event1_state_ret	true
+	assert_event1		true
+	deassert_event1		true
+	id_string		"Presence"
+endsdr
+
+# A second threshold sensor with threshold access explicitly disabled at runtime
+# (see cmds.emu), to exercise zbx_read_ipmi_thresholds()'s "cannot access thresholds"
+# branch (sensor value is still readable, just without threshold classification).
+sdr type 1
+	sensor_owner_id		0x20
+	sensor_owner_lun	0
+	channel_number		0
+	sensor_number		3
+	entity_id		system_board
+	entity_instance		1
+	sensor_type		Temperature
+	init_scanning		true
+	init_sensor_type	true
+	default_sensor_scan_on	true
+	event_reading_type_code	1
+	analog_data_format	unsigned
+	rate_unit		none
+	modifier_unit		none
+	percentage		false
+	base_unit		degrees_C
+	modifier_unit_code	unspecified
+	linearization		linear
+	m			1
+	tolerance		0
+	b			0
+	accuracy		1
+	accuracy_exp		0
+	sensor_direction	input
+	r_exp			0
+	b_exp			0
+	sensor_maximum		255
+	sensor_minimum		0
+	id_string		"NoThresh"
+endsdr
+
+# A sensor with a reserved/unrecognized event_reading_type_code, to exercise
+# zbx_read_ipmi_sensor()'s "IPMI reading type is not supported" default branch.
+sdr type 1
+	sensor_owner_id		0x20
+	sensor_owner_lun	0
+	channel_number		0
+	sensor_number		4
+	entity_id		system_board
+	entity_instance		1
+	sensor_type		Temperature
+	init_scanning		true
+	init_sensor_type	true
+	default_sensor_scan_on	true
+	event_reading_type_code	0x20
+	analog_data_format	unsigned
+	base_unit		degrees_C
+	id_string		"Unsupported"
+endsdr
+
+# A percentage threshold sensor, to exercise zbx_get_ipmi_units()'s early "%" return.
+sdr type 1
+	sensor_owner_id		0x20
+	sensor_owner_lun	0
+	channel_number		0
+	sensor_number		5
+	entity_id		system_board
+	entity_instance		1
+	sensor_type		Temperature
+	init_scanning		true
+	init_sensor_type	true
+	default_sensor_scan_on	true
+	event_reading_type_code	1
+	analog_data_format	unsigned
+	rate_unit		none
+	modifier_unit		none
+	percentage		true
+	base_unit		unspecified
+	modifier_unit_code	unspecified
+	linearization		linear
+	m			1
+	tolerance		0
+	b			0
+	accuracy		1
+	accuracy_exp		0
+	sensor_direction	input
+	r_exp			0
+	b_exp			0
+	sensor_maximum		100
+	sensor_minimum		0
+	id_string		"Percent"
+endsdr
+
+# A threshold sensor with a "base OP modifier" unit (modifier_unit "divide" below), to exercise
+# zbx_get_ipmi_units()'s base/modifier branch instead of its plain "none" one - see the comment on
+# the "WattsHour" assertion in testIpmiChecks.php for why this isn't asserted as "Watts/hour".
+sdr type 1
+	sensor_owner_id		0x20
+	sensor_owner_lun	0
+	channel_number		0
+	sensor_number		6
+	entity_id		system_board
+	entity_instance		1
+	sensor_type		Temperature
+	init_scanning		true
+	init_sensor_type	true
+	default_sensor_scan_on	true
+	event_reading_type_code	1
+	analog_data_format	unsigned
+	rate_unit		none
+	modifier_unit		divide
+	percentage		false
+	base_unit		Watts
+	modifier_unit_code	hour
+	linearization		linear
+	m			1
+	tolerance		0
+	b			0
+	accuracy		1
+	accuracy_exp		0
+	sensor_direction	input
+	r_exp			0
+	b_exp			0
+	sensor_maximum		255
+	sensor_minimum		0
+	id_string		"WattsHour"
+endsdr
+
+# Two sensors sharing the id string "Dup" (sensor numbers 7 and 8): a discrete one listed first and a
+# threshold one listed second. Some real BMCs expose a sensor this way; zbx_get_ipmi_sensor_by_id() must
+# keep scanning past the discrete match and prefer the threshold one.
+sdr type 2
+	sensor_owner_id		0x20
+	sensor_owner_lun	0
+	channel_number		0
+	sensor_number		7
+	entity_id		system_board
+	entity_instance		1
+	sensor_type		37
+	event_reading_type_code	0x6f
+	init_scanning		true
+	init_sensor_type	true
+	default_sensor_scan_on	true
+	event0_state_ret	true
+	assert_event0		true
+	deassert_event0		true
+	event1_state_ret	true
+	assert_event1		true
+	deassert_event1		true
+	id_string		"Dup"
+endsdr
+
+sdr type 1
+	sensor_owner_id		0x20
+	sensor_owner_lun	0
+	channel_number		0
+	sensor_number		8
+	entity_id		system_board
+	entity_instance		1
+	sensor_type		Temperature
+	init_scanning		true
+	init_sensor_type	true
+	default_sensor_scan_on	true
+	event_reading_type_code	1
+	analog_data_format	unsigned
+	rate_unit		none
+	modifier_unit		none
+	percentage		false
+	base_unit		degrees_C
+	modifier_unit_code	unspecified
+	linearization		linear
+	m			1
+	tolerance		0
+	b			0
+	accuracy		1
+	accuracy_exp		0
+	sensor_direction	input
+	r_exp			0
+	b_exp			0
+	sensor_maximum		255
+	sensor_minimum		0
+	id_string		"Dup"
+endsdr
+
+# A threshold sensor whose reading (see cmds.emu) is above its upper non-critical and upper critical
+# thresholds, to exercise the threshold "state" bits/text in discovery (every other threshold sensor here
+# is in range).
+sdr type 1
+	sensor_owner_id		0x20
+	sensor_owner_lun	0
+	channel_number		0
+	sensor_number		9
+	entity_id		system_board
+	entity_instance		1
+	sensor_type		Temperature
+	init_scanning		true
+	init_sensor_type	true
+	default_sensor_scan_on	true
+	event_reading_type_code	1
+	analog_data_format	unsigned
+	rate_unit		none
+	modifier_unit		none
+	percentage		false
+	base_unit		degrees_C
+	modifier_unit_code	unspecified
+	linearization		linear
+	m			1
+	tolerance		0
+	b			0
+	accuracy		1
+	accuracy_exp		0
+	sensor_direction	input
+	r_exp			0
+	b_exp			0
+	sensor_maximum		255
+	sensor_minimum		0
+	lnc_thrsh_readable	true
+	lc_thrsh_readable	true
+	lnr_thrsh_readable	true
+	unc_thrsh_readable	true
+	uc_thrsh_readable	true
+	unr_thrsh_readable	true
+	sensor_threshold_access	readable
+	return_lnc		true
+	return_lc		true
+	return_lnr		true
+	return_unc		true
+	return_uc		true
+	return_unr		true
+	id_string		"Hot"
+endsdr
+
+# A discrete sensor with two state bits asserted at once (see cmds.emu), to exercise the ", "-joined
+# state text in discovery ("Presence" only ever has a single bit set).
+sdr type 2
+	sensor_owner_id		0x20
+	sensor_owner_lun	0
+	channel_number		0
+	sensor_number		10
+	entity_id		system_board
+	entity_instance		1
+	sensor_type		37
+	event_reading_type_code	0x6f
+	init_scanning		true
+	init_sensor_type	true
+	default_sensor_scan_on	true
+	event0_state_ret	true
+	assert_event0		true
+	deassert_event0		true
+	event1_state_ret	true
+	assert_event1		true
+	deassert_event1		true
+	id_string		"MultiState"
+endsdr
+
+# Threshold and discrete sensors whose scanning is disabled at runtime (see cmds.emu), sensor numbers 11
+# and 12: OpenIPMI still returns a reading, flagged "scanning disabled", which must make the item unsupported
+# ("sensor data is not available") and keep the sensor out of discovery.
+sdr type 1
+	sensor_owner_id		0x20
+	sensor_owner_lun	0
+	channel_number		0
+	sensor_number		11
+	entity_id		system_board
+	entity_instance		1
+	sensor_type		Temperature
+	init_scanning		true
+	init_sensor_type	true
+	default_sensor_scan_on	true
+	event_reading_type_code	1
+	analog_data_format	unsigned
+	rate_unit		none
+	modifier_unit		none
+	percentage		false
+	base_unit		degrees_C
+	modifier_unit_code	unspecified
+	linearization		linear
+	m			1
+	tolerance		0
+	b			0
+	accuracy		1
+	accuracy_exp		0
+	sensor_direction	input
+	r_exp			0
+	b_exp			0
+	sensor_maximum		255
+	sensor_minimum		0
+	lnc_thrsh_readable	true
+	lc_thrsh_readable	true
+	lnr_thrsh_readable	true
+	unc_thrsh_readable	true
+	uc_thrsh_readable	true
+	unr_thrsh_readable	true
+	sensor_threshold_access	readable
+	return_lnc		true
+	return_lc		true
+	return_lnr		true
+	return_unc		true
+	return_uc		true
+	return_unr		true
+	id_string		"NoScan"
+endsdr
+sdr type 2
+	sensor_owner_id		0x20
+	sensor_owner_lun	0
+	channel_number		0
+	sensor_number		12
+	entity_id		system_board
+	entity_instance		1
+	sensor_type		37
+	event_reading_type_code	0x6f
+	init_scanning		true
+	init_sensor_type	true
+	default_sensor_scan_on	true
+	event0_state_ret	true
+	assert_event0		true
+	deassert_event0		true
+	event1_state_ret	true
+	assert_event1		true
+	deassert_event1		true
+	id_string		"NoScanDisc"
+endsdr
+
+# Non-linear (exp10, m=2) threshold sensor, sensor number 14: raw x converts to 10^(2x), so raw 0 is 1 and
+# raw 255 is 10^510, i.e. infinity. The infinite upper non-critical threshold set in cmds.emu must be left out
+# of discovery.
+sdr type 1
+	sensor_owner_id		0x20
+	sensor_owner_lun	0
+	channel_number		0
+	sensor_number		14
+	entity_id		system_board
+	entity_instance		1
+	sensor_type		Temperature
+	init_scanning		true
+	init_sensor_type	true
+	default_sensor_scan_on	true
+	event_reading_type_code	1
+	analog_data_format	unsigned
+	rate_unit		none
+	modifier_unit		none
+	percentage		false
+	base_unit		degrees_C
+	modifier_unit_code	unspecified
+	linearization		exp10
+	m			2
+	tolerance		0
+	b			0
+	accuracy		1
+	accuracy_exp		0
+	sensor_direction	input
+	r_exp			0
+	b_exp			0
+	sensor_maximum		255
+	sensor_minimum		0
+	lnc_thrsh_readable	true
+	lc_thrsh_readable	true
+	lnr_thrsh_readable	true
+	unc_thrsh_readable	true
+	uc_thrsh_readable	true
+	unr_thrsh_readable	true
+	sensor_threshold_access	readable
+	return_lnc		true
+	return_lc		true
+	return_lnr		true
+	return_unc		true
+	return_uc		true
+	return_unr		true
+	id_string		"InfThr"
+endsdr
+
+# Threshold sensor with a rate unit, sensor number 15 - zbx_get_ipmi_units() appends the rate string.
+sdr type 1
+	sensor_owner_id		0x20
+	sensor_owner_lun	0
+	channel_number		0
+	sensor_number		15
+	entity_id		system_board
+	entity_instance		1
+	sensor_type		Temperature
+	init_scanning		true
+	init_sensor_type	true
+	default_sensor_scan_on	true
+	event_reading_type_code	1
+	analog_data_format	unsigned
+	rate_unit		per_s
+	modifier_unit		none
+	percentage		false
+	base_unit		degrees_C
+	modifier_unit_code	unspecified
+	linearization		linear
+	m			1
+	tolerance		0
+	b			0
+	accuracy		1
+	accuracy_exp		0
+	sensor_direction	input
+	r_exp			0
+	b_exp			0
+	sensor_maximum		255
+	sensor_minimum		0
+	id_string		"Rate"
+endsdr
+
+# The other "base OP modifier" unit, sensor number 16 (see "WattsHour" above, which uses "divide").
+sdr type 1
+	sensor_owner_id		0x20
+	sensor_owner_lun	0
+	channel_number		0
+	sensor_number		16
+	entity_id		system_board
+	entity_instance		1
+	sensor_type		Temperature
+	init_scanning		true
+	init_sensor_type	true
+	default_sensor_scan_on	true
+	event_reading_type_code	1
+	analog_data_format	unsigned
+	rate_unit		none
+	modifier_unit		multiply
+	percentage		false
+	base_unit		Watts
+	modifier_unit_code	hour
+	linearization		linear
+	m			1
+	tolerance		0
+	b			0
+	accuracy		1
+	accuracy_exp		0
+	sensor_direction	input
+	r_exp			0
+	b_exp			0
+	sensor_maximum		255
+	sensor_minimum		0
+	id_string		"MulUnit"
+endsdr
+
+# Event-only sensor, sensor number 17: not readable, so zbx_sensor_change_cb() must never add it.
+sdr type 3
+	sensor_owner_id		0x20
+	sensor_owner_lun	0
+	channel_number		0
+	sensor_number		17
+	entity_id		system_board
+	entity_instance		1
+	sensor_type		37
+	event_reading_type_code	0x6f
+	id_string		"EventOnly"
+endsdr
+
+# Signed (2s complement) threshold sensor, sensor number 18 - the raw 251 written by the test reads as -5.
+sdr type 1
+	sensor_owner_id		0x20
+	sensor_owner_lun	0
+	channel_number		0
+	sensor_number		18
+	entity_id		system_board
+	entity_instance		1
+	sensor_type		Temperature
+	init_scanning		true
+	init_sensor_type	true
+	default_sensor_scan_on	true
+	event_reading_type_code	1
+	analog_data_format	2s_complement
+	rate_unit		none
+	modifier_unit		none
+	percentage		false
+	base_unit		degrees_C
+	modifier_unit_code	unspecified
+	linearization		linear
+	m			1
+	tolerance		0
+	b			0
+	accuracy		1
+	accuracy_exp		0
+	sensor_direction	input
+	r_exp			0
+	b_exp			0
+	sensor_maximum		255
+	sensor_minimum		0
+	id_string		"Negative"
+endsdr
+
+# Threshold sensor with a fractional reading, sensor number 19: m=5, r_exp=-1, so raw 25 reads as 12.5.
+sdr type 1
+	sensor_owner_id		0x20
+	sensor_owner_lun	0
+	channel_number		0
+	sensor_number		19
+	entity_id		system_board
+	entity_instance		1
+	sensor_type		Temperature
+	init_scanning		true
+	init_sensor_type	true
+	default_sensor_scan_on	true
+	event_reading_type_code	1
+	analog_data_format	unsigned
+	rate_unit		none
+	modifier_unit		none
+	percentage		false
+	base_unit		degrees_C
+	modifier_unit_code	unspecified
+	linearization		linear
+	m			5
+	tolerance		0
+	b			0
+	accuracy		1
+	accuracy_exp		0
+	sensor_direction	input
+	r_exp			-1
+	b_exp			0
+	sensor_maximum		255
+	sensor_minimum		0
+	id_string		"Fraction"
+endsdr
+
+# Threshold sensor with the longest id string a type 1 SDR can hold (16 characters), sensor number 20.
+sdr type 1
+	sensor_owner_id		0x20
+	sensor_owner_lun	0
+	channel_number		0
+	sensor_number		20
+	entity_id		system_board
+	entity_instance		1
+	sensor_type		Temperature
+	init_scanning		true
+	init_sensor_type	true
+	default_sensor_scan_on	true
+	event_reading_type_code	1
+	analog_data_format	unsigned
+	rate_unit		none
+	modifier_unit		none
+	percentage		false
+	base_unit		degrees_C
+	modifier_unit_code	unspecified
+	linearization		linear
+	m			1
+	tolerance		0
+	b			0
+	accuracy		1
+	accuracy_exp		0
+	sensor_direction	input
+	r_exp			0
+	b_exp			0
+	sensor_maximum		255
+	sensor_minimum		0
+	id_string		"SixteenCharIdStr"
+endsdr
+
+# Discrete sensor with only bits 0 and 1 readable, sensor number 21: the test asserts bits 0-2, bit 2 must be
+# masked out of the item value.
+sdr type 2
+	sensor_owner_id		0x20
+	sensor_owner_lun	0
+	channel_number		0
+	sensor_number		21
+	entity_id		system_board
+	entity_instance		1
+	sensor_type		37
+	event_reading_type_code	0x6f
+	init_scanning		true
+	init_sensor_type	true
+	default_sensor_scan_on	true
+	event0_state_ret	true
+	assert_event0		true
+	deassert_event0		true
+	event1_state_ret	true
+	assert_event1		true
+	deassert_event1		true
+	id_string		"Masked"
+endsdr
