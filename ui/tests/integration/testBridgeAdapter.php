@@ -156,7 +156,7 @@ class testBridgeAdapter extends CIntegrationTest {
 			return [
 				self::COMPONENT_SERVER => [
 					'DebugLevel' => 4,
-					'LogFileSize' => 20,
+					'LogFileSize' => 0,
 					'BridgeAdapterURL' => 'http://'.self::ADAPTER_HOST.':'.self::getAdapterPort().'/rpc'
 				]
 			];
@@ -168,7 +168,7 @@ class testBridgeAdapter extends CIntegrationTest {
 		return [
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 4,
-				'LogFileSize' => 20,
+				'LogFileSize' => 0,
 				'TLSCAFile' => $base_dir.'zabbix_ca_file.crt',
 				'TLSCertFile' => $base_dir.'zabbix_server.crt',
 				'TLSKeyFile' => $base_dir.'zabbix_server.key',
@@ -2217,7 +2217,7 @@ class testBridgeAdapter extends CIntegrationTest {
 		return [
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 4,
-				'LogFileSize' => 20,
+				'LogFileSize' => 0,
 				'BridgeAdapterURL' => 'http://'.self::ADAPTER_HOST.':'.$closed_port.'/rpc',
 				'TLSCAFile' => null,
 				'TLSCertFile' => null,
@@ -2356,7 +2356,7 @@ class testBridgeAdapter extends CIntegrationTest {
 		return [
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 4,
-				'LogFileSize' => 20,
+				'LogFileSize' => 0,
 				'BridgeAdapterURL' => 'http://'.self::ADAPTER_HOST.':'.self::getAdapterPort().'/rpc',
 				'TLSCAFile' => null,
 				'TLSCertFile' => null,
