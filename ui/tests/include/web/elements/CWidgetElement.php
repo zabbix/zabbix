@@ -116,7 +116,9 @@ class CWidgetElement extends CElement {
 		catch (ElementClickInterceptedException | ElementNotInteractableException $exception) {
 			$button = $this->query('xpath:.//button[contains(@class, "js-widget-edit")]')->waitUntilPresent()->one();
 			$button->scrollIntoView();
-			$button->click();
+			// Scrolling can move the widget away from the mouse and hide the header, hover it again before the click.
+			$this->hoverMouse();
+			$button->hoverMouse()->click();
 		}
 
 		return $this->query('xpath://div[@data-dialogueid="widget_form"]//form')->waitUntilVisible()
