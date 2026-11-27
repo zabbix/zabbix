@@ -30,6 +30,15 @@ class testInheritanceGraphPrototype extends CLegacyWebTest {
 	private $templateid = 15000;	// 'Inheritance test template'
 	private $template = 'Inheritance test template';
 
+	/**
+	 * Attach CMessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
+
 	private $hostid = 15001;		// 'Template inheritance test host'
 	private $host = 'Template inheritance test host';
 
@@ -121,17 +130,16 @@ class testInheritanceGraphPrototype extends CLegacyWebTest {
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
-				$this->zbxTestCheckTitle('Configuration of graph prototypes');
-				$this->zbxTestCheckHeader('Graph prototypes');
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph prototype added');
+				$this->assertMessage(TEST_GOOD, 'Graph prototype added');
+				$this->page->assertTitle('Configuration of graph prototypes');
+				$this->page->assertHeader('Graph prototypes');
 				$this->zbxTestTextPresent($data['name']);
 				break;
 
 			case TEST_BAD:
-				$this->zbxTestCheckTitle('Configuration of graph prototypes');
-				$this->zbxTestCheckHeader('Graph prototypes');
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add graph prototype');
-				$this->zbxTestTextPresent($data['errors']);
+				$this->assertMessage(TEST_BAD, 'Cannot add graph prototype', $data['errors']);
+				$this->page->assertTitle('Configuration of graph prototypes');
+				$this->page->assertHeader('Graph prototypes');
 				$this->zbxTestTextNotPresent('Graph prototype added');
 				break;
 		}

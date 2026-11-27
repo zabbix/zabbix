@@ -395,7 +395,7 @@ class testFormAdministrationDMProxies extends CLegacyWebTest  {
 
 		$new_name = 'Cloned proxy '.microtime();
 
-		$this->query('button:Clone')->waitUntilClickable()->one()->click();
+		$this->query('button:Clone')->waitUntilClickable()->one()->click()->waitUntilNotVisible();
 		$form->fill(['Proxy name' => $new_name]);
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'Proxy added');
