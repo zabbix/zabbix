@@ -33,7 +33,7 @@ zabbix_export:
         tested_on: Claude API
       vendor:
         name: Zabbix
-        version: 8.2-0
+        version: 8.2-1
       groups:
         - name: Templates/Applications
       items:
@@ -150,8 +150,8 @@ zabbix_export:
             			separator = params ? '&' : '?',
             			uri = ClaudeAPI.params.api_url + endpoint + params;
             
-            		if (typeof ClaudeAPI.params.proxy !== 'undefined' && ClaudeAPI.params.proxy !== '') {
-            			request.setProxy(ClaudeAPI.params.proxy);
+            		if (typeof ClaudeAPI.params.http_proxy !== 'undefined' && ClaudeAPI.params.http_proxy !== '') {
+            			request.setProxy(ClaudeAPI.params.http_proxy);
             		}
             
             		request.addHeader('anthropic-version: 2023-06-01');
@@ -324,8 +324,8 @@ zabbix_export:
             			separator = params ? '&' : '?',
             			uri = ClaudeAPI.params.api_url + endpoint + params;
             
-            		if (typeof ClaudeAPI.params.proxy !== 'undefined' && ClaudeAPI.params.proxy !== '') {
-            			request.setProxy(ClaudeAPI.params.proxy);
+            		if (typeof ClaudeAPI.params.http_proxy !== 'undefined' && ClaudeAPI.params.http_proxy !== '') {
+            			request.setProxy(ClaudeAPI.params.http_proxy);
             		}
             
             		request.addHeader('anthropic-version: 2023-06-01');
@@ -494,8 +494,8 @@ zabbix_export:
             			separator = params ? '&' : '?',
             			uri = ClaudeAPI.params.api_url + endpoint + params;
             
-            		if (typeof ClaudeAPI.params.proxy !== 'undefined' && ClaudeAPI.params.proxy !== '') {
-            			request.setProxy(ClaudeAPI.params.proxy);
+            		if (typeof ClaudeAPI.params.http_proxy !== 'undefined' && ClaudeAPI.params.http_proxy !== '') {
+            			request.setProxy(ClaudeAPI.params.http_proxy);
             		}
             
             		request.addHeader('anthropic-version: 2023-06-01');
@@ -664,8 +664,8 @@ zabbix_export:
             			separator = params ? '&' : '?',
             			uri = ClaudeAPI.params.api_url + endpoint + params;
             
-            		if (typeof ClaudeAPI.params.proxy !== 'undefined' && ClaudeAPI.params.proxy !== '') {
-            			request.setProxy(ClaudeAPI.params.proxy);
+            		if (typeof ClaudeAPI.params.http_proxy !== 'undefined' && ClaudeAPI.params.http_proxy !== '') {
+            			request.setProxy(ClaudeAPI.params.http_proxy);
             		}
             
             		request.addHeader('anthropic-version: 2023-06-01');
@@ -923,8 +923,8 @@ zabbix_export:
             			separator = params ? '&' : '?',
             			uri = ClaudeAPI.params.api_url + endpoint + params;
             
-            		if (typeof ClaudeAPI.params.proxy !== 'undefined' && ClaudeAPI.params.proxy !== '') {
-            			request.setProxy(ClaudeAPI.params.proxy);
+            		if (typeof ClaudeAPI.params.http_proxy !== 'undefined' && ClaudeAPI.params.http_proxy !== '') {
+            			request.setProxy(ClaudeAPI.params.http_proxy);
             		}
             
             		request.addHeader('anthropic-version: 2023-06-01');
@@ -1094,8 +1094,8 @@ zabbix_export:
             			separator = params ? '&' : '?',
             			uri = ClaudeAPI.params.api_url + endpoint + params;
             
-            		if (typeof ClaudeAPI.params.proxy !== 'undefined' && ClaudeAPI.params.proxy !== '') {
-            			request.setProxy(ClaudeAPI.params.proxy);
+            		if (typeof ClaudeAPI.params.http_proxy !== 'undefined' && ClaudeAPI.params.http_proxy !== '') {
+            			request.setProxy(ClaudeAPI.params.http_proxy);
             		}
             
             		request.addHeader('anthropic-version: 2023-06-01');
@@ -1378,8 +1378,8 @@ zabbix_export:
             			separator = params ? '&' : '?',
             			uri = ClaudeAPI.params.api_url + endpoint + params;
             
-            		if (typeof ClaudeAPI.params.proxy !== 'undefined' && ClaudeAPI.params.proxy !== '') {
-            			request.setProxy(ClaudeAPI.params.proxy);
+            		if (typeof ClaudeAPI.params.http_proxy !== 'undefined' && ClaudeAPI.params.http_proxy !== '') {
+            			request.setProxy(ClaudeAPI.params.http_proxy);
             		}
             
             		request.addHeader('anthropic-version: 2023-06-01');
@@ -1607,8 +1607,8 @@ zabbix_export:
             			separator = params ? '&' : '?',
             			uri = ClaudeAPI.params.api_url + endpoint + params;
             
-            		if (typeof ClaudeAPI.params.proxy !== 'undefined' && ClaudeAPI.params.proxy !== '') {
-            			request.setProxy(ClaudeAPI.params.proxy);
+            		if (typeof ClaudeAPI.params.http_proxy !== 'undefined' && ClaudeAPI.params.http_proxy !== '') {
+            			request.setProxy(ClaudeAPI.params.http_proxy);
             		}
             
             		request.addHeader('anthropic-version: 2023-06-01');
