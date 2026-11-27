@@ -1516,7 +1516,7 @@ void	zbx_free_service_resources(int ret)
 	if (NULL != zbx_threads)
 	{
 		/* wait for all child processes to exit */
-		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num, ret);
+		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num, ret, NULL);
 
 		zbx_free(zbx_threads);
 		zbx_free(threads_flags);

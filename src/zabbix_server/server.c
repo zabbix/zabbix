@@ -1179,16 +1179,34 @@ static void	zbx_free_config(void)
 	zbx_strarr_free(&CONFIG_LOAD_MODULE);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: writes data left in history and trend cache to database           *
+ *                                                                            *
+ ******************************************************************************/
+static void	server_sync_database_cache(void)
+{
+	zbx_db_connect(ZBX_DB_CONNECT_EXIT);
+	zbx_sync_database_cache(&events_cbs, config_history_storage_pipelines);
+	zbx_db_close();
+}
+
 static void	zbx_on_exit(int ret, void *on_exit_args)
 {
 	char	*error = NULL;
+	int	sync = ZBX_SYNC_ALL, unsynced_num;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
 
 	if (NULL != zbx_threads)
 	{
-		/* wait for all child processes to exit */
-		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num, ret);
+		/* wait for all child processes to exit, do not touch database if processes had to be killed */
+		if (SUCCEED != zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num, ret,
+				zbx_hc_get_unsynced_num))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "history cache will not be synced to database");
+			sync = ZBX_SYNC_NONE;
+		}
 
 		zbx_free(zbx_threads);
 		zbx_free(threads_flags);
@@ -1209,9 +1227,14 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 		zbx_free_metrics();
 		zbx_ipc_service_free_env();
 
-		zbx_db_connect(ZBX_DB_CONNECT_EXIT);
-		zbx_free_database_cache(ZBX_SYNC_ALL, &events_cbs, config_history_storage_pipelines);
-		zbx_db_close();
+		/* synchronize in child process, so that unavailable database cannot hang main process */
+		if (ZBX_SYNC_ALL == sync)
+			zbx_thread_exec_and_wait(server_sync_database_cache, zbx_hc_get_unsynced_num);
+
+		if (0 != (unsynced_num = zbx_hc_get_unsynced_num()))
+			zabbix_log(LOG_LEVEL_WARNING, "%d unsynced values left in history cache", unsynced_num);
+
+		zbx_free_database_cache(ZBX_SYNC_NONE, &events_cbs, config_history_storage_pipelines);
 
 		zbx_free_configuration_cache();
 
