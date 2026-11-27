@@ -974,7 +974,7 @@ class testUsersPasswordComplexity extends CWebTest {
 		$auth_form = $this->query('id:authentication-form')->asForm()->waitUntilPresent()->one();
 		$auth_form->fill($data['auth_fields']);
 		$auth_form->submit();
-		$this->page->waitUntilReady();
+		$auth_form->waitUntilStalled();
 		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
 		$this->assertEquals($data['db_passwd_check_rules'],
 				CDBHelper::getValue('SELECT passwd_check_rules FROM config')

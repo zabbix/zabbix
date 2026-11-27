@@ -16,6 +16,8 @@
 
 require_once __DIR__ . '/../../include/CWebTest.php';
 
+use Facebook\WebDriver\Exception\TimeoutException;
+
 /**
  * @backup profiles
  *
@@ -191,10 +193,10 @@ class testAlarmNotification extends CWebTest {
 		]);
 
 		// Enable Alarm Notification display for user.
-		DBexecute('INSERT INTO profiles (profileid, userid, idx, value_str, source, type)'.
-				' VALUES (555,1,'.zbx_dbstr('web.messages').',1,'.zbx_dbstr('enabled').',3)');
-		DBexecute('INSERT INTO profiles (profileid, userid, idx, value_str, source, type)'.
-				' VALUES (556,1,'.zbx_dbstr('web.messages').',180,'.zbx_dbstr('timeout').',3)');
+		DB::insert('profiles', [
+			['userid' => 1, 'idx' => 'web.messages', 'value_str' => '1', 'source' => 'enabled', 'type' => 3],
+			['userid' => 1, 'idx' => 'web.messages', 'value_str' => '180', 'source' => 'timeout', 'type' => 3]
+		]);
 
 		// Create Maintenance and host in maintenance.
 		$maintenance = CDataHelper::call('maintenance.create', [
@@ -677,11 +679,13 @@ class testAlarmNotification extends CWebTest {
 		DBexecute('DELETE FROM profiles WHERE source='.zbx_dbstr('triggers.severities').' AND userid=1');
 
 		// Insert new row where value_str field means that all severities are checked.
-		DBexecute('INSERT INTO profiles (profileid, userid, idx, value_str, source, type)'.
-				' VALUES (9950, 1, '.zbx_dbstr('web.messages').', '.
-				zbx_dbstr('a:6:{i:0;s:1:"1";i:1;s:1:"1";i:2;s:1:"1";i:3;s:1:"1";i:4;s:1:"1";i:5;s:1:"1";}').', '.
-				zbx_dbstr('triggers.severities').', 3)'
-		);
+		DB::insert('profiles', [[
+			'userid' => 1,
+			'idx' => 'web.messages',
+			'value_str' => 'a:6:{i:0;s:1:"1";i:1;s:1:"1";i:2;s:1:"1";i:3;s:1:"1";i:4;s:1:"1";i:5;s:1:"1";}',
+			'source' => 'triggers.severities',
+			'type' => 3
+		]]);
 	}
 
 	/**
@@ -707,7 +711,28 @@ class testAlarmNotification extends CWebTest {
 	}
 
 	protected function getAlarmOverlay() {
-		return $this->query('xpath://div['.CXPathHelper::fromClass('overlay-dialogue notif').']')->waitUntilVisible()->one();
+		try {
+			return $this->query('xpath://div['.CXPathHelper::fromClass('overlay-dialogue notif').']')->waitUntilVisible()
+					->one();
+		}
+		catch (TimeoutException $exception) {
+			// TODO: Temporary debug output for the unstable notification appearance.
+			$browser = CElementQuery::getDriver()->executeScript('const get = (key) => Object.keys(localStorage)'.
+					'.filter((k) => k.endsWith(key)).map((k) => JSON.parse(localStorage.getItem(k)).payload);'.
+					'return "focus: " + document.hasFocus() + ", active tab: " + get(":notifications.active_tabid")'.
+					' + ", tabs: " + JSON.stringify(get(":tabs.lastseen"));'
+			);
+			$last_clock = CDBHelper::getValue('SELECT value_str FROM profiles WHERE userid=1 AND idx='.
+					zbx_dbstr('web.messages').' AND source='.zbx_dbstr('last.clock')
+			);
+			$events = CDBHelper::getAll('SELECT eventid, clock FROM events WHERE source=0 AND value=1 AND clock>'.
+					(time() - 600)
+			);
+			echo "\nNotification debug: now ".time().', last.clock '.$last_clock.', '.$browser.', events (id:clock) '.
+					implode(' ', array_map(fn($event) => $event['eventid'].':'.$event['clock'], $events))."\n";
+
+			throw $exception;
+		}
 	}
 
 	/**
