@@ -3,6 +3,8 @@
 
 ## Overview
 
+**Status: Deprecated**
+
 The template to monitor Kubernetes nodes that work without any external scripts.
 It works without external scripts and uses the script item to make HTTP requests to the Kubernetes API.
 Install the Zabbix Helm Chart (https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Fmaster) in your Kubernetes cluster.

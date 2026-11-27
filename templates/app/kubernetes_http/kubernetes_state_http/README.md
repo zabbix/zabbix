@@ -3,6 +3,8 @@
 
 ## Overview
 
+**Status: Deprecated**
+
 The template to monitor Kubernetes state.
 It works without external scripts and uses the script item to make HTTP requests to the Kubernetes API.
 
