@@ -422,13 +422,13 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	if ((ITEM_TYPE_SCRIPT == item.type || ITEM_TYPE_BROWSER == item.type) &&
 			SUCCEED == zbx_json_brackets_by_name(&jp_item, ZBX_PROTO_TAG_PARAMETERS, &jp_script_params))
 	{
-#define	MAX_PARAM_NAME	255
 		const char	*pnext = NULL;
-		char		name[MAX_PARAM_NAME], value[MAX_STRING_LEN];
+		char		*name = NULL, *value = NULL;
+		size_t		name_alloc = 0, value_alloc = 0;
 
-		while (NULL != (pnext = zbx_json_pair_next(&jp_script_params, pnext, name, sizeof(name))))
+		while (NULL != (pnext = zbx_json_pair_next_dyn(&jp_script_params, pnext, &name, &name_alloc)))
 		{
-			if (NULL != zbx_json_decodevalue(pnext, value, sizeof(value), NULL))
+			if (NULL != zbx_json_decodevalue_dyn(pnext, &value, &value_alloc, NULL))
 			{
 				zbx_ptr_pair_t	pair;
 
@@ -437,7 +437,9 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 				zbx_vector_ptr_pair_append(&item.script_params, pair);
 			}
 		}
-#undef	MAX_PARAM_NAME
+
+		zbx_free(name);
+		zbx_free(value);
 	}
 
 	if (NULL == table_interface)
