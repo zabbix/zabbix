@@ -1,11 +1,14 @@
 Changes for 7.4.17rc1
 
 New features:
+A.......S. [ZBXNEXT-10905] updated maximum supported TimescaleDB version to 2.32 (mprihodko)
 A.......S. [ZBXNEXT-10866] updated maximum supported TimescaleDB version to 2.31 (mprihodko)
 .D......S. [ZBXNEXT-10621] added new runtime control option permissions_rebuild to rebuild user and host group permission cache (mprihodko)
 A......PS. [ZBXNEXT-10796] updated maximum supported MariaDB version to 13.0 (mprihodko)
 
 Bug fixes:
+.......PS. [ZBX-28376] fixed Zabbix server crash and hosts being monitored by wrong proxy after host was moved between proxy groups, switched to proxy and back or renamed (vso)
+........S. [ZBX-28104] fixed unassigned hosts not being distributed equally between proxies (vso)
 .......P.. [ZBX-27656] fixed missed history when switching from hybrid to disk mode (vso)
 ..F....... [ZBX-28213] fixed inline validation for array fields (ggrigorjevs)
 .........T [ZBX-23192] added JS script for job discovery with configurable folder depth to Jenkins by HTTP template (mruszczyk)
@@ -1690,11 +1693,20 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.33rc1
 
 New features:
+A.......S. [ZBXNEXT-10905] updated maximum supported TimescaleDB version to 2.32 (mprihodko)
 A.......S. [ZBXNEXT-10866] updated maximum supported TimescaleDB version to 2.31 (mprihodko)
 .D......S. [ZBXNEXT-10621] added new runtime control option permissions_rebuild to rebuild user and host group permission cache (mprihodko)
 A......PS. [ZBXNEXT-10796] updated maximum supported MariaDB version to 13.0 (mprihodko)
 
 Bug fixes:
+.......PS. [ZBX-27901] fixed Script Item dropping parameters when name/value is over maximum length (ademidovs)
+.......PS. [ZBX-28115] prevented Zabbix server and proxy processes from hanging during shutdown when the database is unreachable (arimdjonoks)
+.........T [ZBX-20306] fixed Extreme EXOS 'Operating system' item to reflect the active partition (kflorowski)
+..F....... [ZBX-27952] fixed host navigator widget to load triggers using filter (uolekss)
+.......PS. [ZBX-28376] fixed Zabbix server crash and hosts being monitored by wrong proxy after host was moved between proxy groups, switched to proxy and back or renamed (vso)
+..F....... [ZBX-28121] fixed focus loss by restoring focus to the Edit button after updating a discovery check in the list (aluchko)
+..F....... [ZBX-28037] fixed PHP fatal error when formatting large uptime values in Latest data (aluchko)
+........S. [ZBX-28104] fixed unassigned hosts not being distributed equally between proxies (vso)
 .........T [ZBX-23192] added JS script for job discovery with configurable folder depth to Jenkins by HTTP template (mruszczyk)
 .........T [ZBX-23148] fixed uniqueness of Dell template items (kflorowski)
 ........S. [ZBX-28284] fixed Zabbix server crash if database connection is lost during startup (vso)
@@ -5986,6 +5998,7 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.50rc1
 
 New features:
+A.......S. [ZBXNEXT-10905] updated maximum supported TimescaleDB version to 2.32 (mprihodko)
 A.......S. [ZBXNEXT-10866] updated maximum supported TimescaleDB version to 2.31 (mprihodko)
 A......PS. [ZBXNEXT-10796] updated maximum supported MariaDB version to 13.0 (mprihodko)
 
