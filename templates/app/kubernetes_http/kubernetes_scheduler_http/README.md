@@ -3,6 +3,8 @@
 
 ## Overview
 
+**Status: Deprecated**
+
 The template to monitor Kubernetes Scheduler by Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 
