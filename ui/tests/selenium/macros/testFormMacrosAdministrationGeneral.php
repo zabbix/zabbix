@@ -761,6 +761,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->page->login()->open('zabbix.php?action=macros.edit')->waitUntilReady();
 		$this->fillMacros([$data]);
 		$this->query('button:Update')->one()->click();
+		$this->assertMessage(TEST_GOOD, 'Macros updated');
 
 		$value_field = $this->getValueField($data['macro']);
 		if (CTestArrayHelper::get($data['value'], 'type', CInputGroupElement::TYPE_SECRET) === CInputGroupElement::TYPE_SECRET) {

@@ -223,6 +223,7 @@ class testExpandExpressionMacros extends CWebTest {
 				'width' => 500,
 				'height' => 500,
 				'label_type'=> 0,
+				'grid_show' => SYSMAP_GRID_SHOW_OFF,
 				'selements' =>  [
 					// Host 'Host for expression macro Avg'.
 					[
@@ -233,6 +234,7 @@ class testExpandExpressionMacros extends CWebTest {
 						'elementtype' => 0,
 						'iconid_off' => 151,
 						'label' => '{?avg(/{HOST.HOST}/trapper,1h)}',
+						'label_location' => MAP_LABEL_LOC_RIGHT,
 						'x' => 139,
 						'y' => 27
 					],
@@ -254,7 +256,7 @@ class testExpandExpressionMacros extends CWebTest {
 						'elementtype' => 0,
 						'iconid_off' => 141,
 						'label' => '{?min(/{HOST.HOST}/trapper,1d)}',
-						'x' => 89,
+						'x' => 127,
 						'y' => 377
 					]
 				],
