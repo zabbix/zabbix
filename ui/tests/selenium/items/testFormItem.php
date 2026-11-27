@@ -2465,6 +2465,8 @@ class testFormItem extends CLegacyWebTest {
 		$form->fill(['Name' => $this->host]);
 		$table = $this->query('class:datatable')->asDatatable()->one()->waitUntilReady();
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$table->waitUntilReloaded()->findRow('Name', $this->host)->getColumn('Items')->query('link:Items')->one()->click();
+		$table->waitUntilReloaded();
+		$table->waitUntilRowsCount(1);
+		$table->findRow('Name', $this->host)->getColumn('Items')->query('link:Items')->one()->click();
 	}
 }

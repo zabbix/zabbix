@@ -2584,6 +2584,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 		$form->fill(['Name' => $name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$table->waitUntilReloaded();
+		$table->waitUntilRowsCount(1);
 		$table->findRow('Name', $name)->getColumn('Discovery')->query('link:Discovery')->one()->click();
 	}
 }

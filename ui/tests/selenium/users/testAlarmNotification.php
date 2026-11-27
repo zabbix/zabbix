@@ -191,10 +191,10 @@ class testAlarmNotification extends CWebTest {
 		]);
 
 		// Enable Alarm Notification display for user.
-		DBexecute('INSERT INTO profiles (profileid, userid, idx, value_str, source, type)'.
-				' VALUES (555,1,'.zbx_dbstr('web.messages').',1,'.zbx_dbstr('enabled').',3)');
-		DBexecute('INSERT INTO profiles (profileid, userid, idx, value_str, source, type)'.
-				' VALUES (556,1,'.zbx_dbstr('web.messages').',180,'.zbx_dbstr('timeout').',3)');
+		DB::insert('profiles', [
+			['userid' => 1, 'idx' => 'web.messages', 'value_str' => '1', 'source' => 'enabled', 'type' => 3],
+			['userid' => 1, 'idx' => 'web.messages', 'value_str' => '180', 'source' => 'timeout', 'type' => 3]
+		]);
 
 		// Create Maintenance and host in maintenance.
 		$maintenance = CDataHelper::call('maintenance.create', [
