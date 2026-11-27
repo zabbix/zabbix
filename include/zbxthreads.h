@@ -99,9 +99,15 @@ zbx_thread_args_t;
 void	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread_args_t *thread_args, ZBX_THREAD_HANDLE *thread);
 int	zbx_thread_wait(ZBX_THREAD_HANDLE thread);
 int	zbx_waitpid_nohang(ZBX_THREAD_HANDLE *threads, size_t threads_num);
-void	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num, int timeout);
+#define ZBX_THREADS_STOP_TIMEOUT	120
+
+typedef int	(*zbx_threads_progress_f)(void);
+
+int	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num, int timeout,
+		zbx_threads_progress_f progress_cb);
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
+void	zbx_thread_exec_and_wait(void (*func)(void), int timeout, zbx_threads_progress_f progress_cb);
 void	zbx_pthread_init_attr(pthread_attr_t *attr);
 #endif
 
