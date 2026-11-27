@@ -3183,7 +3183,9 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 
 			$ldap_form->submit();
 
-			if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD || CTestArrayHelper::get($data, 'dialog_submit')) {
+			// The dialog of every server except the last one must close before the next server is added.
+			if ($i < count($data['servers_settings']) - 1 || CTestArrayHelper::get($data, 'expected') === TEST_GOOD
+					|| CTestArrayHelper::get($data, 'dialog_submit')) {
 				$dialog->ensureNotPresent();
 			}
 		}

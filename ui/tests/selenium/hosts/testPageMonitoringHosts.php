@@ -1112,10 +1112,12 @@ class testPageMonitoringHosts extends CWebTest {
 
 			// Count problems of each severity and compare it with problems count from Hosts page.
 			if ($host !== 'Empty host') {
+				$problems_table = $this->query('class:datatable')->asDatatable()->one();
+				$problems_table->query('xpath:.//div[contains(@class, "-bg")]')->waitUntilPresent();
+
 				foreach ($results as $severity => $count) {
-					$problem_count = $table->query('xpath:.//div[contains(@class, "-bg")]//span[text()='
-							.CXPathHelper::escapeQuotes($severity).']'
-					)->all()->count();
+					$problem_count = $problems_table->query('xpath:.//div[contains(@class, "-bg")]//span[text()='.
+							CXPathHelper::escapeQuotes($severity).']')->all()->count();
 					$this->assertEquals(strval($problem_count), $count);
 				}
 			}

@@ -66,6 +66,7 @@ class testDashboardFavoriteGraphsWidget extends CWebTest {
 			$filter->submit();
 			$table_headers->waitUntilStalled();
 			$table->invalidate();
+			$table->waitUntilRowsCount(1);
 			$table->findRow('Host', $this->host_name)->query('link:Graph')->waitUntilClickable()->one()->click();
 
 			// Add graph to favorite.

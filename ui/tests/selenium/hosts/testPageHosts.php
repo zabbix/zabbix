@@ -941,6 +941,8 @@ class testPageHosts extends CLegacyWebTest {
 			$this->selectDatatableRows($selection);
 			$delete_button->click();
 			$this->page->acceptAlert();
+			// Delete reloads the page, wait for it before the message is checked and closed.
+			$delete_button->waitUntilStalled();
 			$this->page->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, ($host_count > 1) ? 'Hosts deleted' : 'Host deleted');
 			CMessageElement::find()->one()->close();

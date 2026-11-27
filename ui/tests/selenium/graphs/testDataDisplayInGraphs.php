@@ -5808,7 +5808,7 @@ class testDataDisplayInGraphs extends CWebTest {
 			$old_source = $image->getAttribute('src');
 		}
 
-		$this->query('xpath://button[@aria-label="Enter full screen mode"]')->one()->click();
+		$this->query('xpath://button[@aria-label="Enter full screen mode"]')->one()->click()->waitUntilNotVisible();
 		$this->page->waitUntilReady();
 
 		$object = $this->query($object_locator)->waitUntilPresent()->one();
