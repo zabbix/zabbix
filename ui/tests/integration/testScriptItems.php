@@ -61,7 +61,6 @@ class testScriptItems extends CIntegrationTest {
 	 * @inheritdoc
 	 */
 	public function prepareData() {
-		self::$sid = CAPIHelper::getSessionId();
 		$response = $this->call('host.create', [
 			[
 				'host' => self::HOST_NAME,
@@ -72,6 +71,8 @@ class testScriptItems extends CIntegrationTest {
 		$this->assertArrayHasKey('hostids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
 		self::$hostid = $response['result']['hostids'][0];
+
+		self::$sid = CAPIHelper::getSessionId();
 
 		return true;
 	}
