@@ -1,1 +1,0 @@
-.......PS. [ZBX-28376] fixed Zabbix server crash and hosts being monitored by wrong proxy after host was moved between proxy groups, switched to proxy and back or renamed (vso)

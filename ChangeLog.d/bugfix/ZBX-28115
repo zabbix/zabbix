@@ -1,1 +1,0 @@
-.......PS. [ZBX-28115] prevented Zabbix server and proxy processes from hanging during shutdown when the database is unreachable (arimdjonoks)
