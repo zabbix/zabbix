@@ -1276,17 +1276,37 @@ static void	zbx_free_config(void)
 	zbx_strarr_free(&config_telemetry_providers);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: writes data left in history cache and proxy buffer to database    *
+ *                                                                            *
+ ******************************************************************************/
+static void	proxy_sync_database_cache(void)
+{
+	zbx_db_connect(ZBX_DB_CONNECT_EXIT);
+
+	if (0 != proxy_has_started)
+		zbx_sync_database_cache(&events_cbs);
+
+	zbx_pb_flush();
+	zbx_db_close();
+}
+
 static void	zbx_on_exit(int ret, void *on_exit_args)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
+	int	sync_mode = ZBX_SYNC_ALL, unsynced_num;
 
-	zbx_pb_disable();
+	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
 
 	if (NULL != zbx_threads)
 	{
-		/* wait for all child processes to exit */
-		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num,
-				SUCCEED == ret ? 0 : SEC_PER_MIN);
+		/* wait for all child processes to exit, do not touch database if processes had to be killed */
+		if (SUCCEED != zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num,
+				SUCCEED == ret ? ZBX_THREADS_STOP_TIMEOUT : SEC_PER_MIN, zbx_hc_get_unsynced_num))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "history cache and proxy buffer will not be synced to database");
+			sync_mode = ZBX_SYNC_NONE;
+		}
 
 		zbx_free(zbx_threads);
 		zbx_free(threads_flags);
@@ -1294,18 +1314,21 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	zbx_locks_disable();
 #endif
+	/* child process can hold proxy buffer lock while waiting for database, disable buffer after they exit */
+	zbx_pb_disable();
 	zbx_free_metrics();
 	zbx_ipc_service_free_env();
 
-	zbx_db_connect(ZBX_DB_CONNECT_EXIT);
+	/* synchronize in child process, so that unavailable database cannot hang main process */
+	if (ZBX_SYNC_ALL == sync_mode)
+		zbx_thread_exec_and_wait(proxy_sync_database_cache, ZBX_THREADS_STOP_TIMEOUT, zbx_hc_get_unsynced_num);
 
-	int	sync_mode = (0 == proxy_has_started ? ZBX_SYNC_NONE : ZBX_SYNC_ALL);
+	if (0 != (unsynced_num = zbx_hc_get_unsynced_num()))
+		zabbix_log(LOG_LEVEL_WARNING, "%d unsynced values left in history cache", unsynced_num);
 
-	zbx_free_database_cache(sync_mode, &events_cbs);
-	zbx_pb_flush();
+	zbx_free_database_cache(ZBX_SYNC_NONE, &events_cbs);
 	zbx_pb_destroy();
 	zbx_free_configuration_cache();
-	zbx_db_close();
 
 	zbx_db_deinit();
 

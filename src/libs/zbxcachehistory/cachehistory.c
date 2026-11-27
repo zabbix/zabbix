@@ -3771,16 +3771,16 @@ out:
  * Purpose: writes updates and new data from pool and cache data to database  *
  *                                                                            *
  ******************************************************************************/
-static void	DCsync_all(const zbx_events_funcs_t *events_cbs)
+void	zbx_sync_database_cache(const zbx_events_funcs_t *events_cbs)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In DCsync_all()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	sync_history_cache_full(events_cbs);
 
 	if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 		DCsync_trends(1, ZBX_DC_SYNC_TREND_MODE_FULL);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of DCsync_all()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -3793,7 +3793,7 @@ void	zbx_free_database_cache(int sync, const zbx_events_funcs_t *events_cbs)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (ZBX_SYNC_ALL == sync)
-		DCsync_all(events_cbs);
+		zbx_sync_database_cache(events_cbs);
 
 	cache = NULL;
 
@@ -4110,6 +4110,22 @@ void	zbx_dbcache_set_history_num(int num)
 int	zbx_dbcache_get_history_num(void)
 {
 	return cache->history_num;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: gets number of history values and trends left to be synced        *
+ *                                                                            *
+ * Comments: Cache is read without locking because the value is only used to  *
+ *           detect if history syncers are making progress during shutdown.   *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_hc_get_unsynced_num(void)
+{
+	if (NULL == cache)
+		return 0;
+
+	return cache->history_num + cache->trends_num;
 }
 
 zbx_shmem_info_t	*zbx_dbcache_get_hc_mem(void)

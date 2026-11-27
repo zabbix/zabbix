@@ -192,6 +192,7 @@ int	zbx_init_database_cache(zbx_get_program_type_f get_program_type,
 		zbx_sync_history_cache_f sync_history_cache_func, zbx_uint64_t history_cache_size,
 		zbx_uint64_t history_index_cache_size, zbx_uint64_t *trends_cache_size, char **error);
 
+void	zbx_sync_database_cache(const zbx_events_funcs_t *events_cbs);
 void	zbx_free_database_cache(int sync, const zbx_events_funcs_t *events_cbs);
 
 void	zbx_dc_update_interfaces_availability(void);
@@ -212,6 +213,7 @@ void	zbx_dbcache_lock(void);
 void	zbx_dbcache_unlock(void);
 void	zbx_dbcache_set_history_num(int num);
 int	zbx_dbcache_get_history_num(void);
+int	zbx_hc_get_unsynced_num(void);
 
 zbx_shmem_info_t	*zbx_dbcache_get_hc_mem(void);
 
