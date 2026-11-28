@@ -18,6 +18,7 @@
 #include "zbxlog.h"
 #include "zbxip.h"
 #include "zbxcomms.h"
+#include "zbxcrypto.h"
 #include "zbxnum.h"
 
 #if !defined(_WINDOWS) && !defined(__MINGW32)
@@ -152,13 +153,33 @@ void	zbx_disconnect_from_server(zbx_socket_t *sock)
  *               FAIL - an error occurred                                     *
  *                                                                            *
  ******************************************************************************/
-int	zbx_get_data_from_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error)
+unsigned char	zbx_negotiate_proxy_reply_flags(int peer_protocol)
 {
-	int		ret = FAIL;
+	unsigned char	flags = ZBX_TCP_PROTOCOL;
+
+	if (0 != (peer_protocol & (ZBX_TCP_COMPRESS_ZSTD | ZBX_TCP_BLAKE3)))
+	{
+		flags |= (unsigned char)(peer_protocol & ZBX_TCP_BLAKE3);
+
+		if (0 != (peer_protocol & ZBX_TCP_COMPRESS_MASK))
+			flags |= (unsigned char)(peer_protocol & ZBX_TCP_COMPRESS_MASK);
+		else
+			flags |= ZBX_TCP_COMPRESS_EXT;
+
+		return flags;
+	}
+
+	return ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS;
+}
+
+int	zbx_get_data_from_server_ext(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved,
+		unsigned char flags, char **error)
+{
+	int	ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != zbx_tcp_send_ext(sock, *buffer, buffer_size, reserved, ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, 0))
+	if (SUCCEED != zbx_tcp_send_ext(sock, *buffer, buffer_size, reserved, flags, 0))
 	{
 		*error = zbx_strdup(*error, zbx_socket_strerror());
 		goto exit;
@@ -202,36 +223,46 @@ exit:
 	return ret;
 }
 
+int	zbx_get_data_from_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error)
+{
+	return zbx_get_data_from_server_ext(sock, buffer, buffer_size, reserved, ZBX_TCP_PROXY_PROTOCOL, error);
+}
+
 /******************************************************************************
  *                                                                            *
- * Purpose: send data to server                                               *
+ * Purpose: send data to server with explicit transport flags                 *
  *                                                                            *
  * Return value: SUCCEED - processed successfully                             *
  *               FAIL - an error occurred                                     *
  *                                                                            *
  ******************************************************************************/
-int	zbx_put_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error)
+int	zbx_put_data_to_server_ext(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved,
+		unsigned char flags, char **error)
 {
 	int	ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() datalen:" ZBX_FS_SIZE_T, __func__, (zbx_fs_size_t)buffer_size);
 
-	if (SUCCEED != zbx_tcp_send_ext(sock, *buffer, buffer_size, reserved, ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, 0))
+	if (SUCCEED != zbx_tcp_send_ext(sock, *buffer, buffer_size, reserved, flags, 0))
 	{
 		*error = zbx_strdup(*error, zbx_socket_strerror());
 		goto out;
 	}
 
-	zbx_free(*buffer);
-
 	if (SUCCEED != zbx_recv_response(sock, 0, error))
 		goto out;
 
+	zbx_free(*buffer);
 	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+}
+
+int	zbx_put_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error)
+{
+	return zbx_put_data_to_server_ext(sock, buffer, buffer_size, reserved, ZBX_TCP_PROXY_PROTOCOL, error);
 }
 
 /******************************************************************************
@@ -745,3 +776,156 @@ char	*zbx_sanitize_proxyconfig_json(char *jbuffer)
 	return NULL;
 }
 
+static void	blake3_feed_json_tag_slice(zbx_blake3_hasher_t *hasher, const char *tag, const char *data, size_t len)
+{
+	zbx_uint64_t	len_le = zbx_htole_uint64((zbx_uint64_t)len);
+
+	zbx_blake3_update(hasher, tag, strlen(tag) + 1);
+	zbx_blake3_update(hasher, &len_le, sizeof(len_le));
+	if (0 < len)
+		zbx_blake3_update(hasher, data, len);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: computes canonical BLAKE3 digest over proxy data batch sections   *
+ *                                                                            *
+ * Return value: SUCCEED - batch contains data sections and hash was computed *
+ *               FAIL    - batch has no data sections (e.g. empty poll)       *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_proxy_batch_compute_blake3(const struct zbx_json_parse *jp, unsigned char digest_out[ZBX_BLAKE3_OUT_LEN],
+		char hex_out[ZBX_BLAKE3_HEX_LEN])
+{
+	static const char	*batch_tags[] = {
+		ZBX_PROTO_TAG_INTERFACE_AVAILABILITY,
+		ZBX_PROTO_TAG_HISTORY_DATA,
+		ZBX_PROTO_TAG_DISCOVERY_DATA,
+		ZBX_PROTO_TAG_AUTOREGISTRATION,
+		ZBX_PROTO_TAG_PROXY_ACTIVE_AVAIL_DATA,
+		ZBX_PROTO_TAG_TASKS
+	};
+
+	zbx_blake3_hasher_t	hasher;
+	char			session[MAX_STRING_LEN];
+	int			has_data = 0;
+	size_t			i;
+
+	zbx_blake3_init(&hasher);
+
+	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_SESSION, session, sizeof(session), NULL))
+		blake3_feed_json_tag_slice(&hasher, ZBX_PROTO_TAG_SESSION, session, strlen(session));
+
+	for (i = 0; i < ARRSIZE(batch_tags); i++)
+	{
+		struct zbx_json_parse	jp_sub;
+
+		if (SUCCEED == zbx_json_brackets_by_name(jp, batch_tags[i], &jp_sub) && jp_sub.end >= jp_sub.start)
+		{
+			size_t	slice_len = (size_t)(jp_sub.end - jp_sub.start + 1);
+
+			blake3_feed_json_tag_slice(&hasher, batch_tags[i], jp_sub.start, slice_len);
+			has_data = 1;
+		}
+	}
+
+	if (0 == has_data)
+	{
+		if (NULL != hex_out)
+			hex_out[0] = '\0';
+		return FAIL;
+	}
+
+	zbx_blake3_finalize(&hasher, digest_out, ZBX_BLAKE3_OUT_LEN);
+
+	if (NULL != hex_out)
+		zbx_blake3_buf2hex(digest_out, hex_out);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: extracts and verifies 'batch_blake3' tag against batch contents   *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_proxy_batch_verify_blake3(const struct zbx_json_parse *jp, unsigned char digest_out[ZBX_BLAKE3_OUT_LEN],
+		char hex_out[ZBX_BLAKE3_HEX_LEN], int *has_blake3, char **error)
+{
+	char		recv_hex[ZBX_BLAKE3_HEX_LEN + 8];
+	unsigned char	recv_digest[ZBX_BLAKE3_OUT_LEN];
+
+	*has_blake3 = 0;
+	if (NULL != hex_out)
+		hex_out[0] = '\0';
+
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_BATCH_BLAKE3, recv_hex, sizeof(recv_hex), NULL))
+		return SUCCEED;
+
+	if (SUCCEED != zbx_blake3_hex2buf(recv_hex, recv_digest))
+	{
+		*error = zbx_strdup(*error, "invalid batch_blake3 hexadecimal digest format");
+		return FAIL;
+	}
+
+	if (SUCCEED != zbx_proxy_batch_compute_blake3(jp, digest_out, hex_out))
+	{
+		*error = zbx_strdup(*error, "batch_blake3 tag present on empty proxy batch");
+		return FAIL;
+	}
+
+	if (0 != memcmp(recv_digest, digest_out, ZBX_BLAKE3_OUT_LEN))
+	{
+		*error = zbx_dsprintf(*error, "batch BLAKE3 coherence check failed (expected %s, computed %s)",
+				recv_hex, hex_out);
+		return FAIL;
+	}
+
+	*has_blake3 = 1;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: verifies echoed 'batch_blake3' in server ACK response             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_verify_batch_blake3_ack_ext(const char *response_buf, int peer_protocol, const char *expected_hex,
+		char **error)
+{
+	struct zbx_json_parse	jp;
+	char			ack_hex[ZBX_BLAKE3_HEX_LEN + 8];
+
+	if (NULL == expected_hex || '\0' == *expected_hex)
+		return SUCCEED;
+
+	if (NULL == response_buf || '\0' == *response_buf || SUCCEED != zbx_json_open(response_buf, &jp))
+	{
+		*error = zbx_strdup(*error, "cannot parse server ACK JSON for BLAKE3 verification");
+		return FAIL;
+	}
+
+	if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_BATCH_BLAKE3, ack_hex, sizeof(ack_hex), NULL))
+	{
+		if (0 == (peer_protocol & ZBX_TCP_BLAKE3))
+			return SUCCEED;
+
+		*error = zbx_strdup(*error, "server ACK is missing batch_blake3 confirmation");
+		return FAIL;
+	}
+
+	if (0 != strcmp(ack_hex, expected_hex))
+	{
+		*error = zbx_dsprintf(*error, "server ACK batch_blake3 mismatch (sent %s, received %s)",
+				expected_hex, ack_hex);
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+int	zbx_verify_batch_blake3_ack(const char *response_buf, const char *expected_hex, char **error)
+{
+	return zbx_verify_batch_blake3_ack_ext(response_buf, ZBX_TCP_BLAKE3, expected_hex, error);
+}

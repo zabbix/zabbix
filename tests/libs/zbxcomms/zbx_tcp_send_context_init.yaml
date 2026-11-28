@@ -63,4 +63,35 @@ in:
   flags: 5   # ZBX_TCP_PROTOCOL | ZBX_TCP_LARGE
 out:
   result: SUCCEED
+---
+test case: "ZSTD compression"
+in:
+  data: '{"request":"proxy data","host":"proxy-01"}'
+  len: 42
+  reserved: 0
+  flags: 9   # ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS_ZSTD
+  compress_result: "SUCCEED"
+out:
+  result: "SUCCEED"
+  header_len: 13
+---
+test case: "ZSTD compression with 32-byte BLAKE3 header integrity"
+in:
+  data: '{"request":"proxy data","host":"proxy-01"}'
+  len: 42
+  reserved: 0
+  flags: 25  # ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS_ZSTD | ZBX_TCP_BLAKE3
+  compress_result: "SUCCEED"
+out:
+  result: "SUCCEED"
+  header_len: 45
+---
+test case: "conflicting zlib and ZSTD compression flags"
+in:
+  data: "ABCD"
+  len: 4
+  reserved: 0
+  flags: 11  # ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS | ZBX_TCP_COMPRESS_ZSTD
+out:
+  result: "FAIL"
 ...

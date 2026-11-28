@@ -223,6 +223,8 @@ typedef struct
 }
 zbx_socket_t;
 
+#include "zbxhash.h"
+
 typedef struct
 {
 	size_t		buf_dyn_bytes;
@@ -234,10 +236,13 @@ typedef struct
 	unsigned char	expect;
 	int		protocol_version;
 	size_t		allocated;
+	unsigned char	header_prefix[21];
+	size_t		header_prefix_len;
+	unsigned char	expected_blake3[ZBX_BLAKE3_OUT_LEN];
 }
 zbx_tcp_recv_context_t;
 
-#define ZBX_MAX_HEADER_LEN 21
+#define ZBX_MAX_HEADER_LEN (21 + ZBX_BLAKE3_OUT_LEN)
 typedef struct
 {
 	unsigned char	header_buf[ZBX_MAX_HEADER_LEN];
@@ -276,6 +281,18 @@ int	zbx_socket_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char
 #define ZBX_TCP_PROTOCOL		0x01
 #define ZBX_TCP_COMPRESS		0x02
 #define ZBX_TCP_LARGE			0x04
+#define ZBX_TCP_COMPRESS_ZSTD		0x08
+#define ZBX_TCP_BLAKE3			0x10
+
+#define ZBX_TCP_COMPRESS_MASK		(ZBX_TCP_COMPRESS | ZBX_TCP_COMPRESS_ZSTD)
+
+#ifdef HAVE_ZSTD
+#	define ZBX_TCP_COMPRESS_EXT	ZBX_TCP_COMPRESS_ZSTD
+#else
+#	define ZBX_TCP_COMPRESS_EXT	ZBX_TCP_COMPRESS
+#endif
+
+#define ZBX_TCP_PROXY_PROTOCOL		(ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS_EXT | ZBX_TCP_BLAKE3)
 
 #define ZBX_TCP_SEC_UNENCRYPTED		1		/* do not use encryption with this socket */
 #define ZBX_TCP_SEC_TLS_PSK		2		/* use TLS with pre-shared key (PSK) with this socket */

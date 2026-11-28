@@ -168,7 +168,8 @@ static int	get_data_from_proxy(zbx_dc_proxy_t *proxy, const char *request, int c
 {
 	zbx_socket_t	s;
 	struct zbx_json	j;
-	int		ret, flags = ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS;
+	int		ret;
+	unsigned char	flags = (0 != proxy->protocol_flags ? proxy->protocol_flags : ZBX_TCP_PROXY_PROTOCOL);
 	char		*buffer = NULL;
 	size_t		buffer_size, reserved = 0;
 
@@ -178,7 +179,7 @@ static int	get_data_from_proxy(zbx_dc_proxy_t *proxy, const char *request, int c
 
 	zbx_json_addstring(&j, "request", request, ZBX_JSON_TYPE_STRING);
 
-	if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
+	if (SUCCEED != zbx_compress_with_flags(j.buffer, j.buffer_size, &buffer, &buffer_size, flags))
 	{
 		zabbix_log(LOG_LEVEL_ERR,"cannot compress data: %s", zbx_compress_strerror());
 		ret = FAIL;
@@ -194,7 +195,7 @@ static int	get_data_from_proxy(zbx_dc_proxy_t *proxy, const char *request, int c
 		if (NULL != ts)
 			zbx_timespec(ts);
 
-		ret = send_data_to_proxy(proxy, &s, buffer, buffer_size, reserved, flags);
+		ret = send_data_to_proxy(proxy, &s, buffer, buffer_size, reserved, (int)flags);
 		zbx_free(buffer);
 
 		if (SUCCEED == ret)
@@ -205,8 +206,7 @@ static int	get_data_from_proxy(zbx_dc_proxy_t *proxy, const char *request, int c
 				{
 					int	flags_response = ZBX_TCP_PROTOCOL;
 
-					if (0 != (s.protocol & ZBX_TCP_COMPRESS))
-						flags_response |= ZBX_TCP_COMPRESS;
+					flags_response |= (s.protocol & (ZBX_TCP_COMPRESS_MASK | ZBX_TCP_BLAKE3));
 
 					zbx_send_response_ext(&s, FAIL, "Zabbix server shutdown in progress", NULL,
 							flags_response, config_timeout);
@@ -217,12 +217,41 @@ static int	get_data_from_proxy(zbx_dc_proxy_t *proxy, const char *request, int c
 				}
 				else
 				{
-					ret = zbx_send_proxy_data_response(proxy, &s, NULL, SUCCEED,
-							ZBX_PROXY_UPLOAD_UNDEFINED, 0);
+					struct zbx_json_parse	jp_recv;
+					char			batch_blake3[ZBX_BLAKE3_HEX_LEN], *verify_err = NULL;
+					unsigned char		batch_digest[ZBX_BLAKE3_OUT_LEN];
+					int			has_blake3 = 0;
 
-					if (SUCCEED == ret)
-						*data = zbx_strdup(*data, s.buffer);
+					batch_blake3[0] = '\0';
+
+					if ('\0' != *s.buffer && SUCCEED == zbx_json_open(s.buffer, &jp_recv) &&
+							SUCCEED != zbx_proxy_batch_verify_blake3(&jp_recv,
+							batch_digest, batch_blake3, &has_blake3, &verify_err))
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "passive proxy \"%s\" batch BLAKE3"
+								" check failed: %s", proxy->name, verify_err);
+						(void)zbx_send_proxy_data_response_ext(proxy, &s, verify_err, FAIL,
+								ZBX_PROXY_UPLOAD_UNDEFINED, config_timeout, NULL);
+						zbx_free(verify_err);
+						ret = FAIL;
+					}
+					else
+					{
+						ret = zbx_send_proxy_data_response_ext(proxy, &s, NULL, SUCCEED,
+								ZBX_PROXY_UPLOAD_UNDEFINED, 0,
+								0 != has_blake3 ? batch_blake3 : NULL);
+
+						if (SUCCEED == ret)
+							*data = zbx_strdup(*data, s.buffer);
+					}
 				}
+			}
+			else if (ZBX_TCP_PROXY_PROTOCOL == flags && 0 == s.read_bytes)
+			{
+				proxy->protocol_flags = ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS;
+				zbx_dc_proxy_set_protocol_flags(proxy->proxyid, proxy->protocol_flags);
+				zabbix_log(LOG_LEVEL_WARNING, "passive proxy \"%s\" rejected extended ZSTD/BLAKE3"
+						" header, falling back to legacy zlib protocol", proxy->name);
 			}
 		}
 
@@ -263,7 +292,10 @@ static int	proxy_send_configuration(zbx_dc_proxy_t *proxy, const zbx_config_vaul
 		int *vault_ret)
 {
 	char				*error = NULL, *buffer = NULL;
-	int				ret, flags = ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, loglevel;
+	int				ret, loglevel;
+	unsigned char			flags = (0 != proxy->protocol_flags ? proxy->protocol_flags :
+						ZBX_TCP_PROXY_PROTOCOL);
+	unsigned char			req_flags = ZBX_TCP_PROTOCOL | (unsigned char)(flags & ZBX_TCP_BLAKE3);
 	zbx_socket_t			s;
 	struct zbx_json			j;
 	struct zbx_json_parse		jp;
@@ -276,11 +308,18 @@ static int	proxy_send_configuration(zbx_dc_proxy_t *proxy, const zbx_config_vaul
 	if (SUCCEED != (ret = connect_to_proxy(proxy, &s, config_trapper_timeout, config_source_ip)))
 		goto out;
 
-	if (SUCCEED != (ret = send_data_to_proxy(proxy, &s, j.buffer, j.buffer_size, reserved, ZBX_TCP_PROTOCOL)))
+	if (SUCCEED != (ret = send_data_to_proxy(proxy, &s, j.buffer, j.buffer_size, reserved, (int)req_flags)))
 		goto clean;
 
 	if (FAIL == (ret = zbx_tcp_recv_ext(&s, 0, 0)))
 	{
+		if (0 != (req_flags & ZBX_TCP_BLAKE3) && 0 == s.read_bytes)
+		{
+			proxy->protocol_flags = ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS;
+			zbx_dc_proxy_set_protocol_flags(proxy->proxyid, proxy->protocol_flags);
+			zabbix_log(LOG_LEVEL_WARNING, "passive proxy \"%s\" rejected extended BLAKE3 header,"
+					" falling back to legacy zlib protocol", proxy->name);
+		}
 		zabbix_log(LOG_LEVEL_WARNING, "cannot receive configuration information from proxy \"%s\": %s",
 				proxy->name, zbx_socket_strerror());
 		goto clean;
@@ -304,7 +343,7 @@ static int	proxy_send_configuration(zbx_dc_proxy_t *proxy, const zbx_config_vaul
 		goto clean;
 	}
 
-	if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
+	if (SUCCEED != zbx_compress_with_flags(j.buffer, j.buffer_size, &buffer, &buffer_size, flags))
 	{
 		zabbix_log(LOG_LEVEL_ERR,"cannot compress data: %s", zbx_compress_strerror());
 		ret = FAIL;
@@ -388,12 +427,15 @@ static int	proxy_process_proxy_data(zbx_ipc_async_socket_t *rtc, zbx_dc_proxy_t 
 		zbx_timespec_t *ts, const zbx_events_funcs_t *events_cbs, int proxydata_frequency, int *more)
 {
 	struct zbx_json_parse	jp;
-	char			*error = NULL, *version_str = NULL;
-	int			version_int, ret = FAIL;
+	char			*error = NULL, *version_str = NULL, batch_blake3[ZBX_BLAKE3_HEX_LEN],
+				more_buf[16];
+	unsigned char		batch_digest[ZBX_BLAKE3_OUT_LEN];
+	int			version_int, ret = FAIL, has_blake3 = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	*more = ZBX_PROXY_DATA_DONE;
+	batch_blake3[0] = '\0';
 
 	if ('\0' == *answer)
 	{
@@ -420,6 +462,26 @@ static int	proxy_process_proxy_data(zbx_ipc_async_socket_t *rtc, zbx_dc_proxy_t 
 		goto out;
 	}
 
+	if (SUCCEED != zbx_proxy_batch_verify_blake3(&jp, batch_digest, batch_blake3, &has_blake3, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" failed batch BLAKE3 verification: %s",
+				proxy->name, proxy->addr, error);
+		goto out;
+	}
+
+	if (0 != has_blake3 && SUCCEED == zbx_dc_proxy_check_batch_blake3(proxy->proxyid, batch_digest))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "duplicate proxy data batch (%s) from passive proxy \"%s\""
+				" detected via BLAKE3, skipping duplicate processing", batch_blake3, proxy->name);
+		if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_MORE, more_buf, sizeof(more_buf), NULL) &&
+				ZBX_PROXY_DATA_MORE == atoi(more_buf))
+		{
+			*more = ZBX_PROXY_DATA_MORE;
+		}
+		ret = SUCCEED;
+		goto out;
+	}
+
 	if (SUCCEED != (ret = zbx_process_proxy_data(rtc, proxy, &jp, ts, PROXY_OPERATING_MODE_PASSIVE, events_cbs,
 			proxydata_frequency, zbx_discovery_update_host_server, zbx_discovery_update_hosts_server,
 			zbx_discovery_update_service_server, zbx_discovery_update_service_down_server,
@@ -429,6 +491,10 @@ static int	proxy_process_proxy_data(zbx_ipc_async_socket_t *rtc, zbx_dc_proxy_t 
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid proxy data: %s",
 				proxy->name, proxy->addr, error);
+	}
+	else if (0 != has_blake3)
+	{
+		zbx_dc_proxy_set_batch_blake3(proxy->proxyid, batch_digest, (int)time(NULL));
 	}
 
 out:

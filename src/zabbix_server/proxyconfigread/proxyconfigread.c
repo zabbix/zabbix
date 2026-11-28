@@ -1680,7 +1680,7 @@ void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 
 	zbx_update_proxy_data(&proxy, version_str, version_int, time(NULL), 0, ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG);
 
-	flags |= ZBX_TCP_COMPRESS;
+	flags = (int)zbx_negotiate_proxy_reply_flags(sock->protocol);
 
 	if (ZBX_PROXY_VERSION_CURRENT != proxy.compatibility)
 	{
@@ -1705,7 +1705,7 @@ void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 
 	loglevel = (ZBX_PROXYCONFIG_STATUS_DATA == status ? LOG_LEVEL_WARNING : LOG_LEVEL_DEBUG);
 
-	if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
+	if (SUCCEED != zbx_compress_with_flags(j.buffer, j.buffer_size, &buffer, &buffer_size, (unsigned char)flags))
 	{
 		zabbix_log(LOG_LEVEL_ERR,"cannot compress data: %s", zbx_compress_strerror());
 		goto clean;

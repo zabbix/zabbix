@@ -536,6 +536,7 @@ typedef struct
 	time_t				last_version_error_time;
 
 	int				pending_history;
+	unsigned char			protocol_flags;
 
 	char				*apm;
 }
@@ -1754,6 +1755,9 @@ void	zbx_dc_sync_unlock(void);
 
 int	zbx_dc_get_proxy_version(zbx_uint64_t proxyid);
 void	zbx_dc_update_proxy_pending_history(zbx_dc_proxy_t *proxy, int flag);
+int	zbx_dc_proxy_check_batch_blake3(zbx_uint64_t proxyid, const unsigned char digest[32]);
+void	zbx_dc_proxy_set_batch_blake3(zbx_uint64_t proxyid, const unsigned char digest[32], int now);
+void	zbx_dc_proxy_set_protocol_flags(zbx_uint64_t proxyid, unsigned char flags);
 
 typedef struct
 {

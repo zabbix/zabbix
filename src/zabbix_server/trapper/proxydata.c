@@ -27,13 +27,13 @@
 #include "zbxtasks.h"
 #include "zbxcacheconfig.h"
 
-int	zbx_send_proxy_data_response(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock, const char *info, int status,
-		int upload_status, int config_timeout)
+int	zbx_send_proxy_data_response_ext(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock, const char *info, int status,
+		int upload_status, int config_timeout, const char *batch_blake3)
 {
 	struct zbx_json		json;
 	zbx_vector_tm_task_t	tasks;
 	int			ret;
-	unsigned char		flags = ZBX_TCP_PROTOCOL;
+	unsigned char		flags = zbx_negotiate_proxy_reply_flags(sock->protocol);
 
 	zbx_vector_tm_task_create(&tasks);
 
@@ -54,6 +54,10 @@ int	zbx_send_proxy_data_response(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock
 	if (SUCCEED == status)
 	{
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+		if (NULL != batch_blake3 && '\0' != *batch_blake3)
+		{
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_BATCH_BLAKE3, batch_blake3, ZBX_JSON_TYPE_STRING);
+		}
 		zbx_tm_get_remote_tasks(&tasks, proxy->proxyid, proxy->compatibility);
 	}
 	else
@@ -64,8 +68,6 @@ int	zbx_send_proxy_data_response(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock
 
 	if (0 != tasks.values_num)
 		zbx_tm_json_serialize_tasks(&json, &tasks);
-
-	flags |= ZBX_TCP_COMPRESS;
 
 	if (SUCCEED == (ret = zbx_tcp_send_ext(sock, json.buffer, strlen(json.buffer), 0, flags, config_timeout)))
 	{
@@ -79,6 +81,12 @@ int	zbx_send_proxy_data_response(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock
 	zbx_vector_tm_task_destroy(&tasks);
 
 	return ret;
+}
+
+int	zbx_send_proxy_data_response(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock, const char *info, int status,
+		int upload_status, int config_timeout)
+{
+	return zbx_send_proxy_data_response_ext(proxy, sock, info, status, upload_status, config_timeout, NULL);
 }
 
 /******************************************************************************
@@ -146,9 +154,12 @@ void	recv_proxy_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, const stru
 		const zbx_timespec_t *ts, const zbx_events_funcs_t *events_cbs, int config_timeout,
 		int proxydata_frequency)
 {
-	int			ret = FAIL, upload_status = 0, status, version_int, responded = 0;
-	char			*error = NULL, *version_str = NULL;
+	int			ret = FAIL, upload_status = 0, status, version_int, responded = 0, has_blake3 = 0;
+	char			*error = NULL, *version_str = NULL, batch_blake3[ZBX_BLAKE3_HEX_LEN];
+	unsigned char		batch_digest[ZBX_BLAKE3_OUT_LEN];
 	zbx_dc_proxy_t		proxy = {0};
+
+	batch_blake3[0] = '\0';
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -176,6 +187,14 @@ void	recv_proxy_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, const stru
 		goto reply;
 	}
 
+	if (SUCCEED != zbx_proxy_batch_verify_blake3(jp, batch_digest, batch_blake3, &has_blake3, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "batch BLAKE3 verification failed for proxy \"%s\" at \"%s\": %s",
+				proxy.name, sock->peer, error);
+		ret = FAIL;
+		goto out;
+	}
+
 	upload_status = ZBX_PROXY_UPLOAD_ENABLED;
 
 	if (FAIL == (ret = zbx_hc_check_proxy(proxy.proxyid, proxy_data_has_pending_history(jp)))
@@ -187,7 +206,13 @@ void	recv_proxy_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, const stru
 
 	if (SUCCEED == ret)
 	{
-		if (SUCCEED != (ret = zbx_process_proxy_data(rtc, &proxy, jp, ts, PROXY_OPERATING_MODE_ACTIVE,
+		if (0 != has_blake3 && SUCCEED == zbx_dc_proxy_check_batch_blake3(proxy.proxyid, batch_digest))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "duplicate proxy data batch (%s) from active proxy \"%s\""
+					" detected via BLAKE3, skipping duplicate processing",
+					batch_blake3, proxy.name);
+		}
+		else if (SUCCEED != (ret = zbx_process_proxy_data(rtc, &proxy, jp, ts, PROXY_OPERATING_MODE_ACTIVE,
 				events_cbs, proxydata_frequency, zbx_discovery_update_host_server,
 				zbx_discovery_update_hosts_server, zbx_discovery_update_service_server,
 				zbx_discovery_update_service_down_server, zbx_discovery_find_host_server,
@@ -197,6 +222,10 @@ void	recv_proxy_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, const stru
 			zabbix_log(LOG_LEVEL_WARNING, "received invalid proxy data from proxy \"%s\" at \"%s\": %s",
 					proxy.name, sock->peer, error);
 			goto out;
+		}
+		else if (0 != has_blake3)
+		{
+			zbx_dc_proxy_set_batch_blake3(proxy.proxyid, batch_digest, (int)time(NULL));
 		}
 	}
 
@@ -209,7 +238,8 @@ void	recv_proxy_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, const stru
 		goto out;
 	}
 reply:
-	zbx_send_proxy_data_response(&proxy, sock, error, ret, upload_status, config_timeout);
+	zbx_send_proxy_data_response_ext(&proxy, sock, error, ret, upload_status, config_timeout,
+			0 != has_blake3 ? batch_blake3 : NULL);
 	responded = 1;
 out:
 	if (SUCCEED == status)	/* moved the unpredictable long operation to the end */
@@ -229,8 +259,7 @@ out:
 	{
 		int	flags = ZBX_TCP_PROTOCOL;
 
-		if (0 != (sock->protocol & ZBX_TCP_COMPRESS))
-			flags |= ZBX_TCP_COMPRESS;
+		flags |= (sock->protocol & (ZBX_TCP_COMPRESS_MASK | ZBX_TCP_BLAKE3));
 
 		zbx_send_response_ext(sock, ret, error, NULL, flags, config_timeout);
 	}
