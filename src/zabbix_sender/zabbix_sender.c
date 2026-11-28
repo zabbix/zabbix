@@ -385,7 +385,11 @@ static void	main_signal_handler(int sig)
 
 		for (i = 0; i < destinations_count; i++)
 		{
-			pid_t	child = *(destinations[i].thread);
+			pid_t child = 0;
+			
+			if (NULL == destinations[i].thread) /* ZBX-28415 */
+				continue;
+			child = *(destinations[i].thread);
 
 			if (ZBX_THREAD_HANDLE_NULL != child)
 				kill(child, sig);
@@ -752,6 +756,8 @@ static int	perform_data_sending(zbx_thread_sendval_args *sendval_args, int old_s
 	}
 
 	ret = sender_threads_wait(threads, threads_args, destinations_count, old_status);
+	for (i = 0; i < destinations_count; i++) /* ZBX-28415 */
+		destinations[i].thread = NULL;
 
 	zbx_free(threads_args);
 	zbx_free(threads);
@@ -790,6 +796,7 @@ static int	sender_add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, z
 			sizeof(zbx_send_destinations_t) * destinations_count);
 
 	zbx_vector_addr_ptr_create(&destinations[destinations_count - 1].addrs);
+	destinations[destinations_count - 1].thread = NULL; /* ZBX-28415 */
 
 	zbx_addr_copy(&destinations[destinations_count - 1].addrs, addrs);
 
