@@ -423,7 +423,7 @@ function zbx_db_search($table, $options, &$sql_parts) {
 		$fieldSearch = [];
 		foreach ($patterns as $pattern) {
 			// escaping parameter that is about to be used in LIKE statement
-			$pattern = mb_strtoupper(strtr($pattern, ['!' => '!!', '%' => '!%', '_' => '!_']));
+			$pattern = strtr($pattern, ['!' => '!!', '%' => '!%', '_' => '!_']);
 
 			$pattern = !$options['searchWildcardsEnabled']
 				? $start.$pattern.'%'
@@ -431,7 +431,7 @@ function zbx_db_search($table, $options, &$sql_parts) {
 
 			$pattern = zbx_dbstr($pattern);
 
-			$fieldSearch[] = DB::uppercaseField($field, $table, $tableShort).$exclude.' LIKE '.$pattern." ESCAPE '!'";
+			$fieldSearch[] = DB::uppercaseField($field, $table, $tableShort).$exclude.' LIKE UPPER('.$pattern.") ESCAPE '!'";
 		}
 
 		$search[$field] = '('.implode($glue, $fieldSearch).')';
