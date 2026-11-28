@@ -1008,11 +1008,11 @@ zabbix_export:
                   value: '{#NAME}'
               trigger_prototypes:
                 - uuid: 987178603ce84f9292091c6196e89ea4
-                  expression: 'count(/Docker by Zabbix agent 2/docker.container_info.state.health["{#NAME}"],2m,,2)>=2'
+                  expression: 'count(/Docker by Zabbix agent 2/docker.container_info.state.health["{#NAME}"],5m,,2)>=3 and last(/Docker by Zabbix agent 2/docker.container_info.state.running["{#NAME}"])=1'
                   name: 'Docker: Container {#NAME}: Health state container is unhealthy'
                   opdata: '{ITEM.LASTVALUE1}'
                   priority: HIGH
-                  description: 'Container health state is unhealthy.'
+                  description: 'Container is running and its health state has been unhealthy for several minutes.'
                   tags:
                     - tag: scope
                       value: availability

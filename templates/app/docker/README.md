@@ -163,7 +163,7 @@ Test availability: `zabbix_get -s docker-host -k docker.info`
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Docker: Container {#NAME}: Health state container is unhealthy|<p>Container health state is unhealthy.</p>|`count(/Docker by Zabbix agent 2/docker.container_info.state.health["{#NAME}"],2m,,2)>=2`|High||
+|Docker: Container {#NAME}: Health state container is unhealthy|<p>Container is running and its health state has been unhealthy for several minutes.</p>|`count(/Docker by Zabbix agent 2/docker.container_info.state.health["{#NAME}"],5m,,2)>=3 and last(/Docker by Zabbix agent 2/docker.container_info.state.running["{#NAME}"])=1`|High||
 |Docker: Container {#NAME}: Container has been stopped with error code||`last(/Docker by Zabbix agent 2/docker.container_info.state.exitcode["{#NAME}"])>0 and last(/Docker by Zabbix agent 2/docker.container_info.state.running["{#NAME}"])=0`|Average|**Manual close**: Yes|
 |Docker: Container {#NAME}: An error has occurred in the container|<p>Container {#NAME} has an error. Acknowledge to close the problem manually.</p>|`last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"],#1)<>last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"],#2) and length(last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"]))>0`|Warning|**Manual close**: Yes|
 
