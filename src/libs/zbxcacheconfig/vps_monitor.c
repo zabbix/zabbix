@@ -75,44 +75,44 @@ void	zbx_vps_monitor_add_collected(zbx_uint64_t values_num)
 	zbx_vps_monitor_t	*monitor = &(get_dc_config())->vps_monitor;
 	time_t			now;
 
-	if (0 == monitor->values_limit)
-		return;
-
 	now = time(NULL);
 
 	zbx_mutex_lock(vps_lock);
 
-	if (ZBX_VPS_FLUSH_PERIOD <= now - monitor->last_flush)
-	{
-		if (monitor->values_limit > monitor->values_num)
+	if (0 != monitor->values_limit) {
+		if (ZBX_VPS_FLUSH_PERIOD <= now - monitor->last_flush)
 		{
-			if (monitor->overcommit > monitor->values_limit - monitor->values_num)
-				monitor->overcommit -= monitor->values_limit - monitor->values_num;
-			else
-				monitor->overcommit = 0;
-
-			monitor->values_num = 0;
-		}
-		else
-		{
-			zbx_uint64_t	overcommit_available = monitor->overcommit_limit - monitor->overcommit;
-
-			if (monitor->values_num <= monitor->values_limit + overcommit_available)
+			if (monitor->values_limit > monitor->values_num)
 			{
-				monitor->overcommit += monitor->values_num - monitor->values_limit;
+				if (monitor->overcommit > monitor->values_limit - monitor->values_num)
+					monitor->overcommit -= monitor->values_limit - monitor->values_num;
+				else
+					monitor->overcommit = 0;
+
 				monitor->values_num = 0;
 			}
 			else
 			{
-				monitor->values_num -= monitor->values_limit + overcommit_available;
-				monitor->overcommit = monitor->overcommit_limit;
+				zbx_uint64_t	overcommit_available = monitor->overcommit_limit - monitor->overcommit;
+
+				if (monitor->values_num <= monitor->values_limit + overcommit_available)
+				{
+					monitor->overcommit += monitor->values_num - monitor->values_limit;
+					monitor->values_num = 0;
+				}
+				else
+				{
+					monitor->values_num -= monitor->values_limit + overcommit_available;
+					monitor->overcommit = monitor->overcommit_limit;
+				}
 			}
+
+			monitor->last_flush = now;
 		}
+		monitor->values_num += values_num;
+  }
 
-		monitor->last_flush = now;
-	}
-
-	monitor->values_num += values_num;
+	monitor->total_collected_num += values_num;
 
 	zbx_mutex_unlock(vps_lock);
 }
@@ -172,6 +172,7 @@ void	zbx_vps_monitor_get_stats(zbx_vps_monitor_stats_t *stats)
 
 	zbx_mutex_lock(vps_lock);
 	stats->overcommit = monitor->overcommit;
+	stats->collected_num = monitor->total_collected_num;
 	stats->written_num = monitor->total_values_num;
 	zbx_mutex_unlock(vps_lock);
 
